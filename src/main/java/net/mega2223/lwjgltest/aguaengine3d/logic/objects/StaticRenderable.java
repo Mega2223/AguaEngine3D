@@ -5,6 +5,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class StaticRenderable implements RenderableObject{
     List<Model> models = new ArrayList<>();
@@ -37,5 +38,13 @@ public class StaticRenderable implements RenderableObject{
         this.position[0] = position[0];
         this.position[1] = position[1];
         this.position[2] = position[2];
+    }
+
+    public void generateBuilding(int gridX, int gridY){
+        int[][] grid = new int[gridX][gridY];
+        Random r = new Random();
+        int[] center = {gridX/2,gridY/2};
+
+
     }
 }

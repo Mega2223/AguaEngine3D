@@ -39,13 +39,5 @@ public class GeneratedMuseum implements RenderableObject {
         this.pos = position;
     }
 
-    public static TexturedModel generateWall(float sx, float sy, float h, float ex, float ey, int texture){
-        float[] coords = {sx,sy,0,0 , sx,sy,h,0 , ex,ey,0,0 , ex,ey,h,0};
-        int[] indexes = {0,1,2, 2,3,1};
-        float[] textureShift = {0,0, 0,1, 1,1, 1,0};//todo temp
-        TexturedModel ret = new TexturedModel(
-                coords,indexes,textureShift,texture
-        );
-        return ret;
-    }
+
 }

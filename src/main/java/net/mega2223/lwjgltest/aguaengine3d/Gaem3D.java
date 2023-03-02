@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayBasedTextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
@@ -69,7 +70,14 @@ public class Gaem3D {
         }
         gat.setVertices(ver);
 
+        int wallTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\TijoloSuave.png");
 
+        Model[] walls = {
+                StructureUtils.generateWall(5,5,5,-5,3,0,wallTexture),
+                StructureUtils.generateWall(5,-5,-5,-5,3,0,wallTexture),
+                StructureUtils.generateWall(-5,-5,-5,5,3,0,wallTexture),
+                StructureUtils.generateWall(-5,5,5,5,3,0,wallTexture)
+        };
 
         context.addObject(new StaticRenderable(test));
         context.addObject(new StaticRenderable(pillar));
@@ -85,7 +93,23 @@ public class Gaem3D {
                 ac.setVertices(relativeVertices);
             }
         });
+        context.addObject(new StaticRenderable(walls));
 
+        Model AMONGUS = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "\\IMPOSTER.obj").split("\n"), new SolidColorShaderProgram(1, 0, 0));
+        float[] relativeVertices = AMONGUS.getRelativeVertices();
+        for (int i = 0; i < relativeVertices.length; i+=4) {
+            float[] newPos = {relativeVertices[i],relativeVertices[i+1],relativeVertices[i+2],0};
+            MatrixTranslator.rotateVector3(newPos,0,Math.PI/2,0);
+            for (int j = 0; j < 4; j++) {
+                relativeVertices[i+j]=newPos[j];
+            }
+            relativeVertices[i]+=20;
+            relativeVertices[i+2]+=20;
+
+        }
+        AMONGUS.setVertices(relativeVertices);
+
+        context.addObject(new StaticRenderable(AMONGUS));
 
         //Render Logic be like:
         long unrendered = 0;
