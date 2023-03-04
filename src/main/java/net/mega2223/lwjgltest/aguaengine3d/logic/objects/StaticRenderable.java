@@ -44,7 +44,8 @@ public class StaticRenderable implements RenderableObject{
         int[][] grid = new int[gridX][gridY];
         Random r = new Random();
         int[] center = {gridX/2,gridY/2};
-
-
+    }
+    public void addModel(Model model){
+        models.add(model);
     }
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class TexturedModel extends Model{
 
     int texture;
-    float[] textureShift;
+    protected float[] textureShift;
 
     public TexturedModel(float[] triangles,int[] indices, float[] textureShift, String textureDir) {
         super(triangles,indices,new TextureShaderProgram());
@@ -31,7 +31,7 @@ public class TexturedModel extends Model{
     }
     protected void init(float[] textureData, int texture){
         this.texture = texture;
-        this.textureShift = textureData;
+        this.setTextureShift(textureData);
         textureSamplerUniformCoord = GL30.glGetUniformLocation(shader.getID(),"samplerTexture");
     };
 
@@ -42,7 +42,7 @@ public class TexturedModel extends Model{
         if(additionalVBOS != null){siz += additionalVBOS.length;}
 
         int VBOS[] = new int[siz];
-        VBOS[0] = RenderingManager.genArrayBufferObject(textureShift,GL30.GL_DYNAMIC_DRAW);
+        VBOS[0] = RenderingManager.genArrayBufferObject(getTextureShift(),GL30.GL_DYNAMIC_DRAW);
         for (int i = 1; i < VBOS.length && additionalVBOS != null; i++) {
             VBOS[i] = additionalVBOS[i-1];
         }
@@ -52,8 +52,6 @@ public class TexturedModel extends Model{
 
     int textureSamplerUniformCoord = -1;
 
-
-
     @Override
     public void drawnVAO() {
         if(VBOS == null || VAO == -1){
@@ -61,7 +59,7 @@ public class TexturedModel extends Model{
         }
 
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,VBOS[VAO_TEXTURE_DATA_LOCATION]);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, textureShift,GL30.GL_DYNAMIC_DRAW);
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, getTextureShift(),GL30.GL_DYNAMIC_DRAW);
         GL30.glBindVertexArray(VAO);
         GL30.glUseProgram(shader.getID());
         GL30.glEnableVertexAttribArray(1);
@@ -141,7 +139,7 @@ public class TexturedModel extends Model{
 
     public static void debugTexturedModel(TexturedModel model){
         float[] vertices = model.vertices;
-        float[] textureData = model.textureShift;
+        float[] textureData = model.getTextureShift();
         int[] indexes = model.indexes;
 
         StringBuilder debug = new StringBuilder("Debugging model with " + vertices.length + " vertices\n");
@@ -161,4 +159,11 @@ public class TexturedModel extends Model{
         System.out.println(debug);
     };
 
+    public float[] getTextureShift() {
+        return textureShift.clone();
+    }
+
+    public void setTextureShift(float[] textureShift) {
+        this.textureShift = textureShift;
+    }
 }

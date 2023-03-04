@@ -4,6 +4,8 @@ layout(location = 0) in vec4 vertexPosition_modelspace;
 uniform mat4 translation;
 uniform mat4 projection;
 
+out vec4 worldCoord;
+
 void main(){
 
     gl_Position.xyz = vertexPosition_modelspace.xyz;

@@ -14,7 +14,7 @@ void main(){
     vec2 coord = vec2(gl_FragCoord.x/1400,1-gl_FragCoord.y/800);
     color = texture(samplerTexture,coord);
 
-    float range = (gl_FragCoord.z / gl_FragCoord.w);
+    float range = (distance(worldCoord,vec4(0,0,0,0)));
 
     range-=fogStart;
     range/=fogDissolve;

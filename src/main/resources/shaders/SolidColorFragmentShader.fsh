@@ -1,5 +1,6 @@
 #version 330 core
 
+in vec4 worldCoord;
 
 uniform vec3 color2;
 
@@ -12,7 +13,7 @@ out vec4 color;
 void main(){
     color = vec4(color2.xyz,1);
 
-    float range = (gl_FragCoord.z / gl_FragCoord.w);
+    float range = (distance(worldCoord,vec4(0,0,0,0)));
 
     range-=fogStart;
     range/=fogDissolve;

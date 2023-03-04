@@ -10,6 +10,7 @@ public interface ShaderProgram {
     void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix);
 
     default void uniformVec4(int location,float[] v4){
+        GL30.glUseProgram(getID());
         GL30.glUniform4f(location,v4[0],v4[1],v4[2],v4[3]);
     };
 }

@@ -1,20 +1,22 @@
 package net.mega2223.lwjgltest.aguaengine3d;
 
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayBasedTextureShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.logic.objects.StaticRenderable;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.CallbackI;
+
+import java.util.Vector;
 
 @SuppressWarnings("unused")
 
@@ -22,8 +24,9 @@ public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
-    public static final float[] camera = {0,.65f,10,0};
+    public static final float[] camera = {0,.65f,0,0};
     public static final int TARGET_FPS = 120;
+    public static final float[] skyColor = {1f,0,0,1};
     static WindowManager manager;
     static Context context = new Context();
 
@@ -32,7 +35,7 @@ public class Gaem3D {
         //GLFW
         manager = new WindowManager(300,300, TITLE);
         manager.init();
-        manager.clearColor(.5f, .5f, .6f, 1f);
+        manager.clearColor(skyColor[0],skyColor[1], skyColor[2],skyColor[3]);
 
         manager.addUpdateEvent(() -> {
             double s = Math.sin(camera[3]);
@@ -48,68 +51,51 @@ public class Gaem3D {
         //pra eu não ter que maximizar na gravação
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
-        //test area
-        Model test = TexturedModel.loadTexturedModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\SimpleFloor.obj").split("\n"),
+        //tests
+        TexturedModel model = TexturedModel.loadTexturedModel(
+                Utils.readFile(Utils.MODELS_DIR + "\\ABPattern.obj").split("\n"),
                 new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
-        Model pillar = Model.loadModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\Pilar.obj").split("\n"),
-                new SolidColorShaderProgram(.65f,.65f,.65f)
-        );
-        TexturedModel gat = TexturedModel.loadTexturedModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),
-                new DisplayBasedTextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
-        );
-        //scales down the cube once
-        float[] ver = gat.getRelativeVertices();
-        for (int i = 0; i < ver.length; i++) {
-            ver[i]/=4;
+        StaticRenderable mod = new StaticRenderable(model);
+        float[] ver = model.getRelativeVertices();
+        float[] texVer = model.getTextureShift();
+        int[] indices = model.getIndexes();
+
+        for (int i = 0; i < texVer.length; i++) {
+            texVer[i]-=.5f;
+            texVer[i]*=1.5;
         }
-        gat.setVertices(ver);
+        VectorTranslator.scaleAllVectors(ver,1.5f);
 
-        int wallTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\TijoloSuave.png");
-
-        Model[] walls = {
-                StructureUtils.generateWall(5,5,5,-5,3,0,wallTexture),
-                StructureUtils.generateWall(5,-5,-5,-5,3,0,wallTexture),
-                StructureUtils.generateWall(-5,-5,-5,5,3,0,wallTexture),
-                StructureUtils.generateWall(-5,5,5,5,3,0,wallTexture)
-        };
-
-        context.addObject(new StaticRenderable(test));
-        context.addObject(new StaticRenderable(pillar));
-        context.addObject(new StaticRenderable(gat){
-            @Override
-            public void doLogic(int itneration) {
-                this.setPosition(new float[]{0, ((float) Math.cos((float)itneration/30)+10)/10,0,0});
-                Model ac = this.getModels().get(0);
-                float[] relativeVertices = ac.getRelativeVertices();
-                for (int i = 0; i < relativeVertices.length; i+=4) {
-                    MatrixTranslator.rotateVector3(relativeVertices,.05,0.00001,.01,i);
-                }
-                ac.setVertices(relativeVertices);
+        model.setVertices(ver);
+        model.setTextureShift(texVer);
+        int tex = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\TijoloSuave.png");
+        for (int i = 0; i < indices.length; i+=3) {
+            float[][] tAct = new float[3][];
+            for (int j = 0; j < 3; j++) {
+                int act = indices[i+j]*4;
+                float[] vAct = {ver[act],ver[act+1],ver[act+2],ver[act+3]};
+                tAct[j] = vAct;
             }
-        });
-        context.addObject(new StaticRenderable(walls));
 
-        Model AMONGUS = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "\\IMPOSTER.obj").split("\n"), new SolidColorShaderProgram(1, 0, 0));
-        float[] relativeVertices = AMONGUS.getRelativeVertices();
-        for (int i = 0; i < relativeVertices.length; i+=4) {
-            float[] newPos = {relativeVertices[i],relativeVertices[i+1],relativeVertices[i+2],0};
-            MatrixTranslator.rotateVector3(newPos,0,Math.PI/2,0);
-            for (int j = 0; j < 4; j++) {
-                relativeVertices[i+j]=newPos[j];
-            }
-            relativeVertices[i]+=20;
-            relativeVertices[i+2]+=20;
+            mod.addModel(StructureUtils.generateWall(tAct[0][0],tAct[0][2],tAct[1][0],tAct[1][2],0,-10,tex));
+            mod.addModel(StructureUtils.generateWall(tAct[1][0],tAct[1][2],tAct[2][0],tAct[2][2],0,-10,tex));
+            mod.addModel(StructureUtils.generateWall(tAct[2][0],tAct[2][2],tAct[0][0],tAct[0][2],0,-10,tex));
 
         }
-        AMONGUS.setVertices(relativeVertices);
+        StaticRenderable renderable = new StaticRenderable(
+                new TexturedModel(
+                        new float[]{-3,-3,-15,0 , -3,3,-15,0 , 3,3,-15,0 , 3,-3,-15,0},
+                        new int[]{0,1,2,3,2,0},
+                        new float[]{0,1,0,0,1,0,1,1},
+                        TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\TROLLF.png")
+                )
+        );
 
-        context.addObject(new StaticRenderable(AMONGUS));
+        context.setActive(true).addObject(mod).addObject(renderable).setBackGroundColor(skyColor);
+
+
 
         //Render Logic be like:
         long unrendered = 0;
