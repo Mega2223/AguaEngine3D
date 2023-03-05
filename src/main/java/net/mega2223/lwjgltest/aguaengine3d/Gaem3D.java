@@ -57,21 +57,14 @@ public class Gaem3D {
 
         //tests
 
-        List<Model> predios = new ArrayList<>();
+        TexturedModel test = new TexturedModel(
+                new float[]{-10,0,-10,0, 10,0,-10,0, 10,0,10,0, -10,0,10,0},
+                new int[]{0,1,2,3,2,0},
+                new float[]{0,0,20,0,20,20,0,20},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
+        );
 
-        Random r = new Random();
-
-        SolidColorShaderProgram solid = new SolidColorShaderProgram(.7f,.8f,.6f);
-
-        for (float i = 0; i < Math.PI*2; i+=Math.PI/10) {
-            float cX = (float) (Math.sin(i));
-            float cY = (float) (Math.cos(i));
-
-            predios.add(StructureUtils.genBuildingModel(0,4,cX-.1f,cX+.1f,cY-.1f,cY+.1f,solid));
-
-        }
-
-        context.addObject(new StaticRenderable(predios));
+        context.addObject(new StaticRenderable(test));
 
         //Render Logic be like:
         long unrendered = 0;
