@@ -3,6 +3,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.BuildingGenerator;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
@@ -65,6 +66,9 @@ public class Gaem3D {
         );
 
         context.addObject(new StaticRenderable(test));
+
+        int bricksTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\building styles\\Tijolos.png");
+        context.addObject(new StaticRenderable(BuildingGenerator.genBlock(.1f,5,3,200,bricksTexture)));
 
         //Render Logic be like:
         long unrendered = 0;
