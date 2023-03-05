@@ -17,6 +17,7 @@ public class StaticRenderable implements RenderableObject{
     public StaticRenderable(Model model){
         this.models.add(model);
     }
+    public StaticRenderable(List<Model> models){this.models.addAll(models);}
 
     @Override
     public void doLogic(int itneration) {
@@ -48,4 +49,8 @@ public class StaticRenderable implements RenderableObject{
     public void addModel(Model model){
         models.add(model);
     }
+    public void addModels(List<Model> models){
+        models.addAll(models);
+    }
+
 }

@@ -13,5 +13,6 @@ void main(){
 
     vec4 toTrans = vec4(gl_Position.xyzw);
     gl_Position = projection * (toTrans*translation);
+    worldCoord = gl_Position;
 
 }

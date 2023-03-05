@@ -13,7 +13,6 @@ uniform vec4 fogColor = vec4(.5,.5,.6,1);
 out vec4 color;
 
 void main(){
-
     color = texture(samplerTexture,texturePosition);
 
     float range = (distance(worldCoord,vec4(0,0,0,0)));
