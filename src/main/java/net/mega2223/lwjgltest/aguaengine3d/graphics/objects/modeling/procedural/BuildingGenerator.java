@@ -5,6 +5,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedMod
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class BuildingGenerator {
 
@@ -22,6 +23,7 @@ public class BuildingGenerator {
         List<Integer> indices = new ArrayList();
 
         float[] wallTextureCoords = {0,0 , 0,.5f , .5f,0 , .5f,.5f};
+        float[] windowTextureCoords = {0f,.5f , 0f,1f , .5f,.5f , .5f,1f};
 
         //constructs the walls that run in paralell with the z axis
         for (int x = 0; x < sX; x++) {
@@ -40,10 +42,15 @@ public class BuildingGenerator {
                 for(float act : walls){vertices.add(act);}
                 for(int act : wallsIndices){indices.add(act);}
 
-
-                for (int i = 0; i < wallTextureCoords.length; i++) {textureCoords.add(wallTextureCoords[i]);}
-                for (int i = 0; i < wallTextureCoords.length; i++) {textureCoords.add(wallTextureCoords[i]);}
-
+                Random r = new Random();
+                for (int i = 0; i < 2; i++) {
+                    float texCoord[] = wallTextureCoords;
+                    float chance = r.nextFloat();
+                    if(chance>.8f){
+                        texCoord = windowTextureCoords;
+                    }
+                    for(int f = 0; f < texCoord.length;f++){textureCoords.add(texCoord[f]);}
+                }
             }
         }
         //x axis pararell walls
@@ -63,10 +70,15 @@ public class BuildingGenerator {
                 for(float act : walls){vertices.add(act);}
                 for(int act : wallsIndices){indices.add(act);}
 
-
-                for (int i = 0; i < wallTextureCoords.length; i++) {textureCoords.add(wallTextureCoords[i]);}
-                for (int i = 0; i < wallTextureCoords.length; i++) {textureCoords.add(wallTextureCoords[i]);}
-
+                Random r = new Random();
+                for (int i = 0; i < 2; i++) {
+                    float texCoord[] = wallTextureCoords;
+                    float chance = r.nextFloat();
+                    if(chance>.9f){
+                        texCoord = windowTextureCoords;
+                    }
+                    for(int f = 0; f < texCoord.length;f++){textureCoords.add(texCoord[f]);}
+                }
             }
         }
 

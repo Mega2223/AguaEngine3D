@@ -1,27 +1,14 @@
 package net.mega2223.lwjgltest.aguaengine3d;
 
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.BuildingGenerator;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
-import net.mega2223.lwjgltest.aguaengine3d.logic.objects.StaticRenderable;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.CallbackI;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
 
 @SuppressWarnings("unused")
 
@@ -65,10 +52,10 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
         );
 
-        context.addObject(new StaticRenderable(test));
+        context.addObject(test);
 
         int bricksTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\building styles\\Tijolos.png");
-        context.addObject(new StaticRenderable(BuildingGenerator.genBlock(.1f,5,3,200,bricksTexture)));
+        context.addObject(BuildingGenerator.genBlock(1f,5,3,3,bricksTexture));
 
         //Render Logic be like:
         long unrendered = 0;

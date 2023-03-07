@@ -1,0 +1,9 @@
+name=BrickStyle1
+
+validSidings=%any%
+maxFloors=10
+minFloors=1
+minSize=2x2
+frequency=1
+
+floors=Hall.procf,Floor.procf,Ceiling.procf

@@ -15,7 +15,7 @@ public class Model {
     public static final int VAO_TEXTURE_DATA_LOCATION = 2;
 
     protected float[] vertices; //each vertex has 4 attributes
-
+    protected float[] coords = {0,0,0,0};
     protected int[] indexes;
 
     protected ShaderProgram shader;
@@ -147,5 +147,17 @@ public class Model {
         }
         GL30.glUseProgram(this.shader.getID());
         drawnIndexBufferVBO(VBOS[VAO_VERTEX_DATA_LOCATION],GL30.GL_TRIANGLES,4,this.shader, getVBOS()[VAO_INDEX_DATA_LOCATION], indexes.length);
+    }
+
+    public float[] getCoords(){
+        return coords.clone();
+    }
+    public void setCoords(float[] coords){
+        for (int i = 0; i < this.coords.length; i++) {this.coords[i] = coords[i];}
+    }
+
+    //for subclasses
+    public void doLogic(int itneration){
+
     }
 }
