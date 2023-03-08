@@ -1,0 +1,32 @@
+name=StandardBlock
+
+bias=1
+
+compartibleNorth=WindowBlock,StandardBlock
+compartibleSouth=WindowBlock,StandardBlock
+compartibleWest=WindowBlock,StandardBlock
+compartibleEast=WindowBlock,StandardBlock
+
+wallNorth:
+forceRender=false
+vertices=0,0,.5,0 , 0,1,.5,0 , 1,0,.5,0 , 1,1,.5,0
+textureCoords=0,0 , 0,.5 , .5,.5 , .5,0
+indices=0,1,2,3,2,1
+
+wallSouth:
+forceRender=false
+vertices=0,0,-.5,0 , 0,1,-.5,0 , 1,0,-.5,0 , 1,1,-.5,0
+textureCoords=0,0 , 0,.5 , .5,.5 , .5,0
+indices=0,1,2,3,2,1
+
+wallEast:
+forceRender=false
+vertices=.5,0,0,0 , .5,0,.5,0 , .5,.5,0,0 , .5,.5,.5,0
+textureCoords=0,0 , 0,.5 , .5,.5 , .5,0
+indices=0,1,2,3,2,1
+
+wallWest:
+forceRender=false
+vertices=-.5,0,0,0 , -.5,0,.5,0 , -.5,.5,0,0 , -.5,.5,.5,0
+textureCoords=0,0 , 0,.5 , .5,.5 , .5,0
+indices=0,1,2,3,2,1
