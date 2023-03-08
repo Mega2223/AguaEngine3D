@@ -2,7 +2,7 @@ TODO List:
 - A tag system
 
 
-##General connotation:
+## General connotation:
 All assertments ***must*** be separed by line breaks
 
 Configurations follow the following format:
@@ -25,12 +25,12 @@ Lists are usually separated by comma, like:
 
 `var=val1,val2,val3`
 
-##Built in variables:
+## Built in variables:
 _%any%_ - valid in any file listing, means that it is indifferent towards other buildings, blocks or floors.
 
 
-##Procedural Building (procb) configs:
-###Required:
+## Procedural Building (procb) configs:
+### Required:
 
 name - Name to be identified in other files and such
 
@@ -40,7 +40,7 @@ bias - Chance of generating, standard is 1
 
 floors - Valid floor names. Array of strings
 
-###Optional:
+### Optional:
 
 maxFloors - Maximum of floors
 
@@ -48,9 +48,9 @@ minFloors - Minimum of floors
 
 minSize - Minimum grid size, two sized array of integers
 
-##Procedural Floor (procf)
+## Procedural Floor (procf)
 
-###Required:
+### Required:
 
 name - Name to be identified in other files and such
 
@@ -60,13 +60,13 @@ validAbove - Valid floor names to be below this one, use an array of floor names
 
 blocks - Blocks valid at this level
 
-###Optional:
+### Optional:
 
 height - Number of voxel y coordinates that the floor occupies, defaults to 1
 
-##Procedural Block (procbloc)
+## Procedural Block (procbloc)
 
-###Required:
+### Required:
 
 name - Name to be identified in other files and such
 
@@ -76,7 +76,7 @@ compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String array
 
 wallNorth,wallSouth,wallEast,wallWest - Declares to the interpreter which wall the file is currently defining
 
-####Wall specific variables:
+#### Wall specific variables:
 
 forceRender - if the wall should render even if the rendered side is connected, may be `true` or `false`
 
