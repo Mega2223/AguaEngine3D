@@ -1,8 +1,9 @@
-###General connotation:
-All assertments ***must*** be separed by line breaks
-
 TODO List:
 - A tag system
+
+
+##General connotation:
+All assertments ***must*** be separed by line breaks
 
 Configurations follow the following format:
 
@@ -24,12 +25,12 @@ Lists are usually separated by comma, like:
 
 `var=val1,val2,val3`
 
-###Built in variables:
+##Built in variables:
 _%any%_ - valid in any file listing, means that it is indifferent towards other buildings, blocks or floors.
 
 
-###Procedural Building (procb) configs:
-####Required:
+##Procedural Building (procb) configs:
+###Required:
 
 name - Name to be identified in other files and such
 
@@ -39,7 +40,7 @@ bias - Chance of generating, standard is 1
 
 floors - Valid floor names. Array of strings
 
-####Optional:
+###Optional:
 
 maxFloors - Maximum of floors
 
@@ -47,9 +48,9 @@ minFloors - Minimum of floors
 
 minSize - Minimum grid size, two sized array of integers
 
-###Procedural Floor (procf)
+##Procedural Floor (procf)
 
-####Required:
+###Required:
 
 name - Name to be identified in other files and such
 
@@ -59,13 +60,13 @@ validAbove - Valid floor names to be below this one, use an array of floor names
 
 blocks - Blocks valid at this level
 
-####Optional:
+###Optional:
 
 height - Number of voxel y coordinates that the floor occupies, defaults to 1
 
-###Procedural Block (procbloc)
+##Procedural Block (procbloc)
 
-####Required:
+###Required:
 
 name - Name to be identified in other files and such
 
@@ -73,3 +74,14 @@ bias - Chance of generating, standard is 1
 
 compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String arrays defining which blocks can connect with this on, %any% or %none% is also valid
 
+wallNorth,wallSouth,wallEast,wallWest - Declares to the interpreter which wall the file is currently defining
+
+####Wall specific variables:
+
+forceRender - if the wall should render even if the rendered side is connected, may be `true` or `false`
+
+vertices - set of floats that represent vertices from the wall model, each vertex must have 4 points, the fourth one shall always be 0
+
+textureCoords - respective coordinates in the building texture file for each vertex, must be exactly half the size of the vertices list, also a set of floats
+
+indices - triangles that form the wall's shape, each 3 indices makes a triangle corresponding to the vertices of said coordinates, it is a set of integers
