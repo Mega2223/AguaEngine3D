@@ -1,5 +1,7 @@
-package net.mega2223.lwjgltest.aguaengine3d.misc.proceduralbuildinggenerator;
+package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 
@@ -23,9 +25,10 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     ArrayList<ProceduralBuildingBlock> allBlocks = new ArrayList<>();
     ArrayList<ProceduralBuildingFloor> allFloors = new ArrayList<>();
 
-    public ProceduralBuilding(String[] data, String sourceDir){
+    public ProceduralBuilding(String sourceDir){
         sourceDirectory = sourceDir;
         texture = TextureManager.loadTexture(sourceDir+"\\Texture.png");
+        String[] data = Utils.readFile(sourceDir+"\\Main.procb").split("\n");
         //maybe put it in a constant as the directory names?
         for (int i = 0; i < data.length; i++) {
             String[] cmd = data[i].split("=");
@@ -53,26 +56,31 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
 
     private void compileFloors(String[] names){
         for(String act : names){
-            ProceduralBuildingFloor floor = new ProceduralBuildingFloor(Utils.readFile(sourceDirectory+"\\"+act+ PROCEDURAL_FLOOR_EXTENSION_NAME).split("\n"));
+            ProceduralBuildingFloor floor = new ProceduralBuildingFloor(Utils.readFile(sourceDirectory+"\\"+act+ PROCEDURAL_FLOOR_EXTENSION_NAME).split("\n"),this);
             allFloors.add(floor);
         }
     }
 
     private void compileBlocks(String[] names){
         for(String act : names){
-            ProceduralBuildingBlock block = new ProceduralBuildingBlock(Utils.readFile(sourceDirectory+"\\"+act+ PROCEDURAL_BLOCK_EXTENSION_NAME).split("\n"),textures);
+            ProceduralBuildingBlock block = new ProceduralBuildingBlock(Utils.readFile(sourceDirectory+"\\"+act+ PROCEDURAL_BLOCK_EXTENSION_NAME).split("\n"),this);
             allBlocks.add(block);
         }
     }
 
-    public void generate(int[][] pattern){
+    public TexturedModel generate(int[][] pattern){
 
         Random r = new Random();
         int height = r.nextInt(maxFloors-minFloors)+minFloors;
+        TexturedModel[] floors = new TexturedModel[height];
 
         for (int f = 0; f < height; f++) {
-
+            //todo add object-indenpendent check to see if floor can fit it's desired level
+            //todo floor height compat
+            floors[f] = allFloors.get(r.nextInt(allFloors.size())).generate(pattern,f);
         }
+
+        return ModelUtils.mergeModels(floors,texture);
     }
 
     public ProceduralBuildingBlock getBlock(String name){

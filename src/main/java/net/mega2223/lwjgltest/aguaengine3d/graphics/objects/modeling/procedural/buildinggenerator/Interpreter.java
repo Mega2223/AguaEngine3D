@@ -1,4 +1,4 @@
-package net.mega2223.lwjgltest.aguaengine3d.misc.proceduralbuildinggenerator;
+package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator;
 
 import java.util.ArrayList;
 import java.util.List;

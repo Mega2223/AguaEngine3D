@@ -1,0 +1,5 @@
+name=StandardFloor
+validAbove=%any%
+height=1
+bias=1
+blocks=StandardBlock

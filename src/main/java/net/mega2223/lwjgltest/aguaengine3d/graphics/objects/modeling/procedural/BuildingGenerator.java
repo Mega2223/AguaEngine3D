@@ -11,12 +11,7 @@ public class BuildingGenerator {
 
     private BuildingGenerator(){}
 
-    public static void generateBuilding (int templateTexture,float scale){
-
-
-
-    }
-
+    @Deprecated //use the procedural generation instead
     public static TexturedModel genBlock(float scale, float sX, float sZ, float h, int texture){
         List<Float> vertices = new ArrayList();
         List<Float> textureCoords = new ArrayList();

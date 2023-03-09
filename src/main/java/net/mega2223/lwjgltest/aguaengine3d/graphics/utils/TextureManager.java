@@ -13,7 +13,9 @@ import java.nio.IntBuffer;
 public class TextureManager {
     private TextureManager(){}
 
-    public static int load(String path) {
+    //this is the sole method that is NOT licenced under the project licence
+    //since this code ain't mine
+    public static int loadTexture(String path) {
         int width, height;
         int[] pixels;
         try {
@@ -52,8 +54,4 @@ public class TextureManager {
         return result;
     }
 
-
-    public static int loadTexture(String texturePath){
-        return load(texturePath);
-    }
 }

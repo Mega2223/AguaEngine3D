@@ -1,12 +1,11 @@
 package net.mega2223.lwjgltest.aguaengine3d;
 
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.BuildingGenerator;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -46,22 +45,31 @@ public class Gaem3D {
 
         //tests
 
-        int texture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
-        TexturedModel test = new TexturedModel(
-                new float[]{-10,0,-10,0, 10,0,-10,0, 10,0,10,0, -10,0,10,0},
-                new int[]{0,1,2,3,2,0},
-                new float[]{0,0,20,0,20,20,0,20},
-                texture
-        );
-        TexturedModel test2 = new TexturedModel(
-              new float[]{-10,2,-10,0, 10,2,-10,0, 10,2,10,0, -10,2,10,0},
-                new int[]{0,1,2,3,2,0},
-                new float[]{0,0,20,0,20,20,0,20},
-                texture
-        );
-        TexturedModel test3 = ModelUtils.mergeModels(new TexturedModel[]{test,test2},texture);
+        String buildingDir = Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1";
+        ProceduralBuilding building = new ProceduralBuilding(buildingDir);
 
-        context.addObject(test3);
+        int texture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
+        TexturedModel chessBoardFloor = new TexturedModel(
+                new float[]{-40,0,-40,0, 40,0,-40,0, 40,0,40,0, -40,0,40,0},
+                new int[]{0,1,2,3,2,0},
+                new float[]{0,0,80,0,80,80,0,80},
+                texture
+        );
+        context.addObject(chessBoardFloor);
+
+        long milis = System.currentTimeMillis();
+
+        context.addObject(building.generate(
+                new int[][]{
+                        {0,1,0,1},
+                        {1,1,1,1}
+                        //{0,1,0,1},
+
+                }
+        ));
+
+        System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
+
         //Render Logic be like:
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();

@@ -1,5 +1,6 @@
-package net.mega2223.lwjgltest.aguaengine3d.misc.proceduralbuildinggenerator;
+package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 
 import java.util.ArrayList;
@@ -13,16 +14,16 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     float[][] textureCoordinates = new float[4][];
     int[][] indices = new int[4][];
     boolean[] forceRender = new boolean[4];
-    String[][] compartibles = new String[4][];
-    int texture;
+    String[][] compartiblesForAdjacency = new String[4][];
 
     List<ProceduralBuildingBlock>[] compartibleAdjacentBuildingBlocks = new List[4];
 
     float bias = -1;
+    ProceduralBuilding context;
     String name = null;
 
-    public ProceduralBuildingBlock(String[] data, int texture){
-        this.texture = texture;
+    public ProceduralBuildingBlock(String[] data, ProceduralBuilding context){
+        this.context = context;
         int currentFace = -1;
         //fOr StAtEmEnT cAN Be rePlACeD wITh eNhAncEd 'fOr' 🤓 🤓 🤓
         for (int i = 0; i < data.length; i++) {
@@ -49,16 +50,16 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                             bias = Float.parseFloat(cmd[1]);
                             continue;
                         case "compartibleNorth":
-                            compartibles[NORTH] = cmd[1].split(",");
+                            compartiblesForAdjacency[NORTH] = cmd[1].split(",");
                             continue;
                         case "compartibleSouth":
-                            compartibles[SOUTH] = cmd[1].split(",");
+                            compartiblesForAdjacency[SOUTH] = cmd[1].split(",");
                             continue;
                         case "compartibleWest":
-                            compartibles[WEST] = cmd[1].split(",");
+                            compartiblesForAdjacency[WEST] = cmd[1].split(",");
                             continue;
                         case "compartibleEast":
-                            compartibles[EAST] = cmd[1].split(",");
+                            compartiblesForAdjacency[EAST] = cmd[1].split(",");
                             continue;
                             //Wall specific variables:
                         case "forceRender":
@@ -85,14 +86,17 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         }
     }
 
-    public void generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY){
+    public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ){
         ArrayList<TexturedModel> models = new ArrayList<>(4);
         if(genNorth){models.add(generateWall(NORTH));}
         if(genSouth){models.add(generateWall(SOUTH));}
         if(genEast){models.add(generateWall(EAST));}
         if(genWest){models.add(generateWall(WEST));}
-
-
+        TexturedModel[] modelArray = new TexturedModel[models.size()];
+        for(int i = 0; i < modelArray.length;i++){modelArray[i]=models.get(i);}
+        TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture);
+        ModelUtils.translateModel(finishedModel,correctionX,correctionY,correctionZ);
+        return finishedModel;
     }
 
     private TexturedModel generateWall(int index){
@@ -100,8 +104,39 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                 wallVertices[index],
                 indices[index],
                 textureCoordinates[index],
-                texture
+                context.texture
         );
+    }
+
+    public static int invertDirection(int direction){
+        switch (direction){
+            case NORTH: return SOUTH;
+            case SOUTH: return NORTH;
+            case EAST: return WEST;
+            case WEST: return EAST;
+            default: return direction;
+        }
+    }
+    public boolean isCompartible(int direction, ProceduralBuildingBlock block){
+        return isCompartible(direction,block,true);
+    }
+    public boolean isCompartible(int direction, ProceduralBuildingBlock block, boolean checkForBoth){
+        if(block == null){return true;}
+
+        boolean compartForMe = isCompartible(direction,block.name);
+        if(!checkForBoth){return compartForMe;}
+        boolean compartForThem = block.isCompartible(invertDirection(direction),this,false);
+        return compartForThem && compartForMe;
+    }
+
+    public boolean isCompartible(int direction, String blockName){
+        if(compartiblesForAdjacency[direction][0].equalsIgnoreCase("%any%")){
+            return true;
+        }
+        for(String act : compartiblesForAdjacency[direction]){
+            if(act.equals(blockName)){return true;}
+        }
+        return false;
     }
 
     @Override
@@ -112,5 +147,10 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     @Override
     public float getBias() {
         return bias;
+    }
+
+    @Override
+    public String toString(){
+        return name;
     }
 }
