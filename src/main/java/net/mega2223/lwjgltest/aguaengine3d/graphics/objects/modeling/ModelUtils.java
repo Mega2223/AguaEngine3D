@@ -5,6 +5,8 @@ import java.util.List;
 
 public class ModelUtils {
 
+    private ModelUtils(){}
+
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
         List<Float> verticeList = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
