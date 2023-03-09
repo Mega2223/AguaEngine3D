@@ -6,4 +6,5 @@ minFloors=1
 minSize=2,2
 bias=1
 
-floors=WindowFloor.procf
+floors=WindowFloor
+blocks=StandardBlock

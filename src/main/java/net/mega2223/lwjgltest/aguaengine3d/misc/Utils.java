@@ -8,7 +8,7 @@ public class Utils {
     public static final String SHADERS_DIR = RESOURCES_DIR + "\\shaders";
     public static final String MODELS_DIR = RESOURCES_DIR + "\\models";
     public static final String TEXTURES_DIR = RESOURCES_DIR + "\\textures";
-
+    public static final String PROCEDURAL_BUILDINGS_DIR = RESOURCES_DIR + "\\procedural buildings";
 
     public static String readFile (String path){
 

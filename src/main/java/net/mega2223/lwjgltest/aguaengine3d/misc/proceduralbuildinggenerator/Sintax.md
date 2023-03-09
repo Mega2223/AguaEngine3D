@@ -1,8 +1,18 @@
 TODO List:
 - A tag system
 
+## Directory management:
+
+All files from a building object may be in a single folder
+
+Building objects may always have the file name "Main.procb"
+
+The texture must always be named "Texture.png"
+
+All other files need to be named according to how they are referenced in the Main.procb file
 
 ## General connotation:
+
 All assertments ***must*** be separed by line breaks
 
 Configurations follow the following format:
@@ -32,13 +42,18 @@ _%any%_ - valid in any file listing, means that it is indifferent towards other 
 ## Procedural Building (procb) configs:
 ### Required:
 
+_Note: all procb files **MUST** be called `Main.procb`_
+
 name - Name to be identified in other files and such
 
 validSidings - Tiles that are valid to put on it's side, requires the sidings' names or the variable _%any%_
 
 bias - Chance of generating, standard is 1
 
-floors - Valid floor names. Array of strings
+floors - Valid floor FILE NAMES, extension excluded. Array of strings.
+
+blocks - Valid block FILE NAMES, extension excluded. Array of strings. Must have ALL blocks that'll be used by the floors, otherwise you may get a unpleasant surprise called NullPointerException.
+
 
 ### Optional:
 
@@ -48,7 +63,7 @@ minFloors - Minimum of floors
 
 minSize - Minimum grid size, two sized array of integers
 
-## Procedural Floor (procf)
+## Procedural Building Floor (procf)
 
 ### Required:
 
