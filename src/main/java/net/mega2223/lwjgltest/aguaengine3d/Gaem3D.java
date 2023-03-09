@@ -1,6 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d;
 
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.BuildingGenerator;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
@@ -45,18 +46,22 @@ public class Gaem3D {
 
         //tests
 
+        int texture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel test = new TexturedModel(
                 new float[]{-10,0,-10,0, 10,0,-10,0, 10,0,10,0, -10,0,10,0},
                 new int[]{0,1,2,3,2,0},
                 new float[]{0,0,20,0,20,20,0,20},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
+                texture
         );
+        TexturedModel test2 = new TexturedModel(
+              new float[]{-10,2,-10,0, 10,2,-10,0, 10,2,10,0, -10,2,10,0},
+                new int[]{0,1,2,3,2,0},
+                new float[]{0,0,20,0,20,20,0,20},
+                texture
+        );
+        TexturedModel test3 = ModelUtils.mergeModels(new TexturedModel[]{test,test2},texture);
 
-        context.addObject(test);
-
-        int bricksTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\building styles\\Tijolos.png");
-        context.addObject(BuildingGenerator.genBlock(1f,5,3,3,bricksTexture));
-
+        context.addObject(test3);
         //Render Logic be like:
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
