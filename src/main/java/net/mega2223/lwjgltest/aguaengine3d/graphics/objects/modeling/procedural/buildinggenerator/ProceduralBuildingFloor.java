@@ -14,6 +14,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
     String[] validAbove = null;
     float bias = -1;
     int height = 1;
+    int[] compartibleHeights = null;
 
     ProceduralBuilding context;//mayme fixme? idk i need that to get the objects, and storing the objects in the class also seems unnecessary
 
@@ -37,6 +38,12 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
                     continue;
                 case("validAbove"):
                     validAbove = cmd[1].split(",");
+                    continue;
+                case("compartibleHeights"):
+                    String[] heights = cmd[1].split(",");
+                    compartibleHeights = new int[heights.length];
+                    if(heights[0].equalsIgnoreCase(ANY)){compartibleHeights[0] = ANY_INTEGER; continue;}
+                    for(int h = 0; h < heights.length; h++){compartibleHeights[h] = Integer.parseInt(heights[h]);}
                     continue;
             }
         }
@@ -105,6 +112,19 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             avail.add(context.getBlock(act));
         }
         return avail;
+    }
+
+    public boolean canBeBuilt(int floor, ProceduralBuildingFloor floorBelow){
+        boolean canFloor = floorBelow == null, canNumber = compartibleHeights[0] == ANY_INTEGER;
+        if(!canFloor){canFloor = validAbove[0].equalsIgnoreCase(ANY);}
+        for(int i = 0; i < validAbove.length && !canFloor; i++){
+            canFloor = validAbove[i].equals(floorBelow.name);
+        }
+
+        for (int i = 0; i < compartibleHeights.length && !canNumber; i++) {
+            canNumber = compartibleHeights[i] == floor;
+        }
+        return canFloor && canNumber;
     }
 
     @Override

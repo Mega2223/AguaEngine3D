@@ -5,4 +5,6 @@ public interface ProceduralBuildingObject {
     String getName();
     float getBias();
 
+    String ANY = "%any%";
+    int ANY_INTEGER = -33;
 }

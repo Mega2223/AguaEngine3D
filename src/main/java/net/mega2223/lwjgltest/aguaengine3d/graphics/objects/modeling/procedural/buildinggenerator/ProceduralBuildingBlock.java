@@ -130,7 +130,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     }
 
     public boolean isCompartible(int direction, String blockName){
-        if(compartiblesForAdjacency[direction][0].equalsIgnoreCase("%any%")){
+        if(compartiblesForAdjacency[direction][0].equalsIgnoreCase(ANY)){
             return true;
         }
         for(String act : compartiblesForAdjacency[direction]){

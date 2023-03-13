@@ -14,6 +14,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public static final String PROCEDURAL_BLOCK_EXTENSION_NAME = ".procbloc";
     public static final String PROCEDURAL_BUILDING_EXTENSION_NAME = ".procb";
 
+
     int minFloors = 1, maxFloors = 20; //todo
     float[] minSize = {1,1};
 
@@ -71,16 +72,26 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public TexturedModel generate(int[][] pattern){
 
         Random r = new Random();
-        int height = r.nextInt(maxFloors-minFloors)+minFloors;
-        TexturedModel[] floors = new TexturedModel[height];
+        int desiredHeight = r.nextInt(maxFloors-minFloors)+minFloors;
+        int currentHeight = 0;
 
-        for (int f = 0; f < height; f++) {
+        ArrayList<TexturedModel> floorModels = new ArrayList<>(desiredHeight*2);
+        ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];
+        for (int f = 0; currentHeight < desiredHeight; f++) {
             //todo add object-indenpendent check to see if floor can fit it's desired level
             //todo floor height compat
-            floors[f] = allFloors.get(r.nextInt(allFloors.size())).generate(pattern,f);
+            ProceduralBuildingFloor floor = allFloors.get(r.nextInt(allFloors.size()));
+            ProceduralBuildingFloor prevFloor = null;
+            if(f > 0){prevFloor = floorMap[f-1];}
+            //the application can get stuck here, i really need to up the contratiction model
+            while(!floor.canBeBuilt(f,prevFloor)){floor =  allFloors.get(r.nextInt(allFloors.size()));}
+            floorModels.add(floor.generate(pattern,currentHeight));
+            floorMap[f] = floor;
+            currentHeight += floor.height;
         }
-
-        return ModelUtils.mergeModels(floors,texture);
+        TexturedModel[] floorArray = new TexturedModel[floorModels.size()];
+        floorArray = floorModels.toArray(floorArray);
+        return ModelUtils.mergeModels(floorArray,texture);
     }
 
     public ProceduralBuildingBlock getBlock(String name){

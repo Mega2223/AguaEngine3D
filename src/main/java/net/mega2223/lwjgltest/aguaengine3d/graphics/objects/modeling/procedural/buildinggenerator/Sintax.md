@@ -1,5 +1,7 @@
 TODO List:
 - A tag system
+- Min and max occurrences implementation
+- Ceiling
 
 ## Directory management:
 

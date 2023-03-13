@@ -59,14 +59,19 @@ public class Gaem3D {
 
         long milis = System.currentTimeMillis();
 
-        context.addObject(building.generate(
-                new int[][]{
-                        {0,1,0,1},
-                        {1,1,1,1}
-                        //{0,1,0,1},
+        int[][] mat = {
+                {0,0,0,0,0,0,0,0},
+                {0,1,1,0,0,1,1,0},
+                {0,1,1,0,0,1,1,0},
+                {0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0},
+                {0,1,1,0,0,1,1,0},
+                {0,1,1,0,0,1,1,0},
+                {0,0,0,0,0,0,0,0},
 
-                }
-        ));
+        };
+
+        context.addObject(building.generate(mat));
 
         System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
 
