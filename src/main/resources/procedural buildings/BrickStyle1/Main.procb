@@ -6,5 +6,5 @@ minFloors=10
 minSize=2,2
 bias=1
 
-floors=WindowFloor,StandardFloor
-blocks=StandardBlock,WindowBlock
+floors=WindowFloor,StandardFloor,DoorFloor
+blocks=StandardBlock,WindowBlock,DoorBlock,DoubleHeightBlock
