@@ -1,6 +1,6 @@
 name=WindowFloor
 validAbove=%any%
-height=2
+height=1
 bias=1
 blocks=StandardBlock,WindowBlock
 compartibleHeights=%any%
