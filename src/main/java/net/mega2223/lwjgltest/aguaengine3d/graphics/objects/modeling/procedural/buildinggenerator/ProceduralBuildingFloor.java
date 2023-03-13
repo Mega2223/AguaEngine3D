@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,6 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
                 case("compartibleHeights"):
                     if(cmd[1].charAt(0) == '!'){compartibleHeightsExclusive = true; cmd[1] = cmd[1].replace("!","");}
                     String[] heights = cmd[1].split(",");
-
                     compartibleHeights = new int[heights.length];
                     if(heights[0].equalsIgnoreCase(ANY)){compartibleHeights[0] = ANY_INTEGER; continue;}
                     for(int h = 0; h < heights.length; h++){compartibleHeights[h] = Integer.parseInt(heights[h]);}
@@ -106,7 +106,9 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         }
 
         if(potential.size()==0){return null;}
-        return potential.get(new Random().nextInt(potential.size()));
+        float[] weights = new float[potential.size()];
+        for(int i = 0; i < weights.length; i++){weights[i] = potential.get(i).bias;}
+        return (ProceduralBuildingBlock) MathUtils.doWeightedSelection(potential,weights);
     }
 
     public List<ProceduralBuildingBlock> getUsableBlocks(){
