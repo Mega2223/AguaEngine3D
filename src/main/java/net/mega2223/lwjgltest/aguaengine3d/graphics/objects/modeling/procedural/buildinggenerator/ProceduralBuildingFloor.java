@@ -15,8 +15,9 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
     float bias = -1;
     int height = 1;
     int[] compartibleHeights = null;
+    boolean compartibleHeightsExclusive = false;
 
-    ProceduralBuilding context;//mayme fixme? idk i need that to get the objects, and storing the objects in the class also seems unnecessary
+    ProceduralBuilding context;//maybe fixme? idk i need that to get the objects, and storing the objects in the class also seems unnecessary
 
     //builds object according to data
     public ProceduralBuildingFloor(String[] data, ProceduralBuilding context){
@@ -40,7 +41,9 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
                     validAbove = cmd[1].split(",");
                     continue;
                 case("compartibleHeights"):
+                    if(cmd[1].charAt(0) == '!'){compartibleHeightsExclusive = true; cmd[1] = cmd[1].replace("!","");}
                     String[] heights = cmd[1].split(",");
+
                     compartibleHeights = new int[heights.length];
                     if(heights[0].equalsIgnoreCase(ANY)){compartibleHeights[0] = ANY_INTEGER; continue;}
                     for(int h = 0; h < heights.length; h++){compartibleHeights[h] = Integer.parseInt(heights[h]);}
@@ -115,16 +118,17 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
     }
 
     public boolean canBeBuilt(int floor, ProceduralBuildingFloor floorBelow){
-        boolean canFloor = floorBelow == null, canNumber = compartibleHeights[0] == ANY_INTEGER;
-        if(!canFloor){canFloor = validAbove[0].equalsIgnoreCase(ANY);}
-        for(int i = 0; i < validAbove.length && !canFloor; i++){
-            canFloor = validAbove[i].equals(floorBelow.name);
+        boolean canAboveFloor = floorBelow == null, canNumber = compartibleHeights[0] == ANY_INTEGER;
+        if(!canAboveFloor){canAboveFloor = validAbove[0].equalsIgnoreCase(ANY);}
+        for(int i = 0; i < validAbove.length && !canAboveFloor; i++){
+            canAboveFloor = validAbove[i].equals(floorBelow.name);
         }
 
         for (int i = 0; i < compartibleHeights.length && !canNumber; i++) {
             canNumber = compartibleHeights[i] == floor;
         }
-        return canFloor && canNumber;
+        if(compartibleHeightsExclusive){canNumber = !canNumber;}
+        return canAboveFloor && canNumber;
     }
 
     @Override

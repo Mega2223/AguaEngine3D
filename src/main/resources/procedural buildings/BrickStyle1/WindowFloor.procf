@@ -3,4 +3,4 @@ validAbove=%any%
 height=1
 bias=1
 blocks=StandardBlock,WindowBlock
-compartibleHeights=%any%
+compartibleHeights=!0

@@ -81,7 +81,7 @@ validAbove - Valid floor names to be below this one, use an array of floor names
 
 blocks - Blocks valid at this level
 
-compartibleHeights - Integer array that stores all possible heights (based on floor quantity) that this floor can occupy, can also be %any%.
+compartibleHeights - Integer array that stores all possible heights (based on floor quantity) that this floor can occupy, can also be %any%. If you want an exclusive list just use the `!` operator.
 
 ### Optional:
 
