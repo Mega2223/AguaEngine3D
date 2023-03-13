@@ -8,12 +8,13 @@ import java.util.List;
 
 public class ProceduralBuildingBlock implements ProceduralBuildingObject {
 
-    //side-idependent variables
+    //side-independent variables
     public static final int NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3;
     float[][] wallVertices = new float[4][];
     float[][] textureCoordinates = new float[4][];
     int[][] indices = new int[4][];
     boolean[] forceRender = new boolean[4];
+    boolean[] adjacencyExclusive = {false,false,false,false};//is that really the best way to do so?
     String[][] compartiblesForAdjacency = new String[4][];
 
     List<ProceduralBuildingBlock>[] compartibleAdjacentBuildingBlocks = new List[4];
@@ -50,16 +51,16 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                             bias = Float.parseFloat(cmd[1]);
                             continue;
                         case "compartibleNorth":
-                            compartiblesForAdjacency[NORTH] = cmd[1].split(",");
+                            setCompartibles(NORTH,cmd);
                             continue;
                         case "compartibleSouth":
-                            compartiblesForAdjacency[SOUTH] = cmd[1].split(",");
-                            continue;
-                        case "compartibleWest":
-                            compartiblesForAdjacency[WEST] = cmd[1].split(",");
+                            setCompartibles(SOUTH,cmd);
                             continue;
                         case "compartibleEast":
-                            compartiblesForAdjacency[EAST] = cmd[1].split(",");
+                            setCompartibles(EAST,cmd);
+                            continue;
+                        case "compartibleWest":
+                            setCompartibles(WEST,cmd);
                             continue;
                             //Wall specific variables:
                         case "forceRender":
@@ -108,6 +109,12 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         );
     }
 
+    private void setCompartibles(int side, String[] cmd){ // to avoid verbose code
+        if(cmd[1].substring(0,1).equalsIgnoreCase("!"))
+        {adjacencyExclusive[side] = true;cmd[1] = cmd[1].replace("!","");}
+        compartiblesForAdjacency[side] = cmd[1].split(",");
+    }
+
     public static int invertDirection(int direction){
         switch (direction){
             case NORTH: return SOUTH;
@@ -134,9 +141,9 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
             return true;
         }
         for(String act : compartiblesForAdjacency[direction]){
-            if(act.equals(blockName)){return true;}
+            if(act.equals(blockName)){return !adjacencyExclusive[direction];}
         }
-        return false;
+        return adjacencyExclusive[direction];
     }
 
     @Override

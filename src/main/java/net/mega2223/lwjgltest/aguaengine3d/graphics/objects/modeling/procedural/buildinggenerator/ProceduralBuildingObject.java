@@ -7,4 +7,6 @@ public interface ProceduralBuildingObject {
 
     String ANY = "%any%";
     int ANY_INTEGER = -33;
+
+
 }

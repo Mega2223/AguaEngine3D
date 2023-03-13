@@ -1,7 +1,11 @@
 TODO List:
 - A tag system
 - Min and max occurrences implementation
+- Opposite selector
+- Maybe math selectors aswell? Would be nice
 - Ceiling
+- Proper wave-collapse algorithm, if the building runs into a supposed contradiction that can be fixable by rowling back it will just throw an NullPointerException
+- Among us (it is a very popular game)
 
 ## Directory management:
 
@@ -91,7 +95,7 @@ name - Name to be identified in other files and such
 
 bias - Chance of generating, standard is 1
 
-compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String arrays defining which blocks can connect with this on, %any% or %none% is also valid
+compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String arrays defining which blocks can connect with this on, %any% is valid. If you want to create an exclusive list just put `!` as your first character, then proceed normally.
 
 wallNorth,wallSouth,wallEast,wallWest - Declares to the interpreter which wall the file is currently defining
 

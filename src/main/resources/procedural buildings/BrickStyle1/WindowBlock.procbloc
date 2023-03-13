@@ -2,10 +2,10 @@ name=WindowBlock
 
 bias=1
 
-compartibleNorth=StandardBlock
-compartibleSouth=StandardBlock
-compartibleWest=StandardBlock
-compartibleEast=StandardBlock
+compartibleNorth=!StandardBlock
+compartibleSouth=!StandardBlock
+compartibleWest=!StandardBlock
+compartibleEast=!StandardBlock
 
 wallNorth:
 forceRender=false
