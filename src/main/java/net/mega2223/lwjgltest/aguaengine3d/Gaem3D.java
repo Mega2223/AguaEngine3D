@@ -10,13 +10,15 @@ import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Arrays;
+
 @SuppressWarnings("unused")
 
 public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
-    public static final float[] camera = {0,.65f,0,0};
+    public static final float[] camera = {0,.85f,0,0};
     public static final int TARGET_FPS = 120;
     public static final float[] skyColor = {.5f,.5f,.6f,1};
     static WindowManager manager;
@@ -59,17 +61,10 @@ public class Gaem3D {
 
         long milis = System.currentTimeMillis();
 
-        int[][] mat = {
-                {0,0,0,0,0,0,0,0},
-                {0,1,1,0,0,1,1,0},
-                {0,1,1,0,0,1,1,0},
-                {0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0},
-                {0,1,1,0,0,1,1,0},
-                {0,1,1,0,0,1,1,0},
-                {0,0,0,0,0,0,0,0},
-
-        };
+        int[][] mat = new int[16][16];
+        for (int[] ints : mat) {
+            Arrays.fill(ints, 1);
+        }
 
         context.addObject(building.generate(mat));
 

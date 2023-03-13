@@ -35,6 +35,10 @@ public class TexturedModel extends Model{
         textureSamplerUniformCoord = GL30.glGetUniformLocation(shader.getID(),"samplerTexture");
     };
 
+    public void mirrorTexturesVertically(){
+        for(int i = 1; i < textureShift.length; i+=2){textureShift[i]=1f-textureShift[i];}
+    }
+
     //puts the texture data in the first slot of the additional vbos on the super method
     @Override
     protected void initVAO(int[] additionalVBOS){
@@ -90,8 +94,8 @@ public class TexturedModel extends Model{
                 vertices.add(0f);
             }
             else if(type.equalsIgnoreCase("vt")&&split.length==3){
-                textureIndexes.add(1-Float.parseFloat(split[1]));
-                textureIndexes.add(1-Float.parseFloat(split[2]));
+                textureIndexes.add(Float.parseFloat(split[1]));
+                textureIndexes.add(Float.parseFloat(split[2]));
             }
         }
         if(vertices.size()%4 != 0){
@@ -124,7 +128,7 @@ public class TexturedModel extends Model{
                 vertData[(i*4)+j] = vertices.get((spI[0]-1)*4+j);
             }
             for (int j = 0; j < 2; j++) {
-                texData[(i*2)+j] = 1-textureIndexes.get((spI[0]-1)*2+j);
+                texData[(i*2)+j] = textureIndexes.get((spI[0]-1)*2+j);
             }
         }
         for (int i = 0; i < indData.length; i++) {

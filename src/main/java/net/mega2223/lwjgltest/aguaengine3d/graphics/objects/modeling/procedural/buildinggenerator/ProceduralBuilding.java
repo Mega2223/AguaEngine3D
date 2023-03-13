@@ -3,9 +3,11 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ProceduralBuilding implements ProceduralBuildingObject {
@@ -15,7 +17,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public static final String PROCEDURAL_BUILDING_EXTENSION_NAME = ".procb";
 
 
-    int minFloors = 1, maxFloors = 20; //todo
+    int minFloors = 1, maxFloors = 20;
     float[] minSize = {1,1};
 
     String sourceDirectory;
@@ -46,6 +48,10 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
                 case "blocks":
                     compileBlocks(cmd[1].split(","));
                     continue;
+                case "maxFloors":
+                    maxFloors = Integer.parseInt(cmd[1]);
+                case "minFloors":
+                    minFloors = Integer.parseInt(cmd[1]);
                 case "validSidings":
                     //todo
                     continue;
@@ -72,26 +78,30 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public TexturedModel generate(int[][] pattern){
 
         Random r = new Random();
-        int desiredHeight = r.nextInt(maxFloors-minFloors)+minFloors;
+        int bound = maxFloors - minFloors;
+        int desiredHeight = maxFloors;
+        if(bound>0){desiredHeight = r.nextInt(bound)+minFloors;}
         int currentHeight = 0;
 
         ArrayList<TexturedModel> floorModels = new ArrayList<>(desiredHeight*2);
-        ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];
+
+        ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];//fixme
         for (int f = 0; currentHeight < desiredHeight; f++) {
-            //todo add object-indenpendent check to see if floor can fit it's desired level
-            //todo floor height compat
-            ProceduralBuildingFloor floor = allFloors.get(r.nextInt(allFloors.size()));
             ProceduralBuildingFloor prevFloor = null;
             if(f > 0){prevFloor = floorMap[f-1];}
+            List<ProceduralBuildingFloor> possibleFloors = new ArrayList();
+            for(ProceduralBuildingFloor act : allFloors){if(act.canBeBuilt(f,prevFloor)){possibleFloors.add(act);}}
+            float[] probabilites = new float[possibleFloors.size()];
+            for(int i = 0; i < possibleFloors.size(); i++){probabilites[i]=possibleFloors.get(i).bias;}
+            ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilites);
             //the application can get stuck here, i really need to up the contratiction model
-            while(!floor.canBeBuilt(f,prevFloor)){floor =  allFloors.get(r.nextInt(allFloors.size()));}
-            floorModels.add(floor.generate(pattern,currentHeight));
-            floorMap[f] = floor;
-            currentHeight += floor.height;
+            floorModels.add(floorToBuild.generate(pattern,currentHeight));
+            floorMap[f] = floorToBuild;
+            currentHeight += floorToBuild.height;
         }
         TexturedModel[] floorArray = new TexturedModel[floorModels.size()];
         floorArray = floorModels.toArray(floorArray);
-        return ModelUtils.mergeModels(floorArray,texture);
+        return ModelUtils.mergeModels(floorArray, texture);
     }
 
     public ProceduralBuildingBlock getBlock(String name){

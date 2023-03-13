@@ -2,7 +2,7 @@ name=BrickStyle1
 
 validSidings=%any%
 maxFloors=20
-minFloors=10
+minFloors=20
 minSize=2,2
 bias=1
 
