@@ -113,6 +113,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             if(!genWest){genWest = buildMap[z][x-1] != where;}
 
             whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z));
+            blockMap[z][x] = block;
             return true;
         }
 
