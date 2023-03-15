@@ -53,9 +53,10 @@ public class Gaem3D {
         ProceduralBuilding building = new ProceduralBuilding(buildingDir);
 
         int[][] mat = {
-                {0,1,1,0,1,0,1},
-                {1,1,1,1,1,1,1},
-                {0,1,0,0,1,0,1}
+                {0,0,0,0,0},
+                {0,1,1,0,0},
+                {0,0,1,0,0},
+                {0,0,0,0,0}
         };
         long milis = System.currentTimeMillis();
         context.addObject(building.generate(mat,1));

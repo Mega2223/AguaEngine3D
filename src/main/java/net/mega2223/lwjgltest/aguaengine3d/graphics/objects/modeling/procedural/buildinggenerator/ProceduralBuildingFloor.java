@@ -84,9 +84,20 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             for(int i = 0; i < possibleBlocks.size(); i++){weights[i] = possibleBlocks.get(i).bias;}
             ProceduralBuildingBlock toTry = (ProceduralBuildingBlock) MathUtils.doWeightedSelection(possibleBlocks,weights);
             couldPlace = tryToPlace(z,x,height,buildMap,whereToBuild,blockMap,toTry,whereToPlace);
-            if(couldPlace){genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace);return;} else {possibleBlocks.remove(toTry);}
+            if(couldPlace){
+                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace);return;} catch (ContradictionException ex) {continue;}
+            } else {possibleBlocks.remove(toTry);
         }
-        throw new RuntimeException("The generator has run into a contradiction at the construction " + context.name + ", floor " + height + " of type " + name);
+        }
+        throw new ContradictionException("The generator has run into a contradiction at the construction " + context.name + ", floor " + height + " of type " + name);
+    }
+
+    class ContradictionException extends RuntimeException {
+        String message;
+        ContradictionException(String message){
+            super(message);
+            this.message = message;
+        }
     }
 
     private boolean tryToPlace(int z, int x, int height, int[][] buildMap, int where, ProceduralBuildingBlock[][] blockMap, ProceduralBuildingBlock block, List<TexturedModel> whereToAdd){

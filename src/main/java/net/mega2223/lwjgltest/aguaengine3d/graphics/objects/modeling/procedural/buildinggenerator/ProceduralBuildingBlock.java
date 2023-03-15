@@ -185,7 +185,6 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         if(block == null){
             return true;//todo compartiblesForAdjacency[direction][0].equalsIgnoreCase("%any%");
         }
-        System.out.println(name + " is comparing if " + name + " can exist at " + direction);
 
         boolean compartForMe = isCompartible(direction,block.name);
         if(!checkForBoth){return compartForMe;}
