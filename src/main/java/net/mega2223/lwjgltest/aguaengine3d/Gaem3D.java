@@ -18,7 +18,7 @@ public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
-    public static final float[] camera = {0,.85f,0,0};
+    public static final float[] camera = {0,1,0,0};
     public static final int TARGET_FPS = 120;
     public static final float[] skyColor = {.5f,.5f,.6f,1};
     static WindowManager manager;
@@ -48,27 +48,29 @@ public class Gaem3D {
         //tests
 
         String buildingDir = Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1";
+        String buildingDir2 = Utils.PROCEDURAL_BUILDINGS_DIR+"\\Roads";
+
         ProceduralBuilding building = new ProceduralBuilding(buildingDir);
 
-        int texture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
+        int[][] mat = {
+                {0,1,1,0,1,0,1},
+                {1,1,1,1,1,1,1},
+                {0,1,0,0,1,0,1}
+        };
+        long milis = System.currentTimeMillis();
+        context.addObject(building.generate(mat,1));
+        System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
+
+        int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel chessBoardFloor = new TexturedModel(
                 new float[]{-40,0,-40,0, 40,0,-40,0, 40,0,40,0, -40,0,40,0},
                 new int[]{0,1,2,3,2,0},
                 new float[]{0,0,80,0,80,80,0,80},
-                texture
+                chessTexture
         );
         context.addObject(chessBoardFloor);
 
-        long milis = System.currentTimeMillis();
 
-        int[][] mat = new int[16][16];
-        for (int[] ints : mat) {
-            Arrays.fill(ints, 1);
-        }
-
-        context.addObject(building.generate(mat));
-
-        System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
 
         //Render Logic be like:
         long unrendered = 0;
@@ -84,7 +86,7 @@ public class Gaem3D {
             lastLoop = System.currentTimeMillis();
             if(System.currentTimeMillis() - fLSLastUpdate > 1000){
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName,TITLE + "    FPS: " + (framesLastSecond));
+                GLFW.glfwSetWindowTitle(manager.windowName,TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
                 framesLastSecond = 0;
 
             }

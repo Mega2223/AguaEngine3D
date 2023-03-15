@@ -2,22 +2,24 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ProceduralBuildingBlock implements ProceduralBuildingObject {
 
-    //side-independent variables
-    public static final int NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3;
-    float[][] wallVertices = new float[4][];
-    float[][] textureCoordinates = new float[4][];
-    int[][] indices = new int[4][];
-    boolean[] forceRender = new boolean[4];
-    boolean[] adjacencyExclusive = {false,false,false,false};//is that really the best way to do so?
-    String[][] compartiblesForAdjacency = new String[4][];
+    public static final int SIMMETRY_NONE = 0, SIMMETRY_DOUBLE = 1, SIMMENTRY_QUAD = 2;
+    int simmetry = SIMMETRY_NONE;
 
-    List<ProceduralBuildingBlock>[] compartibleAdjacentBuildingBlocks = new List[4];
+    //side-independent variables
+    public static final int NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, RENDER_ALWAYS = 4;
+    float[][] wallVertices = new float[5][];
+    float[][] textureCoordinates = new float[5][];
+
+    int[][] indices = new int[5][];
+    boolean[] forceRender = new boolean[5];
+    boolean[] adjacencyExclusive = {false,false,false,false,false};//is that really the best way to do so?
+    String[][] compartiblesForAdjacency = new String[5][];
 
     float bias = -1;
     ProceduralBuilding context;
@@ -40,6 +42,9 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                     continue;
                 case "wallWest:":
                     currentFace = WEST;
+                    continue;
+                case "all:":
+                    currentFace = RENDER_ALWAYS;
                     continue;
                 default:
                     String[] cmd = data[i].split("=");
@@ -82,9 +87,29 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                             textureCoordinates[currentFace] = new float[split3.length];
                             for(int j = 0; j < split3.length; j++){textureCoordinates[currentFace][j] = Float.parseFloat(split3[j]);}
                             continue;
+                        case "simmetry":
+                            switch (cmd[1]){
+                                case "none": simmetry = SIMMETRY_NONE; break;
+                                case "mirror": simmetry = SIMMETRY_DOUBLE; break;
+                                case "quad": simmetry = SIMMENTRY_QUAD; break;
+                            }
+                            continue;
                     }
             }
         }
+    }
+
+    private ProceduralBuildingBlock(int simmetry, float[][] wallVertices, float[][] textureCoordinates, int[][] indices, boolean[] forceRender, boolean[] adjacencyExclusive, String[][] compartiblesForAdjacency, float bias, ProceduralBuilding context, String name) {
+        this.simmetry = simmetry;
+        this.wallVertices = wallVertices;
+        this.textureCoordinates = textureCoordinates;
+        this.indices = indices;
+        this.forceRender = forceRender;
+        this.adjacencyExclusive = adjacencyExclusive;
+        this.compartiblesForAdjacency = compartiblesForAdjacency;
+        this.bias = bias;
+        this.context = context;
+        this.name = name;
     }
 
     public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ){
@@ -93,6 +118,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         if(genSouth){models.add(generateWall(SOUTH));}
         if(genEast){models.add(generateWall(EAST));}
         if(genWest){models.add(generateWall(WEST));}
+        models.add(generateWall(RENDER_ALWAYS));
         TexturedModel[] modelArray = new TexturedModel[models.size()];
         for(int i = 0; i < modelArray.length;i++){modelArray[i]=models.get(i);}
         TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture);
@@ -101,6 +127,11 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     }
 
     private TexturedModel generateWall(int index){
+        if(wallVertices[index]==null){
+            wallVertices[index] = new float[0];
+            indices[index] = new int[0];
+            textureCoordinates[index] = new float[0];
+        }
         return new TexturedModel(
                 wallVertices[index],
                 indices[index],
@@ -115,24 +146,49 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         compartiblesForAdjacency[side] = cmd[1].split(",");
     }
 
-    public static int invertDirection(int direction){
-        switch (direction){
+    public static int mirrorDirection(int dir){
+        switch (dir){
             case NORTH: return SOUTH;
             case SOUTH: return NORTH;
             case EAST: return WEST;
             case WEST: return EAST;
-            default: return direction;
+            default: return dir;
         }
     }
+
+    public static int directionToLeft (int dir){
+        switch (dir){
+            case NORTH: return WEST;
+            case SOUTH: return EAST;
+            case EAST: return SOUTH;
+            case WEST: return NORTH;
+            default: return dir;
+        }
+    }
+
+    public static int directionToRight (int dir){
+        switch (dir){
+            case NORTH: return EAST;
+            case SOUTH: return WEST;
+            case EAST: return NORTH;
+            case WEST: return SOUTH;
+            default: return dir;
+        }
+    }
+
     public boolean isCompartible(int direction, ProceduralBuildingBlock block){
         return isCompartible(direction,block,true);
     }
+
     public boolean isCompartible(int direction, ProceduralBuildingBlock block, boolean checkForBoth){
-        if(block == null){return true;}
+
+        if(block == null){
+            return true;//todo compartiblesForAdjacency[direction][0].equalsIgnoreCase("%any%");
+        }
 
         boolean compartForMe = isCompartible(direction,block.name);
         if(!checkForBoth){return compartForMe;}
-        boolean compartForThem = block.isCompartible(invertDirection(direction),this,false);
+        boolean compartForThem = block.isCompartible(mirrorDirection(direction),this,false);
         return compartForThem && compartForMe;
     }
 

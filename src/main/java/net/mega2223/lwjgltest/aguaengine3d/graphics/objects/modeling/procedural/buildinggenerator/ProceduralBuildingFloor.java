@@ -1,5 +1,6 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
@@ -7,6 +8,8 @@ import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingBlock.*;
 
 public class ProceduralBuildingFloor implements ProceduralBuildingObject{
 
@@ -52,7 +55,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         }
     }
 
-    public TexturedModel generate(int[][] map, int height){
+    public TexturedModel generate(int[][] map, int height, int where){
         List<TexturedModel> models = new ArrayList<>();
         Random r = new Random();
 
@@ -60,55 +63,60 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         //perhaps check for that?
         ProceduralBuildingBlock[][] blockMap = new ProceduralBuildingBlock[map.length][map[0].length];
 
-        for (int z = 0; z < blockMap.length; z++) {
-            for (int x = 0; x < blockMap[z].length; x++) {
-                if(map[z][x]==0){continue;}
-                boolean doNorth = z == 0, doSouth = z == blockMap.length - 1,
-                        doEast = x == blockMap[z].length - 1, doWest = x == 0;
-                if(!doNorth&&map[z-1][x]==0){doNorth=true;}
-                if(!doSouth&&map[z+1][x]==0){doSouth=true;}
-                if(!doEast&&map[z][x+1]==0){doEast=true;}
-                if(!doWest&&map[z][x-1]==0){doWest=true;}
-
-                ProceduralBuildingBlock toConstruct = select(x,z,blockMap);
-                blockMap[z][x] = toConstruct;
-                models.add(toConstruct.generate(doNorth,doSouth,doEast,doWest,x,height,z));
-
-            }
-        }
+        genIt(map,height,where,blockMap,0,0,models);
 
         TexturedModel[] ret = new TexturedModel[models.size()];
         for(int i = 0; i < ret.length; i++){ret[i]=models.get(i);}
         return ModelUtils.mergeModels(ret, context.texture);
-
     }
 
-    private ProceduralBuildingBlock select(int z, int x, ProceduralBuildingBlock[][] map){
-        List<ProceduralBuildingBlock> floorBlocks = getUsableBlocks();
-        List<ProceduralBuildingBlock> potential = new ArrayList<>();
-        //todo: weighted probability calculations
-        boolean boundaryNorth = z == 0, boundarySouth = z == map[x].length-1,
-                boundaryEast = x == map.length-1, boundaryWest = x == 0;
+    protected void genIt(int[][] buildMap, int height, int whereToBuild, ProceduralBuildingBlock[][] blockMap, int z, int x, List<TexturedModel> whereToPlace){
+        if(x>=buildMap[z].length){x=0;z++;}; if(z>=blockMap.length){return;}
+        while(buildMap[z][x] != whereToBuild || blockMap[z][x] != null){
+            x++; if(x >= blockMap[z].length){z++; x = 0;}
+            if(z>=blockMap.length){return;}
+        }
+        List<ProceduralBuildingBlock> possibleBlocks = getUsableBlocks();
+
+        boolean couldPlace = false;
+        while (!couldPlace && possibleBlocks.size() > 0){
+            float[] weights = new float[possibleBlocks.size()];
+            for(int i = 0; i < possibleBlocks.size(); i++){weights[i] = possibleBlocks.get(i).bias;}
+            ProceduralBuildingBlock toTry = (ProceduralBuildingBlock) MathUtils.doWeightedSelection(possibleBlocks,weights);
+            couldPlace = tryToPlace(z,x,height,buildMap,whereToBuild,blockMap,toTry,whereToPlace);
+            if(couldPlace){genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace);return;} else {possibleBlocks.remove(toTry);}
+        }
+        throw new RuntimeException("The generator has run into a contradiction at the construction " + context.name + ", floor " + height + " of type " + name);
+    }
+
+    private boolean tryToPlace(int z, int x, int height, int[][] buildMap, int where, ProceduralBuildingBlock[][] blockMap, ProceduralBuildingBlock block, List<TexturedModel> whereToAdd){
+        boolean canBuildNorth = z > 0, canBuildSouth = z < buildMap.length -1,
+                canBuildEast = x < buildMap[z].length -1, canBuildWest = x > 0;
         ProceduralBuildingBlock north = null, south = null, east = null, west = null;
-        if(!boundaryNorth){north = map[x][z-1];}
-        if(!boundarySouth){south = map[x][z+1];}
-        if(!boundaryEast){east = map[x+1][z];}
-        if(!boundaryWest){west = map[x-1][z];}
 
+        if(canBuildNorth){north = blockMap[z-1][x];}
+        if(canBuildSouth){south = blockMap[z+1][x];}
+        if(canBuildEast){east = blockMap[z][x+1];}
+        if(canBuildWest){west = blockMap[z][x-1];}
 
-        for(ProceduralBuildingBlock act : floorBlocks){
-            boolean n = false,s = false,e = false,w = false; //maybe invert the directions? idk
-            if(act.isCompartible(ProceduralBuildingBlock.NORTH,north)){n = true;}
-            if(act.isCompartible(ProceduralBuildingBlock.SOUTH,south)){s =  true;}
-            if(act.isCompartible(ProceduralBuildingBlock.EAST,east)){e = true;}
-            if(act.isCompartible(ProceduralBuildingBlock.WEST,west)){w = true;}
-            if(n&&s&&e&&w){potential.add(act);}
+        canBuildNorth = block.isCompartible(NORTH,north);
+        canBuildSouth = block.isCompartible(SOUTH,south);
+        canBuildEast = block.isCompartible(EAST,east);
+        canBuildWest = block.isCompartible(WEST,west);
+
+        if(canBuildNorth && canBuildSouth && canBuildEast && canBuildWest){
+            boolean genNorth = z <= 0, genSouth = z >= buildMap.length -1,
+                    genEast = x >= buildMap[z].length -1, genWest = x <= 0;
+            if(!genNorth){genNorth = buildMap[z-1][x] != where;}
+            if(!genSouth){genSouth = buildMap[z+1][x] != where;}
+            if(!genEast){genEast = buildMap[z][x+1] != where;}
+            if(!genWest){genWest = buildMap[z][x-1] != where;}
+
+            whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z));
+            return true;
         }
 
-        if(potential.size()==0){return null;}
-        float[] weights = new float[potential.size()];
-        for(int i = 0; i < weights.length; i++){weights[i] = potential.get(i).bias;}
-        return (ProceduralBuildingBlock) MathUtils.doWeightedSelection(potential,weights);
+        return false;
     }
 
     public List<ProceduralBuildingBlock> getUsableBlocks(){

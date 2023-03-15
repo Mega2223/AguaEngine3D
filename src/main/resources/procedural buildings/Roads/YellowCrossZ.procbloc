@@ -1,0 +1,14 @@
+name=YellowCrossZ
+
+bias=1
+
+compartibleNorth=%any%
+compartibleSouth=%any%
+compartibleWest=YellowCrossZ,YellowCrossCross
+compartibleEast=YellowCrossZ,YellowCrossCross
+
+all:
+forceRender=false
+vertices=0,0,0,0 , 0,0,1,0 , 1,0,0,0 , 1,0,1,0
+textureCoords=0,.25 , 0,0 , .25,.25 , .25,0
+indices=0,1,2,3,2,1

@@ -6,6 +6,7 @@ public interface ProceduralBuildingObject {
     float getBias();
 
     String ANY = "%any%";
+    String NONE = "%none%";
     int ANY_INTEGER = -33;
 
 

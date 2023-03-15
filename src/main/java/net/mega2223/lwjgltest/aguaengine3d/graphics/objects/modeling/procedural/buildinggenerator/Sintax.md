@@ -44,6 +44,7 @@ Lists are usually separated by comma, like:
 ## Built in variables:
 _%any%_ - valid in any file listing, means that it is indifferent towards other buildings, blocks or floors.
 
+_%none%_ - sidings where nothing happens
 
 ## Procedural Building (procb) configs:
 ### Required:
@@ -95,9 +96,15 @@ name - Name to be identified in other files and such
 
 bias - Chance of generating, standard is 1
 
-compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String arrays defining which blocks can connect with this on, %any% is valid. If you want to create an exclusive list just put `!` as your first character, then proceed normally.
+compartibleNorth,compartibleSouth,compartibleWest,compartibleEast - String arrays defining which blocks can connect with this on, %any% and %none% are valid. If you want to create an exclusive list just put `!` as your first character, then proceed normally.
 
 wallNorth,wallSouth,wallEast,wallWest - Declares to the interpreter which wall the file is currently defining
+
+all - Will be rendered regardless of which sides are connected
+
+### Optional: 
+
+simmetry - Ways that it can be mirrored, `none` for no mirroring, `mirror` for double mirroring and `quad` for mirroring from all 4 directions
 
 #### Wall specific variables:
 

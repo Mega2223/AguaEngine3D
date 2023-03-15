@@ -75,7 +75,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         }
     }
 
-    public TexturedModel generate(int[][] pattern){
+    public TexturedModel generate(int[][] pattern, int where){
 
         Random r = new Random();
         int bound = maxFloors - minFloors;
@@ -95,7 +95,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
             for(int i = 0; i < possibleFloors.size(); i++){probabilites[i]=possibleFloors.get(i).bias;}
             ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilites);
             //the application can get stuck here, i really need to up the contratiction model
-            floorModels.add(floorToBuild.generate(pattern,currentHeight));
+            floorModels.add(floorToBuild.generate(pattern,currentHeight,where));
             floorMap[f] = floorToBuild;
             currentHeight += floorToBuild.height;
         }

@@ -1,0 +1,10 @@
+name=Roads
+
+validSidings=%any%
+maxFloors=1
+minFloors=1
+minSize=2,2
+bias=1
+
+floors=TheOnlyFloorLOL
+blocks=YellowCrossZ,YellowCrossX,YellowCrossCross
