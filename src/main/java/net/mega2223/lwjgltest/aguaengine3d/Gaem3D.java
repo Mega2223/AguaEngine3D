@@ -1,7 +1,9 @@
 package net.mega2223.lwjgltest.aguaengine3d;
 
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
@@ -51,16 +53,28 @@ public class Gaem3D {
         String buildingDir2 = Utils.PROCEDURAL_BUILDINGS_DIR+"\\Roads";
 
         ProceduralBuilding building = new ProceduralBuilding(buildingDir);
-
+        /*
         int[][] mat = {
-                {0,0,0,0,0},
-                {0,1,1,0,0},
-                {0,0,1,0,0},
-                {0,0,0,0,0}
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
+                {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
+                {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
         };
         long milis = System.currentTimeMillis();
         context.addObject(building.generate(mat,1));
         System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
+        */
+
+        Model mogus = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"), new TextureShaderProgram());
+
 
         int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel chessBoardFloor = new TexturedModel(
@@ -70,7 +84,7 @@ public class Gaem3D {
                 chessTexture
         );
         context.addObject(chessBoardFloor);
-
+        context.addObject(mogus);
 
 
         //Render Logic be like:

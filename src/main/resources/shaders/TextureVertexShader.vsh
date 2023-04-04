@@ -2,12 +2,14 @@
 
 layout(location = 0) in vec4 vertexPosition_modelspace;
 layout(location = 1) in vec2 textureCoords;
+layout(location = 2) in vec3 normal;
 
 uniform mat4 projection;
 uniform mat4 translation;
 
 out vec2 texturePosition;
 out vec4 worldCoord;
+out vec3 normalAligment;
 
 void main(){
 
@@ -18,5 +20,5 @@ void main(){
     gl_Position = projection * (toTrans*translation);
     worldCoord = gl_Position;
     texturePosition = textureCoords;
-
+    normalAligment = normal;
 }

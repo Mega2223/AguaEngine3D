@@ -7,32 +7,19 @@ package net.mega2223.lwjgltest.aguaengine3d.mathematics;
  * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended*/
 public class MatrixTranslator {
 
+
+    public static void genTranslationMatrix(float[] mat,float fov, float x, float y, float z, float zNear, float zFar){
+
+    }
+
     public static final int ISOMETRIC_PROJECTION = 0;
     public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
     public static final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
     protected static final int TRUE_PERSPECTIVE_PROJECTION = 3;
     protected static final int WEAKER_PERSPECTIVE_PROJECTION = 4; //i will not tolerate having this, so [fixme]
 
-    public static void translateProjectAndScale(float[][] polygons,float[] position, float[] projection, double[] rotationRadians, float[] scale, boolean divideZCoords){
-        for (int i = 0; i < polygons.length; i++) {
-            translateProjectAndScale(polygons[i], position, projection, rotationRadians, scale, divideZCoords);
-        }
-    }
 
-    public static void translateProjectAndScale(float[] polygon,float[] position, float[] projection, double[] rotationRadians, float[] scale, boolean divideZCoords){
-        for (int i = 0; i < polygon.length; i+=4) {
-            //rotation, will be depreciated when I rember to remove the rotation variable from models
-            rotateVector3(polygon,rotationRadians[0], rotationRadians[1], rotationRadians[2],position[0], position[1],position[2],i);
-            //translation
-            projectVec3(polygon,i,projection,TRUE_PERSPECTIVE_PROJECTION);
-            //scaling
-            for (int j = 0; j < 3; j++) {polygon[i+j]*= scale[j];}
-            //z coording
-            if(divideZCoords){polygon[i+2] = .5f;}//fixme
-        }
-    }
-
-
+    @Deprecated
     public static void projectVec3 (float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg){
         float fieldOfView = 90;
 

@@ -89,6 +89,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             } else {possibleBlocks.remove(toTry);
         }
         }
+        blockMap[z][x] = null;
         throw new ContradictionException("The generator has run into a contradiction at the construction " + context.name + ", floor " + height + " of type " + name);
     }
 

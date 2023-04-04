@@ -13,10 +13,12 @@ public class Model {
     public static final int VAO_VERTEX_DATA_LOCATION = 0;
     public static final int VAO_INDEX_DATA_LOCATION = 1;
     public static final int VAO_TEXTURE_DATA_LOCATION = 2;
+    public static final int VAO_NORMALS_LOCATION = 3;
 
     protected float[] vertices; //each vertex has 4 attributes
     protected float[] coords = {0,0,0,0};
     protected int[] indexes;
+    protected float[] normals = null;//should've done this way before lol, normals are 3d vectors, no 4th coord
 
     protected ShaderProgram shader;
     protected int VAO = -1;
@@ -26,6 +28,14 @@ public class Model {
         this.setVertices(vertices);
         this.setIndexes(indexes);
         this.setShader(shader);
+        genNormals();
+    }
+
+    public Model(float[] vertices, int[] indexes, ShaderProgram shader, float[] normals){
+        this.setVertices(vertices);
+        this.setIndexes(indexes);
+        this.setShader(shader);
+        this.setNormals(normals);
     }
 
     public static Model loadModel(String[] objData, ShaderProgram shader){
@@ -107,7 +117,7 @@ public class Model {
         initVAO(null);
     }
     protected void initVAO(int[] additionalVBOS){
-        int quant = 2;//initial size of VBO array, first to the vertices and second to indexes
+        int quant = 2;//fixme initial size of VBO array, first to the vertices, second to indexes and third to normals
         if(additionalVBOS != null){quant += additionalVBOS.length;}
 
         VBOS = new int[quant];
@@ -145,8 +155,13 @@ public class Model {
         if(VAO == -1){
             initVAO();
         }
+        GL30.glEnableVertexAttribArray(2);//normals location
+
+        GL30.glVertexAttribPointer(2,3,GL30.GL_FLOAT,false,0,0L);
+
         GL30.glUseProgram(this.shader.getID());
         drawnIndexBufferVBO(VBOS[VAO_VERTEX_DATA_LOCATION],GL30.GL_TRIANGLES,4,this.shader, getVBOS()[VAO_INDEX_DATA_LOCATION], indexes.length);
+        GL30.glDisableVertexAttribArray(2);
     }
 
     public float[] getCoords(){
@@ -160,4 +175,23 @@ public class Model {
     public void doLogic(int itneration){
 
     }
+
+    public float[] getNormals() {
+        return normals.clone();
+    }
+
+    public void setNormals(float[] normals) {
+        this.normals = normals;
+    }
+
+    protected void genNormals(){
+        normals = new float[vertices.length - (vertices.length/4)];
+        for (int i = 2; i < normals.length; i+=3) {
+            normals[i] = 1;
+        }
+        //3/4ths relation
+        //todo maybe calculate normals based in the relation between the shape center and the vertex?
+
+    }
+
 }
