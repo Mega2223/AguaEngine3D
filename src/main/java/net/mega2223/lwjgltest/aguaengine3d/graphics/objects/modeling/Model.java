@@ -126,7 +126,8 @@ public class Model {
         if(!areVBOSInitialized()){
             initVBOS();
         }
-
+        //set normals data, each normal is a 3D vector representing a face
+        //since every face is 3 indices, the indice list and the normals list shall have an 1:1 scale
         GL30.glVertexAttribPointer(SHADER_NORMALS_LOCATION,3,GL30.GL_FLOAT,false,0,0L);
 
         GL30.glUseProgram(this.shader.getID());
