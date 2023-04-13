@@ -35,7 +35,7 @@ public class Context {
             float[] transMatrix = new float[16];
             MatrixTranslator.generateTranslationMatrix(transMatrix,o.getCoords());
             o.getShader().setUniforms(itneration,transMatrix,projectionMatrix);
-            o.drawnVAO();
+            o.drawn();
         }
     }
 

@@ -52,9 +52,8 @@ public class Gaem3D {
         String buildingDir = Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1";
         String buildingDir2 = Utils.PROCEDURAL_BUILDINGS_DIR+"\\Roads";
 
-        ProceduralBuilding building = new ProceduralBuilding(buildingDir);
-        /*
-        int[][] mat = {
+        ProceduralBuilding buildingTemplate = new ProceduralBuilding(buildingDir);
+        int[][] buildingBitMap = {
                 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
                 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
                 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
@@ -69,9 +68,9 @@ public class Gaem3D {
                 {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
         };
         long milis = System.currentTimeMillis();
-        context.addObject(building.generate(mat,1));
+        context.addObject(buildingTemplate.generate(buildingBitMap,1));
         System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
-        */
+
 
         Model mogus = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"), new TextureShaderProgram());
 

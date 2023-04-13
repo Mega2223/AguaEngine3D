@@ -2,7 +2,6 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import org.lwjgl.opengl.GL30;
 
@@ -41,30 +40,22 @@ public class TexturedModel extends Model{
 
     //puts the texture data in the first slot of the additional vbos on the super method
     @Override
-    protected void initVAO(int[] additionalVBOS){
-        int siz = 1;
-        if(additionalVBOS != null){siz += additionalVBOS.length;}
-
-        int VBOS[] = new int[siz];
-        VBOS[0] = RenderingManager.genArrayBufferObject(getTextureShift(),GL30.GL_DYNAMIC_DRAW);
-        for (int i = 1; i < VBOS.length && additionalVBOS != null; i++) {
-            VBOS[i] = additionalVBOS[i-1];
-        }
-
-        super.initVAO(VBOS);
+    protected void initVBOS(){
+        //todo
+        super.initVBOS();
     }
 
     int textureSamplerUniformCoord = -1;
 
     @Override
-    public void drawnVAO() {
-        if(VBOS == null || VAO == -1){
-            initVAO();
+    public void drawn() {
+        if(!areVBOSInitialized()){
+            initVBOS();
         }
 
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,VBOS[VAO_TEXTURE_DATA_LOCATION]);
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, getTextureCoordsVBO());
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, getTextureShift(),GL30.GL_DYNAMIC_DRAW);
-        GL30.glBindVertexArray(VAO);
+
         GL30.glUseProgram(shader.getID());
         GL30.glEnableVertexAttribArray(1);
         //GL30.texparamet
@@ -72,7 +63,7 @@ public class TexturedModel extends Model{
         //GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         //GL30.glTexImage2D();
-        super.drawnVAO();
+        super.drawn();
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
         GL30.glDisable(GL30.GL_TEXTURE_2D);
         GL30.glDisableVertexAttribArray(1);

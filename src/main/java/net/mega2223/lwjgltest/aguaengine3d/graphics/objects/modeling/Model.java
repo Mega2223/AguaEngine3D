@@ -10,10 +10,9 @@ import static net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManage
 
 public class Model {
 
-    public static final int VAO_VERTEX_DATA_LOCATION = 0;
-    public static final int VAO_INDEX_DATA_LOCATION = 1;
-    public static final int VAO_TEXTURE_DATA_LOCATION = 2;
-    public static final int VAO_NORMALS_LOCATION = 3;
+    public static final int SHADER_VERTEX_DATA_LOCATION = 0;
+    public static final int SHADER_TEXTURE_DATA_LOCATION = 1;
+    public static final int SHADER_NORMALS_LOCATION = 2;
 
     protected float[] vertices; //each vertex has 4 attributes
     protected float[] coords = {0,0,0,0};
@@ -21,8 +20,11 @@ public class Model {
     protected float[] normals = null;//should've done this way before lol, normals are 3d vectors, no 4th coord
 
     protected ShaderProgram shader;
-    protected int VAO = -1;
-    protected int[] VBOS = null;
+
+    protected int verticesVBO = -1;
+    protected int indicesVBO = -1;
+    protected int textureCoordsVBO = -1;
+    protected int normalsVBO = -1;
 
     public Model(float[] vertices, int[] indexes, ShaderProgram shader){
         this.setVertices(vertices);
@@ -80,7 +82,7 @@ public class Model {
 
     public void setVertices(float[] vertices) {
         this.vertices = vertices.clone();
-        unloadVAOS();
+        unloadVBOS();
     }
 
     public ShaderProgram getShader() {
@@ -97,71 +99,39 @@ public class Model {
 
     public void setIndexes(int[] indexes) {
         this.indexes = indexes.clone();
-        unloadVAOS();
+        unloadVBOS();
     }
 
-    public int getVAO(){
-        while (VAO == -1){
-            initVAO();
-        }
-        return VAO;
-    }
-    public int[] getVBOS(){
-        while (VBOS == null){
-            initVAO();
-        }
-        return VBOS;
-    }
+    protected void initVBOS(){
 
-    protected void initVAO(){
-        initVAO(null);
-    }
-    protected void initVAO(int[] additionalVBOS){
-        int quant = 2;//fixme initial size of VBO array, first to the vertices, second to indexes and third to normals
-        if(additionalVBOS != null){quant += additionalVBOS.length;}
-
-        VBOS = new int[quant];
-
-        //initializes the VBO and inputs vertex data in it
-        //the VBO with vetex data always has the same ID
-        //it stores itself in a way which each vertex has a lenght of 4 attributes
-        int vertexVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
+        int verticeVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
         int indicesVBO = RenderingManager.genIndexBufferObject(indexes, GL30.GL_DYNAMIC_DRAW);
-        VBOS[0] = vertexVBO;
-        VBOS[1] = indicesVBO;
-        for (int i = 2; i < VBOS.length && additionalVBOS != null; i++) {
-            VBOS[i] = additionalVBOS[i-2];
-        }
-        VAO = RenderingManager.genVAO(VBOS);
+        this.setVerticesVBO(verticeVBO);
+        this.setIndicesVBO(indicesVBO);
+
     }
 
 
-    public void setVBOData(int index, float[] data){
-        while (VAO == -1){
-            initVAO();}
-        RenderingManager.setVBOData(VBOS[index],data);
+    public void unloadVBOS(){
+        GL30.glDeleteBuffers(getIndicesVBO());
+        GL30.glDeleteBuffers(getVerticesVBO());
+        GL30.glDeleteBuffers(getNormalsVBO());
+        GL30.glDeleteBuffers(getTextureCoordsVBO());
+        setIndicesVBO(-1);
+        setVerticesVBO(-1);
+        setNormalsVBO(-1);
+        setTextureCoordsVBO(-1);
     }
-
-    public void unloadVAOS(){
-        if(VAO == -1 && VBOS == null){return;}
-        GL30.glDeleteVertexArrays(VAO);
-        for (int i = 0; i < VBOS.length; i++) {
-            GL30.glDeleteBuffers(VBOS[i]);
+    public void drawn(){
+        if(!areVBOSInitialized()){
+            initVBOS();
         }
-        VAO = -1;
-        VBOS = null;
-    }
-    public void drawnVAO(){
-        if(VAO == -1){
-            initVAO();
-        }
-        GL30.glEnableVertexAttribArray(2);//normals location
 
-        GL30.glVertexAttribPointer(2,3,GL30.GL_FLOAT,false,0,0L);
+        GL30.glVertexAttribPointer(SHADER_NORMALS_LOCATION,3,GL30.GL_FLOAT,false,0,0L);
 
         GL30.glUseProgram(this.shader.getID());
-        drawnIndexBufferVBO(VBOS[VAO_VERTEX_DATA_LOCATION],GL30.GL_TRIANGLES,4,this.shader, getVBOS()[VAO_INDEX_DATA_LOCATION], indexes.length);
-        GL30.glDisableVertexAttribArray(2);
+        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,this.shader, getIndicesVBO(), indexes.length);
+
     }
 
     public float[] getCoords(){
@@ -184,6 +154,10 @@ public class Model {
         this.normals = normals;
     }
 
+    public boolean areVBOSInitialized(){
+        return getVerticesVBO() != -1 && getIndicesVBO() != -1 && getNormalsVBO() != -1;
+    }
+
     protected void genNormals(){
         normals = new float[vertices.length - (vertices.length/4)];
         for (int i = 2; i < normals.length; i+=3) {
@@ -194,4 +168,35 @@ public class Model {
 
     }
 
+    public int getVerticesVBO() {
+        return verticesVBO;
+    }
+
+    public void setVerticesVBO(int verticesVBO) {
+        this.verticesVBO = verticesVBO;
+    }
+
+    public int getIndicesVBO() {
+        return indicesVBO;
+    }
+
+    public void setIndicesVBO(int indicesVBO) {
+        this.indicesVBO = indicesVBO;
+    }
+
+    public int getTextureCoordsVBO() {
+        return textureCoordsVBO;
+    }
+
+    public void setTextureCoordsVBO(int textureCoordsVBO) {
+        this.textureCoordsVBO = textureCoordsVBO;
+    }
+
+    public int getNormalsVBO() {
+        return normalsVBO;
+    }
+
+    public void setNormalsVBO(int normalsVBO) {
+        this.normalsVBO = normalsVBO;
+    }
 }
