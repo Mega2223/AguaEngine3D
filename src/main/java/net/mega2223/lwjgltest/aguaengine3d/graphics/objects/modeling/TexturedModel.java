@@ -69,12 +69,22 @@ public class TexturedModel extends Model{
         GL30.glDisableVertexAttribArray(1);
     }
 
+    /**loads data from a .obj datafront format string array,
+     * then finds vertex combinations that are identical to each other in order to
+     * reference them in the same index, so if the file contais combination "x/y" trice,
+     * it will have 3 references in the index array and only one in the other arrays
+     * */
     public static TexturedModel loadTexturedModel(String[] objData, ShaderProgram shader, int texture){
 
-        ArrayList<String> existingIndexes = new ArrayList<>();
+        boolean modelHasNormals = false; //either a model has normals on ALL faces, or in no faces whatsoever
+
+        ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
         ArrayList<Float> textureIndexes = new ArrayList<>();
+        ArrayList<Float> normals = new ArrayList<>();
+
+        //extracts vertices and texture coordinates and puts them in their respective arrays
         for (int i = 0; i < objData.length; i++) {
             String[] split = objData[i].split(" ");
             String type = split[0];
@@ -83,14 +93,22 @@ public class TexturedModel extends Model{
                 vertices.add(Float.parseFloat(split[2]));
                 vertices.add(Float.parseFloat(split[3]));
                 vertices.add(0f);
+                //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
             }
             else if(type.equalsIgnoreCase("vt")&&split.length==3){
                 textureIndexes.add(Float.parseFloat(split[1]));
                 textureIndexes.add(Float.parseFloat(split[2]));
             }
+            else if(type.equalsIgnoreCase("vn")&&split.length==4){
+                modelHasNormals = true;
+                normals.add(Float.parseFloat(split[1]));
+                normals.add(Float.parseFloat(split[2]));
+                normals.add(Float.parseFloat(split[3]));
+            }
+
         }
         if(vertices.size()%4 != 0){
-            throw new UnsupportedOperationException("invalid modle");
+            throw new UnsupportedOperationException("invalid model");
         }
 
         for (String objDatum : objData) {
@@ -98,28 +116,36 @@ public class TexturedModel extends Model{
             String type = split[0];
             if (type.equalsIgnoreCase("f") && split.length == 4) {
                 for (int j = 1; j < split.length; j++) {
-                    int index = existingIndexes.indexOf(split[j]);
+                    int index = existingVerticeCombinations.indexOf(split[j]);
                     if (index == -1) {
-                        existingIndexes.add(split[j]);
-                        index = existingIndexes.indexOf(split[j]);
+                        existingVerticeCombinations.add(split[j]);
+                        index = existingVerticeCombinations.indexOf(split[j]);
                     }
                     indices.add(index);
                 }
             }
         }
 
-        float[] vertData = new float[existingIndexes.size()*4];
-        float[] texData = new float[existingIndexes.size()*2];
+        float[] vertData = new float[existingVerticeCombinations.size()*4];
+        float[] texData = new float[existingVerticeCombinations.size()*2];
+        float[] normalsData = new float[existingVerticeCombinations.size()*3];
         int[] indData = new int[indices.size()];
 
-        for(int i = 0; i<existingIndexes.size(); i++){
-            String[] sp = existingIndexes.get(i).split("/");
-            int[] spI = {Integer.parseInt(sp[0]),Integer.parseInt(sp[1])};
+        for(int i = 0; i<existingVerticeCombinations.size(); i++){
+            String[] sp = existingVerticeCombinations.get(i).split("/");
+            int[] combination = {Integer.parseInt(sp[0]),Integer.parseInt(sp[1])};
+
             for (int j = 0; j < 3; j++) {
-                vertData[(i*4)+j] = vertices.get((spI[0]-1)*4+j);
+                vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
             }
             for (int j = 0; j < 2; j++) {
-                texData[(i*2)+j] = textureIndexes.get((spI[0]-1)*2+j);
+                texData[(i*2)+j] = textureIndexes.get((combination[1]-1)*2+j);
+            }
+            if(modelHasNormals){
+                int combinationNormal = Integer.parseInt(sp[2]);
+                for (int j = 0; j < 3; j++) {
+                    //normalsData[(i*3)+j] = normals.get();
+                }
             }
         }
         for (int i = 0; i < indData.length; i++) {
