@@ -1,6 +1,6 @@
 name=DoorBlock
 
-bias=.5
+bias=.1
 
 compartibleNorth=!DoorBlock
 compartibleSouth=!DoorBlock

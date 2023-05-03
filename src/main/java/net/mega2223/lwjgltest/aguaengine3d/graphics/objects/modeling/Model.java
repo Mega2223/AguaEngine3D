@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL30;
 import java.util.ArrayList;
 
 import static net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager.drawnIndexBufferVBO;
+import static net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager.genArrayBufferObject;
 
 public class Model {
 
@@ -42,35 +43,79 @@ public class Model {
 
     public static Model loadModel(String[] objData, ShaderProgram shader){
 
+        boolean modelHasNormals = false; //either a model has normals on ALL faces, or in no faces whatsoever
+
+
+        ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
+        ArrayList<Float> normals = new ArrayList<>();
+
+        //extracts vertices and texture coordinates and puts them in their respective arrays
         for (int i = 0; i < objData.length; i++) {
             String[] split = objData[i].split(" ");
-            if(split[0].equalsIgnoreCase("v")&&split.length == 4){
+            String type = split[0];
+            if(type.equalsIgnoreCase("v")&&split.length == 4){
                 vertices.add(Float.parseFloat(split[1]));
                 vertices.add(Float.parseFloat(split[2]));
                 vertices.add(Float.parseFloat(split[3]));
                 vertices.add(0f);
+                //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
             }
-            else if(split[0].equalsIgnoreCase("f")&&split.length == 4){
-                for (int j = 1; j < split.length; j++) {
-                    int ind = Integer.parseInt(split[j].split("/")[0])-1;
-                    indices.add(ind);
-                }
+            else if(type.equalsIgnoreCase("vn")&&split.length==4){
+                modelHasNormals = true;
+                normals.add(Float.parseFloat(split[1]));
+                normals.add(Float.parseFloat(split[2]));
+                normals.add(Float.parseFloat(split[3]));
+            }
 
-            }
         }
         if(vertices.size()%4 != 0){
-            throw new UnsupportedOperationException("invalid modle");
+            throw new UnsupportedOperationException("invalid model");
         }
-        float[] vertData = new float[vertices.size()];
+
+        for (String objDatum : objData) {
+            String[] split = objDatum.split(" ");
+            String type = split[0];
+            if (type.equalsIgnoreCase("f") && split.length == 4) {
+                for (int j = 1; j < split.length; j++) {
+                    int index = existingVerticeCombinations.indexOf(split[j]);
+                    if (index == -1) {
+                        existingVerticeCombinations.add(split[j]);
+                        index = existingVerticeCombinations.indexOf(split[j]);
+                    }
+                    indices.add(index);
+                }
+            }
+        }
+        float[] vertData = new float[existingVerticeCombinations.size()*4];
+        float[] normalsData = new float[existingVerticeCombinations.size()*3];
         int[] indData = new int[indices.size()];
 
-        for (int i = 0; i < vertices.size(); i++) {
-            vertData[i]=vertices.get(i);
+        for(int i = 0; i<existingVerticeCombinations.size(); i++){
+            String[] sp = existingVerticeCombinations.get(i).split("/");
+            int[] combination = new int[sp.length];
+            for (int j = 0; j < sp.length; j++) {
+                if(sp[j].equals("")){continue;}
+                combination[j] = Integer.parseInt(sp[j]);
+            }
+            for (int j = 0; j < 3; j++) {
+                vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
+            }
+
+            if(modelHasNormals){ //otherwise, this would throw an ArrayOutOfBoundsEx
+                for (int j = 0; j < 3; j++) {
+                    normalsData[(i*3)+j] = normals.get((combination[2]-1)*3+j);
+                }
+            }
         }
-        for (int i = 0; i < indices.size(); i++) {
+
+        for (int i = 0; i < indData.length; i++) {
             indData[i]=indices.get(i);
+        }
+
+        if(modelHasNormals){
+            return new Model(vertData,indData,shader,normalsData);
         }
 
         return new Model(vertData,indData,shader);
@@ -106,9 +151,10 @@ public class Model {
 
         int verticeVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
         int indicesVBO = RenderingManager.genIndexBufferObject(indexes, GL30.GL_DYNAMIC_DRAW);
+        int normalsVBO = RenderingManager.genArrayBufferObject(normals,GL30.GL_DYNAMIC_DRAW);
         this.setVerticesVBO(verticeVBO);
         this.setIndicesVBO(indicesVBO);
-
+        this.setNormalsVBO(normalsVBO);
     }
 
 
@@ -122,26 +168,18 @@ public class Model {
         setNormalsVBO(-1);
         setTextureCoordsVBO(-1);
     }
+
     public void drawn(){
         if(!areVBOSInitialized()){
             initVBOS();
         }
-        //set normals data, each normal is a 3D vector representing a face
-        //since every face is 3 indices, the indice list and the normals list shall have an 1:1 scale
+        //set normals data, each normal is a 3D vector representing a vertex normal
+        GL30.glEnableVertexAttribArray(SHADER_NORMALS_LOCATION);
         GL30.glVertexAttribPointer(SHADER_NORMALS_LOCATION,3,GL30.GL_FLOAT,false,0,0L);
-
         GL30.glUseProgram(this.shader.getID());
         drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,this.shader, getIndicesVBO(), indexes.length);
-
+        GL30.glDisableVertexAttribArray(SHADER_NORMALS_LOCATION);
     }
-
-    public float[] getCoords(){
-        return coords.clone();
-    }
-    public void setCoords(float[] coords){
-        for (int i = 0; i < this.coords.length; i++) {this.coords[i] = coords[i];}
-    }
-
     //for subclasses
     public void doLogic(int itneration){
 
@@ -159,14 +197,18 @@ public class Model {
         return getVerticesVBO() != -1 && getIndicesVBO() != -1 && getNormalsVBO() != -1;
     }
 
-    protected void genNormals(){
+    protected void genNormals(){//todo
         normals = new float[vertices.length - (vertices.length/4)];
-        for (int i = 2; i < normals.length; i+=3) {
-            normals[i] = 1;
-        }
-        //3/4ths relation
-        //todo maybe calculate normals based in the relation between the shape center and the vertex?
 
+        //3/4ths relation
+
+    }
+
+    public float[] getCoords(){
+        return coords.clone();
+    }
+    public void setCoords(float[] coords){
+        for (int i = 0; i < this.coords.length; i++) {this.coords[i] = coords[i];}
     }
 
     public int getVerticesVBO() {

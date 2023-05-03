@@ -3,6 +3,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
@@ -12,8 +13,6 @@ import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Arrays;
-
 @SuppressWarnings("unused")
 
 public class Gaem3D {
@@ -22,7 +21,7 @@ public class Gaem3D {
     static int framesElapsed = 0;
     public static final float[] camera = {0,1,0,0};
     public static final int TARGET_FPS = 120;
-    public static final float[] skyColor = {.5f,.5f,.6f,1};
+    public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
     static Context context = new Context();
 
@@ -31,8 +30,6 @@ public class Gaem3D {
         //GLFW
         manager = new WindowManager(300,300, TITLE);
         manager.init();
-        manager.clearColor(skyColor[0],skyColor[1], skyColor[2],skyColor[3]);
-
         manager.addUpdateEvent(() -> {
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
@@ -49,31 +46,15 @@ public class Gaem3D {
 
         //tests
 
-        String buildingDir = Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1";
-        String buildingDir2 = Utils.PROCEDURAL_BUILDINGS_DIR+"\\Roads";
+        Model testCube = Model.loadModel(
+                Utils.readFile(Utils.MODELS_DIR+"\\CubeWithNormals.obj").split("\n"),
+                new SolidColorShaderProgram(.5f,.5f,.6f)
+                //TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
+        );
 
-        ProceduralBuilding buildingTemplate = new ProceduralBuilding(buildingDir);
-        int[][] buildingBitMap = {
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0},
-                {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-                {0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0},
-        };
-        long milis = System.currentTimeMillis();
-        context.addObject(buildingTemplate.generate(buildingBitMap,1));
-        System.out.println("Object generation took " + (System.currentTimeMillis() - milis) + " milis");
+        testCube.setCoords(new float[]{0,.5f,0,0});
 
-
-        Model mogus = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"), new TextureShaderProgram());
-
+        context.addObject(testCube);
 
         int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel chessBoardFloor = new TexturedModel(
@@ -83,8 +64,7 @@ public class Gaem3D {
                 chessTexture
         );
         context.addObject(chessBoardFloor);
-        context.addObject(mogus);
-
+        context.setBackGroundColor(new float[]{.45f,.45f,.65f,1f});
 
         //Render Logic be like:
         long unrendered = 0;

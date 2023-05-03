@@ -11,16 +11,14 @@ uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
 
+
 out vec4 color;
 
 void calculateNormal(inout vec4 color,vec4 absentColor, vec3 lightDirection, vec3 normal){
     if(normal.xyz == 0){return;}
-    float influence = dot(normal,lightDirection);
+    float influence = dot(normal,lightDirection)*0;//fixme
     influence = clamp(influence,0,1);
     color = mix(color,absentColor,influence);
-}
-void test(){
-
 }
 
 void main(){
@@ -34,8 +32,8 @@ void main(){
     range = clamp(range,0,1);
 
     color = mix(color,fogColor,range);
-    const vec3 lightDir = vec3(0,1,0);
-    calculateNormal(color,fogColor,lightDir,normalAligment);
+
+    const vec3 lightDir = vec3(0,1,0);//todo
 
 }
 

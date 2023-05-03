@@ -20,6 +20,14 @@ public class TexturedModel extends Model{
         super(triangles,indices,shader);
         init(textureShift,TextureManager.loadTexture(textureDir));
     }
+    public TexturedModel(float[] triangles,int[] indices, float[] textureShift, ShaderProgram shader, float[] normals, String textureDir) {
+        super(triangles,indices,shader,normals);
+        init(textureShift,TextureManager.loadTexture(textureDir));
+    }
+    public TexturedModel(float[] triangles,int[] indices, float[] textureShift, ShaderProgram shader, float[] normals, int texture) {
+        super(triangles,indices,shader,normals);
+        init(textureShift,texture);
+    }
     public TexturedModel(float[] triangles, int[] indices,float[] textureShift, ShaderProgram shader, int texture) {
         super(triangles,indices,shader);
         init(textureShift,texture);
@@ -77,6 +85,7 @@ public class TexturedModel extends Model{
     public static TexturedModel loadTexturedModel(String[] objData, ShaderProgram shader, int texture){
 
         boolean modelHasNormals = false; //either a model has normals on ALL faces, or in no faces whatsoever
+        boolean modelHasTextureCoords = false; //same thing as above
 
         ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
@@ -96,6 +105,7 @@ public class TexturedModel extends Model{
                 //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
             }
             else if(type.equalsIgnoreCase("vt")&&split.length==3){
+                modelHasTextureCoords = true;
                 textureIndexes.add(Float.parseFloat(split[1]));
                 textureIndexes.add(Float.parseFloat(split[2]));
             }
@@ -133,29 +143,35 @@ public class TexturedModel extends Model{
 
         for(int i = 0; i<existingVerticeCombinations.size(); i++){
             String[] sp = existingVerticeCombinations.get(i).split("/");
-            int[] combination = {Integer.parseInt(sp[0]),Integer.parseInt(sp[1])};
-
+            int[] combination = new int[sp.length];
+            for (int j = 0; j < sp.length; j++) {
+                if(sp[j].equals("")){continue;}
+                combination[j] = Integer.parseInt(sp[j]);
+            }
             for (int j = 0; j < 3; j++) {
                 vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
             }
-            for (int j = 0; j < 2; j++) {
-                texData[(i*2)+j] = textureIndexes.get((combination[1]-1)*2+j);
+            if(modelHasTextureCoords){ //combination[1] will exist either way, but it may be empty
+                for (int j = 0; j < 2; j++) {
+                    texData[(i*2)+j] = textureIndexes.get((combination[1]-1)*2+j);
+                }
             }
-            if(modelHasNormals){
-                int combinationNormal = Integer.parseInt(sp[2]);
+            if(modelHasNormals){ //otherwise, this would throw an ArrayOutOfBoundsEx
                 for (int j = 0; j < 3; j++) {
-                    //normalsData[(i*3)+j] = normals.get();
+                    normalsData[(i*3)+j] = normals.get((combination[2]-1)*3+j);
                 }
             }
         }
+
         for (int i = 0; i < indData.length; i++) {
             indData[i]=indices.get(i);
         }
-        //indData =  new int[]{0,1,3};
 
-        TexturedModel ret = new TexturedModel(vertData,indData,texData,shader,texture);
+        if(modelHasNormals){
+            return new TexturedModel(vertData,indData,texData,shader,normalsData,texture);
+        }
 
-        return ret;
+        return new TexturedModel(vertData,indData,texData,shader,texture);
     }
 
     public static void debugTexturedModel(TexturedModel model){

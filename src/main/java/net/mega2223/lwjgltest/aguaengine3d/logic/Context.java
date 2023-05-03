@@ -29,10 +29,9 @@ public class Context {
         itneration++;
     }
 
+    private float[] transMatrix = new float[16];
     public void doRender(float[] projectionMatrix){
-
         for(Model o : objects){
-            float[] transMatrix = new float[16];
             MatrixTranslator.generateTranslationMatrix(transMatrix,o.getCoords());
             o.getShader().setUniforms(itneration,transMatrix,projectionMatrix);
             o.drawn();
@@ -54,12 +53,20 @@ public class Context {
 
     public void setBackGroundColor(float[] backGroundColor) {
         this.backGroundColor = backGroundColor;
+        GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
         for (Model ac : getObjects()){
             int p = ac.getShader().getID();
             int c = GL30.glGetUniformLocation(p,"fogColor");
             GL30.glUseProgram(p);
             GL30.glUniform4fv(c,backGroundColor);
+        }
+    }
+
+    public void setFogDetails(float dist, float dissolve){
+        for (Model o : objects) {
+            GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogStart"),dist);
+            GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
         }
     }
 }
