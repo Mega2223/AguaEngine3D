@@ -2,33 +2,38 @@
 
 in vec4 worldCoord;
 in vec3 normalAligment;
+in vec4 objectiveCoord;
 
-uniform vec3 color2;
+const int MAX_LIGHTS = 10;
+
+uniform vec4 color2; // uniform color
 
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
+uniform vec4[MAX_LIGHTS] lights;
 
 out vec4 color;
 
-const vec3 lightSource = vec3(0,1,0);
-const vec4 lightColor = vec4(1,1,1,1);
+float calculateLightInfluence(vec4 light,vec4 coord){
+    float influence = distance(light.xyz,coord.xyz);
+    float brightness = light.w;
+    brightness = max(brightness,0);
+    return clamp((1/influence)*brightness,0,1);
+}
 
 void main(){
+    color = fogColor;
 
-    color = vec4(color2.xyz,1);
-    color = clamp(color,0,1);
+    for(int i = 0; i < MAX_LIGHTS; i++){
+        float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
+        color += mix(fogColor,color2,lightInfluence);
+    }
 
-
-    float range = (distance(worldCoord,vec4(0,0,0,0)));
-
-    range-=fogStart;
-    range/=fogDissolve;
-
-    range = clamp(range,0,1);
-
-    color = mix(color,lightColor,clamp(dot(lightSource,normalAligment),0,1));
-    color = mix(color,fogColor,range);
-
+    float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
+    fogInfluence -= fogStart;
+    fogInfluence /= fogDissolve;
+    fogInfluence = clamp(fogInfluence,0,1);
+    color = mix(color,fogColor,fogInfluence);
 
 }

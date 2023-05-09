@@ -49,6 +49,7 @@ public class Context {
     public Context setActive(boolean active) {
         this.active = active;
         return this;
+
     }
 
     public void setBackGroundColor(float[] backGroundColor) {
@@ -67,6 +68,12 @@ public class Context {
         for (Model o : objects) {
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogStart"),dist);
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
+        }
+    }
+
+    public void setLights(float[][] lights){
+        for (Model o : objects){
+            o.getShader().setLights(lights);
         }
     }
 }

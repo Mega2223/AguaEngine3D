@@ -29,7 +29,7 @@ public class SolidColorShaderProgram implements ShaderProgram{
     @Override
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
-        GL30.glUniform3f(uniformColorLocation,color[0],color[1],color[2]);
+        GL30.glUniform4f(uniformColorLocation,color[0],color[1],color[2],1);
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
 

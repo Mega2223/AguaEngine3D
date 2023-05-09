@@ -4,6 +4,8 @@ import org.lwjgl.opengl.GL30;
 
 public interface ShaderProgram {
 
+    int MAX_LIGHTS = 10;
+
     int getID();
 
     void initUniforms();//because i forgot to put it once so now all classes must have it
@@ -13,4 +15,13 @@ public interface ShaderProgram {
         GL30.glUseProgram(getID());
         GL30.glUniform4f(location,v4[0],v4[1],v4[2],v4[3]);
     };
+
+    default void setLights(float[][] lights){
+        GL30.glUseProgram(getID());
+        for (int i = 0; i < lights.length; i++) {
+            int location = GL30.glGetUniformLocation(getID(), "lights[" + i + "]");
+            GL30.glUniform4f(location,lights[i][0],lights[i][1],lights[i][2],lights[i][3]);
+        }
+
+    }
 }

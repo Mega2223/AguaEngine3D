@@ -10,6 +10,7 @@ uniform mat4 translation;
 out vec2 texturePosition;
 out vec4 worldCoord;
 out vec3 normalAligment;
+out vec4 objectiveCoord;
 
 void main(){
 
@@ -18,6 +19,7 @@ void main(){
     vec4 toTrans = vec4(gl_Position.xyzw);
 
     gl_Position = projection * (toTrans*translation);
+    objectiveCoord = toTrans * translation;
     worldCoord = gl_Position;
     texturePosition = textureCoords;
     normalAligment = normal;

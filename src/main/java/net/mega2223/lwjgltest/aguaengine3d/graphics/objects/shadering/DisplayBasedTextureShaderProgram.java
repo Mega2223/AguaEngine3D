@@ -38,4 +38,6 @@ public class DisplayBasedTextureShaderProgram implements ShaderProgram{
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
 
     }
+
+
 }

@@ -12,6 +12,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL30;
 
 @SuppressWarnings("unused")
 
@@ -24,6 +25,9 @@ public class Gaem3D {
     public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
     static Context context = new Context();
+
+    static float testBrightness = 0;
+
 
     public static void main(String[] args) {
 
@@ -46,15 +50,25 @@ public class Gaem3D {
 
         //tests
 
+        manager.addUpdateEvent(() -> {
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){System.out.println(testBrightness);testBrightness+=.003f;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){System.out.println(testBrightness);testBrightness-=.003f;}
+
+        });
+
         Model testCube = Model.loadModel(
                 Utils.readFile(Utils.MODELS_DIR+"\\CubeWithNormals.obj").split("\n"),
-                new SolidColorShaderProgram(.5f,.5f,.6f)
+                new SolidColorShaderProgram(.4f,.03f,.7f)
                 //TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
         );
+        Model newCube = new Model(testCube.getRelativeVertices(),testCube.getIndexes(),testCube.getShader()){
+            @Override
+            public void doLogic(int itneration) {
+                this.setCoords(new float[]{-.5f, (float) (Math.sin(((double)itneration)/60)/6 + .5),0, 0});
+            }
+        };
 
-        testCube.setCoords(new float[]{0,.5f,0,0});
-
-        context.addObject(testCube);
+        context.addObject(newCube);
 
         int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel chessBoardFloor = new TexturedModel(
@@ -66,6 +80,15 @@ public class Gaem3D {
         context.addObject(chessBoardFloor);
         context.setBackGroundColor(new float[]{.45f,.45f,.65f,1f});
 
+        newCube.getShader().setLights(new float[][]{{0,0,0,1f}});
+
+        int loc = GL30.glGetUniformLocation(newCube.getShader().getID(),"lights[0]");
+        System.out.println(loc);
+        GL30.glUseProgram(newCube.getShader().getID());
+        GL30.glUniform4fv(loc,new float[]{0,0,0,1f});
+
+        context.setFogDetails(12,6);
+        context.setBackGroundColor(new float[]{0,0,0,0});
         //Render Logic be like:
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
@@ -99,12 +122,17 @@ public class Gaem3D {
                 framesLastSecond++;
             }
         }
-
     }
 
     protected static void doLogic(){
-
+        float a = ((float) framesElapsed) / 20;
+        float cubeY =  (float) (Math.sin(((double)framesElapsed)/60)/6 + .5);
+        context.setLights(
+                new float[][]{{(float) Math.sin(a)*4,cubeY, (float) Math.cos(a)*4,testBrightness},
+                        {(float) Math.sin(a+Math.PI)*4,cubeY, (float) Math.cos(a+Math.PI)*4,testBrightness}}
+        );
     }
+
     protected static void doRenderLogic(){
 
         float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
