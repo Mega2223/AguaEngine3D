@@ -76,4 +76,10 @@ public class Context {
             o.getShader().setLights(lights);
         }
     }
+
+    public void setLightColor(int index, float r, float g, float b, float influence){
+        for (Model o : objects){
+            o.getShader().setLightColor(index, r, g, b, influence);
+        }
+    }
 }

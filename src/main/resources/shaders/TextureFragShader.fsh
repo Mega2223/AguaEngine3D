@@ -14,6 +14,7 @@ uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
 uniform vec4[MAX_LIGHTS] lights; //4th location is brightness
+uniform vec4[MAX_LIGHTS] lightColors; //4th location is light influence
 
 out vec4 color;
 
@@ -30,7 +31,8 @@ void main(){
 
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
-        color += mix(fogColor,textureColor,lightInfluence);
+        vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
+        color += mix(fogColor,mixedColor,lightInfluence);
     }
 
     //fog calculations

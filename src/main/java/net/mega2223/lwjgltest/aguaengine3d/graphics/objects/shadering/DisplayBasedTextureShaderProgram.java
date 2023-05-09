@@ -6,14 +6,15 @@ import org.lwjgl.opengl.GL30;
 
 public class DisplayBasedTextureShaderProgram implements ShaderProgram{
     final int programID;
-
-    public DisplayBasedTextureShaderProgram(){
+    int texture;
+    public DisplayBasedTextureShaderProgram(int texture){
         programID = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR + "\\DisplayBasedFragShader.fsh",
                         Utils.SHADERS_DIR + "\\TextureVertexShader.vsh"
                 }
         );
+        this.texture = texture;
         initUniforms();
     }
 
@@ -36,7 +37,8 @@ public class DisplayBasedTextureShaderProgram implements ShaderProgram{
         GL30.glUseProgram(getID());
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
-
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
+        GL30.glActiveTexture(texture);
     }
 
 

@@ -3,6 +3,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayBasedTextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
@@ -58,10 +59,10 @@ public class Gaem3D {
 
         Model testCube = Model.loadModel(
                 Utils.readFile(Utils.MODELS_DIR+"\\CubeWithNormals.obj").split("\n"),
-                new SolidColorShaderProgram(.4f,.03f,.7f)
+                new SolidColorShaderProgram(1f,0f,.7f)
                 //TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
         );
-        Model newCube = new Model(testCube.getRelativeVertices(),testCube.getIndexes(),testCube.getShader()){
+        Model newCube = new Model(testCube.getRelativeVertices(),testCube.getIndexes(),new DisplayBasedTextureShaderProgram(TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png"))){
             @Override
             public void doLogic(int itneration) {
                 this.setCoords(new float[]{-.5f, (float) (Math.sin(((double)itneration)/60)/6 + .5),0, 0});
@@ -79,6 +80,16 @@ public class Gaem3D {
         );
         context.addObject(chessBoardFloor);
         context.setBackGroundColor(new float[]{.45f,.45f,.65f,1f});
+
+        context.setLightColor(0,0f,0f,1f,.4f);
+        context.setLightColor(1,1f,0f,0f,.4f);
+        context.setLightColor(2,0f,1f,1f,.4f);
+        context.setLightColor(3,1f,1f,0f,.4f);
+        context.setLightColor(4,0f,1f,1f,.4f);
+        context.setLightColor(5,1f,0f,1f,.4f);
+        context.setLightColor(6,1f,1f,1f,.4f);
+        context.setLightColor(7,0f,0f,0f,.4f);
+
 
         newCube.getShader().setLights(new float[][]{{0,0,0,1f}});
 
@@ -124,13 +135,15 @@ public class Gaem3D {
         }
     }
 
+    static float[][] contextLights = new float[8][];
+
     protected static void doLogic(){
-        float a = ((float) framesElapsed) / 20;
-        float cubeY =  (float) (Math.sin(((double)framesElapsed)/60)/6 + .5);
-        context.setLights(
-                new float[][]{{(float) Math.sin(a)*4,cubeY, (float) Math.cos(a)*4,testBrightness},
-                        {(float) Math.sin(a+Math.PI)*4,cubeY, (float) Math.cos(a+Math.PI)*4,testBrightness}}
-        );
+        for (int i = 0; i < 8; i++) {
+            float acr = (float) ((float) i * Math.PI)/4.0f;
+            contextLights[i] = new float[]{(float) Math.sin((float)framesElapsed/20 + acr)*4,1f, (float) Math.cos((float)framesElapsed/20 + acr)*4,testBrightness};
+
+        }
+        context.setLights(contextLights);
     }
 
     protected static void doRenderLogic(){

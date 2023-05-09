@@ -22,6 +22,15 @@ public interface ShaderProgram {
             int location = GL30.glGetUniformLocation(getID(), "lights[" + i + "]");
             GL30.glUniform4f(location,lights[i][0],lights[i][1],lights[i][2],lights[i][3]);
         }
-
+    }
+    default void setLight(int index, float x, float y, float z, float brightness){
+        int location = GL30.glGetUniformLocation(getID(), "lights[" + index + "]");
+        GL30.glUseProgram(getID());
+        GL30.glUniform4f(location,x,y,z,brightness);
+    }
+    default void setLightColor(int index, float r, float g, float b, float influence){
+        int location = GL30.glGetUniformLocation(getID(), "lightColors[" + index + "]");
+        GL30.glUseProgram(getID());
+        GL30.glUniform4f(location,r,g,b,influence);
     }
 }
