@@ -34,6 +34,7 @@ void main(){
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
         color += mix(fogColor,mixedColor,lightInfluence);
     }
+    color /= MAX_LIGHTS;
 
     //fog calculations
     float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
