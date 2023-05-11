@@ -26,6 +26,14 @@ float calculateLightInfluence(vec4 light,vec4 coord){
     return clamp((1/influence)*brightness,0,1);
 }
 
+//walks var towards varTo, at a maximum diference of unit
+float stepToVar(float var, float varTo, float unit){
+    float difference = var - varTo;
+    if(difference > unit){return -unit;}
+    if(difference < -unit){return unit;}
+    return -difference;
+}
+
 void main(){
     vec4 textureColor = texture(samplerTexture,vec2(gl_FragCoord.x/1400,-gl_FragCoord.y/800));
     color = fogColor;
@@ -33,9 +41,10 @@ void main(){
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
-        color += mix(fogColor,mixedColor,lightInfluence);
+        for(int j = 0; j < 4; j++){
+            color[j] += stepToVar(color[j],mixedColor[j],lightInfluence);
+        }
     }
-    color /= MAX_LIGHTS;
 
     //fog calculations
     float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
