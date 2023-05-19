@@ -107,7 +107,7 @@ public class TexturedModel extends Model{
             else if(type.equalsIgnoreCase("vt")&&split.length==3){
                 modelHasTextureCoords = true;
                 textureIndexes.add(Float.parseFloat(split[1]));
-                textureIndexes.add(Float.parseFloat(split[2]));
+                textureIndexes.add(1-Float.parseFloat(split[2]));
             }
             else if(type.equalsIgnoreCase("vn")&&split.length==4){
                 modelHasNormals = true;

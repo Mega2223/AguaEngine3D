@@ -9,12 +9,15 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColor
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
+
+import java.util.Vector;
 
 @SuppressWarnings("unused")
 
@@ -22,7 +25,7 @@ public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
-    public static final float[] camera = {0,1,0,0};
+    public static final float[] camera = {0,.9f,0,0};
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
@@ -44,38 +47,35 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
         });
+
         //pra eu não ter que maximizar na gravação
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
-        Model testCube = Model.loadModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\CubeWithNormals.obj").split("\n"),
-                new SolidColorShaderProgram(1f,0f,.7f)
-                //TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
-        );
-
-        Model newCube = new Model(testCube.getRelativeVertices(),testCube.getIndexes(),new DisplayBasedTextureShaderProgram(TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png"))){
-            @Override
-            public void doLogic(int itneration) {
-                this.setCoords(new float[]{-.5f, (float) (Math.sin(((double)itneration)/60)/6 + .5),0, 0});
-            }
-        };
-
-        context.addObject(newCube);
 
         int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
         TexturedModel chessBoardFloor = new TexturedModel(
-                new float[]{-40,0,-40,0, 40,0,-40,0, 40,0,40,0, -40,0,40,0},
+                new float[]{-120,0,-120,0, 120,0,-120,0, 120,0,120,0, -120,0,120,0},
                 new int[]{0,1,2,3,2,0},
-                new float[]{0,0,80,0,80,80,0,80},
+                new float[]{0,0,240,0,240,240,0,240},
                 chessTexture
         );
         context.addObject(chessBoardFloor);
 
-        context.setFogDetails(1,20);
-        context.setLight(0,0,0,0,1f);
-        context.setLightColor(0,1,1,1,0);
-        context.setBackGroundColor(new float[]{.5f,.5f,.5f,1});
+        TexturedModel texturedCube = TexturedModel.loadTexturedModel(
+                Utils.readFile("C:\\Users\\Imperiums\\Documents\\TexturedCube.obj").split("\n"),new TextureShaderProgram(),
+                TextureManager.loadTexture("C:\\Users\\Imperiums\\Documents\\TexturedCube.png")
+        );
+        context.addObject(texturedCube);
+        texturedCube.setCoords(new float[]{0,1,0,0});
+        cube = texturedCube;
+
+        context.setLight(0,0,1,0,.8f);
+        context.setLightColor(0,0,0,0,0);
+
+        context.setFogDetails(10,2.5f);
+        context.setBackGroundColor(new float[]{0,0,0,0});
+        //context.setBackGroundColor(new float[]{.35f,.35f,.35f,1});
 
         //Render Logic be like:
         long unrendered = 0;
@@ -111,9 +111,18 @@ public class Gaem3D {
             }
         }
     }
-
+    static TexturedModel cube;
     protected static void doLogic(){
-
+        cube.getShader().setLight(0,0,1,0,.8f);
+        float r = (float) Math.sin((float)framesElapsed/15), g = (float) Math.sin((float)framesElapsed/10), b = (float) Math.cos((float)framesElapsed/(45/2));
+        cube.getShader().setLightColor(0,r/2+.5f,g/2+.5f,b/2+.5f,.35f);
+        float[] v = cube.getRelativeVertices();
+        for (int i = 0; i < v.length; i+=4) {
+            MatrixTranslator.rotateVector3(v,0,.04,0,i);
+        }
+        float s = (float) Math.sin((double) framesElapsed/40)/2 + .5f;
+        cube.setCoords(new float[]{0,s+1,0,0});
+        cube.setVertices(v);
     }
 
     protected static void doRenderLogic(){
