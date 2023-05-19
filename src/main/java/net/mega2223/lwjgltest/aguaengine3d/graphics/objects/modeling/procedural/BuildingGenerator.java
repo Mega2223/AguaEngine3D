@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
+//this is an old class that is the predecessor to the Procedural Building system, don't mind it
+@Deprecated
 public class BuildingGenerator {
 
     private BuildingGenerator(){}

@@ -3,6 +3,8 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayBasedTextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
@@ -36,7 +38,7 @@ public class Gaem3D {
         //GLFW
         manager = new WindowManager(300,300, TITLE);
         manager.init();
-        manager.addUpdateEvent(() -> {
+        manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
             float speed = .03f;
@@ -48,34 +50,24 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
         });
 
-        //pra eu não ter que maximizar na gravação
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
+        //int[][] expectedColors =
+        int[][] expectedColors = {{255,0,0},{0,0,255},{255,255,0}};
+        int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
+        ProceduralBuildingManager.printBitMap(map);
 
-        int chessTexture = TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png");
-        TexturedModel chessBoardFloor = new TexturedModel(
-                new float[]{-120,0,-120,0, 120,0,-120,0, 120,0,120,0, -120,0,120,0},
-                new int[]{0,1,2,3,2,0},
-                new float[]{0,0,240,0,240,240,0,240},
-                chessTexture
-        );
-        context.addObject(chessBoardFloor);
+        ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor");
+        ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor");
+        ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
+        context.addObject(grass.generate(map,1));
+        context.addObject(tile.generate(map,3));
+        context.addObject(building.generate(map,2));
 
-        TexturedModel texturedCube = TexturedModel.loadTexturedModel(
-                Utils.readFile("C:\\Users\\Imperiums\\Documents\\TexturedCube.obj").split("\n"),new TextureShaderProgram(),
-                TextureManager.loadTexture("C:\\Users\\Imperiums\\Documents\\TexturedCube.png")
-        );
-        context.addObject(texturedCube);
-        texturedCube.setCoords(new float[]{0,1,0,0});
-        cube = texturedCube;
-
-        context.setLight(0,0,1,0,.8f);
-        context.setLightColor(0,0,0,0,0);
-
-        context.setFogDetails(10,2.5f);
-        context.setBackGroundColor(new float[]{0,0,0,0});
-        //context.setBackGroundColor(new float[]{.35f,.35f,.35f,1});
+        context.setBackGroundColor(new float[]{0,0,0,1});
+        context.setLight(0,0,2,0,10);
+        context.setActive(true);
 
         //Render Logic be like:
         long unrendered = 0;
@@ -111,18 +103,9 @@ public class Gaem3D {
             }
         }
     }
-    static TexturedModel cube;
+
     protected static void doLogic(){
-        cube.getShader().setLight(0,0,1,0,.8f);
-        float r = (float) Math.sin((float)framesElapsed/15), g = (float) Math.sin((float)framesElapsed/10), b = (float) Math.cos((float)framesElapsed/(45/2));
-        cube.getShader().setLightColor(0,r/2+.5f,g/2+.5f,b/2+.5f,.35f);
-        float[] v = cube.getRelativeVertices();
-        for (int i = 0; i < v.length; i+=4) {
-            MatrixTranslator.rotateVector3(v,0,.04,0,i);
-        }
-        float s = (float) Math.sin((double) framesElapsed/40)/2 + .5f;
-        cube.setCoords(new float[]{0,s+1,0,0});
-        cube.setVertices(v);
+
     }
 
     protected static void doRenderLogic(){

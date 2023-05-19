@@ -8,7 +8,7 @@ import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//some utilities for generating structures
 public class StructureUtils {
 
     public static TexturedModel generateWallModel(float sx, float sz, float ex, float ez, float top, float base, int texture){

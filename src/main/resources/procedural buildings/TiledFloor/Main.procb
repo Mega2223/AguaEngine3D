@@ -1,0 +1,10 @@
+name=GrassFloor
+
+validSidings=%any%
+maxFloors=1
+minFloors=1
+minSize=1,1
+bias=1
+
+floors=Floor
+blocks=Tile

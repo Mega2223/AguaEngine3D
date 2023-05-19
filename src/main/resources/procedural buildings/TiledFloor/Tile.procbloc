@@ -1,0 +1,14 @@
+name=Tile
+
+bias=1
+
+compartibleNorth=%any%
+compartibleSouth=%any%
+compartibleWest=%any%
+compartibleEast=%any%
+
+all:
+forceRender=false
+vertices=0,0,0,0 , 0,0,1,0 , 1,0,0,0 , 1,0,1,0
+textureCoords=0,4 , 0,0 , 4,4 , 4,0
+indices=0,1,2,3,2,1

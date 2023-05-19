@@ -1,0 +1,14 @@
+name=GrassBlockX
+
+bias=1
+
+compartibleNorth=%any%
+compartibleSouth=%any%
+compartibleWest=%any%
+compartibleEast=%any%
+
+all:
+forceRender=false
+vertices=0,0,0,0 , 0,0,1,0 , 1,0,0,0 , 1,0,1,0
+textureCoords=0,1 , 0,0 , 1,1 , 1,0
+indices=0,1,2,3,2,1
