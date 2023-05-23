@@ -1,10 +1,8 @@
 TODO List:
 - A tag system
 - Min and max occurrences implementation
-- Opposite selector
 - Maybe math selectors aswell? Would be nice
 - Ceiling
-- Proper wave-collapse algorithm, if the building runs into a supposed contradiction that can be fixable by rowling back it will just throw an NullPointerException
 - Among us (it is a very popular game)
 
 ## Directory management:
@@ -63,6 +61,8 @@ blocks - Valid block FILE NAMES, extension excluded. Array of strings. Must have
 
 
 ### Optional:
+
+shouldRenderMiddle - whether the renderer should try to consider blocks which have all 4 sides occupied by other blocks, should greatly decrease performance when disabled at cost of some accuracy, defaults to true
 
 maxFloors - Maximum of floors
 

@@ -16,14 +16,13 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public static final String PROCEDURAL_BLOCK_EXTENSION_NAME = ".procbloc";
     public static final String PROCEDURAL_BUILDING_EXTENSION_NAME = ".procb";
 
+    protected int minFloors = 1, maxFloors = 20;
 
-    int minFloors = 1, maxFloors = 20;
-    float[] minSize = {1,1};
-
-    String sourceDirectory;
-    String name = null;
-    float bias = -1;
-    int texture = -1;
+    protected String sourceDirectory;
+    protected String name = null;
+    protected float bias = -1;
+    protected int texture;
+    protected boolean shouldConsiderMiddleBlocks = true;
 
     ArrayList<ProceduralBuildingBlock> allBlocks = new ArrayList<>();
     ArrayList<ProceduralBuildingFloor> allFloors = new ArrayList<>();
@@ -55,6 +54,9 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
                 case "validSidings":
                     //todo
                     continue;
+                case "shouldRenderMiddle":
+                    shouldConsiderMiddleBlocks = Boolean.parseBoolean(cmd[1]);
+                    continue;
             }
 
         }
@@ -83,7 +85,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         if(bound>0){desiredHeight = r.nextInt(bound)+minFloors;}
         int currentHeight = 0;
 
-        ArrayList<TexturedModel> floorModels = new ArrayList<>(desiredHeight*2);
+        ArrayList<TexturedModel> floorModels = new ArrayList<>(desiredHeight);
 
         ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];//fixme
         for (int f = 0; currentHeight < desiredHeight; f++) {
@@ -95,7 +97,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
             for(int i = 0; i < possibleFloors.size(); i++){probabilites[i]=possibleFloors.get(i).bias;}
             ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilites);
             //the application can get stuck here, i really need to up the contratiction model
-            floorModels.add(floorToBuild.generate(pattern,currentHeight,where));
+            floorModels.add(floorToBuild.generate(pattern,currentHeight,where,shouldConsiderMiddleBlocks));
             floorMap[f] = floorToBuild;
             currentHeight += floorToBuild.height;
         }

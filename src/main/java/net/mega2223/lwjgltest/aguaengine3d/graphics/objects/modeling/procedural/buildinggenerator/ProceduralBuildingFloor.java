@@ -55,7 +55,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         }
     }
 
-    public TexturedModel generate(int[][] map, int height, int where){
+    public TexturedModel generate(int[][] map, int height, int where, boolean shouldConsiderMiddleBlocks){
         List<TexturedModel> models = new ArrayList<>();
         Random r = new Random();
 
@@ -63,19 +63,33 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         //perhaps check for that?
         ProceduralBuildingBlock[][] blockMap = new ProceduralBuildingBlock[map.length][map[0].length];
 
-        genIt(map,height,where,blockMap,0,0,models);
+        genIt(map,height,where,blockMap,0,0,models,shouldConsiderMiddleBlocks);
 
         TexturedModel[] ret = new TexturedModel[models.size()];
         for(int i = 0; i < ret.length; i++){ret[i]=models.get(i);}
         return ModelUtils.mergeModels(ret, context.texture);
     }
 
-    protected void genIt(int[][] buildMap, int height, int whereToBuild, ProceduralBuildingBlock[][] blockMap, int z, int x, List<TexturedModel> whereToPlace){
-        if(x>=buildMap[z].length){x=0;z++;}; if(z>=blockMap.length){return;}
+    protected void genIt(int[][] buildMap, int height, int whereToBuild, ProceduralBuildingBlock[][] blockMap, int z, int x, List<TexturedModel> whereToPlace,boolean shouldConsiderMiddleBlocks){
+        if(x>=buildMap[z].length){x=0;z++;}
+        if(z>=blockMap.length){return;}
         while(buildMap[z][x] != whereToBuild || blockMap[z][x] != null){
             x++; if(x >= blockMap[z].length){z++; x = 0;}
             if(z>=blockMap.length){return;}
         }
+
+        if(!shouldConsiderMiddleBlocks){
+            boolean northEmpty = z == 0, southEmpty = z >= buildMap.length-1, eastEmpty = x >= buildMap[z].length-1, westEmpty = x == 0;
+            if(!northEmpty){northEmpty = buildMap[z-1][x] != whereToBuild;}
+            if(!southEmpty){southEmpty = buildMap[z+1][x] != whereToBuild;}
+            if(!eastEmpty){eastEmpty = buildMap[z][x+1] != whereToBuild;}
+            if(!westEmpty){westEmpty = buildMap[z][x-1] != whereToBuild;}
+            if(!northEmpty && !southEmpty && !eastEmpty && !westEmpty){
+                genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace, false);//always false
+                return;
+            }
+        }
+
         List<ProceduralBuildingBlock> possibleBlocks = getUsableBlocks();
 
         boolean couldPlace = false;
@@ -85,7 +99,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             ProceduralBuildingBlock toTry = (ProceduralBuildingBlock) MathUtils.doWeightedSelection(possibleBlocks,weights);
             couldPlace = tryToPlace(z,x,height,buildMap,whereToBuild,blockMap,toTry,whereToPlace);
             if(couldPlace){
-                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace);return;} catch (ContradictionException ex) {continue;}
+                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace,shouldConsiderMiddleBlocks);return;} catch (ContradictionException ex) {continue;}
             } else {possibleBlocks.remove(toTry);
         }
         }
@@ -93,7 +107,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         throw new ContradictionException("The generator has run into a contradiction at the construction " + context.name + ", floor " + height + " of type " + name);
     }
 
-    class ContradictionException extends RuntimeException {
+    static class ContradictionException extends RuntimeException {
         String message;
         ContradictionException(String message){
             super(message);
@@ -124,6 +138,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             if(!genEast){genEast = buildMap[z][x+1] != where;}
             if(!genWest){genWest = buildMap[z][x-1] != where;}
 
+            System.out.println( name +": generating " + x + " " + height + " " + z);
             whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z));
             blockMap[z][x] = block;
             return true;

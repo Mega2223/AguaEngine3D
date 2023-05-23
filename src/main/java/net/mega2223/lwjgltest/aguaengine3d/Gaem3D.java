@@ -53,20 +53,23 @@ public class Gaem3D {
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
-        //int[][] expectedColors =
-        int[][] expectedColors = {{255,0,0},{0,0,255},{255,255,0}};
+
+        int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
         int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
-        ProceduralBuildingManager.printBitMap(map);
+        //ProceduralBuildingManager.printBitMap(map);
 
         ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor");
         ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor");
         ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
+
+        GLFW.glfwMakeContextCurrent(manager.getWindow());
+        long timer = System.currentTimeMillis();
         context.addObject(grass.generate(map,1));
         context.addObject(tile.generate(map,3));
         context.addObject(building.generate(map,2));
 
         context.setBackGroundColor(new float[]{0,0,0,1});
-        context.setLight(0,0,2,0,10);
+        context.setLight(0,0,2,0,100);
         context.setActive(true);
 
         //Render Logic be like:
