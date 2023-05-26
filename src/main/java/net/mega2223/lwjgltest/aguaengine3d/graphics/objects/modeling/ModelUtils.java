@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling;
 
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,4 +54,35 @@ public class ModelUtils {
         VectorTranslator.addToAllVectors(vertices,x,y,z);
         return vertices;
     }
+
+    /**Saves the object in wavefront format, does not consider normals*/
+    public static void saveModel(TexturedModel model, String dir, String nameAndExtension) throws IOException {
+        FileWriter stream = new FileWriter(dir + "\\" + nameAndExtension,false);
+        float[] vertices = model.getRelativeVertices();
+        float[] textureCoords = model.getTextureShift();
+        int[] indices = model.getIndexes();
+
+        stream.write(" # Written by AguaEngine :) \n # Code and license available at https://github.com/Mega2223/AguaEngine3D\n\n # Vertices:\n");
+
+        for (int i = 0; i < vertices.length; i+=4) {
+            stream.write("v " + vertices[i] + " " + vertices[i+1] + " "+ vertices[i+2] + "\n");
+        }
+        stream.write("\nTexture Coordinates:\n");
+        for (int i = 0; i < textureCoords.length; i+=2) {
+            stream.write("vt " + textureCoords[i] + " " + (1-textureCoords[i+1]) + "\n");
+        }
+        stream.write("\nFaces:\n");
+        for (int i = 0; i < indices.length; i+=3) {
+            stream.write("f ");
+            for (int j = 0; j < 3; j++) {
+                int k = indices[i+j];
+                stream.write((1+(k)) + "/" + (1+(k)));
+                if(j!=2){stream.write(" ");}
+            }
+            stream.write("\n");
+        }
+        stream.close();
+    }
+
+
 }
