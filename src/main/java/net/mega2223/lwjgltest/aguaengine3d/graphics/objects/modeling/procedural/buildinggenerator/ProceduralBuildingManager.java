@@ -7,6 +7,8 @@ import java.io.IOException;
 
 public class ProceduralBuildingManager {
 
+    private ProceduralBuildingManager(){}
+
     public static void printBitMap (int[][] map){
         String out = "";
         for (int y = 0; y < map.length; y++) {

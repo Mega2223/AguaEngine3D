@@ -67,11 +67,11 @@ public class ModelUtils {
         for (int i = 0; i < vertices.length; i+=4) {
             stream.write("v " + vertices[i] + " " + vertices[i+1] + " "+ vertices[i+2] + "\n");
         }
-        stream.write("\nTexture Coordinates:\n");
+        stream.write("\n# Texture Coordinates:\n");
         for (int i = 0; i < textureCoords.length; i+=2) {
             stream.write("vt " + textureCoords[i] + " " + (1-textureCoords[i+1]) + "\n");
         }
-        stream.write("\nFaces:\n");
+        stream.write("\n# Faces:\n");
         for (int i = 0; i < indices.length; i+=3) {
             stream.write("f ");
             for (int j = 0; j < 3; j++) {
