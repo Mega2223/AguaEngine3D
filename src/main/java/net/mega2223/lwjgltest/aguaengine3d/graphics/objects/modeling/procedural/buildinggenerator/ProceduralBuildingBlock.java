@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         this.name = name;
     }
 
-    public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ){
+    public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ, ShaderProgram shader){
         ArrayList<TexturedModel> models = new ArrayList<>(4);
         if(genNorth){models.add(generateWall(NORTH));}
         if(genSouth){models.add(generateWall(SOUTH));}
@@ -121,7 +122,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         models.add(generateWall(RENDER_ALWAYS));
         TexturedModel[] modelArray = new TexturedModel[models.size()];
         for(int i = 0; i < modelArray.length;i++){modelArray[i]=models.get(i);}
-        TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture);
+        TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture, shader);
         ModelUtils.translateModel(finishedModel,correctionX,correctionY,correctionZ);
         return finishedModel;
     }
@@ -136,6 +137,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                 wallVertices[index],
                 indices[index],
                 textureCoordinates[index],
+                context.shaderProgram,
                 context.texture
         );
     }

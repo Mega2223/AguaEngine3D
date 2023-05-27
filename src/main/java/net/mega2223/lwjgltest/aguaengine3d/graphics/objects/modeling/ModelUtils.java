@@ -1,5 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 
 import java.io.*;
@@ -11,6 +13,9 @@ public class ModelUtils {
     private ModelUtils(){}
 
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
+        return mergeModels(models,texture,new TextureShaderProgram());
+    }
+    public static TexturedModel mergeModels(TexturedModel[] models, int texture, ShaderProgram program){
         List<Float> verticeList = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
         List<Float> textureCoordList = new ArrayList<>();
@@ -36,7 +41,7 @@ public class ModelUtils {
         for(int i = 0; i < indices.length;i++){indices[i]=indexList.get(i);}
         for(int i = 0; i < textureCoords.length;i++){textureCoords[i]=textureCoordList.get(i);}
 
-        return new TexturedModel(vertices,indices,textureCoords,texture);
+        return new TexturedModel(vertices,indices,textureCoords,program,texture);
     }
 
     public static void translateModel(Model model, float x, float y, float z){

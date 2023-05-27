@@ -2,6 +2,8 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
@@ -22,6 +24,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     protected String name = null;
     protected float bias = -1;
     protected int texture;
+    protected ShaderProgram shaderProgram;
     protected boolean shouldConsiderMiddleBlocks = true;
 
     ArrayList<ProceduralBuildingBlock> allBlocks = new ArrayList<>();
@@ -29,9 +32,22 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
 
     public ProceduralBuilding(String sourceDir){
         sourceDirectory = sourceDir;
+        shaderProgram = new TextureShaderProgram();
         texture = TextureManager.loadTexture(sourceDir+"\\Texture.png");
         String[] data = Utils.readFile(sourceDir+"\\Main.procb").split("\n");
-        //maybe put it in a constant as the directory names?
+        decompileData(data); //maybe put it in a constant as the directory names?
+    }
+
+    public ProceduralBuilding(String sourceDir, ShaderProgram program){
+        sourceDirectory = sourceDir;
+        shaderProgram = program;
+        texture = TextureManager.loadTexture(sourceDir+"\\Texture.png");
+        String[] data = Utils.readFile(sourceDir+"\\Main.procb").split("\n");
+        decompileData(data); //maybe put it in a constant as the directory names?
+    }
+
+
+    private void decompileData(String[] data){
         for (int i = 0; i < data.length; i++) {
             String[] cmd = data[i].split("=");
             switch (cmd[0]){
@@ -60,7 +76,6 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
             }
 
         }
-
     }
 
     private void compileFloors(String[] names){
@@ -103,7 +118,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         }
         TexturedModel[] floorArray = new TexturedModel[floorModels.size()];
         floorArray = floorModels.toArray(floorArray);
-        return ModelUtils.mergeModels(floorArray, texture);
+        return ModelUtils.mergeModels(floorArray, texture, shaderProgram);
     }
 
     public ProceduralBuildingBlock getBlock(String name){

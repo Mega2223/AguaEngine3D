@@ -138,7 +138,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             if(!genEast){genEast = buildMap[z][x+1] != where;}
             if(!genWest){genWest = buildMap[z][x-1] != where;}
 
-            whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z));
+            whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z,context.shaderProgram));
             blockMap[z][x] = block;
             return true;
         }

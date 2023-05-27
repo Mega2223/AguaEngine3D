@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
@@ -19,6 +20,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 
+import java.io.IOException;
 import java.util.Vector;
 
 @SuppressWarnings("unused")
@@ -54,23 +56,33 @@ public class Gaem3D {
 
         //tests
 
+        TextureShaderProgram shaderProgram = new TextureShaderProgram();
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
         int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
         //ProceduralBuildingManager.printBitMap(map);
 
-        ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor");
-        ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor");
-        ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
+        ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor",shaderProgram);
+        ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor",shaderProgram);
+        ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",shaderProgram);
 
         GLFW.glfwMakeContextCurrent(manager.getWindow());
-        long timer = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         context.addObject(grass.generate(map,1));
         context.addObject(tile.generate(map,3));
-        context.addObject(building.generate(map,2));
+        System.out.println("Object generation took: " + (System.currentTimeMillis() - time) + " milis");
+
+        TexturedModel buildingModel = TexturedModel.loadTexturedModel(
+                Utils.readFile(Utils.MODELS_DIR+"\\buildingModel.obj").split("\n"),
+                new TextureShaderProgram(),
+                TextureManager.loadTexture(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1\\Texture.png")
+        );
+        context.addObject(buildingModel);
+
 
         context.setBackGroundColor(new float[]{0,0,0,1});
         context.setLight(0,0,2,0,100);
         context.setActive(true);
+        context.setFogDetails(0,10);
 
         //Render Logic be like:
         long unrendered = 0;

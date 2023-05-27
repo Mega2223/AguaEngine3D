@@ -14,13 +14,13 @@ public class Utils {
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(path));
-            String ret = "";
+            StringBuilder ret = new StringBuilder();
             String line = reader.readLine();
             while(line != null){
-                ret += line + "\n";
+                ret.append(line).append("\n");
                 line = reader.readLine();
             }
-            return ret;
+            return ret.toString();
         } catch (IOException e) {
             RuntimeException runtimeException = new RuntimeException("There is no directory such as " + path);
             e.printStackTrace();

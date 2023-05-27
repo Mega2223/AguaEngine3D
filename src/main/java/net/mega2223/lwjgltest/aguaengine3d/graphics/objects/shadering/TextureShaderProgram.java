@@ -9,6 +9,7 @@ public class TextureShaderProgram implements ShaderProgram{
     final int programID;
 
     public TextureShaderProgram(){
+        System.out.println("gen");
         programID = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR + "\\TextureFragShader.fsh",

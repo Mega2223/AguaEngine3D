@@ -66,6 +66,7 @@ public class Context {
 
     public void setFogDetails(float dist, float dissolve){
         for (Model o : objects) {
+            GL30.glUseProgram(o.getShader().getID());
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogStart"),dist);
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
         }

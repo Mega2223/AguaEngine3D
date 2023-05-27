@@ -20,6 +20,7 @@ public class TexturedModel extends Model{
         super(triangles,indices,shader);
         init(textureShift,TextureManager.loadTexture(textureDir));
     }
+
     public TexturedModel(float[] triangles,int[] indices, float[] textureShift, ShaderProgram shader, float[] normals, String textureDir) {
         super(triangles,indices,shader,normals);
         init(textureShift,TextureManager.loadTexture(textureDir));
