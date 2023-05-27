@@ -36,7 +36,7 @@ void main(){
 
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
-        vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
+        vec4 mixedColor = mix(color2, lightColors[i], lightColors[i].a);
         color = mix(color,mixedColor,lightInfluence);
     }
 
