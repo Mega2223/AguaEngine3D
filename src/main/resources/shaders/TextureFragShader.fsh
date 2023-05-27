@@ -9,7 +9,7 @@ in vec3 normalAligment;
 const int MAX_LIGHTS = 10;
 
 uniform sampler2D samplerTexture;
-
+uniform int itneration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
@@ -27,6 +27,7 @@ float calculateLightInfluence(vec4 light,vec4 coord){
 
 //walks var towards varTo, at a maximum diference of unit
 float stepToVar(float var, float varTo, float unit){
+    if(unit < 0){unit = -unit;}
     float difference = var - varTo;
     if(difference > unit){return -unit;}
     if(difference < -unit){return unit;}
@@ -40,10 +41,7 @@ void main(){
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
-        vec4 test = mixedColor - color;
-        for(int j = 0; j < 3; j++){
-            color[j] += stepToVar(color[j],mixedColor[j],lightInfluence);
-        }
+        color = mix(color,mixedColor,lightInfluence);
     }
 
     //fog calculations
@@ -52,6 +50,7 @@ void main(){
     fogInfluence/=fogDissolve;
     fogInfluence = clamp(fogInfluence,0,1);
     color = mix(color,fogColor,fogInfluence);
+
 
 }
 

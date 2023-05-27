@@ -41,9 +41,7 @@ void main(){
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
-        for(int j = 0; j < 4; j++){
-            color[j] += stepToVar(color[j],mixedColor[j],lightInfluence);
-        }
+        color = mix(color,mixedColor,lightInfluence);
     }
 
     //fog calculations
