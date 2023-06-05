@@ -2,26 +2,16 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayBasedTextureShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL30;
-
-import java.io.IOException;
-import java.util.Vector;
 
 @SuppressWarnings("unused")
 
@@ -50,22 +40,24 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= speed*c;camera[2]+= speed*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+
         });
 
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
 
-        TextureShaderProgram shaderProgram = new TextureShaderProgram();
+        /*TextureShaderProgram shaderProgram = new TextureShaderProgram();
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
         int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
-        //ProceduralBuildingManager.printBitMap(map);
 
         ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor",shaderProgram);
         ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor",shaderProgram);
         ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",shaderProgram);
 
-        GLFW.glfwMakeContextCurrent(manager.getWindow());
+
         long time = System.currentTimeMillis();
         context.addObject(grass.generate(map,1));
         context.addObject(tile.generate(map,3));
@@ -76,13 +68,28 @@ public class Gaem3D {
                 new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1\\Texture.png")
         );
+        Model am = Model.loadModel(
+                Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"),
+                new SolidColorShaderProgram(5f,.3f,.2f)
+        );
+        am.setCoords(new float[]{10,0,10,0});
         context.addObject(buildingModel);
+        context.addObject(am);*/
 
+        Model triang = new Model(
+                new float[]{0,0,0,0 , 0,10,0,0 , 10,0,0,0},
+                new int[]{0,1,2},
+                new MultipleColorsShaderProgram(new float[]{0,1,0,0 , 1,0,0,0 , 0,0,1,0})
 
-        context.setBackGroundColor(new float[]{0,0,0,1});
-        context.setLight(0,0,2,0,100);
+        );
+
+        context.addObject(triang);
+
+        context.setBackGroundColor(new float[]{0,0,.4f,0});
+        context.setLight(0,0,2,0,10);
+        context.setLight(6,0,0,0,1000);
         context.setActive(true);
-        context.setFogDetails(0,10);
+        context.setFogDetails(1500,0);
 
         //Render Logic be like:
         long unrendered = 0;
@@ -120,7 +127,12 @@ public class Gaem3D {
     }
 
     protected static void doLogic(){
-
+        /*double sin = Math.sin((float) framesElapsed / 280);
+        double cos = Math.cos((float) framesElapsed / 280);
+        context.setLight(0,10,4,25,(float) (sin +.9)*6);
+        context.setLight(1,10,1,10,.5f);
+        context.setLightColor(1,1,0,0,.5f);
+        context.setBackGroundColor((float) cos/3, (float) cos/3,(float)(sin+.75f)/2);*/
     }
 
     protected static void doRenderLogic(){

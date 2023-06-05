@@ -173,12 +173,14 @@ public class Model {
         if(!areVBOSInitialized()){
             initVBOS();
         }
+        shader.preRenderLogic();
         //set normals data, each normal is a 3D vector representing a vertex normal
         GL30.glEnableVertexAttribArray(SHADER_NORMALS_LOCATION);
         GL30.glVertexAttribPointer(SHADER_NORMALS_LOCATION,3,GL30.GL_FLOAT,false,0,0L);
         GL30.glUseProgram(this.shader.getID());
         drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,this.shader, getIndicesVBO(), indexes.length);
         GL30.glDisableVertexAttribArray(SHADER_NORMALS_LOCATION);
+        shader.postRenderLogic();
     }
     //for subclasses
     public void doLogic(int itneration){

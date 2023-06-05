@@ -36,6 +36,7 @@ public class WindowManager {
 
         GL.createCapabilities();
         GL30.glEnable(GL30.GL_DEPTH_TEST);
+        GL30.glEnable(GL30.GL_BLEND);
         GL30.glDepthFunc(GL30.GL_LESS);
         //GLFW.glfwSwapInterval(1);
 
@@ -54,7 +55,6 @@ public class WindowManager {
             GL30.glViewport(0,0,w,h);
             viewportSize[0] = w;
             viewportSize[1] = h;
-            System.out.println("resize");
         });
     }
 

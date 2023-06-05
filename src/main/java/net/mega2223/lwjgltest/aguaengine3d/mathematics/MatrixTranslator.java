@@ -269,6 +269,11 @@ public class MatrixTranslator {
         mat4[11]=z;
 
     }
+    public static float[] createTranslationMatrix(float x, float y, float z){
+        float[] ret = new float[16];
+        generateTranslationMatrix(ret,x,y,z);
+        return ret;
+    }
 
     public static void debugMatrix4x4(float[] matrix4) {
         StringBuilder debug = new StringBuilder("[ ");

@@ -1,3 +1,5 @@
+package net.mega2223.aguaengine3d.tests;
+
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 
 public class ProjectionMTeste {

@@ -1,3 +1,5 @@
+package net.mega2223.aguaengine3d.tests;
+
 public class TriDimRotTest {
     static float[]vect = {1,0,0};
 

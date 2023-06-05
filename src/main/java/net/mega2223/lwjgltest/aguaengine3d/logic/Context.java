@@ -51,9 +51,22 @@ public class Context {
         return this;
 
     }
-
+    @Deprecated
     public void setBackGroundColor(float[] backGroundColor) {
         this.backGroundColor = backGroundColor;
+        GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
+        //sets the fog color uniform variable for every shader
+        for (Model ac : getObjects()){
+            int p = ac.getShader().getID();
+            int c = GL30.glGetUniformLocation(p,"fogColor");
+            GL30.glUseProgram(p);
+            GL30.glUniform4fv(c,backGroundColor);
+        }
+    }
+    public void setBackGroundColor(float r, float g, float b) {
+        this.backGroundColor[0] = r;
+        this.backGroundColor[1] = g;
+        this.backGroundColor[2] = b;
         GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
         for (Model ac : getObjects()){
