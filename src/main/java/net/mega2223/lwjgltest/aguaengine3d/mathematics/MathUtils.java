@@ -35,4 +35,16 @@ public class MathUtils {
         }
         return ret;
     }
+
+    public static void predictNextPos(float[] initialVector, float vectorSpeed, float directionRadians){
+        predictNextPos(initialVector,0,1,vectorSpeed,directionRadians);
+    }
+
+    public static void predictNextPos(float[] initialVector, int xLocationInArray, int zLocationInArray, float vectorSpeed, float directionRadians){
+        float x = initialVector[xLocationInArray] , z = initialVector[zLocationInArray];
+        float s = (float) Math.sin(directionRadians);
+        float c = (float) Math.cos(directionRadians);
+        initialVector[xLocationInArray] += s * vectorSpeed;
+        initialVector[zLocationInArray] += c * vectorSpeed;
+    }
 }

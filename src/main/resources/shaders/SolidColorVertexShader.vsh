@@ -4,6 +4,7 @@ layout(location = 2) in vec3 normal;
 
 uniform mat4 translation;
 uniform mat4 projection;
+uniform mat4 rotation = mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
 
 out vec4 worldCoord;
 out vec3 normalAligment;
@@ -15,7 +16,7 @@ void main(){
     gl_Position.w = 1;
 
     vec4 toTrans = vec4(gl_Position.xyzw);
-    gl_Position = projection * (toTrans*translation);
+    gl_Position = projection * (rotation*toTrans*translation);
     worldCoord = gl_Position;
     objectiveCoord = toTrans * translation;
     normalAligment.xyz = ((vec4(normal.xyz,1) * translation)* projection).xyz;

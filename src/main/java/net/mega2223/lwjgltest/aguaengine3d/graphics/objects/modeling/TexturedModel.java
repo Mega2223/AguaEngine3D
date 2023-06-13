@@ -204,4 +204,8 @@ public class TexturedModel extends Model{
     public void setTextureShift(float[] textureShift) {
         this.textureShift = textureShift;
     }
+
+    public int getTexture() {
+        return texture;
+    }
 }

@@ -6,6 +6,7 @@ layout(location = 2) in vec3 normal;
 
 uniform mat4 projection;
 uniform mat4 translation;
+uniform mat4 rotation = mat4(1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1);
 
 out vec2 texturePosition;
 out vec4 worldCoord;
@@ -18,7 +19,7 @@ void main(){
     gl_Position.w = 1;
     vec4 toTrans = vec4(gl_Position.xyzw);
 
-    gl_Position = projection * (toTrans*translation);
+    gl_Position = projection * (toTrans*translation*rotation);
     objectiveCoord = toTrans * translation;
     worldCoord = gl_Position;
     texturePosition = textureCoords;

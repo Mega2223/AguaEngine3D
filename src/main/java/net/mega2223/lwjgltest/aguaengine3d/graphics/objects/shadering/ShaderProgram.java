@@ -29,6 +29,7 @@ public interface ShaderProgram {
         GL30.glUseProgram(getID());
         GL30.glUniform4f(location,r,g,b,influence);
     }
+
     default void preRenderLogic(){}
     default void postRenderLogic(){}
 }

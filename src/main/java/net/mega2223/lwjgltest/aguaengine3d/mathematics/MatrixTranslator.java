@@ -7,11 +7,6 @@ package net.mega2223.lwjgltest.aguaengine3d.mathematics;
  * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended*/
 public class MatrixTranslator {
 
-
-    public static void genTranslationMatrix(float[] mat,float fov, float x, float y, float z, float zNear, float zFar){
-
-    }
-
     public static final int ISOMETRIC_PROJECTION = 0;
     public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
     public static final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
@@ -121,9 +116,17 @@ public class MatrixTranslator {
         rotateVector3(vec3, rX, rY, rZ, aX, aY, aZ,0);
     }
     public static void rotateVector3 (float[] vec3, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex){
-        //pain
         float x = vec3[startIndex]; float y = vec3[startIndex+1]; float z = vec3[startIndex+2];
+        rotateVector3(vec3,x,y,z,rX,rY,rZ,aX,aY,aZ,startIndex);
+        //System.out.println("("+x+","+y+","+z+") -> ("+vec3[0]+","+vec3[1]+","+vec3[2]+")");
+    }
 
+    public static void rotateVector3 (float[] vec3, float x, float y, float z, double rX, double rY, double rZ){
+        rotateVector3(vec3,x,y,z,rX,rY,rZ,0,0,0,0);
+    }
+
+    public static void rotateVector3 (float[] vec3, float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex) {
+        //pain
         while(rX < 0){rX += Math.PI*2;}
         while(rY < 0){rY += Math.PI*2;}
         while(rZ < 0){rZ += Math.PI*2;}
@@ -157,10 +160,10 @@ public class MatrixTranslator {
         vec3[startIndex] = (float) (Axx*nX + Axy*nY + Axz*nZ);
         vec3[startIndex+1] = (float) (Ayx*nX + Ayy*nY + Ayz*nZ);
         vec3[startIndex+2] = (float) (Azx*nX + Azy*nY + Azz*nZ);
-        //System.out.println("("+x+","+y+","+z+") -> ("+vec3[0]+","+vec3[1]+","+vec3[2]+")");
     }
 
-    public static void rotateVector2(float[] vec2, float[] anchorVec, double rotationRadians) {
+
+        public static void rotateVector2(float[] vec2, float[] anchorVec, double rotationRadians) {
         rotateVector2(vec2,vec2[0], vec2[1], anchorVec[0], anchorVec[1], rotationRadians);
     }
     public static void rotateVector2(float[] vec2,float cX, float cY, double rotationRadians){
@@ -269,10 +272,38 @@ public class MatrixTranslator {
         mat4[11]=z;
 
     }
+
     public static float[] createTranslationMatrix(float x, float y, float z){
         float[] ret = new float[16];
         generateTranslationMatrix(ret,x,y,z);
         return ret;
+    }
+
+    private static float[] bufferMatrix = new float[16];
+    public static void generateRotatioMatrix(float[] m4, float rX, float rY, float rZ){
+        float sX = (float) Math.sin(rX);
+        float sY = (float) Math.sin(rY);
+        float sZ = (float) Math.sin(rZ);
+        float cX = (float) Math.cos(rX);
+        float cY = (float) Math.cos(rX);
+        float cZ = (float) Math.cos(rX);
+
+        for (int i = 0; i < m4.length; i++) {m4[i] = 0;}
+
+        m4[0] = cZ * cY;
+        m4[1] = cZ * sY * sX - sZ * cX;
+        m4[2] = cZ * sY * cX + sZ * sX;
+
+        m4[4] = sZ * cY;
+        m4[5] = sZ * sY * sX + cZ * cX;
+        m4[6] = sZ * sY * cX - cZ * sX;
+
+        m4[8] = -sY;
+        m4[9] = cY * sX;
+        m4[10] = cY * cX;
+
+        m4[15] = 1;
+
     }
 
     public static void debugMatrix4x4(float[] matrix4) {

@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
 
-    int id;
+    protected int id;
     @Override
     public int getID() {
         return id;
@@ -12,11 +12,16 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
 
     protected int projectionMatrixLocation = -1;
     protected int translationMatrixLocation = -1;
+    protected int rotationMatrixLocation = -1;
+    protected int itnerationLocation = -1;
 
     @Override
     public void initUniforms() {
         projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
+        rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
+        itnerationLocation = GL30.glGetUniformLocation(getID(),"itneration");
+
     }
 
     @Override
@@ -24,6 +29,12 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         GL30.glUseProgram(getID());
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
+        GL30.glUniform1i(itnerationLocation,interation);
+    }
+
+    public void setRotationMatrix(float[] m4){
+        GL30.glUseProgram(getID());
+        GL30.glUniformMatrix4fv(rotationMatrixLocation,false,m4);
     }
 
     @Override

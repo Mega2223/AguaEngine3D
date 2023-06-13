@@ -212,6 +212,7 @@ public class Model {
     public void setCoords(float[] coords){
         for (int i = 0; i < this.coords.length; i++) {this.coords[i] = coords[i];}
     }
+    public void setCoords(float x, float y, float z){coords[0] = x; coords[1] = y; coords[2] = z;}
 
     public int getVerticesVBO() {
         return verticesVBO;
