@@ -280,13 +280,13 @@ public class MatrixTranslator {
     }
 
     private static float[] bufferMatrix = new float[16];
-    public static void generateRotatioMatrix(float[] m4, float rX, float rY, float rZ){
+    public static void generateRotationMatrix(float[] m4, float rX, float rY, float rZ){
         float sX = (float) Math.sin(rX);
         float sY = (float) Math.sin(rY);
         float sZ = (float) Math.sin(rZ);
         float cX = (float) Math.cos(rX);
-        float cY = (float) Math.cos(rX);
-        float cZ = (float) Math.cos(rX);
+        float cY = (float) Math.cos(rY);
+        float cZ = (float) Math.cos(rZ);
 
         for (int i = 0; i < m4.length; i++) {m4[i] = 0;}
 
