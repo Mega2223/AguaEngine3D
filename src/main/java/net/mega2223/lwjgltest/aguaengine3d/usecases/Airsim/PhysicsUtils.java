@@ -6,7 +6,7 @@ public class PhysicsUtils {
     private PhysicsUtils(){}
 
     public static float[] generatePredictionVector(float magnitude, float rx, float ry, float rz){
-        float[] ret = {0,1,0,0};
+        float[] ret = {0,0,1,0};
         MatrixTranslator.rotateVector3(ret,rx,ry,rz);
         for (int i = 0; i < ret.length; i++) {ret[i]*=magnitude;}
         return ret;

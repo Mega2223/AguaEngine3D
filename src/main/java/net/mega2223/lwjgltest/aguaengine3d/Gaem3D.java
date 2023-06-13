@@ -8,6 +8,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.joml.Matrix4f;
@@ -76,12 +77,23 @@ public class Gaem3D {
         context.addObject(buildingModel);
         context.addObject(am);*/
 
+
+
         Model triang = new Model(
                 new float[]{0,0,0,0 , 0,10,0,0 , 10,0,0,0},
                 new int[]{0,1,2},
                 new MultipleColorsShaderProgram(new float[]{0,1,0,0 , 1,0,0,0 , 0,0,1,0})
-
-        );
+        ){
+            final float[] ret = new float[16];
+            @Override
+            public void doLogic(int itneration) {
+                super.doLogic(itneration);
+                MatrixTranslator.debugMatrix4x4(ret);
+                MatrixTranslator.generateRotationMatrix(ret,0,(float) -itneration/100,0);
+                //new Matrix4f().identity().rotationXYZ(0f,(float) -itneration/100,0f).get(ret);
+                shader.setRotationMatrix(ret);
+            }
+        };
 
         context.addObject(triang);
 

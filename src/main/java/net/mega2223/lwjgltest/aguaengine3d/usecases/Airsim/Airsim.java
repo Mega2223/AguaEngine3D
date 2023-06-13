@@ -1,10 +1,8 @@
 package net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim;
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.MultipleColorsShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
@@ -42,7 +40,6 @@ public class Airsim {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
         });
-        GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
 
@@ -52,8 +49,8 @@ public class Airsim {
         ProceduralBuilding b = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
         TexturedModel build = b.generate(pattern, 1);
         float[] mat =  new float[16];
-        MatrixTranslator.generateRotatioMatrix(mat,0.5f,0,0);
-        ((TextureShaderProgram) build.getShader()).setRotationMatrix(mat);
+        MatrixTranslator.generateRotationMatrix(mat,0,0,0);
+
         context.addObject(build);
         ProceduralBuilding g = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor");
         context.addObject(g.generate(pattern,2));
@@ -76,8 +73,17 @@ public class Airsim {
                 super.doLogic(itneration);
             }
         };
-        plane.setThrottle(.01F);
+
         manager.addKeypressEvent((window, key, scancode, action, mods) -> {
+            if(key == GLFW.GLFW_KEY_F3 && action == GLFW.GLFW_PRESS){
+                plane.addToThrottleControl(.1f);
+            }
+            if(key == GLFW.GLFW_KEY_F2 && action == GLFW.GLFW_PRESS){
+                plane.addToThrottleControl(-.1f);
+            }
+
+        });
+        manager.addUpdateEvent(() -> {
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
                 plane.addToPitchControl(0.1F);
             }
@@ -85,13 +91,11 @@ public class Airsim {
                 plane.addToPitchControl(-0.1F);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
-                plane.addToYawControl(-0.1F);
-            }
-            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
                 plane.addToYawControl(0.1F);
             }
-
-                    System.out.println("P"+plane.getPitchControl());
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
+                plane.addToYawControl(-0.1F);
+            }
         }
         );
 

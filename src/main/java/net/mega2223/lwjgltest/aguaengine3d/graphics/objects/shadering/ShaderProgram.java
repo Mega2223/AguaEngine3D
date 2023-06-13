@@ -10,7 +10,7 @@ public interface ShaderProgram {
 
     void initUniforms();//because i forgot to put it once so now all classes must have it
     void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix);
-
+    void setRotationMatrix(float[] m4);
 
     default void setLights(float[][] lights){
         GL30.glUseProgram(getID());

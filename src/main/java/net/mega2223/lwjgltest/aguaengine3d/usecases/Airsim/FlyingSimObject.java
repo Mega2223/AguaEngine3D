@@ -1,6 +1,8 @@
 package net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 
 @SuppressWarnings("unused")
@@ -32,8 +34,9 @@ public abstract class FlyingSimObject extends SimObject{
         this.engineStrenght = 1f;
         this.maxYawPush = 1f;
         this.maxPitch = 1f;
-        this.drag = .6f;
+        this.drag = .1f;
         this.directionRadians = new float[3];
+
     }
 
     public FlyingSimObject(TexturedModel model) {
@@ -42,11 +45,12 @@ public abstract class FlyingSimObject extends SimObject{
         this.engineStrenght = 1f;
         this.maxYawPush = 1f;
         this.maxPitch = 1f;
-        this.drag = .6f;
+        this.drag = .1f;
         this.directionRadians = new float[3];
 
     }
 
+    private final float[] rotationMatrix = new float[16];
 
     @Override
     public void doLogic(int itneration) {
@@ -59,19 +63,17 @@ public abstract class FlyingSimObject extends SimObject{
             speed = 0;
         }
 
-        //direction calculations
-        float yawInfluence = yawControl * maxYawPush * speed;
 
-        directionRadians[1] -= yawInfluence;
+        directionRadians[1] += yawControl*maxYawPush*speed;
+        directionRadians[2] += pitchControl*maxPitch*speed;
 
-        //direction[1] = 1;
-        directionRadians[2] = (float) (Math.PI/2);
+        MatrixTranslator.generateRotationMatrix(rotationMatrix,-directionRadians[2],-directionRadians[1],directionRadians[0]);
+        shader.setRotationMatrix(rotationMatrix);
 
-        float[] predictionVec = PhysicsUtils.generatePredictionVector(speed, directionRadians[0], directionRadians[1], directionRadians[2]);
+        float[] predictionVector = PhysicsUtils.generatePredictionVector(speed,directionRadians[0],directionRadians[1],directionRadians[2]);
 
-        VectorTranslator.addToVector(coords,predictionVec);
-
-        //System.out.println(direction[0] + ":" + direction[1] + ":" + direction[2]);
+        predictionVector[1] -= 0.1f;
+        VectorTranslator.addToVector(coords,predictionVector);
 
         if(coords[1] <= 0){coords[1] = 0;}
     }

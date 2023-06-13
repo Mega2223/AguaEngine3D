@@ -50,4 +50,12 @@ public class VectorTranslator {
         vector[1]+=y;
         vector[2]+=z;
     }
+
+    public static void debugVector (float[] vec){
+        System.out.print("v: [");
+        for (int i = 0; i < vec.length - 1; i++) {
+            System.out.print(vec[i] + ",");
+        }
+        System.out.print(vec[vec.length-1]+"]\n");
+    }
 }

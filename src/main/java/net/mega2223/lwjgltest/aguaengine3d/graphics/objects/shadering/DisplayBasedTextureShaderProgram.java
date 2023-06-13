@@ -4,7 +4,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
-public class DisplayBasedTextureShaderProgram implements ShaderProgram{
+public class DisplayBasedTextureShaderProgram extends ShaderProgramTemplate implements ShaderProgram{
     final int programID;
     int texture;
     public DisplayBasedTextureShaderProgram(int texture){
@@ -24,19 +24,9 @@ public class DisplayBasedTextureShaderProgram implements ShaderProgram{
     }
 
     @Override
-    public void initUniforms() {
-        translationMatrixLocation = GL30.glGetUniformLocation(programID,"translation");
-        projectionMatrixLocation = GL30.glGetUniformLocation(programID,"projection");
-    }
-
-    int translationMatrixLocation = -1;
-    int projectionMatrixLocation = -1;
-
-    @Override
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
-        GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
-        GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
+        super.setUniforms(interation, translationMatrix, projectionMatrix);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         GL30.glActiveTexture(texture);
     }

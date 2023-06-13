@@ -19,7 +19,7 @@ void main(){
     gl_Position.w = 1;
     vec4 toTrans = vec4(gl_Position.xyzw);
 
-    gl_Position = projection * (toTrans*translation*rotation);
+    gl_Position = projection * (rotation*toTrans*translation);
     objectiveCoord = toTrans * translation;
     worldCoord = gl_Position;
     texturePosition = textureCoords;
