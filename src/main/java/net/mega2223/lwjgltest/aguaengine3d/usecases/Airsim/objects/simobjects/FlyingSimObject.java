@@ -1,9 +1,11 @@
-package net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim;
+package net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.objects.simobjects;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.Aerodynamics;
+import net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.PhysicsUtils;
 
 @SuppressWarnings("unused")
 public abstract class FlyingSimObject extends SimObject{
@@ -11,11 +13,14 @@ public abstract class FlyingSimObject extends SimObject{
     //consts
     public static final boolean GEAR_DOWN = true;
     public static final boolean GEAR_UP = false;
+    public static final int PITCH_LOC = 2;
+    public static final int YAW_LOC = 1;
+    protected static final float DEFAULT_ATTACK_ANGLE = (float) ((Math.PI * 2) - (2 * Math.PI / 10));
 
     private float[] directionRadians;
 
     //local variables that differ for each model, should not be changeable
-    protected final float weight, drag;
+    protected final float weight, drag, attackAngle;
     protected final float engineStrenght, maxYawPush, maxPitch;
 
     //local variables for physics and stuff, should be calculated by the physics handlers and NOT changed externally
@@ -31,10 +36,11 @@ public abstract class FlyingSimObject extends SimObject{
     public FlyingSimObject(float[] vertices, int[] indices, float[] textureShift, String textureDir) {
         super(vertices, indices, textureShift, textureDir);
         this.weight = 1f;
-        this.engineStrenght = 1f;
+        this.engineStrenght = .1f;
         this.maxYawPush = 1f;
         this.maxPitch = 1f;
         this.drag = .1f;
+        this.attackAngle = DEFAULT_ATTACK_ANGLE;
         this.directionRadians = new float[3];
 
     }
@@ -42,12 +48,23 @@ public abstract class FlyingSimObject extends SimObject{
     public FlyingSimObject(TexturedModel model) {
         super(model);
         this.weight = 1f;
-        this.engineStrenght = 1f;
-        this.maxYawPush = 1f;
-        this.maxPitch = 1f;
+        this.engineStrenght = .1f;
+        this.maxYawPush = .1f;
+        this.maxPitch = .1f;
         this.drag = .1f;
+        this.attackAngle = DEFAULT_ATTACK_ANGLE;
         this.directionRadians = new float[3];
 
+    }
+
+    public FlyingSimObject(float[] vertices, int[] indices, float[] textureShift, String textureDir, float weight, float drag, float engineStrenght, float maxYawPush, float maxPitch, float attackAngle) {
+        super(vertices, indices, textureShift, textureDir);
+        this.weight = weight;
+        this.drag = drag;
+        this.engineStrenght = engineStrenght;
+        this.maxYawPush = maxYawPush;
+        this.maxPitch = maxPitch;
+        this.attackAngle = attackAngle;
     }
 
     private final float[] rotationMatrix = new float[16];
@@ -59,20 +76,30 @@ public abstract class FlyingSimObject extends SimObject{
         //speed and drag calculations
         speed += getThrottle() * engineStrenght;
         speed -= speed*drag;
+
+
         if(speed == Float.NEGATIVE_INFINITY || speed == Float.POSITIVE_INFINITY || speed < 0){
             speed = 0;
         }
 
 
-        directionRadians[1] += yawControl*maxYawPush*speed;
-        directionRadians[2] += pitchControl*maxPitch*speed;
+        directionRadians[YAW_LOC] += yawControl*maxYawPush*speed;
+        directionRadians[PITCH_LOC] += pitchControl*maxPitch*speed;
 
-        MatrixTranslator.generateRotationMatrix(rotationMatrix,-directionRadians[2],-directionRadians[1],directionRadians[0]);
+        if(coords[1] <= 0){
+            directionRadians[PITCH_LOC] += (float) MathUtils.stepTowardsVar(directionRadians[PITCH_LOC],0,0.06);
+        }
+
+        MatrixTranslator.generateRotationMatrix(rotationMatrix,-directionRadians[PITCH_LOC],-directionRadians[1],directionRadians[0]);
         shader.setRotationMatrix(rotationMatrix);
 
-        float[] predictionVector = PhysicsUtils.generatePredictionVector(speed,directionRadians[0],directionRadians[1],directionRadians[2]);
+        float[] predictionVector = Aerodynamics.generatePredictionVector(directionRadians,attackAngle,speed,3);
+        //float[] predictionVector = PhysicsUtils.generatePredictionVector(speed,directionRadians[0],directionRadians[1],directionRadians[2]);
+        VectorTranslator.debugVector(predictionVector);
 
-        predictionVector[1] -= 0.1f;
+
+        predictionVector[1] -= 0.1f;//todo
+
         VectorTranslator.addToVector(coords,predictionVector);
 
         if(coords[1] <= 0){coords[1] = 0;}
@@ -85,6 +112,10 @@ public abstract class FlyingSimObject extends SimObject{
         if(pitchControl > 1){pitchControl = 1;}
         if(throttle < 0){throttle = 0;}
         if(throttle > 1){throttle = 1;}
+        for (int i = 0; i < directionRadians.length; i++) {
+            while (directionRadians[i]>=Math.PI*2){directionRadians[i]-=Math.PI*2;}
+            while (directionRadians[i]<0){directionRadians[i]+=Math.PI*2;}
+        }
     }
 
     //"boy i sure do wish my file was bloated"

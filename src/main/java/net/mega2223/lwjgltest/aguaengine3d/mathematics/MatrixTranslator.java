@@ -126,6 +126,11 @@ public class MatrixTranslator {
     }
 
     public static void rotateVector3 (float[] vec3, float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex) {
+
+        if(rX == Float.POSITIVE_INFINITY || rX == Float.NEGATIVE_INFINITY){rX = 0;}
+        if(rY == Float.POSITIVE_INFINITY || rY == Float.NEGATIVE_INFINITY){rY = 0;}
+        if(rZ == Float.POSITIVE_INFINITY || rZ == Float.NEGATIVE_INFINITY){rZ = 0;}
+
         //pain
         while(rX < 0){rX += Math.PI*2;}
         while(rY < 0){rY += Math.PI*2;}

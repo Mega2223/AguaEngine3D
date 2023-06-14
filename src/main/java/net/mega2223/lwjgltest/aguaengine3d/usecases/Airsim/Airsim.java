@@ -9,9 +9,9 @@ import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
+import net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.objects.simobjects.FlyingSimObject;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
 
 public class Airsim {
 
@@ -21,6 +21,8 @@ public class Airsim {
     public static final int TARGET_FPS = 120;
     static WindowManager manager;
     static Context context = new Context();
+
+    static FlyingSimObject plane;
 
     public static void main(String[] args) {
 
@@ -51,22 +53,18 @@ public class Airsim {
         float[] mat =  new float[16];
         MatrixTranslator.generateRotationMatrix(mat,0,0,0);
 
-        context.addObject(build);
+        //context.addObject(build);
         ProceduralBuilding g = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor");
-        context.addObject(g.generate(pattern,2));
+        //context.addObject(g.generate(pattern,2));
         ProceduralBuilding p = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor");
-        context.addObject(p.generate(pattern,3));
-        context.setBackGroundColor(.5f,.5f,.6f);
-        context.setLight(6,0,0,0,1000);
-        context.setActive(true);
-        context.setFogDetails(1500,0);
+        //context.addObject(p.generate(pattern,3));
 
         //air tests
-        FlyingSimObject plane = new FlyingSimObject(
+        plane = new FlyingSimObject(
                 TexturedModel.loadTexturedModel(
                         Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),
                         new TextureShaderProgram(),
-                        TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\tijolo.png")
+                        TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
                 )
         ) {
             public void doLogic(int itneration) {
@@ -74,7 +72,21 @@ public class Airsim {
             }
         };
 
+        TexturedModel chessBoardFloor = new TexturedModel(
+                new float[]{-1000,0,-1000,0 , -1000,0,1000,0 , 1000,0,1000,0 , 1000,0,-1000,0},
+                new int[]{0,1,2,2,3,0},
+                new float[]{0,0 , 0,2000 , 2000,2000 , 2000,0},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
+        );
+
+        context.addObject(chessBoardFloor);
+
         manager.addKeypressEvent((window, key, scancode, action, mods) -> {
+            if(key == GLFW.GLFW_KEY_P && action == GLFW.GLFW_PRESS){
+                plane.setThrottle(0);
+                plane.setYawControl(0);
+                plane.setPitchControl(0);
+            }
             if(key == GLFW.GLFW_KEY_F3 && action == GLFW.GLFW_PRESS){
                 plane.addToThrottleControl(.1f);
             }
@@ -104,6 +116,12 @@ public class Airsim {
         //plane.setThrottle(.01f);
 
         //Render Logic be like:
+
+        context.setBackGroundColor(.5f,.5f,.6f);
+        context.setLight(6,0,0,0,1000);
+        context.setActive(true);
+        context.setFogDetails(1500,0);
+
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
         long lastLoop = applicationStart;
@@ -117,7 +135,8 @@ public class Airsim {
             lastLoop = System.currentTimeMillis();
             if(System.currentTimeMillis() - fLSLastUpdate > 1000){
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName,TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
+                float[] coords = plane.getCoords();
+                GLFW.glfwSetWindowTitle(manager.windowName,TITLE + "    FPS: " + (framesLastSecond) + "(x: " + coords[0] + " y: " + coords[1]+ " z: " + coords[2] + ")");
                 framesLastSecond = 0;
 
             }
@@ -145,9 +164,10 @@ public class Airsim {
     protected static void doRenderLogic(){
 
         float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
+        float[] coords = plane.getCoords();
         Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), asp, 0.01f, 10000.0f)
                 .lookAt(camera[0], camera[1], camera[2],
-                        (float) (camera[0]+Math.sin(camera[3])), camera[1], (float) (camera[2]+Math.cos(camera[3])),
+                        (float) coords[0], coords[1], coords[2],
                         0.0f, 1.0f, 0.0f);
         float[] trans = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
         proj.get(trans);

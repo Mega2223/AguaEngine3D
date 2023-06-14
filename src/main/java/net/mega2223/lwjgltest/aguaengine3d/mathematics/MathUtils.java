@@ -47,4 +47,29 @@ public class MathUtils {
         initialVector[xLocationInArray] += s * vectorSpeed;
         initialVector[zLocationInArray] += c * vectorSpeed;
     }
+
+    public static double stepTowardsVar(double var, double varTo, double unit){
+        double difference = var - varTo;
+        if(difference > unit){return - unit;}
+        if(difference < -unit){return unit;}
+        return -difference;
+    }
+
+
+    public static float angleDifference(float a1, float a2){
+        final float pi2 = (float) (Math.PI * 2);
+        a1 = Math.abs(a1%pi2);
+        a2 = Math.abs(a2%pi2);
+
+        float smallestDis = Math.abs(a1-a2);
+        for (float i = -1; i < 2; i+=1) {
+            float dis = Math.abs(a1-(a2+(i*pi2)));
+            smallestDis = Math.min(dis,smallestDis);
+        }
+
+        return smallestDis;
+
+    }
+
+
 }
