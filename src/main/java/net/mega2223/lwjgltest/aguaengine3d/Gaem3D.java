@@ -50,7 +50,7 @@ public class Gaem3D {
 
         //tests
 
-        /*TextureShaderProgram shaderProgram = new TextureShaderProgram();
+        TextureShaderProgram shaderProgram = new TextureShaderProgram();
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
         int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
 
@@ -75,7 +75,7 @@ public class Gaem3D {
         );
         am.setCoords(new float[]{10,0,10,0});
         context.addObject(buildingModel);
-        context.addObject(am);*/
+        context.addObject(am);
 
 
 
@@ -97,11 +97,11 @@ public class Gaem3D {
 
         context.addObject(triang);
 
-        context.setBackGroundColor(new float[]{0,0,.4f,0});
-        context.setLight(0,0,2,0,10);
-        context.setLight(6,0,0,0,1000);
+        context.setBackGroundColor(.5f,.5f,.6f);
+        context.setLight(0,32,2,32,30);
+        //context.setLight(6,0,0,0,10);
         context.setActive(true);
-        context.setFogDetails(1500,0);
+        context.setFogDetails(5,20);
 
         //Render Logic be like:
         long unrendered = 0;

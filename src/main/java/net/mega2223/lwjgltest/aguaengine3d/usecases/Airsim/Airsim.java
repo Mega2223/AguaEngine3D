@@ -7,6 +7,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureSha
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.objects.simobjects.FlyingSimObject;
@@ -61,16 +62,21 @@ public class Airsim {
 
         //air tests
         plane = new FlyingSimObject(
-                TexturedModel.loadTexturedModel(
-                        Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),
-                        new TextureShaderProgram(),
-                        TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
-                )
+                //new TexturedModel(
+                //        new float[]{-1,.1f,0,0 , 1,.1f,0,0 , 0,.1f,1.5f,0},
+                //        new int[]{0,1,2},
+                //        new float[]{0,0 , 0,1 , 1,1},
+                //        TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
+                //)
+                TexturedModel.loadTexturedModel(Utils.readFile(Utils.MODELS_DIR+"\\cube2.obj").split("\n"),new TextureShaderProgram(),TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png"))
         ) {
             public void doLogic(int itneration) {
                 super.doLogic(itneration);
             }
         };
+        float[] ver = plane.getRelativeVertices();
+        VectorTranslator.addToAllVectors(ver,0,1,0);
+        plane.setVertices(ver);
 
         TexturedModel chessBoardFloor = new TexturedModel(
                 new float[]{-1000,0,-1000,0 , -1000,0,1000,0 , 1000,0,1000,0 , 1000,0,-1000,0},
@@ -120,7 +126,7 @@ public class Airsim {
         context.setBackGroundColor(.5f,.5f,.6f);
         context.setLight(6,0,0,0,1000);
         context.setActive(true);
-        context.setFogDetails(1500,0);
+        context.setFogDetails(0,100);
 
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
@@ -165,9 +171,12 @@ public class Airsim {
 
         float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
         float[] coords = plane.getCoords();
+        float[] pred = plane.getRotation();
+        pred = PhysicsUtils.generatePredictionVector(1,pred[0],pred[1],pred[2]);
         Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), asp, 0.01f, 10000.0f)
-                .lookAt(camera[0], camera[1], camera[2],
-                        (float) coords[0], coords[1], coords[2],
+                .lookAt(
+                        camera[0], camera[1], camera[2],
+                        coords[0],coords[1],coords[2],
                         0.0f, 1.0f, 0.0f);
         float[] trans = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
         proj.get(trans);

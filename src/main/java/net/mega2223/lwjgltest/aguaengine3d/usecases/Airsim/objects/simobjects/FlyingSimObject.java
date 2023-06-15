@@ -164,6 +164,11 @@ public abstract class FlyingSimObject extends SimObject{
     public float getPitchControl() {
         return pitchControl;
     }
+
+    public float[] getRotation(){
+        return directionRadians.clone();
+    }
+
     //setters for the controls
     public void setThrottle(float throttle) {
         this.throttle = throttle;
