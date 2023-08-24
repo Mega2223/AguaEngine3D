@@ -1,0 +1,1 @@
+This path contains shaders before they were adapted to the ShaderDictionary sintaxe, be aware that the shaders in this folder may not be up to date and are currently not supported

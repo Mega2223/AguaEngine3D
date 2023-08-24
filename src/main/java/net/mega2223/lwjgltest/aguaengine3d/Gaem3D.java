@@ -7,6 +7,7 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
@@ -24,7 +25,6 @@ public class Gaem3D {
     public static final float[] camera = {0,.9f,0,0};
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
-    public static ShaderDictonary shaderDictonary = ShaderDictonary.fromFile(Utils.SHADERS_DIR+"\\DefaultShaderDictionary.sdc");
     static WindowManager manager;
     static Context context = new Context();
 
@@ -51,6 +51,10 @@ public class Gaem3D {
         GLFW.glfwMaximizeWindow(manager.getWindow());
 
         //tests
+
+        ShaderManager.setIsGlobalShaderDictEnabled(true);
+        ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
+        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR+"\\DefaultShaderDictionary.sdc"));
 
         TextureShaderProgram shaderProgram = new TextureShaderProgram();
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};

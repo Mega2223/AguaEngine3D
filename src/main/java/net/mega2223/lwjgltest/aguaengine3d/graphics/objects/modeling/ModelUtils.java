@@ -13,7 +13,7 @@ public class ModelUtils {
     private ModelUtils(){}
 
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
-        return mergeModels(models,texture,new TextureShaderProgram());
+        return mergeModels(models,texture,models[0].getShader());
     }
     public static TexturedModel mergeModels(TexturedModel[] models, int texture, ShaderProgram program){
         List<Float> verticeList = new ArrayList<>();

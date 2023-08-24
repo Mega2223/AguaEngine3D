@@ -7,6 +7,8 @@ import org.lwjgl.opengl.GL32;
 public class ShaderManager {
 
     private ShaderManager(){}
+    private static ShaderDictonary globalShaderDictionary = null;
+    private static boolean isGlobalShaderDictEnabled = false;
 
     public static int loadShaderFromFiles(String[] shaderPaths, ShaderDictonary dict){
         String[] shaderContents = new String[shaderPaths.length];
@@ -32,10 +34,12 @@ public class ShaderManager {
     public static int loadShaderFromContent(String content, int shaderType, ShaderDictonary dict){
         int shader = GL30.glCreateShader(shaderType);
         if(dict != null){content = dict.resolve(content);}
+        if(isGlobalShaderDictEnabled){content = globalShaderDictionary.resolve(content);}
         GL30.glShaderSource(shader,content);
         GL30.glCompileShader(shader);
         if(GL30.glGetShaderi(shader,GL30.GL_COMPILE_STATUS) == GL30.GL_FALSE){
             System.out.println("Failed to compile shader " + shader);
+            System.out.println("\nContents:\n" + content);
             return -1;
         }
         return shader;
@@ -60,5 +64,15 @@ public class ShaderManager {
         return genProgramFromContent(shaderContents,respectiveTypes,null);
     }
 
-
+    public static void setIsGlobalShaderDictEnabled(boolean value){
+        isGlobalShaderDictEnabled = value;
+        if(value && globalShaderDictionary == null){globalShaderDictionary = new ShaderDictonary();}
     }
+    public static ShaderDictonary getGlobalShaderDictionary(){
+        return globalShaderDictionary;
+    }
+    public static void resetGlobalShaderDictionary(){
+        globalShaderDictionary.entries.clear();
+    }
+
+}

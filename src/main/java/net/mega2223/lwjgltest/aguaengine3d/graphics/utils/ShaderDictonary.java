@@ -11,7 +11,7 @@ public class ShaderDictonary {
 
     public static final String ENTRY_DIV = "--!";
     public static final String TITLE_DIV = "--:";
-    public static final String REPLACE_SIGN = "--@";
+    public static final String REPLACE_SIGN = "//--@";
 
     public ShaderDictonary(){
 
@@ -21,6 +21,12 @@ public class ShaderDictonary {
         entries.add(new ShaderDictionaryEntry(alias,content));
         return this;
     }
+
+    public ShaderDictonary add(ShaderDictonary content){
+        entries.addAll(content.entries);
+        return this;
+    }
+
     public ShaderDictonary remove(String alias){
         ArrayList<ShaderDictionaryEntry> toRemove = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
