@@ -1,6 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
@@ -12,11 +13,12 @@ public class MultipleColorsShaderProgram extends ShaderProgramTemplate implement
     float[] colorData;
     int colorDataVBO = -1;
 
-    public MultipleColorsShaderProgram(float[] colors){
+    public MultipleColorsShaderProgram(float[] colors){this(colors,null);}
+    public MultipleColorsShaderProgram(float[] colors, ShaderDictonary dict){
         this.id = ShaderManager.loadShaderFromFiles(new String[] {
                 Utils.SHADERS_DIR+"\\MultipleColorsVertexShader.vsh",
                 Utils.SHADERS_DIR+"\\MultipleColorsFragmentShader.fsh",}
-        );
+        ,dict);
         setVertexColors(colors);
         initUniforms();
     }

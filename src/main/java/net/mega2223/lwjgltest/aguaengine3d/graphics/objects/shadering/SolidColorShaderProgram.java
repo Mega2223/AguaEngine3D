@@ -1,5 +1,6 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
@@ -10,11 +11,12 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
 
     private int program = -1;
     private float[] color;
-    public SolidColorShaderProgram(float r,float g,float b){
+    public SolidColorShaderProgram(float r, float g, float b){this(r,g,b,null);}
+    public SolidColorShaderProgram(float r, float g, float b, ShaderDictonary dict){
         color = new float[]{r,g,b};
         program = ShaderManager.loadShaderFromFiles(new String[]{
                 VERTEX_SH,FRAG_SH
-        });
+        },dict);
         initUniforms();
     }
 
