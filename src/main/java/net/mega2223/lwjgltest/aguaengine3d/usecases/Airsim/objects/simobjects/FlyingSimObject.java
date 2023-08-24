@@ -83,11 +83,11 @@ public abstract class FlyingSimObject extends SimObject{
         }
 
 
-        directionRadians[YAW_LOC] += yawControl*maxYawPush*speed;
-        directionRadians[PITCH_LOC] += pitchControl*maxPitch*speed;
+        directionRadians[YAW_LOC] += yawControl*maxYawPush;//*speed;
+        directionRadians[PITCH_LOC] += pitchControl*maxPitch;//*speed;
 
         if(coords[1] <= 0){
-            directionRadians[PITCH_LOC] += (float) MathUtils.stepTowardsVar(directionRadians[PITCH_LOC],0,0.06);
+            //directionRadians[PITCH_LOC] += (float) MathUtils.stepTowardsVar(directionRadians[PITCH_LOC],0,0.06);
         }
 
         MatrixTranslator.generateRotationMatrix(rotationMatrix,-directionRadians[PITCH_LOC],-directionRadians[1],directionRadians[0]);

@@ -88,13 +88,31 @@ public class Gaem3D {
             @Override
             public void doLogic(int itneration) {
                 super.doLogic(itneration);
-                MatrixTranslator.debugMatrix4x4(ret);
                 MatrixTranslator.generateRotationMatrix(ret,0,(float) -itneration/100,0);
                 //new Matrix4f().identity().rotationXYZ(0f,(float) -itneration/100,0f).get(ret);
                 shader.setRotationMatrix(ret);
             }
         };
+        
+        TexturedModel mod = new TexturedModel(
+                new float[]{/*-1.5f,0,0,0 , -1.5f,3,0,0 , 1.5f,0,0,0 , 1.5f,3,0,0*/},
+                new int[]{/*0,1,2,1,2,3*/},
+                new float[]{/*1,1 , 1,0 , 0,1 , 0,0*/},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
+        ){
+            float[] rMatrix = new float[16];
+            @Override
+            public void doLogic(int itneration) {
+                super.doLogic(itneration);
+                float itnerationF = itneration;
+                MatrixTranslator.generateRotationMatrix(rMatrix,itnerationF / 909, itnerationF /100,0);
+                this.getShader().setRotationMatrix(rMatrix);
+            }
+        };
+        mod.setCoords(10,0,20);
 
+
+        context.addObject(mod);
         context.addObject(triang);
 
         context.setBackGroundColor(.5f,.5f,.6f);
