@@ -1,5 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.mathematics;
 
+import java.util.Arrays;
+
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
 
 /**Class that stores handmade math calculations for matrix translation and stuff
@@ -284,7 +286,7 @@ public class MatrixTranslator {
         return ret;
     }
 
-    private static float[] bufferMatrix = new float[16];
+    private static final float[] bufferMatrix = new float[16];
     public static void generateRotationMatrix(float[] m4, float rX, float rY, float rZ){
         float sX = (float) Math.sin(rX);
         float sY = (float) Math.sin(rY);
@@ -293,7 +295,7 @@ public class MatrixTranslator {
         float cY = (float) Math.cos(rY);
         float cZ = (float) Math.cos(rZ);
 
-        for (int i = 0; i < m4.length; i++) {m4[i] = 0;}
+        Arrays.fill(m4, 0);
 
         m4[0] = cZ * cY;
         m4[1] = cZ * sY * sX - sZ * cX;
@@ -311,6 +313,72 @@ public class MatrixTranslator {
 
     }
 
+    public static void generateProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){
+        Arrays.fill(m4,0);
+        float hh = (float) Math.tan(fov*.5f);
+        float ar = w/h;
+        m4[0] = 1/(hh*ar);
+        m4[5] = 1/hh;
+        m4[10] = (zFar + zNear) / (zNear - zFar);
+        m4[11] = -1f;
+        m4[14] = (zFar + zFar)*zNear/(zNear-zFar);
+    }
+    //This project's copyright license does not apply to the function below
+    //as i took extremely heavy inspiration from JOML
+    //by the way why does JOML consider m23 as the m32'rd matrix variable
+    //like seriously why does it do that am i going crazy
+
+    public static void applyLookTransformation(float[] m4, float[] cam, float x, float y, float z, float upX, float upY, float upZ){
+        float dX, dY, dZ;
+        dX = cam[0] - x;
+        dY = cam[1] - y;
+        dZ = cam[2] - z;
+        float i = 1F/(float)(Math.sqrt(dX*dX + dY*dY + dZ*dZ));
+        dX*=i; dY*=i; dZ*=i;
+        float lX,lY,lZ;
+        lX = upY*dZ-upZ*dY;
+        lY = upZ*dX-upX*dZ;
+        lZ = upX*dY-upY*dX;
+        float iL = 1F/((float)Math.sqrt(lX*lX+lY*lY+lZ*lZ));
+        lX*=iL; lY*=iL; lZ*=iL;
+        float uX, uY, uZ;
+        uX = dY * lZ - dZ * lY;
+        uY = dZ * lX - dX * lZ;
+        uZ = dX * lY - dY * lX;
+        float   m00, m10, m20, m30,
+                m01, m11, m21, m31,
+                m02, m12, m22, m32,
+                m03, m13, m23, m33;
+        m00 = lX; m01 = uX; m02 = dX; m10 = lY;
+        m11 = uY; m12 = dY; m20 = lZ; m21 = uZ;
+        m22 = dZ;
+        m30 = -(lX * cam[0] + lY * cam[1] + lZ * cam[2]);
+        m31 = -(uX * cam[0] + uY * cam[1] + uZ * cam[2]);
+        m32 = -(dX * cam[0] + dY * cam[1] + dZ * cam[2]);
+        //i have no idea what i'm doing
+        bufferMatrix[0] = m4[0] * m00;
+        bufferMatrix[1] = m4[0] * m10;
+        bufferMatrix[8] = m4[0] * m20;
+        bufferMatrix[12] = m4[0] * m30;
+
+        bufferMatrix[4] = m4[5] * m01;
+        bufferMatrix[5] = m4[5] * m11;
+        bufferMatrix[6] = m4[5] * m21;
+        bufferMatrix[13] = m4[5] * m31;
+
+        bufferMatrix[2] = m4[10] * m02;
+        bufferMatrix[9] = m4[10] * m12;
+        bufferMatrix[10] = m4[10] * m22;
+        bufferMatrix[14] = m4[10] * m32 + m4[14];
+
+        bufferMatrix[3] = m4[11] * m02;
+        bufferMatrix[7] = m4[14] * m12;
+        bufferMatrix[11] = m4[11] * m22;
+        bufferMatrix[15] = m4[11] * m32;
+
+        System.arraycopy(bufferMatrix, 0, m4, 0, bufferMatrix.length);
+    }
+
     public static void debugMatrix4x4(float[] matrix4) {
         StringBuilder debug = new StringBuilder("[ ");
         for (int i = 0; i < matrix4.length; i += 4) {
@@ -323,6 +391,15 @@ public class MatrixTranslator {
             }
         }
         System.out.println(debug);
+    }
+
+    public static void compareMatrices(String m1N, String m2N, float[] m1, float[] m2){
+        System.out.println("Comparing " + m1N + " with " + m2N + ": ");
+        for (int i = 0; i < m1.length; i++) {
+            String m = "m" + i%4 + "" + i/4;
+            if(m1[i]!=m2[i]){System.out.println("Descrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
+        }
+        System.out.println("Comparison complete!");
     }
 
     public static void debugMatrix(float[][] mat){
