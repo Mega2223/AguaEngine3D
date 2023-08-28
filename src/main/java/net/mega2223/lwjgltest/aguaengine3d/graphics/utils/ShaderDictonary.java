@@ -57,6 +57,7 @@ public class ShaderDictonary {
         String[] lines = sdcText.split(ENTRY_DIV);
         ShaderDictonary ret = new ShaderDictonary();
         for (int l = 0; l < lines.length; l++) {
+            if(lines[l].toCharArray()[0] == '#'){continue;}
             String[] split = lines[l].split(TITLE_DIV);
             if(split.length != 2){continue;}
             ret.add(split[0],split[1]);

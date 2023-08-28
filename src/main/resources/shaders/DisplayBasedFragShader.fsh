@@ -6,7 +6,7 @@ in vec4 worldCoord;
 in vec4 objectiveCoord;
 in vec3 normalAligment;
 
-const int MAX_LIGHTS = 10;
+//--@maxLightsConstant
 
 uniform sampler2D samplerTexture;
 

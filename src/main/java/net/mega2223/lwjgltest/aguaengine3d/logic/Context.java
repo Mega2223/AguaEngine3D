@@ -1,7 +1,9 @@
 package net.mega2223.lwjgltest.aguaengine3d.logic;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
@@ -14,6 +16,7 @@ public class Context {
     int itneration = 0;
     float[] backGroundColor = {.5f,.5f,.6f,1};
     protected boolean active = false;
+    protected boolean areFBOSValid = false;
     public Context(){
 
     }
@@ -29,7 +32,6 @@ public class Context {
         return this;
     }
 
-
     public void doLogic(){
         if(!active){return;}
         for(Model o : objects){
@@ -38,12 +40,35 @@ public class Context {
         itneration++;
     }
 
-    private float[] transMatrix = new float[16];
+    private final float[] transMatrix = new float[16];
+
     public void doRender(float[] projectionMatrix){
-        for(Model o : objects){
+        if(!areFBOSValid){initFBOS();}
+        //shadow render
+        for(int s = 0; s < ShaderProgram.MAX_LIGHTS-9; s++){
+            if(lights[s][3] == 0){continue;}
+
+            float[] actProj = new float[16];
+            float[] actTrans = MatrixTranslator.createTranslationMatrix(lights[s][0],lights[s][1],lights[s][2]);
+            MatrixTranslator.generateProjectionMatrix(actProj,0.1f,100,(float)Math.toRadians(45.0f),100,100);
+            MatrixTranslator.applyLookTransformation(actProj,lights[s],lights[s][0]+1,lights[s][1],lights[s][2],0,1,0);
+            MatrixTranslator.debugMatrix4x4(actProj);
+            GL30.glUseProgram(DepthBufferShaderProgram.GLOBAL_INSTANCE.getID());
+            //GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,shadowFBOS[s][0]);
+            //GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
+            DepthBufferShaderProgram.GLOBAL_INSTANCE.setUniforms(itneration,actTrans,actProj);
+            for(Model o : objects){
+                o.getShader().setUniforms(itneration,actTrans,actProj);
+                o.draw();
+                //o.drawForceShader(DepthBufferShaderProgram.GLOBAL_INSTANCE);
+            }
+            //GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+        }
+        if(true){return;}
+        for(Model o : objects){//scene render
             MatrixTranslator.generateTranslationMatrix(transMatrix,o.getCoords());
             o.getShader().setUniforms(itneration,transMatrix,projectionMatrix);
-            o.drawn();
+            o.draw();
         }
     }
 
@@ -92,12 +117,14 @@ public class Context {
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
         }
     }
-    float[][] lights = new float[ShaderProgram.MAX_LIGHTS][4];
+    int[][] shadowFBOS = new int[ShaderProgram.MAX_LIGHTS][];
+    final float[][] lights = new float[ShaderProgram.MAX_LIGHTS][4];
     public void setLights(float[][] lights){
+        System.arraycopy(lights, 0, this.lights, 0, lights.length);
         for (Model o : objects){
-            o.getShader().setLights(lights);
+            o.getShader().setLights(this.lights);
         }
-        this.lights = lights;
+
     }
     public void setLight(int index, float x, float y, float z, float brightness){
         for (Model o : objects){
@@ -114,5 +141,12 @@ public class Context {
         for (Model o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
+    }
+
+    void initFBOS(){
+        for(int i = 0; i < shadowFBOS.length; i++){
+            shadowFBOS[i]=RenderingManager.genDepthFrameBufferObject(1000,1000);//fixme
+        }
+        areFBOSValid = true;
     }
 }

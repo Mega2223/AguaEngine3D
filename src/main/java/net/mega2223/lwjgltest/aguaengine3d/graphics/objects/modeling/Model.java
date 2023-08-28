@@ -7,7 +7,6 @@ import org.lwjgl.opengl.GL30;
 import java.util.ArrayList;
 
 import static net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager.drawnIndexBufferVBO;
-import static net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager.genArrayBufferObject;
 
 public class Model {
 
@@ -168,8 +167,8 @@ public class Model {
         setNormalsVBO(-1);
         setTextureCoordsVBO(-1);
     }
-
-    public void drawn(){
+    //todo remove normals entirely from scene drawing logic, it's literally useless
+    public void draw(){
         if(!areVBOSInitialized()){
             initVBOS();
         }
@@ -182,6 +181,17 @@ public class Model {
         GL30.glDisableVertexAttribArray(SHADER_NORMALS_LOCATION);
         shader.postRenderLogic();
     }
+
+    public void drawForceShader(ShaderProgram shader){
+        if(!areVBOSInitialized()){
+            initVBOS();
+        }
+        shader.preRenderLogic();
+        GL30.glUseProgram(shader.getID());
+        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,shader, getIndicesVBO(), indexes.length);
+        shader.postRenderLogic();
+    }
+
     //for subclasses
     public void doLogic(int itneration){
 
