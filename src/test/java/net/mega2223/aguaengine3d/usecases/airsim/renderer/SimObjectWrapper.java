@@ -2,7 +2,6 @@ package net.mega2223.aguaengine3d.usecases.airsim.renderer;
 
 import net.mega2223.aguaengine3d.usecases.airsim.objects.SimObject;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
-import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL30;
 
 public class SimObjectWrapper extends SimObject {
@@ -16,7 +15,7 @@ public class SimObjectWrapper extends SimObject {
         rotationUniformLoc = GL30.glGetUniformLocation(model.getShader().getID(),"rotation");
     }
 
-    Matrix4f trans = new Matrix4f();
+
     float[] transArray = new float[16];
     int rotationUniformLoc = -1;
 
@@ -24,11 +23,7 @@ public class SimObjectWrapper extends SimObject {
         toWrap.update();
         model.setCoords(toWrap.getX(),toWrap.getZ(),toWrap.getY());//todo temp fix
         float[] rotation = toWrap.getRotation();
-        trans.identity().rotationXYZ(
-                0,
-                0,
-                -rotation[1]
-        ).get(transArray);
+        //todo
         GL30.glUseProgram(model.getShader().getID());
         GL30.glUniformMatrix4fv(rotationUniformLoc,false,transArray);
     }

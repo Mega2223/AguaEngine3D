@@ -57,7 +57,7 @@ public class TexturedModel extends Model{
     int textureSamplerUniformCoord = -1;
 
     @Override
-    public void drawn() {
+    public void draw() {
         if(!areVBOSInitialized()){
             initVBOS();
         }
@@ -72,7 +72,7 @@ public class TexturedModel extends Model{
         //GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         //GL30.glTexImage2D();
-        super.drawn();
+        super.draw();
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
         GL30.glDisable(GL30.GL_TEXTURE_2D);
         GL30.glDisableVertexAttribArray(1);

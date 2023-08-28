@@ -59,10 +59,13 @@ public class WindowManager {
     }
 
     public void update(){
+
         if(glfwWindowShouldClose(windowName)){
             GLFW.glfwDestroyWindow(windowName);
             System.exit(0);
         }
+        //todo unoptimized viewport call
+        GL30.glViewport(0,0,viewportSize[0],viewportSize[1]);
         GLFW.glfwSwapBuffers(windowName);
         GLFW.glfwPollEvents();
 
