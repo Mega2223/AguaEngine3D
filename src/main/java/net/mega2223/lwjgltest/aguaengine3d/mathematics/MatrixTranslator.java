@@ -355,24 +355,24 @@ public class MatrixTranslator {
         m30 = -(lX * cam[0] + lY * cam[1] + lZ * cam[2]);
         m31 = -(uX * cam[0] + uY * cam[1] + uZ * cam[2]);
         m32 = -(dX * cam[0] + dY * cam[1] + dZ * cam[2]);
-        //i have no idea what i'm doing
+
         bufferMatrix[0] = m4[0] * m00;
-        bufferMatrix[1] = m4[0] * m10;
+        bufferMatrix[4] = m4[0] * m10;
         bufferMatrix[8] = m4[0] * m20;
         bufferMatrix[12] = m4[0] * m30;
 
-        bufferMatrix[4] = m4[5] * m01;
+        bufferMatrix[1] = m4[5] * m01;
         bufferMatrix[5] = m4[5] * m11;
-        bufferMatrix[6] = m4[5] * m21;
+        bufferMatrix[9] = m4[5] * m21;
         bufferMatrix[13] = m4[5] * m31;
 
         bufferMatrix[2] = m4[10] * m02;
-        bufferMatrix[9] = m4[10] * m12;
+        bufferMatrix[6] = m4[10] * m12;
         bufferMatrix[10] = m4[10] * m22;
         bufferMatrix[14] = m4[10] * m32 + m4[14];
 
         bufferMatrix[3] = m4[11] * m02;
-        bufferMatrix[7] = m4[14] * m12;
+        bufferMatrix[7] = m4[11] * m12;
         bufferMatrix[11] = m4[11] * m22;
         bufferMatrix[15] = m4[11] * m32;
 
@@ -396,22 +396,23 @@ public class MatrixTranslator {
     public static void compareMatrices(String m1N, String m2N, float[] m1, float[] m2){
         System.out.println("Comparing " + m1N + " with " + m2N + ": ");
         for (int i = 0; i < m1.length; i++) {
-            String m = "m" + i%4 + "" + i/4;
+            String m = "m" + i/4 + "" + i%4;
             if(m1[i]!=m2[i]){System.out.println("Descrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
         }
         System.out.println("Comparison complete!");
     }
 
     public static void debugMatrix(float[][] mat){
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < mat.length; i++) {
             float[] act = mat[i];
-            out += "[";
+            out.append("[");
             for (int j = 0; j < act.length; j++) {
-                out += mat[i][j];
-                if(j != act.length - 1){out += ",";}
+                out.append(mat[i][j]);
+                if(j != act.length - 1){
+                    out.append(",");}
             }
-            out += "]\n";
+            out.append("]\n");
         }
         System.out.println(out);
     }
