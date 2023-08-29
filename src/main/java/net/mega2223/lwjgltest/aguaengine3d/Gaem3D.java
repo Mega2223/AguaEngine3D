@@ -23,6 +23,7 @@ public class Gaem3D {
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
     public static final float[] camera = {0,.9f,0,0};
+    static float tempCamY = 0f;
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
@@ -45,6 +46,8 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_R)==GLFW.GLFW_PRESS){tempCamY += speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_F)==GLFW.GLFW_PRESS){tempCamY -= speed;}
 
         });
 
@@ -106,7 +109,7 @@ public class Gaem3D {
                 new float[]{/*1,1 , 1,0 , 0,1 , 0,0*/},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
         ){
-            float[] rMatrix = new float[16];
+            final float[] rMatrix = new float[16];
             @Override
             public void doLogic(int itneration) {
                 super.doLogic(itneration);
@@ -171,21 +174,17 @@ public class Gaem3D {
         context.setBackGroundColor((float) cos/3, (float) cos/3,(float)(sin+.75f)/2);*/
     }
 
+    static float[] trans =  new float[16];
+
     protected static void doRenderLogic(){
+        float[] methodMatrix = new float[16];
+        float yCoord = (float) (camera[1] + Math.sin(tempCamY));
 
-        float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
-        Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), asp, 0.01f, 100.0f)
-                .lookAt(camera[0], camera[1], camera[2],
-                        (float) (camera[0]+Math.sin(camera[3])), camera[1], (float) (camera[2]+Math.cos(camera[3])),
-                        0.0f, 1.0f, 0.0f);
-        float[] trans = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
-        float[] trans2 = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
-
-        proj.get(trans);
+        MatrixTranslator.generateProjectionMatrix(methodMatrix,0.01f,100.0f, (float) Math.toRadians(45.0f),manager.viewportSize[0],manager.viewportSize[1]);
+        MatrixTranslator.applyLookTransformation(methodMatrix,camera,(float) (camera[0]+Math.sin(camera[3])), yCoord, (float) (camera[2]+Math.cos(camera[3])),0,1,0);
 
         context.doLogic();
-        context.doRender(trans);
-
+        context.doRender(methodMatrix);
         manager.update();
     }
 
