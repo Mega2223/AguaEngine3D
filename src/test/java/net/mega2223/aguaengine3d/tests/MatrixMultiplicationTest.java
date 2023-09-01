@@ -9,7 +9,7 @@ public class MatrixMultiplicationTest {
         float[][] m2 = {{2,5},{6,7},{1,8}};
         MatrixTranslator.debugMatrix(m1);
         MatrixTranslator.debugMatrix(m2);
-        MatrixTranslator.debugMatrix(MatrixTranslator.multiplyMatrix(m1,m2));
+        MatrixTranslator.debugMatrix(MatrixTranslator.multiplyMatrices(m1,m2));
 
     }
 

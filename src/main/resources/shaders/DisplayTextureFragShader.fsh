@@ -7,7 +7,7 @@ in vec4 objectiveCoord;
 
 //--@maxLightsConstant
 
-uniform sampler2D samplerTexture;
+uniform sampler2D displayTexture;
 uniform int itneration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
@@ -23,7 +23,10 @@ out vec4 color;
 //--@stepToVarFunction
 
 void main(){
-    vec4 textureColor = texture(samplerTexture,texturePosition);
+
+    vec4 textureColor = texture(displayTexture,texturePosition);
+    color = textureColor;
+
     color = fogColor;
 
     for(int i = 0; i < MAX_LIGHTS; i++){
@@ -38,7 +41,6 @@ void main(){
     fogInfluence/=fogDissolve;
     fogInfluence = clamp(fogInfluence,0,1);
     color = mix(color,fogColor,fogInfluence);
-
 
 }
 

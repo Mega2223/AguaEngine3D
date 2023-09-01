@@ -26,6 +26,7 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
 
     @Override
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+
         GL30.glUseProgram(getID());
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);

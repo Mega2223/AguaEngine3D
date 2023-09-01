@@ -3,7 +3,6 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
 
 import java.util.ArrayList;
 

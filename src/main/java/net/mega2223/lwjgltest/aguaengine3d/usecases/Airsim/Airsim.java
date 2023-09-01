@@ -166,7 +166,7 @@ public class Airsim {
 
     }
 
-    protected static void doRenderLogic(){
+    protected static void doRenderLogic(){/*fixme
 
         float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
         float[] coords = plane.getCoords();
@@ -177,7 +177,7 @@ public class Airsim {
         context.doLogic();
         context.doRender(trans);
 
-        manager.update();
+        manager.update();*/
     }
 
 

@@ -16,7 +16,7 @@ public class Model {
 
     protected float[] vertices; //each vertex has 4 attributes
     protected float[] coords = {0,0,0,0};
-    protected int[] indexes;
+    protected int[] indices;
     protected float[] normals = null;//should've done this way before lol, normals are 3d vectors, no 4th coord
 
     protected ShaderProgram shader;
@@ -28,14 +28,14 @@ public class Model {
 
     public Model(float[] vertices, int[] indexes, ShaderProgram shader){
         this.setVertices(vertices);
-        this.setIndexes(indexes);
+        this.setIndices(indexes);
         this.setShader(shader);
         genNormals();
     }
 
     public Model(float[] vertices, int[] indexes, ShaderProgram shader, float[] normals){
         this.setVertices(vertices);
-        this.setIndexes(indexes);
+        this.setIndices(indexes);
         this.setShader(shader);
         this.setNormals(normals);
     }
@@ -137,19 +137,18 @@ public class Model {
         this.shader = shader;
     }
 
-    public int[] getIndexes() {
-        return indexes;
+    public int[] getIndices() {
+        return indices;
     }
 
-    public void setIndexes(int[] indexes) {
-        this.indexes = indexes.clone();
+    public void setIndices(int[] indices) {
+        this.indices = indices.clone();
         unloadVBOS();
     }
 
     protected void initVBOS(){
-
         int verticeVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
-        int indicesVBO = RenderingManager.genIndexBufferObject(indexes, GL30.GL_DYNAMIC_DRAW);
+        int indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_DYNAMIC_DRAW);
         int normalsVBO = RenderingManager.genArrayBufferObject(normals,GL30.GL_DYNAMIC_DRAW);
         this.setVerticesVBO(verticeVBO);
         this.setIndicesVBO(indicesVBO);
@@ -167,19 +166,9 @@ public class Model {
         setNormalsVBO(-1);
         setTextureCoordsVBO(-1);
     }
-    //todo remove normals entirely from scene drawing logic, it's literally useless
+
     public void draw(){
-        if(!areVBOSInitialized()){
-            initVBOS();
-        }
-        shader.preRenderLogic();
-        //set normals data, each normal is a 3D vector representing a vertex normal
-        GL30.glEnableVertexAttribArray(SHADER_NORMALS_LOCATION);
-        GL30.glVertexAttribPointer(SHADER_NORMALS_LOCATION,3,GL30.GL_FLOAT,false,0,0L);
-        GL30.glUseProgram(this.shader.getID());
-        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,this.shader, getIndicesVBO(), indexes.length);
-        GL30.glDisableVertexAttribArray(SHADER_NORMALS_LOCATION);
-        shader.postRenderLogic();
+        drawForceShader(this.getShader());
     }
 
     public void drawForceShader(ShaderProgram shader){
@@ -188,7 +177,7 @@ public class Model {
         }
         shader.preRenderLogic();
         GL30.glUseProgram(shader.getID());
-        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,shader, getIndicesVBO(), indexes.length);
+        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,shader, getIndicesVBO(), indices.length);
         shader.postRenderLogic();
     }
 

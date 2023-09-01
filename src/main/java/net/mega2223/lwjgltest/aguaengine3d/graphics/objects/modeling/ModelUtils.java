@@ -1,10 +1,10 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class ModelUtils {
 
         for (int m = 0; m < models.length; m++) {
             float[] modelVertices = models[m].vertices;
-            int[] modelIndexes = models[m].indexes;
+            int[] modelIndexes = models[m].indices;
             float[] modelTextureCoords = models[m].textureShift;
             int indexStartingPoint = verticeList.size()/4;
             translateVertices(modelVertices,models[m].coords);
@@ -65,7 +65,7 @@ public class ModelUtils {
         FileWriter stream = new FileWriter(dir + "\\" + nameAndExtension,false);
         float[] vertices = model.getRelativeVertices();
         float[] textureCoords = model.getTextureShift();
-        int[] indices = model.getIndexes();
+        int[] indices = model.getIndices();
 
         stream.write(" # Written by AguaEngine :) \n # Code and license available at https://github.com/Mega2223/AguaEngine3D\n\n # Vertices:\n");
 

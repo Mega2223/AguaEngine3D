@@ -88,18 +88,34 @@ public class RenderingManager {
         return GL30.glGenRenderbuffers();
     }
 
-    public static int[] genTextureFrameBufferObject(int tX, int tY) {
+    public static int[] genTextureFrameBufferObject(int tX, int tY) { //todo maybe move the texture logic to a method in the TextureManager class?
         int id = genFrameBufferObject();
         int texture = GL30.glGenTextures();
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, id);
         GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_RGB, tX, tY, 0, GL30.GL_RGB, GL30.GL_UNSIGNED_BYTE, (ByteBuffer) null);
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_TEXTURE_2D, texture, 0);
-
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
 
         return new int[]{id, texture};
+    }
+
+    public static int[] genRenderBuffer(int tX, int tY){
+        int id = genFrameBufferObject();
+        int texture = GL30.glGenTextures();
+        int renderBuffer = genRenderBufferObject();
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,id);
+        GL30.glTexImage2D(GL30.GL_TEXTURE_2D,0,GL30.GL_DEPTH_COMPONENT,tX,tY,0, GL30.GL_RGB,GL30.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER,GL30.GL_COLOR_ATTACHMENT0,GL30.GL_TEXTURE_2D,texture,0);
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, renderBuffer);
+
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
+        return new int[]{id,texture};
     }
 
     public static int[] genDepthFrameBufferObject(int w, int h) {
@@ -126,20 +142,6 @@ public class RenderingManager {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
-    /*public static int[] genRenderBuffer(int tX, int tY){
-        int id = genFrameBufferObject();
-        int texture = GL30.glGenTextures();
-        int renderBuffer = genRenderBufferObject();
-        GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,id);
-        GL30.glTexImage2D(GL30.GL_TEXTURE_2D,0,GL30.GL_DEPTH_COMPONENT,tX,tY,0, GL30.GL_RGB,GL30.GL_UNSIGNED_BYTE, (ByteBuffer) null);
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER,GL30.GL_COLOR_ATTACHMENT0,GL30.GL_TEXTURE_2D,texture,0);
-        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, renderBuffer);
-
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-        GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
-        return new int[]{id,texture};
-    }*/
     public static void setVBOData(int VBO, float[] data) {
 
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
@@ -166,5 +168,13 @@ public class RenderingManager {
             debug.append("Vertice ").append(i / 4).append(": (x:").append(poly[i]).append(",y:").append(poly[i + 1]).append(",z:").append(poly[i + 2]).append(")\n");
         }
         System.out.println(debug);
+    }
+
+    public void printErrorQueue(){
+        int e = 1;
+        while (e != GL30.GL_NO_ERROR){
+            e = GL30.glGetError();
+            System.out.println("Error: " + e);
+        }
     }
 }

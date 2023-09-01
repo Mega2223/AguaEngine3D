@@ -23,7 +23,11 @@ public class SimObjectWrapper extends SimObject {
         toWrap.update();
         model.setCoords(toWrap.getX(),toWrap.getZ(),toWrap.getY());//todo temp fix
         float[] rotation = toWrap.getRotation();
-        //todo
+        /*trans.identity().rotationXYZ(
+                0,
+                0,
+                -rotation[1]
+        ).get(transArray);fixme*/
         GL30.glUseProgram(model.getShader().getID());
         GL30.glUniformMatrix4fv(rotationUniformLoc,false,transArray);
     }

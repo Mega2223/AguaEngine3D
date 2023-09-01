@@ -56,7 +56,7 @@ public class StructureUtils {
     public static List<Model> elongateSurface(Model model, float bas){
         ArrayList<Model> ret = new ArrayList();
         float[] ver = model.getRelativeVertices();
-        int[] indices = model.getIndexes();
+        int[] indices = model.getIndices();
 
         model.setVertices(ver);
 
