@@ -1,8 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.logic;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
@@ -15,6 +14,7 @@ public class Context {
     protected List<Model> objects = new ArrayList<>();
     int itneration = 0;
     float[] backGroundColor = {.5f,.5f,.6f,1};
+    float[] fogDetails = new float[2];
     protected boolean active = false;
     protected boolean areFBOSValid = false;
     public Context(){
@@ -22,13 +22,12 @@ public class Context {
     }
 
     public Context addObjects(List<Model> toAdd){
-        objects.addAll(toAdd);
-        for(Model ac : toAdd){ac.getShader().setLights(lights);}
+        for(Model ac : toAdd){addObject(ac);}
         return this;
     }
     public Context addObject(Model toAdd){
         objects.add(toAdd);
-        toAdd.getShader().setLights(lights);
+        this.synchronizeUniforms(toAdd.getShader());
         return this;
     }
 
@@ -40,35 +39,41 @@ public class Context {
         itneration++;
     }
 
-    private final float[] transMatrix = new float[16];
+    private final float[] bufferTransMatrix = new float[16];
+
+    ShaderProgram testShaderProgram = null;
 
     public void doRender(float[] projectionMatrix){
         if(!areFBOSValid){initFBOS();}
         //shadow render
-        for(int s = 0; s < ShaderProgram.MAX_LIGHTS-9; s++){
-            if(lights[s][3] == 0){continue;}
-
-            float[] actProj = new float[16];
-            float[] actTrans = MatrixTranslator.createTranslationMatrix(lights[s][0],lights[s][1],lights[s][2]);
-            MatrixTranslator.generateProjectionMatrix(actProj,0.1f,100,(float)Math.toRadians(45.0f),100,100);
-            MatrixTranslator.applyLookTransformation(actProj,lights[s],lights[s][0]+1,lights[s][1],lights[s][2],0,1,0);
-            MatrixTranslator.debugMatrix4x4(actProj);
-            GL30.glUseProgram(DepthBufferShaderProgram.GLOBAL_INSTANCE.getID());
-            //GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,shadowFBOS[s][0]);
-            //GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
-            DepthBufferShaderProgram.GLOBAL_INSTANCE.setUniforms(itneration,actTrans,actProj);
-            for(Model o : objects){
-                o.getShader().setUniforms(itneration,actTrans,actProj);
-                o.draw();
-                //o.drawForceShader(DepthBufferShaderProgram.GLOBAL_INSTANCE);
+        for(int l = 0; l < lights.length; l++) {
+            float[] transMat = MatrixTranslator.createTranslationMatrix(0, 0, 0);
+            float[] projMat = new float[16];
+            MatrixTranslator.generateProjectionMatrix(projMat, 0.01F, 1000F, (float) Math.toRadians(45), 200, 200);
+            MatrixTranslator.applyLookTransformation(projMat, lights[l], 10, 0, 10, 0, 1, 0);
+            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,shadowFBOS[l][0]);
+            GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
+            for (Model o : objects) {
+                o.getShader().setUniforms(itneration, transMat, projMat);
+                o.drawForceShader(DepthBufferShaderProgram.GLOBAL_INSTANCE);
             }
-            //GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
         }
-        if(true){return;}
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+        //if(true){return;}
+
         for(Model o : objects){//scene render
-            MatrixTranslator.generateTranslationMatrix(transMatrix,o.getCoords());
-            o.getShader().setUniforms(itneration,transMatrix,projectionMatrix);
+            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,o.getCoords());
+            o.getShader().setUniforms(itneration, bufferTransMatrix,projectionMatrix);
             o.draw();
+        }
+    }
+
+    /**Assumes that the rendering context is already in place*/
+    public void doCustomRender(float projectionMatrix[]){
+        MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,0,0,0);
+        for(Model m : objects){
+            m.getShader().setUniforms(itneration,bufferTransMatrix,projectionMatrix);
+            m.draw();
         }
     }
 
@@ -111,7 +116,10 @@ public class Context {
     }
 
     public void setFogDetails(float dist, float dissolve){
+        fogDetails[0] = dist;
+        fogDetails[1] = dissolve;
         for (Model o : objects) {
+            //todo sub optimal uniform call
             GL30.glUseProgram(o.getShader().getID());
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogStart"),dist);
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
@@ -119,6 +127,8 @@ public class Context {
     }
     int[][] shadowFBOS = new int[ShaderProgram.MAX_LIGHTS][];
     final float[][] lights = new float[ShaderProgram.MAX_LIGHTS][4];
+    final float[][] lightColors = new float[ShaderProgram.MAX_LIGHTS][4];
+
     public void setLights(float[][] lights){
         System.arraycopy(lights, 0, this.lights, 0, lights.length);
         for (Model o : objects){
@@ -134,13 +144,27 @@ public class Context {
         lights[index][1] = y;
         lights[index][2] = z;
         lights[index][3] = brightness;
-
     }
 
     public void setLightColor(int index, float r, float g, float b, float influence){
+        lightColors[index][0] = r;
+        lightColors[index][1] = g;
+        lightColors[index][2] = b;
+        lightColors[index][3] = influence;
+
         for (Model o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
+    }
+
+    public void synchronizeUniforms(ShaderProgram program){
+        GL30.glUseProgram(program.getID());
+        program.setLights(lights);
+        for(int i = 0; i < lightColors.length; i++){program.setLightColor(i,lightColors[i][0],lightColors[i][1],lightColors[i][2],lightColors[i][3]);}
+        //todo sub optimal uniform call
+        GL30.glUniform1f(GL30.glGetUniformLocation(program.getID(), "fogStart"),fogDetails[0]);
+        GL30.glUniform1f(GL30.glGetUniformLocation(program.getID(), "fogDissolve"),fogDetails[1]);
+
     }
 
     void initFBOS(){

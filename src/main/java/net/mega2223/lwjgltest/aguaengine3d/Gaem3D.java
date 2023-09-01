@@ -14,7 +14,6 @@ import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
-
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 
@@ -24,7 +23,8 @@ public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
     static int framesElapsed = 0;
-    public static final float[] camera = {.3f,.9f,.3f,.5f};
+    public static final float[] camera = {0,.9f,0,0};
+    static float tempCamY = 0f;
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
@@ -47,12 +47,14 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_R)==GLFW.GLFW_PRESS){tempCamY += speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_F)==GLFW.GLFW_PRESS){tempCamY -= speed;}
 
         });
 
         GLFW.glfwMaximizeWindow(manager.getWindow());
+        //shader dict setup
 
-        //setup
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR+"\\DefaultShaderDictionary.sdc"));
@@ -68,7 +70,6 @@ public class Gaem3D {
         ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor",shaderProgram);
         ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",shaderProgram);
 
-
         long time = System.currentTimeMillis();
         context.addObject(grass.generate(map,1));
         context.addObject(tile.generate(map,3));
@@ -79,13 +80,13 @@ public class Gaem3D {
                 new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1\\Texture.png")
         );
-        /*Model am = Model.loadModel(
+        Model am = Model.loadModel(
                 Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"),
                 new SolidColorShaderProgram(5f,.3f,.2f)
-        );*/
-       // am.setCoords(new float[]{10,0,10,0});
-        context.addObject(buildingModel);
-        //context.addObject(am);
+        );
+        am.setCoords(new float[]{10,0,10,0});
+        //context.addObject(buildingModel);
+        context.addObject(am);
 
         Model triang = new Model(
                 new float[]{0,0,0,0 , 0,10,0,0 , 10,0,0,0},
@@ -97,23 +98,57 @@ public class Gaem3D {
             public void doLogic(int itneration) {
                 super.doLogic(itneration);
                 MatrixTranslator.generateRotationMatrix(ret,0,(float) -itneration/100,0);
-                //new Matrix4f().identity().rotationXYZ(0f,(float) -itneration/100,0f).get(ret);
                 shader.setRotationMatrix(ret);
             }
         };
+        
+        /*TexturedModel mod = new TexturedModel(
+                new float[]{-1.5f,0,0,0 , -1.5f,3,0,0 , 1.5f,0,0,0 , 1.5f,3,0,0},
+                new int[]{0,1,2,1,2,3},
+                new float[]{1,1 , 1,0 , 0,1 , 0,0},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
+        ){
+            final float[] rMatrix = new float[16];
+            @Override
+            public void doLogic(int itneration) {
+                super.doLogic(itneration);
+                float itnerationF = itneration;
+                MatrixTranslator.generateRotationMatrix(rMatrix,itnerationF / 909, itnerationF /100,0);
+                this.getShader().setRotationMatrix(rMatrix);
+            }
+        };
+        mod.setCoords(10,0,20);
+
+        context.addObject(mod);*/
 
         context.addObject(triang);
 
         context.setBackGroundColor(.5f,.5f,.6f);
-        context.setLight(0,.3F,.9F,.3F,.5F);
-        context.setLight(9,1,1,1,100);
+        context.setLight(6,0,0,0,10000);
         context.setActive(true);
-        context.setFogDetails(500,100);
+        context.setFogDetails(5000,20);
 
-        int s = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
-        System.out.println(s == GL30.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
-        System.out.println(s == GL30.GL_FRAMEBUFFER_COMPLETE);
-        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+        DisplayShaderProgram g = new DisplayShaderProgram(
+                new float[]{0,0 , 0,1, 1,0 , 1,1},1000,1000
+        );
+        Model monitor = new Model(
+                new float[]{3,0,0,0 , 3,5,0,0 , 7,0,0,0 , 7,5,0,0},
+                new int[]{0,1,2, 3,2,1},
+                g){
+            final float[] pm = new float[16];
+            final float[] cam = {10,10,10,0};
+            @Override
+            public void doLogic(int itneration) {
+                MatrixTranslator.generateProjectionMatrix(pm,0.1f,100,(float)Math.toRadians(45),100,100);
+                MatrixTranslator.applyLookTransformation(pm,cam,0,0,0,0,1,0);
+                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,g.getFBO()[0]);
+                GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
+                context.doCustomRender(pm);
+                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+            }
+        };
+
+        context.addObject(monitor);
         //Render Logic be like:
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
@@ -158,12 +193,12 @@ public class Gaem3D {
         context.setBackGroundColor((float) cos/3, (float) cos/3,(float)(sin+.75f)/2);*/
     }
 
+    static float[] trans =  new float[16];
+
     protected static void doRenderLogic(){
+        float[] methodMatrix = new float[16];
 
-
-        float[] methodMatrix = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
-
-        MatrixTranslator.generateProjectionMatrix(methodMatrix,0.01f,100.0f, (float) Math.toRadians(45.0f),manager.viewportSize[0],manager.viewportSize[1]);
+        MatrixTranslator.generateProjectionMatrix(methodMatrix,0.01f,100.0f, (float) Math.toRadians(45),manager.viewportSize[0],manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(methodMatrix,camera,(float) (camera[0]+Math.sin(camera[3])), camera[1], (float) (camera[2]+Math.cos(camera[3])),0,1,0);
 
         context.doLogic();

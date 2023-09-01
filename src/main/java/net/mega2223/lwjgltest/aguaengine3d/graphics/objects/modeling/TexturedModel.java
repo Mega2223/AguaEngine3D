@@ -58,6 +58,11 @@ public class TexturedModel extends Model{
 
     @Override
     public void draw() {
+        drawForceShader(shader);
+    }
+
+    @Override
+    public void drawForceShader(ShaderProgram shader){
         if(!areVBOSInitialized()){
             initVBOS();
         }
@@ -66,13 +71,14 @@ public class TexturedModel extends Model{
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, getTextureShift(),GL30.GL_DYNAMIC_DRAW);
 
         GL30.glUseProgram(shader.getID());
+        GL30.glEnable(GL30.GL_TEXTURE_2D);
         GL30.glEnableVertexAttribArray(1);
         //GL30.texparamet
         GL30.glVertexAttribPointer(1,2,GL30.GL_FLOAT,false,0,0L);
         //GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         //GL30.glTexImage2D();
-        super.draw();
+        super.drawForceShader(shader);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
         GL30.glDisable(GL30.GL_TEXTURE_2D);
         GL30.glDisableVertexAttribArray(1);
@@ -178,7 +184,7 @@ public class TexturedModel extends Model{
     public static void debugTexturedModel(TexturedModel model){
         float[] vertices = model.vertices;
         float[] textureData = model.getTextureShift();
-        int[] indexes = model.indexes;
+        int[] indexes = model.indices;
 
         StringBuilder debug = new StringBuilder("Debugging model with " + vertices.length + " vertices\n");
         debug.append("It is using the shaderProgram ").append(model.shader.getID());

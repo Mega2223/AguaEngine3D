@@ -1,6 +1,5 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator;
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MathUtils;
