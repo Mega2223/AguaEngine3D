@@ -52,9 +52,9 @@ public class WindowManager {
             }
         });
         GLFW.glfwSetWindowSizeCallback(windowName, (l, w, h) -> {
-            GL30.glViewport(0,0,w,h);
             viewportSize[0] = w;
             viewportSize[1] = h;
+            fitViewport();
         });
     }
 
@@ -64,8 +64,7 @@ public class WindowManager {
             GLFW.glfwDestroyWindow(windowName);
             System.exit(0);
         }
-        //todo unoptimized viewport call
-        GL30.glViewport(0,0,viewportSize[0],viewportSize[1]);
+
         GLFW.glfwSwapBuffers(windowName);
         GLFW.glfwPollEvents();
 
@@ -74,6 +73,10 @@ public class WindowManager {
         }
 
         clear();
+    }
+
+    public void fitViewport(){
+        GL30.glViewport(0,0,viewportSize[0],viewportSize[1]);
     }
 
     void clear(){

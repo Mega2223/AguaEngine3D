@@ -13,8 +13,7 @@ import java.nio.IntBuffer;
 public class TextureManager {
     private TextureManager(){}
 
-    //this is the sole method that is NOT licenced under the project licence
-    //since this code ain't mine
+    //this method is not licenced under the project license
     public static int loadTexture(String path) {
         int width, height;
         int[] pixels;
@@ -52,6 +51,26 @@ public class TextureManager {
                 GL30.GL_UNSIGNED_BYTE, buffer);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
         return result;
+    }
+
+    public static int generateImageTexture(int w, int h){
+        int texture = GL30.glGenTextures();
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
+        GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_RGB, w, h, 0, GL30.GL_RGB, GL30.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
+        return texture;
+    }
+    public static int generateDepthTexture(int w, int h){
+        int texture = GL30.glGenTextures();
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
+        GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_DEPTH_COMPONENT, w, h, 0, GL30.GL_DEPTH_COMPONENT, GL30.GL_FLOAT, (ByteBuffer) null);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
+
+        return texture;
     }
 
 }

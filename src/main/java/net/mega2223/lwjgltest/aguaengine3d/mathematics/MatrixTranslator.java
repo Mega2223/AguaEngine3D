@@ -323,16 +323,24 @@ public class MatrixTranslator {
         m4[11] = -1f;
         m4[14] = (zFar + zFar)*zNear/(zNear-zFar);
     }
-    //This project's copyright license does not apply to the function below
-    //as i took extremely heavy inspiration from JOML
-    //by the way why does JOML consider m23 as the m32'rd matrix variable
-    //like seriously why does it do that am i going crazy
 
-    public static void applyLookTransformation(float[] m4, float[] cam, float x, float y, float z, float upX, float upY, float upZ){
+    public static void applyLookTransformation(float[] m4, float cX, float cY, float cZ, float x, float y, float z) {
+        applyLookTransformation(m4,cX,cY,cZ,x,y,z,0,1,0);
+    }
+
+    public static void applyLookTransformation(float[] m4, float[] camera, float x, float y, float z) {
+        applyLookTransformation(m4,camera[0],camera[1],camera[2],x,y,z);
+    }
+
+    public static void applyLookTransformation(float[] m4, float[] camera, float x, float y, float z, float upX, float upY, float upZ) {
+        applyLookTransformation(m4,camera[0],camera[1],camera[2],x,y,z,upX,upY,upZ);
+    }
+
+    public static void applyLookTransformation(float[] m4, float cX, float cY, float cZ, float x, float y, float z, float upX, float upY, float upZ){
         float dX, dY, dZ;
-        dX = cam[0] - x;
-        dY = cam[1] - y;
-        dZ = cam[2] - z;
+        dX = cX - x;
+        dY = cY - y;
+        dZ = cZ - z;
         float i = 1F/(float)(Math.sqrt(dX*dX + dY*dY + dZ*dZ));
         dX*=i; dY*=i; dZ*=i;
         float lX,lY,lZ;
@@ -345,16 +353,16 @@ public class MatrixTranslator {
         uX = dY * lZ - dZ * lY;
         uY = dZ * lX - dX * lZ;
         uZ = dX * lY - dY * lX;
-        float   m00, m10, m20, m30,
+        float   m00, m10, m20, m30, //likely wrong lol
                 m01, m11, m21, m31,
                 m02, m12, m22, m32,
                 m03, m13, m23, m33;
         m00 = lX; m01 = uX; m02 = dX; m10 = lY;
         m11 = uY; m12 = dY; m20 = lZ; m21 = uZ;
         m22 = dZ;
-        m30 = -(lX * cam[0] + lY * cam[1] + lZ * cam[2]);
-        m31 = -(uX * cam[0] + uY * cam[1] + uZ * cam[2]);
-        m32 = -(dX * cam[0] + dY * cam[1] + dZ * cam[2]);
+        m30 = -(lX * cX + lY * cY + lZ * cZ);
+        m31 = -(uX * cX + uY * cY + uZ * cZ);
+        m32 = -(dX * cX + dY * cY + dZ * cZ);
 
         bufferMatrix[0] = m4[0] * m00;
         bufferMatrix[4] = m4[0] * m10;
