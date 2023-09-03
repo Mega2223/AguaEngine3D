@@ -1,10 +1,9 @@
 #version 330 core
 
 in vec4 worldCoord;
-in vec3 normalAligment;
 in vec4 objectiveCoord;
 
-const int MAX_LIGHTS = 10;
+//--@maxLightsConstant
 
 uniform vec4 color2; // uniform color
 

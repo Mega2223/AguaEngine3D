@@ -228,9 +228,9 @@ public class MatrixTranslator {
         }
     }
     /**took me way too long*/
-    public static float[][] multiplyMatrix(float[][] m1, float[][] m2){
+    public static float[][] multiplyMatrices(float[][] m1, float[][] m2){
         if(m1[0].length != m2.length){
-            throw new UnsupportedOperationException("Matrices inc");
+            throw new UnsupportedOperationException("Incompartible matrices");
         }
         float[][] ret = new float[m2.length][m2[0].length];
         for (int i = 0; i < m2.length; i++) {

@@ -11,7 +11,6 @@ import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import net.mega2223.lwjgltest.aguaengine3d.usecases.Airsim.objects.simobjects.FlyingSimObject;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 public class Airsim {
@@ -167,24 +166,18 @@ public class Airsim {
 
     }
 
-    protected static void doRenderLogic(){
+    protected static void doRenderLogic(){/*fixme
 
         float asp = (float) manager.viewportSize[0]/(float) manager.viewportSize[1];
         float[] coords = plane.getCoords();
         float[] pred = plane.getRotation();
         pred = PhysicsUtils.generatePredictionVector(1,pred[0],pred[1],pred[2]);
-        Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), asp, 0.01f, 10000.0f)
-                .lookAt(
-                        camera[0], camera[1], camera[2],
-                        coords[0],coords[1],coords[2],
-                        0.0f, 1.0f, 0.0f);
-        float[] trans = {1,0,0,0 , 0,1,0,0 , 0,0,1,0, 0,0,0,1};
-        proj.get(trans);
-
+        float[] trans = new float[16];
+        //todo
         context.doLogic();
         context.doRender(trans);
 
-        manager.update();
+        manager.update();*/
     }
 
 

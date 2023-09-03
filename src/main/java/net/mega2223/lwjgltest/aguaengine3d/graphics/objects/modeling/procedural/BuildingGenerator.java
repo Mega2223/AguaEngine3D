@@ -3,7 +3,6 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 //this is an old class that is the predecessor to the Procedural Building system, don't mind it

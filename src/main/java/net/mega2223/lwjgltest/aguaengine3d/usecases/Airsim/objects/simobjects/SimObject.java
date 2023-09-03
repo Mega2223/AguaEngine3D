@@ -9,7 +9,7 @@ public abstract class SimObject extends TexturedModel {
     }
 
     public SimObject(TexturedModel model) {
-        super(model.getRelativeVertices(), model.getIndexes(), model.getTextureShift(), model.getTexture());
+        super(model.getRelativeVertices(), model.getIndices(), model.getTextureShift(), model.getTexture());
     }
 
 }

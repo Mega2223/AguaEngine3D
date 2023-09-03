@@ -37,6 +37,7 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
 
     public void initUniforms(){
         uniformColorLocation = GL30.glGetUniformLocation(getID(),"color2");
+        rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
         projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
     }
