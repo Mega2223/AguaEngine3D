@@ -80,13 +80,8 @@ public class Gaem3D {
                 new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1\\Texture.png")
         );
-        Model am = Model.loadModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\IMPOSTER.obj").split("\n"),
-                new SolidColorShaderProgram(5f,.3f,.2f)
-        );
-        am.setCoords(new float[]{10,0,10,0});
-        //context.addObject(buildingModel);
-        context.addObject(am);
+
+        context.addObject(buildingModel);
 
         Model triang = new Model(
                 new float[]{0,0,0,0 , 0,10,0,0 , 10,0,0,0},
@@ -124,9 +119,8 @@ public class Gaem3D {
         context.addObject(triang);
 
         context.setBackGroundColor(.5f,.5f,.6f);
-        context.setLight(6,0,0,0,10000);
         context.setActive(true);
-        context.setFogDetails(5000,20);
+        context.setFogDetails(200,200);
 
         DisplayShaderProgram g = new DisplayShaderProgram(
                 new float[]{0,0 , 0,1, 1,0 , 1,1},1000,1000
@@ -136,17 +130,19 @@ public class Gaem3D {
                 new int[]{0,1,2, 3,2,1},
                 g){
             final float[] pm = new float[16];
-            final float[] cam = {10,10,10,0};
+            final float[] cam = {20,40,20,0};
+
             @Override
             public void doLogic(int itneration) {
-                MatrixTranslator.generateProjectionMatrix(pm,0.1f,100,(float)Math.toRadians(45),100,100);
-                MatrixTranslator.applyLookTransformation(pm,cam,0,0,0,0,1,0);
+                MatrixTranslator.generateProjectionMatrix(pm,0.1f,1000,(float)Math.toRadians(45),100,150);
+                MatrixTranslator.applyLookTransformation(pm,cam,camera[0],camera[1],camera[2],0,1,0);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,g.getFBO()[0]);
                 GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
                 context.doCustomRender(pm);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
             }
         };
+        monitor.setCoords(10,0,10);
 
         context.addObject(monitor);
         //Render Logic be like:
@@ -185,12 +181,7 @@ public class Gaem3D {
     }
 
     protected static void doLogic(){
-        /*double sin = Math.sin((float) framesElapsed / 280);
-        double cos = Math.cos((float) framesElapsed / 280);
-        context.setLight(0,10,4,25,(float) (sin +.9)*6);
-        context.setLight(1,10,1,10,.5f);
-        context.setLightColor(1,1,0,0,.5f);
-        context.setBackGroundColor((float) cos/3, (float) cos/3,(float)(sin+.75f)/2);*/
+        context.setLight(5,0,10,0,framesElapsed/500F);
     }
 
     static float[] trans =  new float[16];
