@@ -12,11 +12,14 @@ import java.util.List;
 public class Context {
 
     protected List<Model> objects = new ArrayList<>();
+    protected List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
+
     int itneration = 0;
     float[] backGroundColor = {.5f,.5f,.6f,1};
     float[] fogDetails = new float[2];
     protected boolean active = false;
     protected boolean areFBOSValid = false;
+
     public Context(){
 
     }
@@ -33,8 +36,14 @@ public class Context {
 
     public void doLogic(){
         if(!active){return;}
-        for(Model o : objects){
-            o.doLogic(itneration);
+        for(ScriptedSequence s : scripts){
+            if(s.shouldTrigger(itneration,true,this))
+            {s.preLogic(itneration,this);}
+        }
+        for(Model o : objects){o.doLogic(itneration);}
+        for(ScriptedSequence s : scripts){
+            if(s.shouldTrigger(itneration,false,this))
+            {s.postLogic(itneration,this);}
         }
         itneration++;
     }
