@@ -55,7 +55,7 @@ public class Context {
     public void doRender(float[] projectionMatrix){
         if(!areFBOSValid){initFBOS();}
         //shadow render
-        for(int l = 0; l < lights.length; l++) {
+        /*for(int l = 0; l < lights.length; l++) {
             float[] transMat = MatrixTranslator.createTranslationMatrix(0, 0, 0);
             float[] projMat = new float[16];
             MatrixTranslator.generateProjectionMatrix(projMat, 0.01F, 1000F, (float) Math.toRadians(45), 200, 200);
@@ -66,7 +66,7 @@ public class Context {
                 o.getShader().setUniforms(itneration, transMat, projMat);
                 o.drawForceShader(DepthBufferShaderProgram.GLOBAL_INSTANCE);
             }
-        }
+        }*/
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
         //if(true){return;}
 
@@ -79,10 +79,18 @@ public class Context {
 
     /**Assumes that the rendering context is already in place*/
     public void doCustomRender(float projectionMatrix[]){
-        MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,0,0,0);
         for(Model m : objects){
+            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,m.getCoords());
             m.getShader().setUniforms(itneration,bufferTransMatrix,projectionMatrix);
             m.draw();
+        }
+    }
+
+    public void doCustomRenderForceShader(float[] projectionMatrix, ShaderProgram shaderProgram){
+        for(Model m : objects){
+            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,m.getCoords());
+            shaderProgram.setUniforms(itneration,bufferTransMatrix,projectionMatrix);
+            m.drawForceShader(shaderProgram);
         }
     }
 
@@ -164,6 +172,18 @@ public class Context {
         for (Model o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
+    }
+
+    public void addScript(ScriptedSequence sequence) {
+        scripts.add(sequence);
+    }
+    public void removeScript(ScriptedSequence sequence) {
+        scripts.remove(sequence);
+    }
+    public void removeScript(String sequenceName) {
+        List<ScriptedSequence> toRemove = new ArrayList<>();
+        for(ScriptedSequence ac : scripts){if(ac.name.equals(sequenceName)){toRemove.add(ac);}}
+        scripts.removeAll(toRemove);
     }
 
     public void synchronizeUniforms(ShaderProgram program){

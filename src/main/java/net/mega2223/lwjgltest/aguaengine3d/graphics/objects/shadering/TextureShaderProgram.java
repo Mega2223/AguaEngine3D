@@ -33,6 +33,5 @@ public class TextureShaderProgram extends ShaderProgramTemplate implements Shade
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
         super.setUniforms(interation, translationMatrix, projectionMatrix);
-
     }
 }

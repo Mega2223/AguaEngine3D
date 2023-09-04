@@ -15,6 +15,8 @@ uniform vec4 fogColor = vec4(.5,.5,.6,1);
 uniform vec4[MAX_LIGHTS] lights; //4th location is brightness
 uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 uniform bool doShadowMapping = false;
+uniform float zMin = 0F;
+uniform float zMax = 10F;
 
 out vec4 color;
 
@@ -25,8 +27,10 @@ out vec4 color;
 void main(){
 
     vec4 textureColor = texture(displayTexture,texturePosition);
-    //textureColor = vec4(textureColor.rgba);
-    color = fogColor;
+    textureColor = vec4(textureColor.r);
+
+    //textureColor = vec4((worldCoord.w-zMin)/abs(zMin - zMax));
+    //textureColor = vec4(textureColor.r/10);
 
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);

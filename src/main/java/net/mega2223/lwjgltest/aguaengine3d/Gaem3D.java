@@ -4,26 +4,29 @@ package net.mega2223.lwjgltest.aguaengine3d;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthDisplayShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DisplayShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.logic.ScriptedSequence;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.opengl.GL30;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings({"unused","UnnecessaryLocalVariable"})
 
 public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
+    protected static final int D = 128;
     static int framesElapsed = 0;
     public static final float[] camera = {0,.9f,0,0};
     static float tempCamY = 0f;
@@ -75,68 +78,48 @@ public class Gaem3D {
         context.addObject(tile.generate(map,3));
         System.out.println("Object generation took: " + (System.currentTimeMillis() - time) + " milis");
 
-        int[] shadowDepthBuffer = RenderingManager.genDepthFrameBufferObject(128,128);
-        DepthBufferShaderProgram depthBufferShaderProgram = DepthBufferShaderProgram.GLOBAL_INSTANCE;
-
-        ScriptedSequence up = new ScriptedSequence("Shadow calculators.") {
-            final float[] tm4 = {1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1};
-            final float[] pm4 = new float[16];
-            @Override
-            protected void preLogic(int itneration, Context context) {
-                MatrixTranslator.generateProjectionMatrix(pm4,0.1F,1000F, (float) Math.toRadians(45),1,1);
-                MatrixTranslator.applyLookTransformation(pm4,25,25,25,0,0,0);
-                depthBufferShaderProgram.setUniforms(itneration,tm4, pm4);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthBufferShaderProgram.getFBO()[0]);
-                GL30.glUseProgram(depthBufferShaderProgram.getID());
-                context.doCustomRender(pm4);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-            }
-            protected void postLogic(int itneration, Context context) {}
-            @Override
-            protected boolean shouldTrigger(int itneration, boolean isPreLogic, Context context) {
-                return isPreLogic;
-            }
-        };
+        //rendering tests
+        float[] monitorVertices = new float[]{0,0,0,0 , 0,1,0,0 , 1,0,0,0 , 1,1,0,0};
+        int[] monitorIndices = new int[]{0,1,2,2,1,3};
+        float[] textureCoords = new float[]{1,0, 1,1 , 0,0 , 0,1};
+        int[] textureFrameB = RenderingManager.genTextureFrameBufferObject(512,512);
+        int[] depthFrameB = RenderingManager.genDepthFrameBufferObject(512,512);
+        DisplayShaderProgram dispSP = new DisplayShaderProgram(textureCoords,textureFrameB);
+        ShaderProgram depthDispSP = new DepthDisplayShaderProgram(textureCoords,depthFrameB);
+        ShaderProgram depthComputer = DepthBufferShaderProgram.GLOBAL_INSTANCE;
 
         Model testMonitor = new Model(
-                new float[]{0,0,0,0 , 0,1,0,0 , 1,0,0,0, 1,1,0,0},
-                new int[]{0,1,2,2,1,3},
-                new DepthDisplayShaderProgram(
-                        new float[]{0,0 , 0,1 , 1,0, 1,1},depthBufferShaderProgram.getFBO()
-                )
-        ){
-            @Override
-            public void doLogic(int itneration) {
-
-            }
-        };
-
+                monitorVertices,monitorIndices,dispSP
+        );
         Model testMonitor2 = new Model(
-                new float[]{0,0,0,0 , 0,1,0,0 , 1,0,0,0, 1,1,0,0},
-                new int[]{0,1,2,2,1,3},
-                new DisplayShaderProgram(
-                        new float[]{0,0 , 1,0 , 0,1, 1,1},depthBufferShaderProgram.getFBO()
-                )
-        ){
-            final float[] pm4 = new float[16];
-            final float[] tm4 = new float[16];
+                monitorVertices,monitorIndices,depthDispSP
+        );
+        final int[][] data = new int[2][];
+        ScriptedSequence up = new ScriptedSequence("FBOUpdater") {
+            final float[] projM = new float[16];
             @Override
-            public void doLogic(int itneration) {
-                MatrixTranslator.generateProjectionMatrix(pm4,0.1F,1000F, (float) Math.toRadians(45),1,1);
-                MatrixTranslator.applyLookTransformation(pm4,25,25,25,0,0,0);
-                MatrixTranslator.generateTranslationMatrix(tm4,0,0,0);
-                depthBufferShaderProgram.setUniforms(itneration,tm4, pm4);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthBufferShaderProgram.getFBO()[0]);
-                GL30.glUseProgram(depthBufferShaderProgram.getID());
-                context.doCustomRender(pm4);
+            protected boolean shouldTrigger(int itneration, boolean isPreLogic, Context context) {return isPreLogic;}
+            @Override
+            protected void preLogic(int itneration, Context context) {
+                MatrixTranslator.generateProjectionMatrix(projM,7F,40F, (float) Math.toRadians(45),1);
+                MatrixTranslator.applyLookTransformation(projM,50,25,50,0,0,0);
+                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,textureFrameB[0]);
+                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_COLOR_BUFFER_BIT);
+                GL30.glViewport(0,0,512,512);
+                context.doCustomRender(projM);
+                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
+                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_COLOR_BUFFER_BIT);
+                GL30.glViewport(0,0,512,512);
+                context.doCustomRender(projM);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-                RenderingManager.printErrorQueue();
             }
         };
-        testMonitor2.setCoords(3,0,0);
+        testMonitor2.setCoords(2,0,0);
 
         context.addObject(testMonitor);
         context.addObject(testMonitor2);
+        context.addScript(up);
+
         context.setBackGroundColor(.5f,.5f,.6f);
         context.setActive(true);
         context.setFogDetails(2000,20);

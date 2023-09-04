@@ -1,5 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.misc;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class Utils {
@@ -33,7 +35,12 @@ public class Utils {
             BufferedWriter writer = new BufferedWriter(new FileWriter(path));
             writer.write(content);
             writer.close();
-        } catch (IOException ex){}
+        } catch (IOException ignored){}
+    }
+    public static void writeToFile(String path, BufferedImage content){
+        try {
+            ImageIO.write(content,"png",new File(path));
+        } catch (IOException ignored) {}
     }
 
 }

@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.lwjgltest.aguaengine3d.logic.ScriptedSequence;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
@@ -59,6 +60,8 @@ public class DisplayShaderProgram extends ShaderProgramTemplate implements Shade
         GL30.glDisableVertexAttribArray(TEXTURE_VERTEX_ATTRIBUTE_POS);
         GL30.glDisable(GL30.GL_TEXTURE_2D);
     }
+
+
 
     public int[] getFBO(){
         return FBO.clone();
