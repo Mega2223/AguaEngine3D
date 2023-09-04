@@ -46,6 +46,7 @@ public class Airsim {
 
         //Loop
         long unrendered = 0;
+        //noinspection UnnecessaryLocalVariable
         final long applicationStart = System.currentTimeMillis();
         long lastLoop = applicationStart;
         int framesLastSecond = 0;

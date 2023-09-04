@@ -25,7 +25,7 @@ out vec4 color;
 void main(){
 
     vec4 textureColor = texture(displayTexture,texturePosition);
-
+    //textureColor = vec4(textureColor.rgba);
     color = fogColor;
 
     for(int i = 0; i < MAX_LIGHTS; i++){

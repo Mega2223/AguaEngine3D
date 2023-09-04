@@ -174,10 +174,10 @@ public class RenderingManager {
     }
 
     public static void printErrorQueue(){
-        int e = 1;
+        int e = GL30.glGetError();
         while (e != GL30.GL_NO_ERROR){
-            e = GL30.glGetError();
             System.out.println("Error: " + e);
+            e = GL30.glGetError();
         }
     }
 }

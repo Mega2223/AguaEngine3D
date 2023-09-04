@@ -194,6 +194,7 @@ public class Model {
         this.normals = normals;
     }
 
+    /** @noinspection BooleanMethodIsAlwaysInverted*/
     public boolean areVBOSInitialized(){
         return getVerticesVBO() != -1 && getIndicesVBO() != -1 && getNormalsVBO() != -1;
     }

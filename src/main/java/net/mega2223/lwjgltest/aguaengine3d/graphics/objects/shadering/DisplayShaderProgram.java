@@ -13,16 +13,23 @@ public class DisplayShaderProgram extends ShaderProgramTemplate implements Shade
     float[] textureCoords;
     int textureCoordsVBO;
 
-    public DisplayShaderProgram(float[] textureCoords, int tX, int tY){
-        id = ShaderManager.loadShaderFromFiles(new String[]{
+    public DisplayShaderProgram(float[] textureCoords, int sX, int sY){
+        this(textureCoords,RenderingManager.genTextureFrameBufferObject(sX,sY));
+    }
+    public DisplayShaderProgram(float[] textureCoords, int[] FBO){
+        this(textureCoords,FBO,new String[]{
                 Utils.SHADERS_DIR+"\\DisplayTextureFragShader.fsh",
                 Utils.SHADERS_DIR+"\\DisplayTextureVertexShader.vsh"
-    });
-        this.FBO = RenderingManager.genTextureFrameBufferObject(tX,tY);
+        });
+    }
+    protected DisplayShaderProgram(float[] textureCoords, int[] FBO, String[] shaderFiles){
+        id = ShaderManager.loadShaderFromFiles(shaderFiles);
+        this.FBO = FBO;
         this.textureCoords = textureCoords;
         this.textureCoordsVBO = RenderingManager.genArrayBufferObject(textureCoords,GL30.GL_DYNAMIC_DRAW);
         initUniforms();
     }
+
     int boundsLocation = -1;
     @Override
     public void initUniforms() {

@@ -41,7 +41,7 @@ public class TexturedModel extends Model{
         this.texture = texture;
         this.setTextureShift(textureData);
         textureSamplerUniformCoord = GL30.glGetUniformLocation(shader.getID(),"samplerTexture");
-    };
+    }
 
     public void mirrorTexturesVertically(){
         for(int i = 1; i < textureShift.length; i+=2){textureShift[i]=1f-textureShift[i];}

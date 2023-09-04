@@ -2,7 +2,8 @@
 
 in vec4 gl_FragCoord;
 
-out vec4 color;
-void main(){
+layout(location = 0) out float fragDepth;
 
+void main(){
+    fragDepth = gl_FragCoord.z;
 }

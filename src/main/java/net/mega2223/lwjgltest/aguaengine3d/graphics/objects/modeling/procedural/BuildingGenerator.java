@@ -94,6 +94,6 @@ public class BuildingGenerator {
         );
 
         return result;
-    };
+    }
 
 }
