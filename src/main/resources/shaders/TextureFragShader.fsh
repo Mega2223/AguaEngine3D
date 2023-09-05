@@ -45,6 +45,9 @@ void main(){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
         color = mix(color,mixedColor,lightInfluence);
+        if(doShadowMapping[i]!=0){
+
+        }
     }
 
 

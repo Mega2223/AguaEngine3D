@@ -65,8 +65,6 @@ public class Gaem3D {
 
         //tests
 
-        //textureShaderProgram = new SolidColorShaderProgram(0,1,0);
-
         //rendering tests
         float[] monitorVertices = new float[]{0,0,0,0 , 0,1,0,0 , 1,0,0,0 , 1,1,0,0};
         int[] monitorIndices = new int[]{0,1,2,2,1,3};
@@ -75,7 +73,6 @@ public class Gaem3D {
         int[] depthFrameB = RenderingManager.genDepthFrameBufferObject(D,D);
         DisplayShaderProgram dispSP = new DisplayShaderProgram(textureCoords,textureFrameB);
         ShaderProgram depthDispSP = new DepthDisplayShaderProgram(textureCoords,depthFrameB);
-        ShaderProgram depthComputer = DepthBufferShaderProgram.GLOBAL_INSTANCE;
 
         Model testMonitor = new Model(
                 monitorVertices,monitorIndices,dispSP
@@ -84,7 +81,7 @@ public class Gaem3D {
                 monitorVertices,monitorIndices,depthDispSP
         );
 
-        ScriptedSequence up = new ScriptedSequence("FBOUpdater") {
+        ScriptedSequence FBOUpdater = new ScriptedSequence("FBOUpdater") {
             final float[] projM = new float[16];
             @Override
             protected boolean shouldTrigger(int itneration, boolean isPreLogic, Context context) {return isPreLogic;}
@@ -99,7 +96,7 @@ public class Gaem3D {
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
                 GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
                 GL30.glViewport(0,0,D,D);
-                context.doCustomRenderForceShader(projM,depthComputer);
+                context.doCustomRenderForceShader(projM,DepthBufferShaderProgram.GLOBAL_INSTANCE);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
             }
         };
@@ -107,17 +104,27 @@ public class Gaem3D {
 
         context.addObject(testMonitor);
         context.addObject(testMonitor2);
-        context.addScript(up);
+        context.addScript(FBOUpdater);
 
-        //building generator
-        //i have no idea why, but initializing this stuff before the stuff above causes the depth frame buffer to be empty
-        //weirldy enough, it only happens when:
-        //1- this is executet BEFORE the monitors are placed
-        //2- The TextureFragShader.fsh initializes it's doShadowMapping uniform (and OpenGL does not optimizes it away)
-        //3- I cannot stress this enough, the depth buffer is computed with the DepthAlg fragment and vertex shaders
-        //  and the monitor itself is rendered with the DepthDisplay fragment shader and the Display vertex shader.
-        //  changes in the TextureFragShader.fsh shader should NOT affect the depth display framebuffer whatsoever.
-        //  I have ABSOLUTELY NO IDEA why this happens, if you do please submit a PR or contact me.
+        /*building generator
+        i have no idea why, but initializing this stuff before the stuff above causes the depth frame buffer to be empty
+        weirldy enough, it only happens when:
+        1- this is executed BEFORE the monitors are placed/initialized
+        2- The TextureFragShader.fsh initializes it's doShadowMapping uniform (and OpenGL does not optimizes it away)
+        3- If the buildings do not use the TextureFragShader program this will also happen in some situations
+
+          I cannot stress this enough, the depth buffer is computed with the DepthAlg fragment and vertex shaders
+          and the monitor itself is rendered with the DepthDisplay fragment shader and the Display vertex shader.
+          changes in the TextureFragShader.fsh shader should NOT affect the depth display framebuffer whatsoever.
+          I have ABSOLUTELY NO IDEA why this happens, if you do please submit a PR or contact me.
+          this may very well require a line by line analisis of the shader initialization process
+
+        * Current theories:
+        * - Shader initialization is wrong somehow, i have no idea why changing the TextureFragShader affects the rendering tho
+        * It's worth noting that the shaders that work with depth calculations do not extend the TemplateShaderProgram class, that could be somehow omitting important initialization steps
+        * - Since the status of the int[] doShadowmapping at the TextureFragShader.fsh file affects this, this very well supports the theory of
+        * shader inialization being messed up somehow, I'll look into this deeper
+        * */
 
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
         int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
