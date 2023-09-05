@@ -70,6 +70,17 @@ public class DepthBufferShaderProgram implements ShaderProgram{
     }
 
     @Override
+    public void setRenderShadows(int index, boolean s) {
+        //do nothing
+    }
+
+    @Override
+    public int[] getLightspaceTextureLocs() {
+        return new int[0]; //do nothing
+    }
+
+
+    @Override
     public void setLights(float[][] lights) {
         //do nothing
     }

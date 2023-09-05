@@ -15,18 +15,23 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     protected int rotationMatrixLocation = -1;
     protected int itnerationLocation = -1;
 
+    protected int[] shadowEnableBoolLoc = new int[ShaderProgram.MAX_LIGHTS];
+    protected int[] lightSpaceTextureLocs = new int[ShaderProgram.MAX_LIGHTS];
+
     @Override
     public void initUniforms() {
         projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
         rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
         itnerationLocation = GL30.glGetUniformLocation(getID(),"itneration");
-
+        for (int i = 0; i < ShaderProgram.MAX_LIGHTS; i++) {
+            shadowEnableBoolLoc[i] = GL30.glGetUniformLocation(getID(),"doShadowMapping["+i+"]");
+            lightSpaceTextureLocs[i] = GL30.glGetUniformLocation(getID(),"lightspace_positions["+i+"]");
+        }
     }
 
     @Override
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
-
         GL30.glUseProgram(getID());
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
@@ -52,5 +57,16 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     @Override
     public void setLightColor(int index, float r, float g, float b, float influence) {
         ShaderProgram.super.setLightColor(index, r, g, b, influence);
+    }
+
+    @Override
+    public void setRenderShadows(int index, boolean s) {
+        int should = s? 1:0;
+        GL30.glUniform1i(shadowEnableBoolLoc[index],should);
+    }
+
+    @Override
+    public int[] getLightspaceTextureLocs() {
+        return lightSpaceTextureLocs;
     }
 }

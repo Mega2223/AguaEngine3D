@@ -7,10 +7,12 @@ public interface ShaderProgram {
     int MAX_LIGHTS = 10;
 
     int getID();
+    int[] getLightspaceTextureLocs();
 
     void initUniforms();//because i forgot to put it once so now all classes must have it
     void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix);
     void setRotationMatrix(float[] m4);
+    void setRenderShadows(int index,boolean s);
 
     default void setLights(float[][] lights){
         GL30.glUseProgram(getID());

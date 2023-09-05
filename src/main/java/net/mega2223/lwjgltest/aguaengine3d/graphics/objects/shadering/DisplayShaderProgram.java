@@ -31,11 +31,9 @@ public class DisplayShaderProgram extends ShaderProgramTemplate implements Shade
         initUniforms();
     }
 
-    int boundsLocation = -1;
     @Override
     public void initUniforms() {
         super.initUniforms();
-        boundsLocation = GL30.glGetUniformLocation(id,"bounds");
     }
 
     @Override

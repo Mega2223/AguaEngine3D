@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
@@ -26,7 +27,7 @@ import java.util.List;
 public class Gaem3D {
 
     protected static final String TITLE = "3 DIMENSÇÕES";
-    protected static final int D = 128;
+    protected static final int D = 512;
     static int framesElapsed = 0;
     public static final float[] camera = {0,.9f,0,0};
     static float tempCamY = 0f;
@@ -64,26 +65,14 @@ public class Gaem3D {
 
         //tests
 
-        TextureShaderProgram shaderProgram = new TextureShaderProgram();
-        int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
-        int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
-
-        ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor",shaderProgram);
-        ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor",shaderProgram);
-        ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",shaderProgram);
-
-        long time = System.currentTimeMillis();
-        context.addObject(grass.generate(map,1));
-        context.addObject(building.generate(map,2));
-        context.addObject(tile.generate(map,3));
-        System.out.println("Object generation took: " + (System.currentTimeMillis() - time) + " milis");
+        //textureShaderProgram = new SolidColorShaderProgram(0,1,0);
 
         //rendering tests
         float[] monitorVertices = new float[]{0,0,0,0 , 0,1,0,0 , 1,0,0,0 , 1,1,0,0};
         int[] monitorIndices = new int[]{0,1,2,2,1,3};
         float[] textureCoords = new float[]{1,0, 1,1 , 0,0 , 0,1};
-        int[] textureFrameB = RenderingManager.genTextureFrameBufferObject(512,512);
-        int[] depthFrameB = RenderingManager.genDepthFrameBufferObject(512,512);
+        int[] textureFrameB = RenderingManager.genTextureFrameBufferObject(D,D);
+        int[] depthFrameB = RenderingManager.genDepthFrameBufferObject(D,D);
         DisplayShaderProgram dispSP = new DisplayShaderProgram(textureCoords,textureFrameB);
         ShaderProgram depthDispSP = new DepthDisplayShaderProgram(textureCoords,depthFrameB);
         ShaderProgram depthComputer = DepthBufferShaderProgram.GLOBAL_INSTANCE;
@@ -94,23 +83,23 @@ public class Gaem3D {
         Model testMonitor2 = new Model(
                 monitorVertices,monitorIndices,depthDispSP
         );
-        final int[][] data = new int[2][];
+
         ScriptedSequence up = new ScriptedSequence("FBOUpdater") {
             final float[] projM = new float[16];
             @Override
             protected boolean shouldTrigger(int itneration, boolean isPreLogic, Context context) {return isPreLogic;}
             @Override
             protected void preLogic(int itneration, Context context) {
-                MatrixTranslator.generateProjectionMatrix(projM,7F,40F, (float) Math.toRadians(45),1);
+                MatrixTranslator.generateProjectionMatrix(projM,20F,60F, (float) Math.toRadians(45),1);
                 MatrixTranslator.applyLookTransformation(projM,50,25,50,0,0,0);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,textureFrameB[0]);
                 GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_COLOR_BUFFER_BIT);
-                GL30.glViewport(0,0,512,512);
+                GL30.glViewport(0,0,D,D);
                 context.doCustomRender(projM);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
-                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_COLOR_BUFFER_BIT);
-                GL30.glViewport(0,0,512,512);
-                context.doCustomRender(projM);
+                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
+                GL30.glViewport(0,0,D,D);
+                context.doCustomRenderForceShader(projM,depthComputer);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
             }
         };
@@ -120,10 +109,38 @@ public class Gaem3D {
         context.addObject(testMonitor2);
         context.addScript(up);
 
+        //building generator
+        //i have no idea why, but initializing this stuff before the stuff above causes the depth frame buffer to be empty
+        //weirldy enough, it only happens when:
+        //1- this is executet BEFORE the monitors are placed
+        //2- The TextureFragShader.fsh initializes it's doShadowMapping uniform (and OpenGL does not optimizes it away)
+        //3- I cannot stress this enough, the depth buffer is computed with the DepthAlg fragment and vertex shaders
+        //  and the monitor itself is rendered with the DepthDisplay fragment shader and the Display vertex shader.
+        //  changes in the TextureFragShader.fsh shader should NOT affect the depth display framebuffer whatsoever.
+        //  I have ABSOLUTELY NO IDEA why this happens, if you do please submit a PR or contact me.
+
+        int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
+        int[][] map = ProceduralBuildingManager.pngToBitmap(Utils.TEXTURES_DIR+"\\bitmap.png",expectedColors);
+        ShaderProgram textureShaderProgram = new TextureShaderProgram();
+        ProceduralBuilding grass = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\GrassFloor",textureShaderProgram);
+        ProceduralBuilding tile = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\TiledFloor",textureShaderProgram);
+        ProceduralBuilding building = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",textureShaderProgram);
+        long time = System.currentTimeMillis();
+        context.addObject(grass.generate(map,1));
+        TexturedModel buildingModel = building.generate(map, 2);
+        context.addObject(buildingModel);
+        context.addObject(tile.generate(map,3));
+        System.out.println("Object generation took: " + (System.currentTimeMillis() - time) + " milis");
+
         context.setBackGroundColor(.5f,.5f,.6f);
         context.setActive(true);
-        context.setFogDetails(2000,20);
-        context.setLight(0,0,100,0,10000);
+        context.setFogDetails(2000,0);
+        context.setLight(0,0,100,0,100);
+
+        for(Model m : context.getObjects()){
+            m.getShader().setRenderShadows(0,true);
+        }
+
         //Render Logic be like:
         long unrendered = 0;
         final long applicationStart = System.currentTimeMillis();
@@ -171,6 +188,7 @@ public class Gaem3D {
         context.doLogic();
         manager.fitViewport();
         context.doRender(methodMatrix);
+        RenderingManager.printErrorQueue();
         manager.update();
     }
 

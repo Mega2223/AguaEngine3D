@@ -1,5 +1,6 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.utils;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
@@ -9,6 +10,8 @@ public class ShaderManager {
     private ShaderManager(){}
     private static ShaderDictonary globalShaderDictionary = null;
     private static boolean isGlobalShaderDictEnabled = false;
+
+    public static final int SHADER_MAX_LIGHTS = ShaderProgram.MAX_LIGHTS;
 
     public static int loadShaderFromFiles(String[] shaderPaths, ShaderDictonary dict){
         String[] shaderContents = new String[shaderPaths.length];
