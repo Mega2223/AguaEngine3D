@@ -7,10 +7,9 @@ import org.lwjgl.opengl.GL30;
 
 public class TextureShaderProgram extends ShaderProgramTemplate implements ShaderProgram{
 
-    final int programID;
     public TextureShaderProgram(){this(null);}
     public TextureShaderProgram(ShaderDictonary dict){
-        programID = ShaderManager.loadShaderFromFiles(
+        id = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR + "\\TextureFragShader.fsh",
                         Utils.SHADERS_DIR + "\\TextureVertexShader.vsh"
@@ -21,7 +20,7 @@ public class TextureShaderProgram extends ShaderProgramTemplate implements Shade
 
     @Override
     public int getID() {
-        return programID;
+        return id;
     }
 
     @Override
