@@ -276,6 +276,20 @@ public class MatrixTranslator {
         }
         return ret;
     }
+    //very proud of that one
+    public static void multiply4x4Matrices(float[] m1, float[] m2){
+        for (int c = 0; c < 4; c++) {
+            for (int r = 0; r <4; r++) {
+                for (int i = 0; i < 4; i++) {
+                    int m1Loc = r*4+i;
+                    int m2Loc = c+i*4;//(c)*4+(3-r);
+                    int retLoc = i+r*4;
+                    bufferMatrix[c + r*4] += m1[m1Loc]*m2[m2Loc];
+                }
+            }
+        }
+        System.arraycopy(bufferMatrix, 0, m1, 0, m1.length);
+    }
 
     /**
      * resets the current matrix and sets it to a translation
