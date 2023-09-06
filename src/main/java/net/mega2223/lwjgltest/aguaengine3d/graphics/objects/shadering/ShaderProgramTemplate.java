@@ -1,5 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
+import net.mega2223.lwjgltest.aguaengine3d.logic.LightSpaceRenderingManager;
 import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
@@ -16,7 +18,8 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     protected int itnerationLocation = -1;
 
     protected int[] shadowEnableBoolLoc = new int[ShaderProgram.MAX_LIGHTS];
-    protected int[] lightSpaceTextureLocs = new int[ShaderProgram.MAX_LIGHTS];
+    protected int[] lightSpaceMatrices = new int[ShaderProgram.MAX_LIGHTS];
+    protected int[] shadowmapSamplers = new int[ShaderProgram.MAX_LIGHTS];
 
     @Override
     public void initUniforms() {
@@ -24,10 +27,15 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
         rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
         itnerationLocation = GL30.glGetUniformLocation(getID(),"itneration");
+        GL30.glUseProgram(getID());
+        //fixme this may be messing up the depth display shader somehow
         for (int i = 0; i < ShaderProgram.MAX_LIGHTS; i++) {
             shadowEnableBoolLoc[i] = GL30.glGetUniformLocation(getID(),"doShadowMapping["+i+"]");
-            lightSpaceTextureLocs[i] = GL30.glGetUniformLocation(getID(),"lightspace_positions["+i+"]");
+            lightSpaceMatrices[i] = GL30.glGetUniformLocation(getID(),"lightspace_positions["+i+"]");
+            shadowmapSamplers[i] = GL30.glGetUniformLocation(getID(),"shadowmaps["+i+"]");
+            GL30.glUniform1i(shadowmapSamplers[i], LightSpaceRenderingManager.FIRST_TEXTURE_LIGHTMAP_LOC+i);
         }
+
     }
 
     @Override
@@ -67,6 +75,6 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
 
     @Override
     public int[] getLightspaceTextureLocs() {
-        return lightSpaceTextureLocs;
+        return lightSpaceMatrices;
     }
 }

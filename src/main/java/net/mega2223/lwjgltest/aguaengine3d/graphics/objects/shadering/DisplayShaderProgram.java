@@ -44,6 +44,7 @@ public class DisplayShaderProgram extends ShaderProgramTemplate implements Shade
         //todo sub-optimal bufferData call
         //this happens thru all the engine, perhaps i need to clean up things a little
         //besides, i should be specifying STATIC_DRAW access anyway
+        GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER,textureCoords,GL30.GL_DYNAMIC_DRAW);
         GL30.glEnableVertexAttribArray(TEXTURE_VERTEX_ATTRIBUTE_POS);
         GL30.glVertexAttribPointer(TEXTURE_VERTEX_ATTRIBUTE_POS,2,GL30.GL_FLOAT,false,0,0L);

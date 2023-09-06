@@ -19,6 +19,7 @@ public class Context {
     float[] fogDetails = new float[2];
     protected boolean active = false;
     protected boolean areFBOSValid = false;
+    private final LightSpaceRenderingManager lightSpaceRenderingManager = new LightSpaceRenderingManager(this);
 
     public Context(){
 
@@ -68,7 +69,6 @@ public class Context {
             }
         }*/
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-        //if(true){return;}
 
         for(Model o : objects){//scene render
             MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,o.getCoords());
@@ -147,9 +147,8 @@ public class Context {
     final float[][] lightColors = new float[ShaderProgram.MAX_LIGHTS][4];
 
     public void setLights(float[][] lights){
-        System.arraycopy(lights, 0, this.lights, 0, lights.length);
-        for (Model o : objects){
-            o.getShader().setLights(this.lights);
+        for (int i = 0; i < lights.length; i++) {
+            setLight(i,lights[i][0],lights[i][1],lights[i][2],lights[i][3]);
         }
 
     }
@@ -161,6 +160,7 @@ public class Context {
         lights[index][1] = y;
         lights[index][2] = z;
         lights[index][3] = brightness;
+        lightSpaceRenderingManager.renderLightmapsAsNeeded();
     }
 
     public void setLightColor(int index, float r, float g, float b, float influence){
@@ -172,6 +172,10 @@ public class Context {
         for (Model o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
+    }
+
+    public void setEnableShadowsForLight(int index, boolean value){
+        lightSpaceRenderingManager.setDoShadowMapping(index,value);
     }
 
     public void addScript(ScriptedSequence sequence) {
@@ -193,7 +197,7 @@ public class Context {
         //todo sub optimal uniform call
         GL30.glUniform1f(GL30.glGetUniformLocation(program.getID(), "fogStart"),fogDetails[0]);
         GL30.glUniform1f(GL30.glGetUniformLocation(program.getID(), "fogDissolve"),fogDetails[1]);
-
+        lightSpaceRenderingManager.alignUniforms(program);
     }
 
     void initFBOS(){
@@ -201,5 +205,9 @@ public class Context {
             shadowFBOS[i]=RenderingManager.genDepthFrameBufferObject(1000,1000);//fixme
         }
         areFBOSValid = true;
+    }
+    //for testing purposes
+    public LightSpaceRenderingManager getLightSpaceRenderingManager() {
+        return lightSpaceRenderingManager;
     }
 }

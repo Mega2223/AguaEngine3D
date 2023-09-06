@@ -9,18 +9,13 @@ import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
 import net.mega2223.lwjgltest.aguaengine3d.logic.ScriptedSequence;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.opengl.GL30;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings({"unused","UnnecessaryLocalVariable"})
 
@@ -70,7 +65,13 @@ public class Gaem3D {
         int[] monitorIndices = new int[]{0,1,2,2,1,3};
         float[] textureCoords = new float[]{1,0, 1,1 , 0,0 , 0,1};
         int[] textureFrameB = RenderingManager.genTextureFrameBufferObject(D,D);
-        int[] depthFrameB = RenderingManager.genDepthFrameBufferObject(D,D);
+
+        context.setLight(0,50,25,50,100);
+        context.setEnableShadowsForLight(0,true);
+        context.getLightSpaceRenderingManager().renderLightmapsAsNeeded();
+
+        int[] depthFrameB = context.getLightSpaceRenderingManager().getAssossiatedFBO(0);
+
         DisplayShaderProgram dispSP = new DisplayShaderProgram(textureCoords,textureFrameB);
         ShaderProgram depthDispSP = new DepthDisplayShaderProgram(textureCoords,depthFrameB);
 
@@ -93,11 +94,12 @@ public class Gaem3D {
                 GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_COLOR_BUFFER_BIT);
                 GL30.glViewport(0,0,D,D);
                 context.doCustomRender(projM);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
-                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
-                GL30.glViewport(0,0,D,D);
-                context.doCustomRenderForceShader(projM,DepthBufferShaderProgram.GLOBAL_INSTANCE);
-                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
+                context.getLightSpaceRenderingManager().renderLightmapsAsNeeded();
+//                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
+//                GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
+//                GL30.glViewport(0,0,D,D);
+//                context.doCustomRenderForceShader(projM,DepthBufferShaderProgram.GLOBAL_INSTANCE);
+//                GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
             }
         };
         testMonitor2.setCoords(2,0,0);
@@ -124,6 +126,7 @@ public class Gaem3D {
         * It's worth noting that the shaders that work with depth calculations do not extend the TemplateShaderProgram class, that could be somehow omitting important initialization steps
         * - Since the status of the int[] doShadowmapping at the TextureFragShader.fsh file affects this, this very well supports the theory of
         * shader inialization being messed up somehow, I'll look into this deeper
+        * - Maybe the texture is fine and it's displaying that is wrong somehow
         * */
 
         int[][] expectedColors = {{0,255,0},{0,0,0},{255,0,0}};
@@ -142,11 +145,8 @@ public class Gaem3D {
         context.setBackGroundColor(.5f,.5f,.6f);
         context.setActive(true);
         context.setFogDetails(2000,0);
-        context.setLight(0,0,100,0,100);
 
-        for(Model m : context.getObjects()){
-            m.getShader().setRenderShadows(0,true);
-        }
+        RenderingManager.printErrorQueue();
 
         //Render Logic be like:
         long unrendered = 0;

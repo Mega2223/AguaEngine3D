@@ -75,7 +75,7 @@ public class TexturedModel extends Model{
         GL30.glEnableVertexAttribArray(1);
         //GL30.texparamet
         GL30.glVertexAttribPointer(1,2,GL30.GL_FLOAT,false,0,0L);
-        //GL30.glActiveTexture(GL30.GL_TEXTURE0);
+        GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         //GL30.glTexImage2D();
         super.drawForceShader(shader);
