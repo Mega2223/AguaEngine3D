@@ -25,8 +25,11 @@ out vec4 color;
 
 float calculateShadowAt(int index){
     vec4 fragLightspacePos = objectiveCoord * lightspace_positions[index];
-    float itensity = texture(shadowmaps[index],fragLightspacePos.xy).x;
-    return itensity;
+    vec3 compressed = fragLightspacePos.xyz / fragLightspacePos.w;
+    float textureDepth = texture(shadowmaps[index],compressed.xy)[0];
+    float depth = compressed.z;
+    return abs(textureDepth);
+    return(-depth);
 }
 
 float calculateLightInfluence(vec4 light,vec4 coord){
@@ -40,7 +43,6 @@ float calculateLightInfluence(vec4 light,vec4 coord){
 
 void main(){
     vec4 textureColor = texture(samplerTexture,texturePosition);
-
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
