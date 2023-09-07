@@ -278,6 +278,7 @@ public class MatrixTranslator {
     }
     //very proud of that one
     public static void multiply4x4Matrices(float[] m1, float[] m2){
+        Arrays.fill(bufferMatrix,0);
         for (int c = 0; c < 4; c++) {
             for (int r = 0; r <4; r++) {
                 for (int i = 0; i < 4; i++) {

@@ -23,7 +23,7 @@ out vec4 color;
 
 void main(){
 
-    vec4 textureColor = texture(displayTexture,texturePosition);
+    vec4 textureColor = texture(displayTexture,texturePosition);///2 + .5F;
     //textureColor = vec4(textureColor.r);
 
     //textureColor = vec4((worldCoord.w-zMin)/abs(zMin - zMax));

@@ -1,6 +1,7 @@
 package net.mega2223.lwjgltest.aguaengine3d.logic;
 
 import com.sun.org.apache.xpath.internal.operations.Mod;
+import net.mega2223.lwjgltest.aguaengine3d.Gaem3D;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
@@ -30,6 +31,7 @@ public class LightSpaceRenderingManager {
         //GL30.glActiv
     }
     float[] bufferM4 = new float[16];
+    float[] bufferM42 = new float[16];
 
     public void renderLightmapsAsNeeded(){
         GL30.glUseProgram(DepthBufferShaderProgram.GLOBAL_INSTANCE.getID());
@@ -38,13 +40,14 @@ public class LightSpaceRenderingManager {
                 assureFBOIsValid(i);
                 int[] FBO = shadowMappingFBOS[i];
                 genProjectionMatrixForLight(bufferM4,i);
+                genTranslationMatrixForLight(bufferM42,i);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,FBO[0]);
                 GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
                 GL30.glViewport(0,0,SHADOW_RES,SHADOW_RES);
                 GL30.glActiveTexture(GL30.GL_TEXTURE0 + FIRST_TEXTURE_LIGHTMAP_LOC + i);
                 GL30.glBindTexture(GL30.GL_TEXTURE_2D,shadowMappingFBOS[i][1]);
+                setLightspaceProjMatricesUniforms(i,bufferM4,bufferM42);
                 associatedContext.doCustomRenderForceShader(bufferM4,DepthBufferShaderProgram.GLOBAL_INSTANCE);
-                setLightspaceProjMatricesUniforms(i,bufferM4);
                 GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
                 GL30.glActiveTexture(GL30.GL_TEXTURE0);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
@@ -52,19 +55,28 @@ public class LightSpaceRenderingManager {
         }
     }
 
-    void genProjectionMatrixForLight(float[] m4,int index){
+    public void genTranslationMatrixForLight(float[] m4, int index){
         float[] pos = associatedContext.lights[index];
-        MatrixTranslator.generateProjectionMatrix(m4,10F,40F, (float) Math.toRadians(45),1);
+        MatrixTranslator.generateTranslationMatrix(m4,pos[0],pos[1],pos[2]);
+    }
+
+    public void genProjectionMatrixForLight(float[] m4,int index){
+        float[] pos = associatedContext.lights[index];
+        System.out.println("INDEX = " + index);
+        System.out.println("POS = " + pos[0] + " : " + pos[1] + " : " + pos[2]);
+        MatrixTranslator.generateProjectionMatrix(m4,1F, 100F, (float) Math.toRadians(45),1);
         MatrixTranslator.applyLookTransformation(m4,pos[0],pos[1],pos[2],0,0,0); //fixme
     }
 
-    void setLightspaceProjMatricesUniforms(int index,float[] m4){
+    void setLightspaceProjMatricesUniforms(int index,float[] projection, float[] translation){
         List<Model> objects = associatedContext.getObjects();
         for(Model ac : objects){
             ShaderProgram shader = ac.getShader();
             GL30.glUseProgram(shader.getID());
-            int loc = GL30.glGetUniformLocation(shader.getID(),"lightspace_positions["+index+"]");
-            GL30.glUniformMatrix4fv(loc,false,m4);
+            int projLoc = GL30.glGetUniformLocation(shader.getID(),"lightspace_projections["+index+"]");
+            int transLoc = GL30.glGetUniformLocation(shader.getID(),"lightspace_translations["+index+"]");
+            GL30.glUniformMatrix4fv(projLoc,false,projection);
+            GL30.glUniformMatrix4fv(transLoc,false,translation);
         }
     }
 

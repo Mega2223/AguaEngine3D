@@ -1,11 +1,12 @@
 #version 330 core
 
+//--@maxLightsConstant
+
 in vec2 texturePosition;
 in vec4 gl_FragCoord;
 in vec4 worldCoord;
 in vec4 objectiveCoord;
-
-//--@maxLightsConstant
+in vec4[MAX_LIGHTS] lightSpacePos;
 
 uniform sampler2D samplerTexture;
 uniform int itneration;
@@ -18,18 +19,17 @@ uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 
 //lightspace calculations for shadow rendering, off by default
 uniform sampler2D[MAX_LIGHTS] shadowmaps;
-uniform mat4[MAX_LIGHTS] lightspace_positions;
 uniform int[MAX_LIGHTS] doShadowMapping;
 
 out vec4 color;
-
+//todo não tem como escapar da projeção ortográfica :p
 float calculateShadowAt(int index){
-    vec4 fragLightspacePos = objectiveCoord * lightspace_positions[index];
-    vec3 compressed = fragLightspacePos.xyz / fragLightspacePos.w;
-    float textureDepth = texture(shadowmaps[index],compressed.xy)[0];
-    float depth = compressed.z;
-    return abs(textureDepth);
-    return(-depth);
+    vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
+    if(tr.x > 1 || tr.x < -1 || tr.y > 1 || tr.y < -1){return -111F;}
+    float depth = texture(shadowmaps[index],tr.xy)[0];
+
+    return depth;
+    //return tr.z > depth ? (tr.z):(depth);
 }
 
 float calculateLightInfluence(vec4 light,vec4 coord){
@@ -46,12 +46,9 @@ void main(){
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
-        if(doShadowMapping[i]!=0){
-            lightInfluence -= calculateShadowAt(i);
-        }
+        lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
         color = mix(color,mixedColor,lightInfluence);
     }
-
 
     //fog calculations
     float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));

@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
@@ -59,12 +60,14 @@ public class DepthBufferShaderProgram implements ShaderProgram{
     @Override
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(id);
+        MatrixTranslator.generateTranslationMatrix(translationMatrix,0,0,0);
         GL30.glUniformMatrix4fv(projectionMatrixLoc,false,projectionMatrix);
         GL30.glUniformMatrix4fv(translationMatrixLoc,false,translationMatrix);
     }
 
     @Override
     public void setRotationMatrix(float[] m4) {
+        if (true){throw new RuntimeException();}
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(rotationMatrixLoc,false,m4);
     }

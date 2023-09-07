@@ -1,6 +1,5 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.logic.LightSpaceRenderingManager;
 import org.lwjgl.opengl.GL30;
 
@@ -18,7 +17,8 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     protected int itnerationLocation = -1;
 
     protected int[] shadowEnableBoolLoc = new int[ShaderProgram.MAX_LIGHTS];
-    protected int[] lightSpaceMatrices = new int[ShaderProgram.MAX_LIGHTS];
+    protected int[] lightSpacePositions = new int[ShaderProgram.MAX_LIGHTS];
+    protected int[] lightSpaceTranslations = new int[ShaderProgram.MAX_LIGHTS];
     protected int[] shadowmapSamplers = new int[ShaderProgram.MAX_LIGHTS];
 
     @Override
@@ -31,7 +31,8 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         //fixme this may be messing up the depth display shader somehow
         for (int i = 0; i < ShaderProgram.MAX_LIGHTS; i++) {
             shadowEnableBoolLoc[i] = GL30.glGetUniformLocation(getID(),"doShadowMapping["+i+"]");
-            lightSpaceMatrices[i] = GL30.glGetUniformLocation(getID(),"lightspace_positions["+i+"]");
+            lightSpacePositions[i] = GL30.glGetUniformLocation(getID(),"lightspace_projections["+i+"]");
+            lightSpaceTranslations[i] = GL30.glGetUniformLocation(getID(),"lightspace_translations["+i+"]");
             shadowmapSamplers[i] = GL30.glGetUniformLocation(getID(),"shadowmaps["+i+"]");
             GL30.glUniform1i(shadowmapSamplers[i], LightSpaceRenderingManager.FIRST_TEXTURE_LIGHTMAP_LOC+i);
         }
@@ -75,6 +76,6 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
 
     @Override
     public int[] getLightspaceTextureLocs() {
-        return lightSpaceMatrices;
+        return lightSpacePositions;
     }
 }
