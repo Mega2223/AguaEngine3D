@@ -182,11 +182,11 @@ public class Gaem3D {
 
             @Override
             protected void preLogic(int itneration, Context context) {
-                lightFollower.setCoords(lightPerspective[0],lightPerspective[1],lightPerspective[2]);
+                lightFollower.setCoords(lightPerspective[0],lightPerspective[1]+1,lightPerspective[2]);
             }
         });
 
-        cube.setCoords(0,1,0);
+        //cube.setCoords(0,1,0);
         context.addObject(chessFloor);
         context.addObject(cube);
         context.addObject(lightFollower);

@@ -29,6 +29,6 @@ void main(){
     texturePosition = textureCoords;
 
     for(int i = 0; i < MAX_LIGHTS; i++){
-        lightSpacePos[i] = lightspace_projections[i] * (objectiveCoord*lightspace_translations[i]);
+        lightSpacePos[i] = lightspace_projections[i] * (toTrans*lightspace_translations[i]);
     }
 }

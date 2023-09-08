@@ -21,14 +21,17 @@ uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 uniform sampler2D[MAX_LIGHTS] shadowmaps;
 uniform int[MAX_LIGHTS] doShadowMapping;
 
+uniform mat4[MAX_LIGHTS] lightspace_projections;
+uniform mat4[MAX_LIGHTS] lightspace_translations;
+
 out vec4 color;
 //todo não tem como escapar da projeção ortográfica :p
 float calculateShadowAt(int index){
+    vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
-    if(tr.x > 1 || tr.x < -1 || tr.y > 1 || tr.y < -1){return -111F;}
-    float depth = texture(shadowmaps[index],tr.xy)[0];
 
-    return depth;
+    if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}
+    return 0;
     //return tr.z > depth ? (tr.z):(depth);
 }
 
@@ -47,6 +50,10 @@ void main(){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
         lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
+//        if(doShadowMapping[i]!=0){
+//            color.rgb = lightSpacePos[i].xyz;
+//            return;
+//        }
         color = mix(color,mixedColor,lightInfluence);
     }
 
