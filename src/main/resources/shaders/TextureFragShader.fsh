@@ -22,14 +22,14 @@ uniform sampler2D[MAX_LIGHTS] shadowmaps;
 uniform int[MAX_LIGHTS] doShadowMapping;
 
 out vec4 color;
-//todo não tem como escapar da projeção ortográfica :p
+
 float calculateShadowAt(int index){
     vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
-    //if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}
+    if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}
     tr/=2;tr+=.5;
     float depth = texture(shadowmaps[index],tr.xy)[0];
-    return tr.z > depth ? 1:0;
+    return tr.z-.00005F > depth ? 1:0;
 }
 
 float calculateLightInfluence(vec4 light,vec4 coord){
