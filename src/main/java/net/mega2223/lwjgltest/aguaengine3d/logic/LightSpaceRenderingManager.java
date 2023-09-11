@@ -62,7 +62,7 @@ public class LightSpaceRenderingManager {
 
     public void genProjectionMatrixForLight(float[] m4,int index){
         float[] pos = associatedContext.lights[index];
-        MatrixTranslator.generateProjectionMatrix(m4,20f,40f, (float) Math.toRadians(45),1);
+        MatrixTranslator.generateProjectionMatrix(m4,0.1f,80f, (float) Math.toRadians(45),1);
         MatrixTranslator.applyLookTransformation(m4,pos[0],pos[1],pos[2],0,0,0); //fixme
     }
 

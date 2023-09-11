@@ -27,9 +27,11 @@ float calculateShadowAt(int index){
     vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
     if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}
+    vec3 br = tr.xyz;
+    br = cos(clamp(br*3.14,-3.14,3.14))+1;
     tr/=2;tr+=.5;
     float depth = texture(shadowmaps[index],tr.xy)[0];
-    return tr.z-.00005F > depth ? 1:0;
+    return tr.z-.00005 > depth ? 1:(2-br.x)+(2-br.y);
 }
 
 float calculateLightInfluence(vec4 light,vec4 coord){

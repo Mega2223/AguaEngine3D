@@ -108,16 +108,11 @@ public class Gaem3D {
                 context.doCustomRender(projM);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
                 context.getLightSpaceRenderingManager().renderLightmapsAsNeeded();
-//              GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,depthFrameB[0]);
-//              GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
-//              GL30.glViewport(0,0,D,D);
-//              context.doCustomRenderForceShader(projM,DepthBufferShaderProgram.GLOBAL_INSTANCE);
-//              GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
             }
         };
 
-        context.addObject(testMonitor);
-        context.addObject(testMonitor2);
+        //context.addObject(testMonitor);
+        //context.addObject(testMonitor2);
         context.addScript(FBOUpdater);
 
         /*building generator
