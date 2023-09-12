@@ -31,7 +31,7 @@ float calculateShadowAt(int index){
     br = cos(clamp(br*3.14,-3.14,3.14))+1;
     tr/=2;tr+=.5;
     float depth = texture(shadowmaps[index],tr.xy)[0];
-    return tr.z-.00005 > depth ? 1:(2-br.x)+(2-br.y);
+    return tr.z-.00005 > depth ? 1:0;
 }
 
 float calculateLightInfluence(vec4 light,vec4 coord){
@@ -49,10 +49,7 @@ void main(){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
         lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
-//        if(doShadowMapping[i]!=0){
-//            color.rgb = lightSpacePos[i].xyz;
-//            return;
-//        }
+        lightInfluence = clamp(lightInfluence,0,1);
         color = mix(color,mixedColor,lightInfluence);
     }
 

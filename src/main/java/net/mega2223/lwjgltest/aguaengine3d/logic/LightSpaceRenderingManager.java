@@ -15,7 +15,7 @@ import java.util.List;
 public class LightSpaceRenderingManager {
 
     public static final int FIRST_TEXTURE_LIGHTMAP_LOC = 3; // 3 - 13
-    static final int SHADOW_RES = 512;
+    static final int SHADOW_RES = 2048;
 
     boolean[] doShadowMapping = new boolean[ShaderProgram.MAX_LIGHTS];
     int[][] shadowMappingFBOS = new int[ShaderProgram.MAX_LIGHTS][];

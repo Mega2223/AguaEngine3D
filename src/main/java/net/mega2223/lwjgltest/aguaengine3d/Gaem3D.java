@@ -78,8 +78,15 @@ public class Gaem3D {
         float[] textureCoords = new float[]{1,0, 1,1 , 0,0 , 0,1};
         int[] textureFrameB = RenderingManager.genTextureFrameBufferObject(D,D);
 
-        context.setLight(0,80,80,80,100);
         context.setEnableShadowsForLight(0,true);
+        context.setEnableShadowsForLight(1,true);
+        context.setEnableShadowsForLight(2,true);
+        context.setEnableShadowsForLight(3,true);
+        context.setLightColor(0,1,0,0,.2F);
+        context.setLightColor(1,1,1,0,.2F);
+        context.setLightColor(2,0,1,0,.2F);
+        context.setLightColor(3,0,0,1,.2F);
+
         context.getLightSpaceRenderingManager().renderLightmapsAsNeeded();
 
         int[] depthFrameB = context.getLightSpaceRenderingManager().getAssossiatedFBO(0);
@@ -228,7 +235,21 @@ public class Gaem3D {
     }
 
     protected static void doLogic(){
-        context.setLight(0,lightPerspective[0], lightPerspective[1], lightPerspective[2], 100);
+
+        context.setLight(0,
+                (float) (Math.cos(framesElapsed/60F)/2F)*40,1,
+                (float) (Math.sin(framesElapsed/60F)/2F)*40,10);
+        context.setLight(1,
+                (float) (Math.cos(framesElapsed/60F+Math.PI)/2F)*40,1,
+                (float) (Math.sin(framesElapsed/60F+Math.PI)/2F)*40,10);
+        context.setLight(2,
+                (float) (Math.cos(framesElapsed/60F+Math.PI/2)/2F)*40,1,
+                (float) (Math.sin(framesElapsed/60F+Math.PI/2)/2F)*40,10);
+        context.setLight(3,
+                (float) (Math.cos(framesElapsed/60F+Math.PI*1.5F)/2F)*40,1,
+                (float) (Math.sin(framesElapsed/60F+Math.PI*1.5F)/2F)*40,10);
+
+
     }
 
     static float[] trans =  new float[16];
