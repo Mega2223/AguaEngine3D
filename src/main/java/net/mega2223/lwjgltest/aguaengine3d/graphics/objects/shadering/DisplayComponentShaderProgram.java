@@ -1,5 +1,6 @@
 package net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering;
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
@@ -11,11 +12,15 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     float aspectRatio;
     protected float[] nativeProjectionMatrix = new float[16];
+    protected float[] textureCoords;
+
+    int textureCoordsVBO;
+
     int rotationMatrixLoc = -1;
     int translationMatrixLoc = -1;
     int projectionMatrixLoc = -1;
 
-    public DisplayComponentShaderProgram(int texture, float aspectRatio){
+    public DisplayComponentShaderProgram(int texture,float[] textureCoords, float aspectRatio){
         id = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR+"\\InterfaceComponentFragmentShader.fsh",
@@ -25,6 +30,8 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         this.texture = texture;
         initUniforms();
         this.aspectRatio = aspectRatio;
+        this.textureCoords = textureCoords;
+        textureCoordsVBO = RenderingManager.genArrayBufferObject(textureCoords,GL30.GL_STATIC_DRAW);
     }
 
     @Override
@@ -44,6 +51,7 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(translationMatrixLoc,false,translationMatrix);
         MatrixTranslator.generateStaticInterfaceProjectionMatrix(nativeProjectionMatrix,aspectRatio);
+        MatrixTranslator.debugMatrix4x4(nativeProjectionMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLoc,false,nativeProjectionMatrix);
     }
 
@@ -51,11 +59,16 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     public void preRenderLogic() {
         GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
+        GL30.glEnableVertexAttribArray(1);
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,textureCoordsVBO);//fixme unoptimized call, also present at MultipleColorsShaderProgram
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER,textureCoords,GL30.GL_DYNAMIC_DRAW);
+        GL30.glVertexAttribPointer(1,2,GL30.GL_FLOAT,false,0,0L);
     }
 
     @Override
     public void postRenderLogic() {
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
+        GL30.glDisableVertexAttribArray(1);
     }
 
     @Override

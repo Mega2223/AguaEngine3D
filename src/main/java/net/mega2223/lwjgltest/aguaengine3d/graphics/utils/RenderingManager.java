@@ -37,10 +37,6 @@ public class RenderingManager {
         GL30.glDisableVertexAttribArray(VERT_DATA_LOC);
     }
 
-    public static void drawnFrameBufferVBO() {
-
-    }
-
     public static int genArrayBufferObject(float[] data, int accessMode) {
         int vbo = GL30.glGenBuffers();
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vbo);

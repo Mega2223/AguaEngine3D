@@ -2,6 +2,7 @@ package net.mega2223.lwjgltest.aguaengine3d;
 
 
 
+import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.RenderingManager;
@@ -68,14 +69,26 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
         );
-        context.addObject(cube).addObject(chessFloor);
+        InterfaceComponent comp = new InterfaceComponent(
+                new float[]{.5F,.5F,0,0 , .5F,0,0,0 , 0,.5F,0,0 , 0,0,0,0},
+                new int[]{0,1,2,3,2,1},
+                new float[]{0,0 , 0,1 , 1,0 , 1,1},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png"),
+                1
+        ){
+            @Override
+            public void doLogic(int itneration) {
+                setAspectRatio(manager.getAspectRatio());
+            }
+        };
+
+
+        context.addObject(cube).addObject(chessFloor).addObject(comp);
 
         context.setLight(0,0,10,0,10);
         context.setBackGroundColor(.5f,.5f,.6f);
         context.setActive(true);
         context.setFogDetails(2000,0);
-
-        DisplayComponentShaderProgram prog = new DisplayComponentShaderProgram(1,1);
 
         RenderingManager.printErrorQueue();
 

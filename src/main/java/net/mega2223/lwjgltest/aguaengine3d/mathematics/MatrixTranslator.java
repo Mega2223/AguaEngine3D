@@ -377,7 +377,7 @@ public class MatrixTranslator {
 
     public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio){
         generateIdentity(m4);
-        m4[0] = aspectRatio;
+        m4[0] = 1/aspectRatio;
         m4[10] = 0;
     }
 

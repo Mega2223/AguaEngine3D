@@ -98,6 +98,9 @@ public class WindowManager {
         }
     }
 
+    public float getAspectRatio(){
+        return viewportSize[0]/(float)viewportSize[1];
+    }
 
     public void addUpdateEvent(Runnable event){
         updateEventList.add(event);
