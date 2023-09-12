@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL30;
  * Not supposed to be used for standard rendering, does not support lighting.
  * */
 public class DepthBufferShaderProgram implements ShaderProgram{
+    //fixme needs suppor for the tranlsation matrix
     int id = -1;
     int rotationMatrixLoc = -1;
     int translationMatrixLoc = -1;

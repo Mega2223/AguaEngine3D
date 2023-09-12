@@ -1,7 +1,5 @@
 package net.mega2223.lwjgltest.aguaengine3d.logic;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import net.mega2223.lwjgltest.aguaengine3d.Gaem3D;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
 import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
@@ -62,7 +60,7 @@ public class LightSpaceRenderingManager {
 
     public void genProjectionMatrixForLight(float[] m4,int index){
         float[] pos = associatedContext.lights[index];
-        MatrixTranslator.generateProjectionMatrix(m4,0.1f,80f, (float) Math.toRadians(45),1);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(m4,0.1f,80f, (float) Math.toRadians(45),1);
         MatrixTranslator.applyLookTransformation(m4,pos[0],pos[1],pos[2],0,0,0); //fixme
     }
 

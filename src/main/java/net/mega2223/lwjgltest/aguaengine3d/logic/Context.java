@@ -59,7 +59,7 @@ public class Context {
         /*for(int l = 0; l < lights.length; l++) {
             float[] transMat = MatrixTranslator.createTranslationMatrix(0, 0, 0);
             float[] projMat = new float[16];
-            MatrixTranslator.generateProjectionMatrix(projMat, 0.01F, 1000F, (float) Math.toRadians(45), 200, 200);
+            MatrixTranslator.generatePerspectiveProjectionMatrix(projMat, 0.01F, 1000F, (float) Math.toRadians(45), 200, 200);
             MatrixTranslator.applyLookTransformation(projMat, lights[l], 10, 0, 10, 0, 1, 0);
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,shadowFBOS[l][0]);
             GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);

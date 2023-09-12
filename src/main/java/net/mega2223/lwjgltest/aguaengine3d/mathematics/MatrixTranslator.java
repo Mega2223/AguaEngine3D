@@ -326,9 +326,7 @@ public class MatrixTranslator {
 
     public static void generateTranslationMatrix(float[] mat4, float x, float y, float z) {
 
-        for (int i = 0; i < mat4.length; i++) {
-            mat4[i] = 0;
-        }
+        Arrays.fill(mat4, 0);
         for (int i = 0; i < mat4.length; i += 5) {
             mat4[i] = 1;
         }
@@ -337,6 +335,10 @@ public class MatrixTranslator {
         mat4[7] = y;
         mat4[11] = z;
 
+    }
+
+    public static void generateIdentity(float[] m4){
+        generateTranslationMatrix(m4,0,0,0);
     }
 
     public static float[] createTranslationMatrix(float x, float y, float z) {
@@ -373,12 +375,17 @@ public class MatrixTranslator {
 
     }
 
-
-    public static void generateProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){
-        float ar = w / h;
-        generateProjectionMatrix(m4,zNear,zFar,fov,ar);
+    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio){
+        generateIdentity(m4);
+        m4[0] = aspectRatio;
+        m4[10] = 0;
     }
-    public static void generateProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float aspR){
+
+    public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){
+        float ar = w / h;
+        generatePerspectiveProjectionMatrix(m4,zNear,zFar,fov,ar);
+    }
+    public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float aspR){
         Arrays.fill(m4,0);
         float hh = (float) Math.tan(fov*.5f);
         m4[0] = 1/(hh*aspR);
@@ -450,6 +457,8 @@ public class MatrixTranslator {
 
         System.arraycopy(bufferMatrix, 0, m4, 0, bufferMatrix.length);
     }
+
+
 
     public static void debugMatrix4x4(float[] matrix4) {
         StringBuilder debug = new StringBuilder("[ ");
