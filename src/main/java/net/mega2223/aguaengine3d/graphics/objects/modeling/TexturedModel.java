@@ -20,15 +20,6 @@ public class TexturedModel extends Model{
         super(triangles,indices,shader);
         init(textureShift,TextureManager.loadTexture(textureDir));
     }
-
-    public TexturedModel(float[] triangles,int[] indices, float[] textureShift, ShaderProgram shader, float[] normals, String textureDir) {
-        super(triangles,indices,shader,normals);
-        init(textureShift,TextureManager.loadTexture(textureDir));
-    }
-    public TexturedModel(float[] triangles,int[] indices, float[] textureShift, ShaderProgram shader, float[] normals, int texture) {
-        super(triangles,indices,shader,normals);
-        init(textureShift,texture);
-    }
     public TexturedModel(float[] triangles, int[] indices,float[] textureShift, ShaderProgram shader, int texture) {
         super(triangles,indices,shader);
         init(textureShift,texture);
@@ -91,14 +82,12 @@ public class TexturedModel extends Model{
      * */
     public static TexturedModel loadTexturedModel(String[] objData, ShaderProgram shader, int texture){
 
-        boolean modelHasNormals = false; //either a model has normals on ALL faces, or in no faces whatsoever
         boolean modelHasTextureCoords = false; //same thing as above
 
         ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
         ArrayList<Float> textureIndexes = new ArrayList<>();
-        ArrayList<Float> normals = new ArrayList<>();
 
         //extracts vertices and texture coordinates and puts them in their respective arrays
         for (int i = 0; i < objData.length; i++) {
@@ -116,13 +105,6 @@ public class TexturedModel extends Model{
                 textureIndexes.add(Float.parseFloat(split[1]));
                 textureIndexes.add(1-Float.parseFloat(split[2]));
             }
-            else if(type.equalsIgnoreCase("vn")&&split.length==4){
-                modelHasNormals = true;
-                normals.add(Float.parseFloat(split[1]));
-                normals.add(Float.parseFloat(split[2]));
-                normals.add(Float.parseFloat(split[3]));
-            }
-
         }
         if(vertices.size()%4 != 0){
             throw new UnsupportedOperationException("invalid model");
@@ -145,7 +127,6 @@ public class TexturedModel extends Model{
 
         float[] vertData = new float[existingVerticeCombinations.size()*4];
         float[] texData = new float[existingVerticeCombinations.size()*2];
-        float[] normalsData = new float[existingVerticeCombinations.size()*3];
         int[] indData = new int[indices.size()];
 
         for(int i = 0; i<existingVerticeCombinations.size(); i++){
@@ -163,19 +144,10 @@ public class TexturedModel extends Model{
                     texData[(i*2)+j] = textureIndexes.get((combination[1]-1)*2+j);
                 }
             }
-            if(modelHasNormals){ //otherwise, this would throw an ArrayOutOfBoundsEx
-                for (int j = 0; j < 3; j++) {
-                    normalsData[(i*3)+j] = normals.get((combination[2]-1)*3+j);
-                }
-            }
         }
 
         for (int i = 0; i < indData.length; i++) {
             indData[i]=indices.get(i);
-        }
-
-        if(modelHasNormals){
-            return new TexturedModel(vertData,indData,texData,shader,normalsData,texture);
         }
 
         return new TexturedModel(vertData,indData,texData,shader,texture);

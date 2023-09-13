@@ -12,43 +12,29 @@ public class Model {
 
     public static final int SHADER_VERTEX_DATA_LOCATION = 0;
     public static final int SHADER_TEXTURE_DATA_LOCATION = 1;
-    public static final int SHADER_NORMALS_LOCATION = 2;
 
     protected float[] vertices; //each vertex has 4 attributes
     protected float[] coords = {0,0,0,0};
     protected int[] indices;
-    protected float[] normals = null;//should've done this way before lol, normals are 3d vectors, no 4th coord
 
     protected ShaderProgram shader;
 
     protected int verticesVBO = -1;
     protected int indicesVBO = -1;
     protected int textureCoordsVBO = -1;
-    protected int normalsVBO = -1;
 
     public Model(float[] vertices, int[] indexes, ShaderProgram shader){
         this.setVertices(vertices);
         this.setIndices(indexes);
         this.setShader(shader);
-        genNormals();
     }
 
-    public Model(float[] vertices, int[] indexes, ShaderProgram shader, float[] normals){
-        this.setVertices(vertices);
-        this.setIndices(indexes);
-        this.setShader(shader);
-        this.setNormals(normals);
-    }
 
     public static Model loadModel(String[] objData, ShaderProgram shader){
-
-        boolean modelHasNormals = false; //either a model has normals on ALL faces, or in no faces whatsoever
-
 
         ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
-        ArrayList<Float> normals = new ArrayList<>();
 
         //extracts vertices and texture coordinates and puts them in their respective arrays
         for (int i = 0; i < objData.length; i++) {
@@ -61,12 +47,7 @@ public class Model {
                 vertices.add(0f);
                 //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
             }
-            else if(type.equalsIgnoreCase("vn")&&split.length==4){
-                modelHasNormals = true;
-                normals.add(Float.parseFloat(split[1]));
-                normals.add(Float.parseFloat(split[2]));
-                normals.add(Float.parseFloat(split[3]));
-            }
+
 
         }
         if(vertices.size()%4 != 0){
@@ -88,7 +69,6 @@ public class Model {
             }
         }
         float[] vertData = new float[existingVerticeCombinations.size()*4];
-        float[] normalsData = new float[existingVerticeCombinations.size()*3];
         int[] indData = new int[indices.size()];
 
         for(int i = 0; i<existingVerticeCombinations.size(); i++){
@@ -102,19 +82,10 @@ public class Model {
                 vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
             }
 
-            if(modelHasNormals){ //otherwise, this would throw an ArrayOutOfBoundsEx
-                for (int j = 0; j < 3; j++) {
-                    normalsData[(i*3)+j] = normals.get((combination[2]-1)*3+j);
-                }
-            }
         }
 
         for (int i = 0; i < indData.length; i++) {
             indData[i]=indices.get(i);
-        }
-
-        if(modelHasNormals){
-            return new Model(vertData,indData,shader,normalsData);
         }
 
         return new Model(vertData,indData,shader);
@@ -149,21 +120,17 @@ public class Model {
     protected void initVBOS(){
         int verticeVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
         int indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_DYNAMIC_DRAW);
-        int normalsVBO = RenderingManager.genArrayBufferObject(normals,GL30.GL_DYNAMIC_DRAW);
         this.setVerticesVBO(verticeVBO);
         this.setIndicesVBO(indicesVBO);
-        this.setNormalsVBO(normalsVBO);
     }
 
 
     public void unloadVBOS(){
         GL30.glDeleteBuffers(getIndicesVBO());
         GL30.glDeleteBuffers(getVerticesVBO());
-        GL30.glDeleteBuffers(getNormalsVBO());
         GL30.glDeleteBuffers(getTextureCoordsVBO());
         setIndicesVBO(-1);
         setVerticesVBO(-1);
-        setNormalsVBO(-1);
         setTextureCoordsVBO(-1);
     }
 
@@ -186,24 +153,9 @@ public class Model {
 
     }
 
-    public float[] getNormals() {
-        return normals.clone();
-    }
-
-    public void setNormals(float[] normals) {
-        this.normals = normals;
-    }
-
     /** @noinspection BooleanMethodIsAlwaysInverted*/
     public boolean areVBOSInitialized(){
-        return getVerticesVBO() != -1 && getIndicesVBO() != -1 && getNormalsVBO() != -1;
-    }
-
-    protected void genNormals(){//todo
-        normals = new float[vertices.length - (vertices.length/4)];
-
-        //3/4ths relation
-
+        return getVerticesVBO() != -1 && getIndicesVBO() != -1;
     }
 
     public float[] getCoords(){
@@ -238,11 +190,4 @@ public class Model {
         this.textureCoordsVBO = textureCoordsVBO;
     }
 
-    public int getNormalsVBO() {
-        return normalsVBO;
-    }
-
-    public void setNormalsVBO(int normalsVBO) {
-        this.normalsVBO = normalsVBO;
-    }
 }

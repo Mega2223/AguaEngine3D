@@ -35,8 +35,7 @@ public class Airsim {
         SimObjectWrapper wrapped = new SimObjectWrapper(ob,new Model(
                 new float[]{-.5f,0,0,0, 0,1f,0,0, .5f,0,0,0},
                 new int[]{0,1,2},
-                new SimpleSolidColorShaderProgram(0,1,0),
-                new float[3]
+                new SimpleSolidColorShaderProgram(0,1,0)
         ));
 
         stage.add(wrapped);
