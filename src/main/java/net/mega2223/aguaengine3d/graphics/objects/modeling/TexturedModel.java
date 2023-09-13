@@ -41,7 +41,6 @@ public class TexturedModel extends Model{
     //puts the texture data in the first slot of the additional vbos on the super method
     @Override
     protected void initVBOS(){
-        //todo
         super.initVBOS();
     }
 

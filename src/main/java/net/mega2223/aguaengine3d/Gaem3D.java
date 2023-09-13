@@ -16,21 +16,44 @@ import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unused"})
 
+/*
+* The official AguaEngine3D TODO list:
+* Remove shadow acnes somehow (I hade normals so much it's unreal)
+* Font rendering
+* Rewrite texture loading function
+* Geometry Shader support
+* Move aero to tests? (also finish it lol)
+* Shadow calculations at the global shader dictionary
+* Cubemap support (for lights and skyboxes)
+* Btw the shadow calculation algorithm is not finished lmao
+* Transparency, which should be working but it's not
+* Logo and Readme.md
+* Figure out why the FPS loop is weird
+* Improvements on procedural building generation (aka multi building and scaling support)
+* Optimize OpenGL calls
+* Sound stuff
+* Trigger stuff
+* Collision stuff
+* */
+
 public class Gaem3D {
 
+    public static final int TARGET_FPS = 120;
+    public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     protected static final String TITLE = "3 DIMENSÇÕES";
     protected static final int D = 512;
+    private static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
-    private static final float[] camera = {0,.9f,0,0};
-    public static final int TARGET_FPS = 120;
-    public static final float[] DEFAULT_SKY_COLOR = {.5f,.5f,.5f,1};
     static WindowManager manager;
     static Context context = new Context();
+
+    static float[] trans = new float[16];
+    static float[] proj = new float[16];
 
     public static void main(String[] args) {
 
         //GLFW
-        manager = new WindowManager(300,300, TITLE);
+        manager = new WindowManager(300, 300, TITLE);
         manager.init();
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
@@ -51,28 +74,28 @@ public class Gaem3D {
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR+"\\DefaultShaderDictionary.sdc"));
+        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //tests
 
         TexturedModel chessFloor = new TexturedModel(
-                new float[]{-50,0,-50,0 , 50,0,-50,0 , -50,0,50,0 , 50,0,50,0},
-                new int[]{0,1,2,2,1,3},
-                new float[]{0,0 , 100,0 , 0,100 , 100,100},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\xadrez.png")
+                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
+                new int[]{0, 1, 2, 2, 1, 3},
+                new float[]{0, 0, 100, 0, 0, 100, 100, 100},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
         TexturedModel cube = TexturedModel.loadTexturedModel(
-                Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png")
+                Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
 
         InterfaceComponent comp = new InterfaceComponent(
-                new float[]{.5F,.5F,0,0 , .5F,0,0,0 , 0,.5F,0,0 , 0,0,0,0},
-                new int[]{0,1,2,3,2,1},
-                new float[]{0,0 , 0,1 , 1,0 , 1,1},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR+"\\img.png"),
+                new float[]{.5F, .5F, 0, 0, .5F, 0, 0, 0, 0, .5F, 0, 0, 0, 0, 0, 0},
+                new int[]{0, 1, 2, 3, 2, 1},
+                new float[]{0, 0, 0, 1, 1, 0, 1, 1},
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png"),
                 1
-        ){
+        ) {
             @Override
             public void doLogic(int itneration) {
                 setAspectRatio(manager.getAspectRatio());
@@ -82,10 +105,10 @@ public class Gaem3D {
 
         context.addObject(cube).addObject(chessFloor).addObject(comp);
 
-        context.setLight(0,0,10,0,10)
-        .setBackGroundColor(.5f,.5f,.6f)
-        .setActive(true)
-        .setFogDetails(2000,0);
+        context.setLight(0, 0, 10, 0, 10)
+                .setBackGroundColor(.5f, .5f, .6f)
+                .setActive(true)
+                .setFogDetails(10, 0);
 
         RenderingManager.printErrorQueue();
 
@@ -100,9 +123,9 @@ public class Gaem3D {
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             unrendered += System.currentTimeMillis() - lastLoop;
             lastLoop = System.currentTimeMillis();
-            if(System.currentTimeMillis() - fLSLastUpdate > 1000){
+            if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName,TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
+                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
                 framesLastSecond = 0;
 
             }
@@ -120,23 +143,18 @@ public class Gaem3D {
         }
     }
 
-    protected static void doLogic(){
+    protected static void doLogic() {
 
     }
 
-    static float[] trans =  new float[16];
-    static float[] proj = new float[16];
-
-    protected static void doRenderLogic(){
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj,0.01f,100.0f, (float) Math.toRadians(45),manager.viewportSize[0],manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(proj,camera,(float) (camera[0]+Math.sin(camera[3])), camera[1], (float) (camera[2]+Math.cos(camera[3])),0,1,0);
+    protected static void doRenderLogic() {
+        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 100.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
         context.doLogic();
         manager.fitViewport();
         context.doRender(proj);
         RenderingManager.printErrorQueue();
         manager.update();
     }
-
-
 
 }

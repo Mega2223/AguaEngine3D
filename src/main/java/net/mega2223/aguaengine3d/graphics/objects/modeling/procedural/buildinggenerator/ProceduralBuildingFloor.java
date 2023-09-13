@@ -18,7 +18,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
     int[] compartibleHeights = null;
     boolean compartibleHeightsExclusive = false;
 
-    ProceduralBuilding context;//maybe fixme? idk i need that to get the objects, and storing the objects in the class also seems unnecessary
+    ProceduralBuilding context;
 
     //builds object according to data
     public ProceduralBuildingFloor(String[] data, ProceduralBuilding context){
