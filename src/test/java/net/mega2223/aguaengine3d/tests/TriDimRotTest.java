@@ -1,8 +1,8 @@
 package net.mega2223.aguaengine3d.tests;
 
+@SuppressWarnings("ALL")
 public class TriDimRotTest {
     static float[]vect = {1,0,0};
-
     private static double DEG = Math.PI;
     public static void main(String[] args) {
         printVec(vect);

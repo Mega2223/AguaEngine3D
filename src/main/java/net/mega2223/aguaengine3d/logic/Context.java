@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d.logic;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -12,12 +11,12 @@ import java.util.List;
 
 public class Context {
 
-    protected List<Model> objects = new ArrayList<>();
-    protected List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
+    protected final List<Model> objects = new ArrayList<>();
+    protected final List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
 
     int itneration = 0;
     float[] backGroundColor = {.5f,.5f,.6f,1};
-    float[] fogDetails = new float[2];
+    final float[] fogDetails = new float[2];
     protected boolean active = false;
     protected boolean areFBOSValid = false;
     private final LightSpaceRenderingManager lightSpaceRenderingManager = new LightSpaceRenderingManager(this);
@@ -56,21 +55,8 @@ public class Context {
 
     public void doRender(float[] projectionMatrix){
         if(!areFBOSValid){initFBOS();}
-        //shadow render
-        /*for(int l = 0; l < lights.length; l++) {
-            float[] transMat = MatrixTranslator.createTranslationMatrix(0, 0, 0);
-            float[] projMat = new float[16];
-            MatrixTranslator.generatePerspectiveProjectionMatrix(projMat, 0.01F, 1000F, (float) Math.toRadians(45), 200, 200);
-            MatrixTranslator.applyLookTransformation(projMat, lights[l], 10, 0, 10, 0, 1, 0);
-            GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,shadowFBOS[l][0]);
-            GL30.glClear(GL30.GL_DEPTH_BUFFER_BIT);
-            for (Model o : objects) {
-                o.getShader().setUniforms(itneration, transMat, projMat);
-                o.drawForceShader(DepthBufferShaderProgram.GLOBAL_INSTANCE);
-            }
-        }*/
+        //todo shadow render pipeline
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-
         for(Model o : objects){//scene render
             MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,o.getCoords());
             o.getShader().setUniforms(itneration, bufferTransMatrix,projectionMatrix);
@@ -79,7 +65,7 @@ public class Context {
     }
 
     /**Assumes that the rendering context is already in place*/
-    public void doCustomRender(float projectionMatrix[]){
+    public void doCustomRender(float[] projectionMatrix){
         for(Model m : objects){
             MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,m.getCoords());
             m.getShader().setUniforms(itneration,bufferTransMatrix,projectionMatrix);
@@ -108,7 +94,7 @@ public class Context {
         return this;
     }
     @Deprecated
-    public void setBackGroundColor(float[] backGroundColor) {
+    public Context setBackGroundColor(float[] backGroundColor) {
         this.backGroundColor = backGroundColor;
         GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
@@ -118,8 +104,9 @@ public class Context {
             GL30.glUseProgram(p);
             GL30.glUniform4fv(c,backGroundColor);
         }
+        return this;
     }
-    public void setBackGroundColor(float r, float g, float b) {
+    public Context setBackGroundColor(float r, float g, float b) {
         this.backGroundColor[0] = r;
         this.backGroundColor[1] = g;
         this.backGroundColor[2] = b;
@@ -131,6 +118,7 @@ public class Context {
             GL30.glUseProgram(p);
             GL30.glUniform4fv(c,backGroundColor);
         }
+        return this;
     }
 
     public void setFogDetails(float dist, float dissolve){
@@ -143,7 +131,7 @@ public class Context {
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogDissolve"),dissolve);
         }
     }
-    int[][] shadowFBOS = new int[ShaderProgram.MAX_LIGHTS][];
+    final int[][] shadowFBOS = new int[ShaderProgram.MAX_LIGHTS][];
     final float[][] lights = new float[ShaderProgram.MAX_LIGHTS][4];
     final float[][] lightColors = new float[ShaderProgram.MAX_LIGHTS][4];
 
@@ -153,7 +141,7 @@ public class Context {
         }
 
     }
-    public void setLight(int index, float x, float y, float z, float brightness){
+    public Context setLight(int index, float x, float y, float z, float brightness){
         for (Model o : objects){
             o.getShader().setLight(index,x,y,z,brightness);
         }
@@ -162,9 +150,10 @@ public class Context {
         lights[index][2] = z;
         lights[index][3] = brightness;
         lightSpaceRenderingManager.renderLightmapsAsNeeded();
+        return this;
     }
 
-    public void setLightColor(int index, float r, float g, float b, float influence){
+    public Context setLightColor(int index, float r, float g, float b, float influence){
         lightColors[index][0] = r;
         lightColors[index][1] = g;
         lightColors[index][2] = b;
@@ -173,6 +162,7 @@ public class Context {
         for (Model o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
+        return this;
     }
 
     public void setEnableShadowsForLight(int index, boolean value){

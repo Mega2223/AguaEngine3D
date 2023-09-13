@@ -21,10 +21,9 @@ public class StructureUtils {
         float dif = top-base;
 
         float[] textureShift = {0,0 , 0,-dif , r,0 , r,-dif};
-        TexturedModel ret = new TexturedModel(
+        return new TexturedModel(
                 coords,indexes,textureShift,texture
         );
-        return ret;
     }
 
 
@@ -54,7 +53,7 @@ public class StructureUtils {
     }
 
     public static List<Model> elongateSurface(Model model, float bas){
-        ArrayList<Model> ret = new ArrayList();
+        ArrayList<Model> ret = new ArrayList<>();
         float[] ver = model.getRelativeVertices();
         int[] indices = model.getIndices();
 

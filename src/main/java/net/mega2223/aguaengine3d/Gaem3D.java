@@ -1,22 +1,20 @@
 package net.mega2223.aguaengine3d;
 
 
-
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.logic.Context;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.objects.WindowManager;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.*;
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
-@SuppressWarnings({"unused","UnnecessaryLocalVariable"})
+@SuppressWarnings({"unused"})
 
 public class Gaem3D {
 
@@ -84,20 +82,19 @@ public class Gaem3D {
 
         context.addObject(cube).addObject(chessFloor).addObject(comp);
 
-        context.setLight(0,0,10,0,10);
-        context.setBackGroundColor(.5f,.5f,.6f);
-        context.setActive(true);
-        context.setFogDetails(2000,0);
+        context.setLight(0,0,10,0,10)
+        .setBackGroundColor(.5f,.5f,.6f)
+        .setActive(true)
+        .setFogDetails(2000,0);
 
         RenderingManager.printErrorQueue();
 
         //Render Logic be like:
         long unrendered = 0;
-        final long applicationStart = System.currentTimeMillis();
-        long lastLoop = applicationStart;
+        long lastLoop = System.currentTimeMillis();
         int framesLastSecond = 0;
         long fLSLastUpdate = 0;
-        long lastCycleDuration = 0;
+        //long lastCycleDuration = 0; STOP SCREAMING AT ME INTELLIJ I GET IT
         context.setActive(true);
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
@@ -111,16 +108,13 @@ public class Gaem3D {
             }
             if (unrendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();
-
-                //experimentation zone
-
                 //cpu logic
                 doLogic();
                 //render logic
                 doRenderLogic();
                 unrendered = 0;
                 framesElapsed++;
-                lastCycleDuration = System.currentTimeMillis() - cycleStart;
+                //lastCycleDuration = System.currentTimeMillis() - cycleStart;
                 framesLastSecond++;
             }
         }

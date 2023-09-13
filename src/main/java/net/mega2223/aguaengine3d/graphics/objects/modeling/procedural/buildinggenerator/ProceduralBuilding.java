@@ -72,7 +72,6 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
                     continue;
                 case "shouldRenderMiddle":
                     shouldConsiderMiddleBlocks = Boolean.parseBoolean(cmd[1]);
-                    continue;
             }
 
         }
@@ -106,12 +105,12 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         for (int f = 0; currentHeight < desiredHeight; f++) {
             ProceduralBuildingFloor prevFloor = null;
             if(f > 0){prevFloor = floorMap[f-1];}
-            List<ProceduralBuildingFloor> possibleFloors = new ArrayList();
+            List<ProceduralBuildingFloor> possibleFloors = new ArrayList<>();
             for(ProceduralBuildingFloor act : allFloors){if(act.canBeBuilt(f,prevFloor)){possibleFloors.add(act);}}
             float[] probabilites = new float[possibleFloors.size()];
             for(int i = 0; i < possibleFloors.size(); i++){probabilites[i]=possibleFloors.get(i).bias;}
             ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilites);
-            //the application can get stuck here, i really need to up the contratiction model
+            //the application can get stuck here, I really need to up the contratiction model
             floorModels.add(floorToBuild.generate(pattern,currentHeight,where,shouldConsiderMiddleBlocks));
             floorMap[f] = floorToBuild;
             currentHeight += floorToBuild.height;

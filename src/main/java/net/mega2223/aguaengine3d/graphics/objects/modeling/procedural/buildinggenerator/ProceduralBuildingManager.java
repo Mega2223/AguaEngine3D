@@ -10,13 +10,13 @@ public class ProceduralBuildingManager {
     private ProceduralBuildingManager(){}
 
     public static void printBitMap (int[][] map){
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (int y = 0; y < map.length; y++) {
-            out += "[";
+            out.append("[");
             for (int x = 0; x < map[y].length-1; x++) {
-                out += map[y][x] + ",";
+                out.append(map[y][x]).append(",");
             }
-            out += map[y][map[y].length-1]+"]\n";
+            out.append(map[y][map[y].length - 1]).append("]\n");
         }
         System.out.println(out);
     }

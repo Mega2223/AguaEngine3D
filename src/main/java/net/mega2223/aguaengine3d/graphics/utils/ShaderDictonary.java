@@ -5,6 +5,7 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class ShaderDictonary {
 
     List<ShaderDictionaryEntry> entries =  new ArrayList<>();

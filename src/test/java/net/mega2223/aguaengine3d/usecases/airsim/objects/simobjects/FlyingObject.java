@@ -4,7 +4,7 @@ import net.mega2223.aguaengine3d.usecases.airsim.PhysicsUtils;
 import net.mega2223.aguaengine3d.usecases.airsim.objects.SimObject;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"ALL"}) //remove this when the class gets completed, the compiler screams about every variable that is not changed
 
 public abstract class FlyingObject extends SimObject {
 
@@ -14,8 +14,8 @@ public abstract class FlyingObject extends SimObject {
 
     //local variables for physics and stuff, should be calculated by the physics handlers and NOT changed externally
     private float speed = 0;
-    private float[] rotation = new float[3];
-    private boolean gearState = true;
+    private final float[] rotation = new float[3];
+    private final boolean gearState = true;
     //local variables that differ for waach model
     protected final float weight, drag;
     protected final float engineStrenght, maxYawPush, maxPitch;

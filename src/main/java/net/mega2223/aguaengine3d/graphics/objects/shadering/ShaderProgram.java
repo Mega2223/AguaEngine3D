@@ -9,7 +9,7 @@ public interface ShaderProgram {
     int getID();
     int[] getLightspaceTextureLocs();
 
-    void initUniforms();//because i forgot to put it once so now all classes must have it
+    void initUniforms();//because I forgot to put it once so now all classes must have it
     void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix);
     void setRotationMatrix(float[] m4);
     void setRenderShadows(int index,boolean s);

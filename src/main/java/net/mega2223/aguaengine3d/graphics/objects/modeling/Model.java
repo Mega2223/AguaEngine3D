@@ -210,7 +210,7 @@ public class Model {
         return coords.clone();
     }
     public void setCoords(float[] coords){
-        for (int i = 0; i < this.coords.length; i++) {this.coords[i] = coords[i];}
+        System.arraycopy(coords, 0, this.coords, 0, this.coords.length);
     }
     public void setCoords(float x, float y, float z){coords[0] = x; coords[1] = y; coords[2] = z;}
 

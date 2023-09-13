@@ -47,7 +47,6 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
                     compartibleHeights = new int[heights.length];
                     if(heights[0].equalsIgnoreCase(ANY)){compartibleHeights[0] = ANY_INTEGER; continue;}
                     for(int h = 0; h < heights.length; h++){compartibleHeights[h] = Integer.parseInt(heights[h]);}
-                    continue;
             }
         }
     }
@@ -96,7 +95,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             ProceduralBuildingBlock toTry = (ProceduralBuildingBlock) MathUtils.doWeightedSelection(possibleBlocks,weights);
             couldPlace = tryToPlace(z,x,height,buildMap,whereToBuild,blockMap,toTry,whereToPlace);
             if(couldPlace){
-                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace,shouldConsiderMiddleBlocks);return;} catch (ContradictionException ex) {continue;}
+                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace,shouldConsiderMiddleBlocks);return;} catch (ContradictionException ignored) {}
             } else {possibleBlocks.remove(toTry);
         }
         }

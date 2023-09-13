@@ -201,7 +201,7 @@ public class TexturedModel extends Model{
         }
         debug.append(indexes[indexes.length - 1]).append("]");
         System.out.println(debug);
-    };
+    }
 
     public float[] getTextureShift() {
         return textureShift.clone();

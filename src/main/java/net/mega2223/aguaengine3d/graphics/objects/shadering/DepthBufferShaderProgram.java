@@ -9,9 +9,12 @@ import org.lwjgl.opengl.GL30;
 /**
  * Not supposed to be used for standard rendering, does not support lighting.
  * */
+
+@SuppressWarnings({"unused"})
+
 public class DepthBufferShaderProgram implements ShaderProgram{
-    //fixme needs suppor for the tranlsation matrix
-    int id = -1;
+    //fixme needs support for the tranlsation matrix
+    int id;
     int rotationMatrixLoc = -1;
     int translationMatrixLoc = -1;
     int projectionMatrixLoc = -1;
@@ -68,7 +71,6 @@ public class DepthBufferShaderProgram implements ShaderProgram{
 
     @Override
     public void setRotationMatrix(float[] m4) {
-        if (true){throw new RuntimeException();}
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(rotationMatrixLoc,false,m4);
     }

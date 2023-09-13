@@ -5,6 +5,8 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
+@SuppressWarnings("unused")
+
 public class DisplayCoordinateBasedTextureShaderProgram extends ShaderProgramTemplate implements ShaderProgram{
     final int programID;
     int texture;
@@ -37,5 +39,7 @@ public class DisplayCoordinateBasedTextureShaderProgram extends ShaderProgramTem
         GL30.glActiveTexture(texture);
     }
 
-
+    public void setTexture(int texture) {
+        this.texture = texture;
+    }
 }

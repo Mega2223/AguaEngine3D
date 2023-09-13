@@ -21,7 +21,7 @@ public class RenderingManager {
         GL30.glUseProgram(program.getID());
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vbo);
         GL30.glEnableVertexAttribArray(VERT_DATA_LOC);
-        GL30.glVertexAttribPointer(VERT_DATA_LOC, attribSize, GL30.GL_FLOAT, false, 0, 0l);
+        GL30.glVertexAttribPointer(VERT_DATA_LOC, attribSize, GL30.GL_FLOAT, false, 0, 0L);
         GL30.glDrawArrays(mode, 0, totalVarCount / attribSize);
         GL30.glDisableVertexAttribArray(VERT_DATA_LOC);
 
@@ -32,7 +32,7 @@ public class RenderingManager {
         GL30.glEnableVertexAttribArray(VERT_DATA_LOC);
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, verticesVBO);
         GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, indicesVBO);
-        GL30.glVertexAttribPointer(VERT_DATA_LOC, attribSize, GL30.GL_FLOAT, false, 0, 0l);
+        GL30.glVertexAttribPointer(VERT_DATA_LOC, attribSize, GL30.GL_FLOAT, false, 0, 0L);
         GL30.glDrawElements(mode, indicesSize, GL30.GL_UNSIGNED_INT, 0);
         GL30.glDisableVertexAttribArray(VERT_DATA_LOC);
     }

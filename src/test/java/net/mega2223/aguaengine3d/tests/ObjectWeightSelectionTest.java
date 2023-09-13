@@ -8,7 +8,7 @@ public class ObjectWeightSelectionTest {
         String[] prob = {"50","25","10","15"};
         float[] probs = {.5f,.25f,.1f,.15f};
 
-        int count[] = new int[4];
+        int[] count = new int[4];
 
         for (int i = 0; i < 10000; i++) {
             Object selected = MathUtils.doWeightedSelection(prob, probs);

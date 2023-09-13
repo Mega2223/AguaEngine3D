@@ -11,8 +11,8 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     int texture;
 
     float aspectRatio;
-    protected float[] nativeProjectionMatrix = new float[16];
-    protected float[] textureCoords;
+    protected final float[] nativeProjectionMatrix = new float[16];
+    protected final float[] textureCoords;
 
     int textureCoordsVBO;
 
@@ -82,5 +82,9 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     public void setAspectRatio(float aspectRatio) {
         this.aspectRatio = aspectRatio;
+    }
+
+    protected void setTexture(int texture){
+        this.texture = texture;
     }
 }

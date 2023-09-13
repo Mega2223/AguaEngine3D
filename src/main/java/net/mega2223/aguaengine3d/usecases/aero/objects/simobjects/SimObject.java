@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.usecases.Airsim.objects.simobjects;
+package net.mega2223.aguaengine3d.usecases.aero.objects.simobjects;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 

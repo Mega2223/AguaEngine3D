@@ -1,11 +1,12 @@
-package net.mega2223.aguaengine3d.usecases.Airsim.objects.simobjects;
+package net.mega2223.aguaengine3d.usecases.aero.objects.simobjects;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.usecases.Airsim.Aerodynamics;
+import net.mega2223.aguaengine3d.usecases.aero.Aerodynamics;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"ALL"})
+
 public abstract class FlyingSimObject extends SimObject{
 
     //consts
@@ -84,9 +85,9 @@ public abstract class FlyingSimObject extends SimObject{
         directionRadians[YAW_LOC] += yawControl*maxYawPush;//*speed;
         directionRadians[PITCH_LOC] += pitchControl*maxPitch;//*speed;
 
-        if(coords[1] <= 0){
+        //if(coords[1] <= 0){
             //directionRadians[PITCH_LOC] += (float) MathUtils.stepTowardsVar(directionRadians[PITCH_LOC],0,0.06);
-        }
+        //}
 
         MatrixTranslator.generateRotationMatrix(rotationMatrix,-directionRadians[PITCH_LOC],-directionRadians[1],directionRadians[0]);
         shader.setRotationMatrix(rotationMatrix);
@@ -199,4 +200,7 @@ public abstract class FlyingSimObject extends SimObject{
         this.throttle-=amount;
     }
 
+    public void setGearState(boolean gearState) {
+        this.gearState = gearState;
+    }
 }

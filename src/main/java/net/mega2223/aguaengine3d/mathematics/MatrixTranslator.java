@@ -4,10 +4,13 @@ import java.util.Arrays;
 
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
 
-/**Class that stores handmade math calculations for matrix translation and stuff
- * Seems like LWJGL has libraries that do exactly what i'm trying to do, but i'm just too deep to care now
- * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended*/
 public class MatrixTranslator {
+
+    /**
+     * Class that stores handmade math calculations for matrix translation and stuff
+     * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
+     * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
+     * */
 
     public static final int ISOMETRIC_PROJECTION = 0;
     public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
@@ -34,7 +37,7 @@ public class MatrixTranslator {
                 vec3[startingPoint + 1] += projectionPoint[1];
                 vec3[startingPoint + 2] += projectionPoint[2];
 
-                System.out.println("");
+                System.out.println();
                 System.out.println(vec3[startingPoint + 2]);
 
                 float mult = fieldOfView / (fieldOfView + vec3[startingPoint + 2]);
@@ -54,9 +57,6 @@ public class MatrixTranslator {
             case TRUE_PERSPECTIVE_PROJECTION:
                 float near = .01f;
                 float far = 1000f;
-
-
-                return;
 
         }
     }
@@ -93,19 +93,17 @@ public class MatrixTranslator {
                 vectors[i + g] = (matrix[i1] * vectors[g]) + (matrix[i1 + 1] * vectors[g + 1]) + (matrix[i1 + 2] * vectors[g + 2]) + (matrix[i1 + 3] * vectors[g + 3]);
             }
         }
-        return;
     }
 
     public void rotatePolygons(float[][] polygons, float[] rotationRadians) {
-        for (int i = 0; i < polygons.length; i++) {
-            rotatePolygon(polygons[i], rotationRadians);
+        for (float[] polygon : polygons) {
+            rotatePolygon(polygon, rotationRadians);
         }
-        return;
     }
 
-    public void rotatePolygon(float[] polygon, float rotationRadians[]) {
+    public void rotatePolygon(float[] polygon, float[] rotationRadians) {
         for (int j = 0; j < polygon.length; j += 4) {
-            float rot[] = polygon.clone();
+            float[] rot = polygon.clone();
             MatrixTranslator.rotateVector3(polygon, rotationRadians[0], rotationRadians[1], rotationRadians[2], j);
         }
     }
@@ -203,7 +201,7 @@ public class MatrixTranslator {
         rotateVector2(vec2, cX, cY, 0, 0, rotationRadians);
     }
 
-    public static void rotateVector2(float vec2[], final float cX, final float cY, float anchorX, float anchorY, double rotationRadians) {
+    public static void rotateVector2(float[] vec2, final float cX, final float cY, float anchorX, float anchorY, double rotationRadians) {
         final double sin = Math.sin(rotationRadians);
         final double cos = Math.cos(rotationRadians);
         final double nCX = (float) ((cX * cos) - (cY * sin));
@@ -498,7 +496,7 @@ public class MatrixTranslator {
         System.out.println(out);
     }
 
-    public static void debugPolygon(float poly[], int debugN){
+    public static void debugPolygon(float[] poly, int debugN){
         if(debugN >= 0){System.out.println("Debugging polygon " + debugN + ": ");}
         for (int i = 0; i < poly.length; i+=4) {
             System.out.println("| Vertice " + i/4 + ": [" + poly[i] + "," + poly[i+1] + "," + poly[i+2] + "]");

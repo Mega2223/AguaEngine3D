@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.graphics.objects.shadering;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.misc.Utils;
 
+
 public class DepthDisplayShaderProgram extends DisplayShaderProgram {
 
     public DepthDisplayShaderProgram(float[] textureCoords, int sX, int sY){

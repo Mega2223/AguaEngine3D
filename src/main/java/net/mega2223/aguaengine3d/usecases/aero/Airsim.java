@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.usecases.Airsim;
+package net.mega2223.aguaengine3d.usecases.aero;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuildingManager;
@@ -10,8 +10,10 @@ import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.aguaengine3d.misc.Utils;
-import net.mega2223.aguaengine3d.usecases.Airsim.objects.simobjects.FlyingSimObject;
+import net.mega2223.aguaengine3d.usecases.aero.objects.simobjects.FlyingSimObject;
 import org.lwjgl.glfw.GLFW;
+
+@SuppressWarnings({"ALL"})
 
 public class Airsim {
 

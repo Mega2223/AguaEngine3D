@@ -2,6 +2,8 @@ package net.mega2223.aguaengine3d.usecases.airsim.objects;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("ALL")
+
 public class Stage {
 
     ArrayList<SimObject> flyingObjects = new ArrayList(20);

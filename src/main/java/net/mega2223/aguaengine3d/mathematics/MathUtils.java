@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MathUtils {
-    public static Object doWeightedSelection(List objectList, float[] weights){
+    public static Object doWeightedSelection(@SuppressWarnings("rawtypes") List objectList, float[] weights){
         return doWeightedSelection(objectList.toArray(),weights);
     }
     public static Object doWeightedSelection(Object[] objects, float[] weights){
@@ -18,7 +18,7 @@ public class MathUtils {
             if(randomValue >= currentPos && randomValue < currentPos+weights[i]){return objects[i];}
             currentPos+=weights[i];
         }
-        return null;
+        return objects[0];
     }
 
     public static float[][] cloneFloatArrayArray(float[][] base){

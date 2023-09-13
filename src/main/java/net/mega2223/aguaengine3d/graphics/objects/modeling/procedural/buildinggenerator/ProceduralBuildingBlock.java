@@ -93,7 +93,6 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                                 case "mirror": simmetry = SIMMETRY_DOUBLE; break;
                                 case "quad": simmetry = SIMMENTRY_QUAD; break;
                             }
-                            continue;
                     }
             }
         }

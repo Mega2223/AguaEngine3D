@@ -1,10 +1,11 @@
-package net.mega2223.aguaengine3d.usecases.Airsim;
+package net.mega2223.aguaengine3d.usecases.aero;
 
 import net.mega2223.aguaengine3d.mathematics.MathUtils;
-import net.mega2223.aguaengine3d.usecases.Airsim.objects.simobjects.FlyingSimObject;
+import net.mega2223.aguaengine3d.usecases.aero.objects.simobjects.FlyingSimObject;
+
+@SuppressWarnings({"unused"})
 
 public class Aerodynamics {
-
 
     public static float[] generatePredictionVector(float[] currentRotation,float attackAngle,float velocity) {
         return generatePredictionVector(currentRotation, attackAngle, velocity,1);

@@ -9,9 +9,9 @@ public class DisplayShaderProgram extends ShaderProgramTemplate implements Shade
 
     public static final int TEXTURE_VERTEX_ATTRIBUTE_POS = 1;
 
-    int[] FBO;
+    final int[] FBO;
     float[] textureCoords;
-    int textureCoordsVBO;
+    final int textureCoordsVBO;
 
     public DisplayShaderProgram(float[] textureCoords, int sX, int sY){
         this(textureCoords, RenderingManager.genTextureFrameBufferObject(sX,sY));

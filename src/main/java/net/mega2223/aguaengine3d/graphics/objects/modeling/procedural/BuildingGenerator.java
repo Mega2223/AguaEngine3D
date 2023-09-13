@@ -13,9 +13,9 @@ public class BuildingGenerator {
 
     @Deprecated //use the procedural generation instead
     public static TexturedModel genBlock(float scale, float sX, float sZ, float h, int texture){
-        List<Float> vertices = new ArrayList();
-        List<Float> textureCoords = new ArrayList();
-        List<Integer> indices = new ArrayList();
+        List<Float> vertices = new ArrayList<>();
+        List<Float> textureCoords = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
 
         float[] wallTextureCoords = {0,0 , 0,.5f , .5f,0 , .5f,.5f};
         float[] windowTextureCoords = {0f,.5f , 0f,1f , .5f,.5f , .5f,1f};
@@ -39,7 +39,7 @@ public class BuildingGenerator {
 
                 Random r = new Random();
                 for (int i = 0; i < 2; i++) {
-                    float texCoord[] = wallTextureCoords;
+                    float[] texCoord = wallTextureCoords;
                     float chance = r.nextFloat();
                     if(chance>.8f){
                         texCoord = windowTextureCoords;
@@ -67,7 +67,7 @@ public class BuildingGenerator {
 
                 Random r = new Random();
                 for (int i = 0; i < 2; i++) {
-                    float texCoord[] = wallTextureCoords;
+                    float[] texCoord = wallTextureCoords;
                     float chance = r.nextFloat();
                     if(chance>.9f){
                         texCoord = windowTextureCoords;
@@ -86,14 +86,12 @@ public class BuildingGenerator {
         for(int i = 0; i < indicesArray.length; i++){indicesArray[i] = indices.get(i);}
         for(int i = 0; i < textureCoordArray.length; i++){textureCoordArray[i] = textureCoords.get(i);}
 
-        TexturedModel result = new TexturedModel(
+        return new TexturedModel(
                 verticesArray,
                 indicesArray,
                 textureCoordArray,
                 texture
         );
-
-        return result;
     }
 
 }

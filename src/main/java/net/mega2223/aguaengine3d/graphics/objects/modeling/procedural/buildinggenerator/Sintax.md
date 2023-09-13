@@ -57,7 +57,7 @@ bias - Chance of generating, standard is 1
 
 floors - Valid floor FILE NAMES, extension excluded. Array of strings.
 
-blocks - Valid block FILE NAMES, extension excluded. Array of strings. Must have ALL blocks that'll be used by the floors, otherwise you may get a unpleasant surprise called NullPointerException.
+blocks - Valid block FILE NAMES, extension excluded. Array of strings. Must have ALL blocks that'll be used by the floors, otherwise you may get an unpleasant surprise called NullPointerException.
 
 
 ### Optional:

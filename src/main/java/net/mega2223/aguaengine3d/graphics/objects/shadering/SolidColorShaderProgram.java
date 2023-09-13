@@ -9,8 +9,8 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
     private static final String VERTEX_SH = Utils.SHADERS_DIR+"\\SolidColorVertexShader.vsh";
     private static final String FRAG_SH = Utils.SHADERS_DIR+"\\SolidColorFragmentShader.fsh";
 
-    private int program = -1;
-    private float[] color;
+    private final int program;
+    private final float[] color;
     public SolidColorShaderProgram(float r, float g, float b){this(r,g,b,null);}
     public SolidColorShaderProgram(float r, float g, float b, ShaderDictonary dict){
         color = new float[]{r,g,b};
