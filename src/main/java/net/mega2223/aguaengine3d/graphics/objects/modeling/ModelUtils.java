@@ -44,6 +44,35 @@ public class ModelUtils {
         return new TexturedModel(vertices,indices,textureCoords,program,texture);
     }
 
+    public static InterfaceComponent mergeComponents(InterfaceComponent[] components, int texture){
+        List<Float> verticeList = new ArrayList<>();
+        List<Integer> indexList = new ArrayList<>();
+        List<Float> textureCoordList = new ArrayList<>();
+
+        for (int m = 0; m < components.length; m++) {
+            float[] modelVertices = components[m].vertices;
+            int[] modelIndexes = components[m].indices;
+            float[] modelTextureCoords = components[m].textureCoords;
+            int indexStartingPoint = verticeList.size()/4;
+            translateVertices(modelVertices,components[m].coords);
+
+            for (float modelVertex : modelVertices) {verticeList.add(modelVertex);}
+            for (int modelIndex : modelIndexes){indexList.add(modelIndex+indexStartingPoint);}
+            for (float textureCoord : modelTextureCoords){textureCoordList.add(textureCoord);}
+
+        }
+        float[] vertices = new float[verticeList.size()];
+        int[] indices = new int[indexList.size()];
+        float[] textureCoords = new float[textureCoordList.size()];
+
+        for(int i = 0; i < vertices.length;i++){vertices[i]=verticeList.get(i);}
+        for(int i = 0; i < indices.length;i++){indices[i]=indexList.get(i);}
+        for(int i = 0; i < textureCoords.length;i++){textureCoords[i]=textureCoordList.get(i);}
+        //should I make an Interface that abranges InterfaceComponent AND TexturedModel?
+
+        return new InterfaceComponent(vertices,indices,textureCoords,texture,components[0].getAspectRatio());
+    }
+
     public static void translateModel(Model model, float x, float y, float z){
         model.setVertices(translateVertices(model,x,y,z));
     }

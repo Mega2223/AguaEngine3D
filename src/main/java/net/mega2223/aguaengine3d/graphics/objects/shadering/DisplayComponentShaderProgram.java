@@ -51,7 +51,6 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(translationMatrixLoc,false,translationMatrix);
         MatrixTranslator.generateStaticInterfaceProjectionMatrix(nativeProjectionMatrix,aspectRatio);
-        MatrixTranslator.debugMatrix4x4(nativeProjectionMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLoc,false,nativeProjectionMatrix);
     }
 
@@ -86,5 +85,9 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     protected void setTexture(int texture){
         this.texture = texture;
+    }
+
+    public float getAspectRatio() {
+        return aspectRatio;
     }
 }

@@ -31,6 +31,7 @@ import org.lwjgl.glfw.GLFW;
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support)
 * Optimize OpenGL calls
+* Coverage testing
 * Sound stuff
 * Trigger stuff
 * Collision stuff
