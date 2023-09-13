@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.usecases.airsim.renderer;
 
 import net.mega2223.aguaengine3d.usecases.airsim.objects.SimObject;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import org.lwjgl.opengl.GL30;
 
 public class SimObjectWrapper extends SimObject {

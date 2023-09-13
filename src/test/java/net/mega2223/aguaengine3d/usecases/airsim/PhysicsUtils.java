@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.usecases.airsim;
 
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 public class PhysicsUtils {
     private PhysicsUtils(){}

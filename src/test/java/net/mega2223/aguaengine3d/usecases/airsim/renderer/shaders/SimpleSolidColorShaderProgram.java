@@ -1,9 +1,9 @@
 package net.mega2223.aguaengine3d.usecases.airsim.renderer.shaders;
 
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.utils.ShaderManager;
-import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
 public class SimpleSolidColorShaderProgram extends ShaderProgramTemplate implements ShaderProgram {

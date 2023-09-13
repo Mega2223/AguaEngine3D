@@ -350,7 +350,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.mega2223.lwjgltest.aguaengine3d.Gaem3D</mainClass>
+                            <mainClass>net.mega2223.aguaengine3d.Gaem3D</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

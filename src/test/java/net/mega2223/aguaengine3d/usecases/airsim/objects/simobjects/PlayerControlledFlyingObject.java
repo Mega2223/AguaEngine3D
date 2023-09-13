@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.usecases.airsim.objects.simobjects;
 
-import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
 public class PlayerControlledFlyingObject extends FlyingObject {

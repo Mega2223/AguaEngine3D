@@ -5,10 +5,10 @@ import net.mega2223.aguaengine3d.usecases.airsim.objects.Stage;
 import net.mega2223.aguaengine3d.usecases.airsim.objects.simobjects.PlayerControlledFlyingObject;
 import net.mega2223.aguaengine3d.usecases.airsim.renderer.SimObjectWrapper;
 import net.mega2223.aguaengine3d.usecases.airsim.renderer.shaders.SimpleSolidColorShaderProgram;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.lwjgltest.aguaengine3d.logic.Context;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.lwjgltest.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.logic.Context;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
 public class Airsim {

@@ -2,7 +2,7 @@ package net.mega2223.aguaengine3d.usecases.airsim.objects.simobjects;
 
 import net.mega2223.aguaengine3d.usecases.airsim.PhysicsUtils;
 import net.mega2223.aguaengine3d.usecases.airsim.objects.SimObject;
-import net.mega2223.lwjgltest.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 @SuppressWarnings("unused")
 

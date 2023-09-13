@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.tests;
 
-import net.mega2223.lwjgltest.aguaengine3d.misc.Utils;
-import net.mega2223.lwjgltest.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
+import net.mega2223.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 
 public class ProceduralBuildingTest {
 
