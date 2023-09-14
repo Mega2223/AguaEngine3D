@@ -2,8 +2,6 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.BitmapFont;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.TextManipulator;
@@ -27,9 +25,9 @@ import org.lwjgl.glfw.GLFW;
 * Font rendering (unfinished)
 * Rewrite texture loading function
 * Convert light objects to structs in shaders
-* Geometry Shader support
+* Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
 * Move aero to another module? (also finish it lol)
-* Shadow calculations at the global shader dictionary
+* Move shadow calculation algorithm to the default shader dictionary
 * Cubemap support (for lights and skyboxes)
 * Logo and Readme.md
 * Figure out why the FPS loop is weird

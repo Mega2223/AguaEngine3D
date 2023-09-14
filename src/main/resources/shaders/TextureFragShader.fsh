@@ -23,7 +23,7 @@ uniform int[MAX_LIGHTS] doShadowMapping = {0,0,0,0,0,0,0,0,0,0};
 
 out vec4 color;
 
-float calculateShadowAt(int index){
+float calculateShadowAt(int index){ //fixme this may crash low-end gpus
     vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
     if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}

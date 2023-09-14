@@ -43,6 +43,8 @@ public class ShaderManager {
         if(GL30.glGetShaderi(shader,GL30.GL_COMPILE_STATUS) == GL30.GL_FALSE){
             System.out.println("Failed to compile shader " + shader);
             System.out.println("\nContents:\n" + content);
+            System.out.println("\nError:\n");
+            System.out.println(GL30.glGetShaderInfoLog(shader));
             return -1;
         }
         return shader;

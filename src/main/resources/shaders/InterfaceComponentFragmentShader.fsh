@@ -8,5 +8,4 @@ out vec4 color;
 
 void main() {
     color = texture(samplerTexture,texturePosition);
-
 }
