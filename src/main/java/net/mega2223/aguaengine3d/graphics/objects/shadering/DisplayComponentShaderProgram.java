@@ -34,6 +34,10 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         textureCoordsVBO = RenderingManager.genArrayBufferObject(textureCoords,GL30.GL_STATIC_DRAW);
     }
 
+    public DisplayComponentShaderProgram(DisplayComponentShaderProgram shaderProgram){
+        this(shaderProgram.texture, shaderProgram.textureCoords.clone(),shaderProgram.aspectRatio);
+    }
+
     @Override
     public int getID() {
         return id;
@@ -81,6 +85,10 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     public void setAspectRatio(float aspectRatio) {
         this.aspectRatio = aspectRatio;
+    }
+
+    public int getTexture() {
+        return texture;
     }
 
     protected void setTexture(int texture){

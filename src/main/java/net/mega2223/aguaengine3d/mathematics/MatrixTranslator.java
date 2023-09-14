@@ -16,8 +16,9 @@ public class MatrixTranslator {
     public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
     public static final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
     protected static final int TRUE_PERSPECTIVE_PROJECTION = 3;
-    protected static final int WEAKER_PERSPECTIVE_PROJECTION = 4; //i will not tolerate having this, so [fixme]
+    protected static final int WEAKER_PERSPECTIVE_PROJECTION = 4;
 
+    private static final float[] bufferMatrix = new float[16];
 
     @Deprecated
     public static void projectVec3(float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg) {
@@ -339,13 +340,22 @@ public class MatrixTranslator {
         generateTranslationMatrix(m4,0,0,0);
     }
 
+    public static void generateTranslationAndScaleMatrix(float[] m4, float tx, float ty, float tz, float sx, float sy, float sz){
+        m4[0] = sx;
+        m4[5] = sy;
+        m4[10] = sz;
+
+        m4[3] = tx;
+        m4[7] = ty;
+        m4[11] = tz;
+        m4[15] = 1;
+    }
+
     public static float[] createTranslationMatrix(float x, float y, float z) {
         float[] ret = new float[16];
         generateTranslationMatrix(ret, x, y, z);
         return ret;
     }
-
-    private static final float[] bufferMatrix = new float[16];
 
     public static void generateRotationMatrix(float[] m4, float rX, float rY, float rZ) {
         float sX = (float) Math.sin(rX);
@@ -374,9 +384,15 @@ public class MatrixTranslator {
     }
 
     public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio){
-        generateIdentity(m4);
-        m4[0] = 1/aspectRatio;
-        m4[10] = 0;
+        generateStaticInterfaceProjectionMatrix(m4,aspectRatio,0,0,0);
+    }
+
+    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio, float tX, float tY, float tZ){
+        generateStaticInterfaceProjectionMatrix(m4,aspectRatio,tX,tY,tZ,1,1,1);
+    }
+
+    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio, float tX, float tY, float tZ, float sX, float sY, float sZ){
+        generateTranslationAndScaleMatrix(m4,tX,tY,tZ,sX,sY*aspectRatio,sZ);//fixme
     }
 
     public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){

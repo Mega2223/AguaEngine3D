@@ -7,6 +7,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.BitmapFont;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.TextManipulator;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
@@ -26,7 +27,7 @@ import org.lwjgl.glfw.GLFW;
 * Font rendering
 * Rewrite texture loading function
 * Geometry Shader support
-* Move aero to tests? (also finish it lol)
+* Move aero to another module? (also finish it lol)
 * Shadow calculations at the global shader dictionary
 * Cubemap support (for lights and skyboxes)
 * Btw the shadow calculation algorithm is not finished lmao
@@ -35,6 +36,7 @@ import org.lwjgl.glfw.GLFW;
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support)
 * Optimize OpenGL calls
+* Model blueprint class
 * Coverage testing
 * Sound stuff
 * Trigger stuff
@@ -117,8 +119,23 @@ public class Gaem3D {
         );
 
         assert font != null;
-        InterfaceComponent text = font.genFromString("Slz vc é um amigo horrível");
-        ModelUtils.debugIndices(text);
+        InterfaceComponent og = font.genFromString("Slz vc é um amigo horrível :'(");
+        InterfaceComponent text = new InterfaceComponent(og,
+                new DisplayComponentShaderProgram(new DisplayComponentShaderProgram(og.getCastShader())){
+                    @Override
+                    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+                        MatrixTranslator.generateStaticInterfaceProjectionMatrix(translationMatrix,getAspectRatio(),0,0,0,1,.5F,1);
+                        super.setUniforms(interation, translationMatrix, projectionMatrix);
+                    }
+                }
+        ){
+            @Override
+            public void doLogic(int itneration) {
+                getCastShader().setAspectRatio(manager.getAspectRatio());
+            }
+        };
+
+
         context.addObject(cube).addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
 
         context.setLight(0, 0, 10, 0, 10)
