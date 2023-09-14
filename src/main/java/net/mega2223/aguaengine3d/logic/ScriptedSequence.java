@@ -5,7 +5,5 @@ public abstract class ScriptedSequence {
     protected ScriptedSequence(String name){this.name = name;}
     protected void preLogic(int itneration, Context context){}
     protected void postLogic(int itneration, Context context){}
-
-    protected abstract boolean shouldTrigger(int itneration, boolean isPreLogic, Context context);
     public String getName(){return name;}
 }

@@ -38,13 +38,11 @@ public class Context {
     public void doLogic(){
         if(!active){return;}
         for(ScriptedSequence s : scripts){
-            if(s.shouldTrigger(itneration,true,this))
-            {s.preLogic(itneration,this);}
+            s.preLogic(itneration,this);
         }
         for(Model o : objects){o.doLogic(itneration);}
         for(ScriptedSequence s : scripts){
-            if(s.shouldTrigger(itneration,false,this))
-            {s.postLogic(itneration,this);}
+            s.postLogic(itneration,this);
         }
         itneration++;
     }

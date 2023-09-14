@@ -60,6 +60,5 @@ void main(){
     fogInfluence = clamp(fogInfluence,0,1);
     color = mix(color,fogColor,fogInfluence);
 
-
 }
 

@@ -14,7 +14,7 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class WindowManager {
-    public long windowName;
+    public final long windowName;
     public final int[] viewportSize;
     public WindowManager(int w, int h, String title){
         if ( !glfwInit() ) {throw new IllegalStateException("Unable to initialize GLFW");}
@@ -37,8 +37,9 @@ public class WindowManager {
         GL.createCapabilities();
         GL30.glEnable(GL30.GL_DEPTH_TEST);
         GL30.glEnable(GL30.GL_BLEND);
+        GL30.glDisable(GL30.GL_CULL_FACE);
         GL30.glDepthFunc(GL30.GL_LESS);
-        //GLFW.glfwSwapInterval(1);
+        GL30.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 
         GLFW.glfwShowWindow(windowName);
 

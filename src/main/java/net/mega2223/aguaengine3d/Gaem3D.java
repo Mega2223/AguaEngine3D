@@ -24,14 +24,13 @@ import org.lwjgl.glfw.GLFW;
 /*
 * The official AguaEngine3D TODO list:
 * Remove shadow acnes somehow (I hade normals so much it's unreal)
-* Font rendering
+* Font rendering (unfinished)
 * Rewrite texture loading function
+* Convert light objects to structs in shaders
 * Geometry Shader support
 * Move aero to another module? (also finish it lol)
 * Shadow calculations at the global shader dictionary
 * Cubemap support (for lights and skyboxes)
-* Btw the shadow calculation algorithm is not finished lmao
-* Transparency, which should be working but it's not
 * Logo and Readme.md
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support)
@@ -41,6 +40,7 @@ import org.lwjgl.glfw.GLFW;
 * Sound stuff
 * Trigger stuff
 * Collision stuff
+* Perhaps a static OpenGL manager class?
 * */
 
 public class Gaem3D {
