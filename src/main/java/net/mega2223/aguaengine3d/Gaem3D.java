@@ -2,7 +2,11 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.BitmapFont;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.TextManipulator;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
@@ -90,11 +94,14 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
 
+        String bitmapFile = Utils.FONTS_DIR + "\\consolas\\Consolas.png";
+        //String bitmapFile = Utils.TEXTURES_DIR + "\\Screenshot_1589.png";
+
         InterfaceComponent comp = new InterfaceComponent(
                 new float[]{.5F, .5F, 0, 0, .5F, 0, 0, 0, 0, .5F, 0, 0, 0, 0, 0, 0},
                 new int[]{0, 1, 2, 3, 2, 1},
                 new float[]{0, 0, 0, 1, 1, 0, 1, 1},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png"),
+                3,
                 1
         ) {
             @Override
@@ -104,12 +111,20 @@ public class Gaem3D {
         };
 
 
-        context.addObject(cube).addObject(chessFloor).addObject(comp);
+        BitmapFont font = TextManipulator.decompileCSV(
+                Utils.FONTS_DIR+"\\consolas\\Consolas.csv",
+                bitmapFile
+        );
+
+        assert font != null;
+        InterfaceComponent text = font.genFromString("Slz vc é um amigo horrível");
+        ModelUtils.debugIndices(text);
+        context.addObject(cube).addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
 
         context.setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(10, 0);
+                .setFogDetails(10, 20);
 
         RenderingManager.printErrorQueue();
 

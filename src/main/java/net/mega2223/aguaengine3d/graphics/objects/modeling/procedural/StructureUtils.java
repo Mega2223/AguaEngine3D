@@ -120,4 +120,10 @@ public class StructureUtils {
         return newVertices;
     }
 
+    public static float[] genQuad(float bX, float bY, float eX, float eY){
+        return new float[]{
+                bX,bY,0,0 ,eX,bY,0,0 , eX,eY,0,0 , bX,eY,0,0
+        };
+    }
+
 }

@@ -119,5 +119,39 @@ public class ModelUtils {
         stream.close();
     }
 
+    public static void debugIndices(Model model){
+        int[] indices = model.indices;
+        float[] vertices = model.vertices;
+        debugIndices(indices,vertices);
+    }
+    public static void debugIndices(int[] indices, float[] vertices){
+        for (int i = 0; i < indices.length; i+=3) {
+            System.out.println("Triangle " + i/3 + ": ");
+            for (int j = 0; j < 3; j++) {
+                int ind = indices[i + j]*4;
+                System.out.print("Vertice " + ind/4 + ": ");
+                System.out.println("x: " + vertices[ind] + " y: " + vertices[ind+1] + " z: " + vertices[ind + 2]);
+            }
+            System.out.println();
+        }
+    }
+
+    public static void debugIndices(InterfaceComponent model){
+        debugIndices(model.indices,model.vertices,model.textureCoords);
+    }
+
+    public static void debugIndices(int[] indices, float[] vertices, float[] textureCoords){
+        for (int i = 0; i < indices.length; i+=3) {
+            System.out.println("Triangle " + i/3 + ": ");
+            for (int j = 0; j < 3; j++) {
+                int ind = indices[i + j]*4;
+                System.out.print("Vertice " + ind/4 + ": ");
+                System.out.println("x: " + vertices[ind] + " y: " + vertices[ind+1] + " z: " + vertices[ind + 2]);
+                System.out.println("tx: " + textureCoords[ind/2] + " ty: " + textureCoords[ind/2+1]);
+
+            }
+            System.out.println();
+        }
+    }
 
 }
