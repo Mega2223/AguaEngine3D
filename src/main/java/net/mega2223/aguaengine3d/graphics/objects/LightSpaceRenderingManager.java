@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.logic;
+package net.mega2223.aguaengine3d.graphics.objects;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
@@ -19,10 +19,10 @@ public class LightSpaceRenderingManager {
     int[][] shadowMappingFBOS = new int[ShaderProgram.MAX_LIGHTS][];
     float[][] shadowMappingProjectionMatrices = new float[ShaderProgram.MAX_LIGHTS][];
 
-    final Context associatedContext;
+    final RenderingContext associatedRenderingContext;
 
-    LightSpaceRenderingManager(Context context){
-        associatedContext = context;
+    LightSpaceRenderingManager(RenderingContext context){
+        associatedRenderingContext = context;
     }
 
     public void applyRenderMaps(){
@@ -45,7 +45,7 @@ public class LightSpaceRenderingManager {
                 GL30.glActiveTexture(GL30.GL_TEXTURE0 + FIRST_TEXTURE_LIGHTMAP_LOC + i);
                 GL30.glBindTexture(GL30.GL_TEXTURE_2D,shadowMappingFBOS[i][1]);
                 setLightspaceProjMatricesUniforms(i,bufferM4,bufferM42);
-                associatedContext.doCustomRenderForceShader(bufferM4,DepthBufferShaderProgram.GLOBAL_INSTANCE);
+                associatedRenderingContext.doCustomRenderForceShader(bufferM4,DepthBufferShaderProgram.GLOBAL_INSTANCE);
                 GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
                 GL30.glActiveTexture(GL30.GL_TEXTURE0);
                 GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
@@ -54,18 +54,18 @@ public class LightSpaceRenderingManager {
     }
 
     public void genTranslationMatrixForLight(float[] m4, int index){
-        float[] pos = associatedContext.lights[index];
+        float[] pos = associatedRenderingContext.lights[index];
         MatrixTranslator.generateTranslationMatrix(m4,pos[0],pos[1],pos[2]);
     }
 
     public void genProjectionMatrixForLight(float[] m4,int index){
-        float[] pos = associatedContext.lights[index];
+        float[] pos = associatedRenderingContext.lights[index];
         MatrixTranslator.generatePerspectiveProjectionMatrix(m4,0.1f,80f, (float) Math.toRadians(45),1);
         MatrixTranslator.applyLookTransformation(m4,pos[0],pos[1],pos[2],0,0,0); //fixme
     }
 
     void setLightspaceProjMatricesUniforms(int index,float[] projection, float[] translation){
-        List<Model> objects = associatedContext.getObjects();
+        List<Model> objects = associatedRenderingContext.getObjects();
         for(Model ac : objects){
             ShaderProgram shader = ac.getShader();
             GL30.glUseProgram(shader.getID());
@@ -78,7 +78,7 @@ public class LightSpaceRenderingManager {
 
     public void setDoShadowMapping(int index, boolean state){
         doShadowMapping[index] = state;
-        List<Model> objects = associatedContext.getObjects();
+        List<Model> objects = associatedRenderingContext.getObjects();
         for(Model m : objects){
             m.getShader().setRenderShadows(index,state);
         }

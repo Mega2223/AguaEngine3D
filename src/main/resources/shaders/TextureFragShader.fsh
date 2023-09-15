@@ -19,7 +19,7 @@ uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 
 //lightspace calculations for shadow rendering, off by default
 uniform sampler2D[MAX_LIGHTS] shadowmaps;
-uniform int[MAX_LIGHTS] doShadowMapping = {0,0,0,0,0,0,0,0,0,0};
+uniform int[MAX_LIGHTS] doShadowMapping;
 
 out vec4 color;
 

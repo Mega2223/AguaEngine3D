@@ -11,9 +11,10 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
-import net.mega2223.aguaengine3d.logic.Context;
+import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.objects.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,7 +51,7 @@ public class Gaem3D {
     private static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
     static WindowManager manager;
-    static Context context = new Context();
+    static PhysicsRenderContext context = new PhysicsRenderContext();
 
     static float[] trans = new float[16];
     static float[] proj = new float[16];
@@ -136,7 +137,7 @@ public class Gaem3D {
 
         context.addObject(cube).addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
 
-        context.setLight(0, 0, 10, 0, 10)
+        context.renderContext().setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(10, 20);

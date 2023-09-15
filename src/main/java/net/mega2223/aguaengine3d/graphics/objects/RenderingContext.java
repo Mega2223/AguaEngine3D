@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.logic;
+package net.mega2223.aguaengine3d.graphics.objects;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL30;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Context {
+public class RenderingContext {
 
     protected final List<Model> objects = new ArrayList<>();
     protected final List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
@@ -21,15 +21,15 @@ public class Context {
     protected boolean areFBOSValid = false;
     private final LightSpaceRenderingManager lightSpaceRenderingManager = new LightSpaceRenderingManager(this);
 
-    public Context(){
+    public RenderingContext(){
 
     }
 
-    public Context addObjects(List<Model> toAdd){
+    public RenderingContext addObjects(List<Model> toAdd){
         for(Model ac : toAdd){addObject(ac);}
         return this;
     }
-    public Context addObject(Model toAdd){
+    public RenderingContext addObject(Model toAdd){
         objects.add(toAdd);
         this.synchronizeUniforms(toAdd.getShader());
         return this;
@@ -87,12 +87,12 @@ public class Context {
         return active;
     }
 
-    public Context setActive(boolean active) {
+    public RenderingContext setActive(boolean active) {
         this.active = active;
         return this;
     }
     @Deprecated
-    public Context setBackGroundColor(float[] backGroundColor) {
+    public RenderingContext setBackGroundColor(float[] backGroundColor) {
         this.backGroundColor = backGroundColor;
         GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
@@ -104,7 +104,7 @@ public class Context {
         }
         return this;
     }
-    public Context setBackGroundColor(float r, float g, float b) {
+    public RenderingContext setBackGroundColor(float r, float g, float b) {
         this.backGroundColor[0] = r;
         this.backGroundColor[1] = g;
         this.backGroundColor[2] = b;
@@ -139,7 +139,7 @@ public class Context {
         }
 
     }
-    public Context setLight(int index, float x, float y, float z, float brightness){
+    public RenderingContext setLight(int index, float x, float y, float z, float brightness){
         for (Model o : objects){
             o.getShader().setLight(index,x,y,z,brightness);
         }
@@ -151,7 +151,7 @@ public class Context {
         return this;
     }
 
-    public Context setLightColor(int index, float r, float g, float b, float influence){
+    public RenderingContext setLightColor(int index, float r, float g, float b, float influence){
         lightColors[index][0] = r;
         lightColors[index][1] = g;
         lightColors[index][2] = b;

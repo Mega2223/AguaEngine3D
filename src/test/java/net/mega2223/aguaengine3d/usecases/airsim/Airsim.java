@@ -6,7 +6,7 @@ import net.mega2223.aguaengine3d.usecases.airsim.objects.simobjects.PlayerContro
 import net.mega2223.aguaengine3d.usecases.airsim.renderer.SimObjectWrapper;
 import net.mega2223.aguaengine3d.usecases.airsim.renderer.shaders.SimpleSolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.logic.Context;
+import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
@@ -20,7 +20,7 @@ public class Airsim {
     //the translation matrix will initially be isometriaclly projected
 
     static float[] camera = {0,1,0};
-    static Context context = new Context();
+    static RenderingContext context = new RenderingContext();
     static WindowManager manager;
     static Stage stage = new Stage();
 

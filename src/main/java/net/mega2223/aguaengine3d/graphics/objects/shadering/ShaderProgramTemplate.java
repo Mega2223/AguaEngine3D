@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.aguaengine3d.logic.LightSpaceRenderingManager;
+import net.mega2223.aguaengine3d.graphics.objects.LightSpaceRenderingManager;
 import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
