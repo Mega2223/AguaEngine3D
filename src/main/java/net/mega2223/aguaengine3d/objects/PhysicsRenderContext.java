@@ -5,9 +5,14 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PhysicsRenderContext {
     final RenderingContext renderingContext;
     final PhysicsContext physicsContext;
+
+    List<ModelPhysicsAggregate> objects = new ArrayList<>();
 
     public PhysicsRenderContext(){
         renderingContext = new RenderingContext();
@@ -19,6 +24,7 @@ public class PhysicsRenderContext {
     }
 
     public void doLogic(float time){
+        for(ModelPhysicsAggregate act: objects){act.doLogic();}
         renderingContext.doLogic();
         physicsContext.doLogic(time);
     }
@@ -48,6 +54,7 @@ public class PhysicsRenderContext {
     public PhysicsRenderContext addObject(ModelPhysicsAggregate object){
         addObject(object.model);
         addObject(object.physicsHandler);
+        objects.add(object);
         return this;
     }
 

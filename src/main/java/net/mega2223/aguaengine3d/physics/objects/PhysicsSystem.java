@@ -39,4 +39,10 @@ public abstract class PhysicsSystem {
     public float[] getCoords() {
         return coords.clone();
     }
+
+    public void applyForce(float[] force){
+        for (int i = 0; i < acceleration.length; i++) {
+            acceleration[i]+=force[i];
+        }
+    }
 }

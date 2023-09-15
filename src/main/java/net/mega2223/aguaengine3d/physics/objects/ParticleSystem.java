@@ -1,8 +1,8 @@
 package net.mega2223.aguaengine3d.physics.objects;
 
-public class Particle extends PhysicsSystem{
+public class ParticleSystem extends PhysicsSystem{
 
-    public Particle(float mass){
+    public ParticleSystem(float mass){
         super(mass);
     }
 

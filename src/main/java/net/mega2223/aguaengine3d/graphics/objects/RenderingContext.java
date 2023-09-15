@@ -7,6 +7,7 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RenderingContext {
@@ -56,7 +57,9 @@ public class RenderingContext {
         //todo shadow render pipeline
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
         for(Model o : objects){//scene render
-            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,o.getCoords());
+            float[] coords = o.getCoords();
+            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix, coords);
+            System.out.println(coords[0] + ":" + coords[1] + ":" + coords[2]);
             o.getShader().setUniforms(itneration, bufferTransMatrix,projectionMatrix);
             o.draw();
         }

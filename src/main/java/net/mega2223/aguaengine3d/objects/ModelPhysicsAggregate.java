@@ -13,10 +13,9 @@ public class ModelPhysicsAggregate {
         this.physicsHandler = physicsHandler;
     }
 
-    public void doLogic(int interation, float timeElapsed, float drag, float[] gravity){
-        model.doLogic(interation);
+    public void doLogic(){
         model.setCoords(physicsHandler.getCoords());
-        physicsHandler.doLogic(timeElapsed,drag,gravity);
+        //does not need to call any doLogic methods, the assossiated RenderingContext and PhyscsContext will handle that
     }
 
     public void draw(){

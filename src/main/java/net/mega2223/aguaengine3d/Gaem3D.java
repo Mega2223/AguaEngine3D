@@ -11,11 +11,13 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
-import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.objects.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.objects.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.physics.objects.ParticleSystem;
+import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unused"})
@@ -26,8 +28,9 @@ import org.lwjgl.glfw.GLFW;
 * Font rendering (unfinished)
 * Rewrite texture loading function
 * Convert light objects to structs in shaders
+* The floor is slightly transparent somehow
 * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
-* Move aero to another module? (also finish it lol)
+* Move aero to another module? (also finish it lol) <- DONE
 * Move shadow calculation algorithm to the default shader dictionary
 * Cubemap support (for lights and skyboxes)
 * Logo and Readme.md
@@ -37,6 +40,7 @@ import org.lwjgl.glfw.GLFW;
 * Model blueprint class
 * Coverage testing
 * Sound stuff
+* Physics stuff
 * Trigger stuff
 * Collision stuff
 * Perhaps a static OpenGL manager class?
@@ -73,6 +77,8 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+
+
         });
 
         //GLFW.glfwMaximizeWindow(manager.getWindow());
@@ -90,10 +96,12 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
-        TexturedModel cube = TexturedModel.loadTexturedModel(
+        TexturedModel cubeModel = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
+        PhysicsSystem cubePhysics = new ParticleSystem(1);
+        ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics);
 
         String bitmapFile = Utils.FONTS_DIR + "\\consolas\\Consolas.png";
         //String bitmapFile = Utils.TEXTURES_DIR + "\\Screenshot_1589.png";
@@ -118,7 +126,7 @@ public class Gaem3D {
         );
 
         assert font != null;
-        InterfaceComponent og = font.genFromString("Slz vc é um amigo horrível :'(");
+        InterfaceComponent og = font.genFromString("Slz vc é um amigo legal :)");
         InterfaceComponent text = new InterfaceComponent(og,
                 new DisplayComponentShaderProgram(new DisplayComponentShaderProgram(og.getCastShader())){
                     @Override
@@ -141,6 +149,15 @@ public class Gaem3D {
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(10, 20);
+
+        manager.addUpdateEvent(()->{
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(new float[]{.0001F,0,0,0});
+            }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(new float[]{-.0001F,0,0,0});
+            }
+        });
 
         RenderingManager.printErrorQueue();
 
