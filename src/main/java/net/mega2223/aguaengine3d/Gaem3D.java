@@ -13,8 +13,8 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
-import net.mega2223.aguaengine3d.objects.ModelPhysicsAggregate;
-import net.mega2223.aguaengine3d.objects.PhysicsRenderContext;
+import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
+import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.objects.ParticleSystem;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
@@ -43,6 +43,7 @@ import org.lwjgl.glfw.GLFW;
 * Physics stuff
 * Trigger stuff
 * Collision stuff
+* Animation stuff
 * Perhaps a static OpenGL manager class?
 * */
 
@@ -77,8 +78,6 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
-
-
         });
 
         //GLFW.glfwMaximizeWindow(manager.getWindow());
@@ -152,10 +151,10 @@ public class Gaem3D {
 
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(new float[]{.0001F,0,0,0});
+
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(new float[]{-.0001F,0,0,0});
+
             }
         });
 

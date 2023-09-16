@@ -79,6 +79,10 @@ public class VectorTranslator {
     public static float getMagnitude(float[] vec3){
         return (float) Math.sqrt(vec3[0]*vec3[0]+vec3[1]*vec3[1]+vec3[2]*vec3[2]);
     }
+
+    public static float getMagnitude(float x, float y, float z){
+        return (float) Math.sqrt(x*x+y*y+z*z);
+    }
     
     public static float getScalarProduct(float[] vec3, float[] vec32){
         return vec3[0]*vec32[0]+vec3[1]*vec32[1]+vec3[2]*vec32[2];

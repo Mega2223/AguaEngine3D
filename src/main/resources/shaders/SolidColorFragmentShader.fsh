@@ -28,7 +28,6 @@ void main(){
         color = mix(color,mixedColor,lightInfluence);
     }
 
-
     float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
     fogInfluence -= fogStart;
     fogInfluence /= fogDissolve;

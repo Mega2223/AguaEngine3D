@@ -1,6 +1,8 @@
 package net.mega2223.aguaengine3d.physics.objects;
 
-import org.lwjgl.system.CallbackI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class PhysicsSystem {
 
@@ -8,32 +10,31 @@ public abstract class PhysicsSystem {
 
     protected final float[] coords = new float[4];
     protected final float[] velocity = new float[3];
-    protected final float[] acceleration = new float[3];
+    protected final float[] accumulatedForce = new float[3];
     protected final float inverseMass;
+
+    List<PhysicsForce> forces = new ArrayList<>(10); //fixme not performant
 
     public PhysicsSystem(float mass) {
         this.inverseMass = 1/mass;
     }
 
-    public void doLogic(float time, float drag, float[] gravity){
-        //double pow = Math.pow(DAMPLING, time);
+    public void doLogic(float time, float drag, float[] globalAccel){
+        for(PhysicsForce act : forces){act.update(this,time);}
         for (int i = 0; i < 3; i++) {
-            coords[i] += velocity[i]* time;// + (acceleration[i] * time * time * .5F);
-            //velocity[i] = velocity[i] * pow + acceleration[i*time;
-            velocity[i] *= DAMPLING;
-            velocity[i] += acceleration[i]*time;
+            coords[i] += velocity[i]* time;
+            velocity[i] *= DAMPLING; //not a good estimate but ‾\_O_/‾
+            velocity[i] += globalAccel[i]*time;
+            velocity[i] += accumulatedForce[i];
         }
+        Arrays.fill(accumulatedForce,0);
     }
 
     public float getInverseMass(){
         return inverseMass;
     }
     public float getMass(){
-        return 1/inverseMass;
-    }
-
-    public void applyAccel(float[] accel){
-        System.arraycopy(accel, 0, acceleration, 0, acceleration.length);
+        return 1F/inverseMass;
     }
 
     public float[] getCoords() {
@@ -41,8 +42,43 @@ public abstract class PhysicsSystem {
     }
 
     public void applyForce(float[] force){
-        for (int i = 0; i < acceleration.length; i++) {
-            acceleration[i]+=force[i];
+        for (int i = 0; i < accumulatedForce.length; i++) {
+            accumulatedForce[i] += force[i];
         }
     }
+
+    public void applyForce(float x, float y, float z){
+        accumulatedForce[0]+=x;
+        accumulatedForce[1]+=y;
+        accumulatedForce[2]+=z;
+    }
+
+    public void addForce(PhysicsForce force){
+        forces.add(force);
+    }
+
+    public float getVelocityX(){
+        return velocity[0];
+    }
+
+    public float getVelocityY(){
+        return velocity[1];
+    }
+
+    public float getVelocityZ(){
+        return velocity[2];
+    }
+
+    /*void addConstantForce(float[] force){
+        for (int i = 0; i < constantAcceleration.length; i++) {
+            constantAcceleration[i]+=force[i];
+        }
+    }
+    void setConstantAcceleration(float[] accel){
+        System.arraycopy(accel, 0, constantAcceleration, 0, constantAcceleration.length);
+    }
+    void resetConstantAcceleration(){
+        Arrays.fill(constantAcceleration,0);
+    }*/
+
 }

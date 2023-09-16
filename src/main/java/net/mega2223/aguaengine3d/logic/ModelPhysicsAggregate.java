@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.objects;
+package net.mega2223.aguaengine3d.logic;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;

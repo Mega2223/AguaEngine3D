@@ -51,6 +51,7 @@ void main(){
         lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
         lightInfluence = clamp(lightInfluence,0,1);
         color = mix(color,mixedColor,lightInfluence);
+        color.a = textureColor.a;
     }
 
     //fog calculations
