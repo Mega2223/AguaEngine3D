@@ -17,12 +17,16 @@ public class DragForce implements PhysicsForce {
     @Override
     public void update(PhysicsSystem system, float time) {
         float x = system.getVelocityX(), y = system.getVelocityY(), z = system.getVelocityZ();
-        float mag = VectorTranslator.getMagnitude(x,y,z);
+        if(x == 0 && y == 0 && z == 0){return;}
+        float drag = VectorTranslator.getMagnitude(x,y,z);
+        drag = k1 * drag + k2 * drag * drag;
         buffer[0] = x;
         buffer[1] = y;
         buffer[2] = z;
         VectorTranslator.normalizeVector(buffer);
+        VectorTranslator.scaleVector(buffer,drag);
+        VectorTranslator.scaleVector(buffer,time);
         VectorTranslator.flipVector(buffer);
-
+        system.applyForce(buffer);
     }
 }

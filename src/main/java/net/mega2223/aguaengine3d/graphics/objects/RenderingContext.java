@@ -59,7 +59,6 @@ public class RenderingContext {
         for(Model o : objects){//scene render
             float[] coords = o.getCoords();
             MatrixTranslator.generateTranslationMatrix(bufferTransMatrix, coords);
-            System.out.println(coords[0] + ":" + coords[1] + ":" + coords[2]);
             o.getShader().setUniforms(itneration, bufferTransMatrix,projectionMatrix);
             o.draw();
         }

@@ -3,8 +3,8 @@ package net.mega2223.aguaengine3d;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.BitmapFont;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils.TextManipulator;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.BitmapFont;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.TextManipulator;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -18,6 +18,9 @@ import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.objects.ParticleSystem;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
+import net.mega2223.aguaengine3d.physics.utils.objects.ConstantForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.DragForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.SpringForce;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unused"})
@@ -99,11 +102,30 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
+
+        //physics
+
         PhysicsSystem cubePhysics = new ParticleSystem(1);
         ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics);
 
+        cube.physicsHandler().addForce(new DragForce(.3F,.2F));
+        cube.physicsHandler().addForce(new SpringForce(1.2F,.02F,0,6,0));
+        cube.physicsHandler().addForce(new ConstantForce(0,-.05F,0));
+
+        manager.addUpdateEvent(()->{
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(0.1F,0,0);
+
+            }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(-0.1F,0,0);
+            }
+        });
+
+        //interface
+
         String bitmapFile = Utils.FONTS_DIR + "\\consolas\\Consolas.png";
-        //String bitmapFile = Utils.TEXTURES_DIR + "\\Screenshot_1589.png";
+
 
         InterfaceComponent comp = new InterfaceComponent(
                 new float[]{.5F, .5F, 0, 0, .5F, 0, 0, 0, 0, .5F, 0, 0, 0, 0, 0, 0},
@@ -148,15 +170,6 @@ public class Gaem3D {
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(10, 20);
-
-        manager.addUpdateEvent(()->{
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-
-            }
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-
-            }
-        });
 
         RenderingManager.printErrorQueue();
 

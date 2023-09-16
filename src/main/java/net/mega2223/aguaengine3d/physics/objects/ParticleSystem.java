@@ -6,7 +6,7 @@ public class ParticleSystem extends PhysicsSystem {
         super(mass);
     }
 
-    public void doLogic(float time, float drag, float[] globalAccel){
-        super.doLogic(time,drag, globalAccel);
+    public void doLogic(float time, float drag){
+        super.doLogic(time,drag);
     }
 }

@@ -11,6 +11,11 @@ public class VectorTranslator {
             vector[i+start]*=factor;
         }
     }
+
+    public static void scaleVector(float[] vector, float factor){
+        scaleVector(vector,factor,0);
+    }
+
     public static void scaleAllVectors(float[] vectors, float factor){
         for (int i = 0; i < vectors.length; i+=4) {
             for (int j = 0; j < 3; j++) {
@@ -28,6 +33,12 @@ public class VectorTranslator {
             vectors[i]*=x;
             vectors[i+1]*=y;
             vectors[i+2]*=z;
+        }
+    }
+
+    public static void divideVector(float[] vector, float factor){
+        for (int i = 0; i < vector.length; i++) {
+            vector[i]/=factor;
         }
     }
 
@@ -92,7 +103,9 @@ public class VectorTranslator {
     }
 
     public static void normalizeVector(float[] vec3){
-        scaleVector(vec3,1F/getMagnitude(vec3),0);
+        float magnitude = getMagnitude(vec3);
+        if(magnitude == 0){return;}
+        divideVector(vec3, magnitude);
     }
 
     public static float getAngleBetweenVectors(float[] vec, float[] vec2){

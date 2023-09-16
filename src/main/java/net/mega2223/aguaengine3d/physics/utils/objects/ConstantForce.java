@@ -11,6 +11,6 @@ public class ConstantForce implements PhysicsForce {
 
     @Override
     public void update(PhysicsSystem system, float time) {
-        system.applyForce(aX,aY,aZ);
+        system.applyForce(aX*time,aY*time,aZ*time);
     }
 }

@@ -10,20 +10,10 @@ public class PhysicsContext {
     List<PhysicsForce> globalForces = new ArrayList<>();
 
     float drag;
-    final float[] gravity;
     boolean isActive;
 
     public PhysicsContext(float drag){
-        this(drag,.98F);
-    }
-
-    public PhysicsContext(float drag, float gravity){
-        this(drag,new float[]{0,-1*gravity,0});
-    }
-
-    public PhysicsContext(float drag, float[] gravity){
         this.drag = drag;
-        this.gravity = gravity;
     }
 
     public void doLogic(){
@@ -36,7 +26,7 @@ public class PhysicsContext {
             for(PhysicsForce act : globalForces){
                 act.update(sy,time);
             }
-            sy.doLogic(time,drag,gravity);
+            sy.doLogic(time,drag);
         }
     }
 
@@ -58,14 +48,6 @@ public class PhysicsContext {
 
     public void setDrag(float drag) {
         this.drag = drag;
-    }
-
-    public float[] getGravity() {
-        return gravity.clone();
-    }
-
-    public void setGravity(float[] gravity) {
-        System.arraycopy(gravity,0,this.gravity,0,this.gravity.length);
     }
 
     public boolean isActive() {

@@ -6,8 +6,6 @@ import java.util.List;
 
 public abstract class PhysicsSystem {
 
-    public static final float DAMPLING = .99F;
-
     protected final float[] coords = new float[4];
     protected final float[] velocity = new float[3];
     protected final float[] accumulatedForce = new float[3];
@@ -19,12 +17,11 @@ public abstract class PhysicsSystem {
         this.inverseMass = 1/mass;
     }
 
-    public void doLogic(float time, float drag, float[] globalAccel){
+    public void doLogic(float time, float drag){
+        //assureVariablesAreOK(); not necessary as long as no forces generate a NaN value
         for(PhysicsForce act : forces){act.update(this,time);}
         for (int i = 0; i < 3; i++) {
             coords[i] += velocity[i]* time;
-            velocity[i] *= DAMPLING; //not a good estimate but ‾\_O_/‾
-            velocity[i] += globalAccel[i]*time;
             velocity[i] += accumulatedForce[i];
         }
         Arrays.fill(accumulatedForce,0);
@@ -67,6 +64,52 @@ public abstract class PhysicsSystem {
 
     public float getVelocityZ(){
         return velocity[2];
+    }
+
+    public float getCoordX(){
+        return coords[0];
+    }
+
+    public float getCoordY(){
+        return coords[1];
+    }
+
+    public float getCoordZ(){
+        return coords[2];
+    }
+
+    public void setCoordX(float c){
+        coords[0] = c;
+    }
+
+    public void setCoordY(float c){
+        coords[1] = c;
+    }
+
+    public void setCoordZ(float c){
+        coords[2] = c;
+    }
+
+    public void setCoords(float x, float y, float z){
+        coords[0] = x;
+        coords[1] = y;
+        coords[2] = z;
+    }
+
+    protected void assureVariablesAreOK(){
+        for (int i = 0; i < coords.length; i++) {
+            coords[i] = getOkVersion(coords[i]);
+        }
+        for (int i = 0; i < velocity.length; i++) {
+            velocity[i] = getOkVersion(velocity[i]);
+        }
+        for (int i = 0; i < accumulatedForce.length; i++) {
+            accumulatedForce[i] = getOkVersion(accumulatedForce[i]);
+        }
+    }
+
+    static float getOkVersion(float f){
+        return Float.isNaN(f) || Float.isInfinite(f) ? 0 : f;
     }
 
     /*void addConstantForce(float[] force){

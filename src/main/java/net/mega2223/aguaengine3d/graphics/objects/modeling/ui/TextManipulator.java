@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.graphics.objects.modeling.uiutils;
+package net.mega2223.aguaengine3d.graphics.objects.modeling.ui;
 
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.misc.Utils;
