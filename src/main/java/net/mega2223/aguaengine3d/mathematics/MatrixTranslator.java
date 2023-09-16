@@ -473,6 +473,17 @@ public class MatrixTranslator {
     }
 
 
+    public static void getInverseMatrix3(float[] m3, float[] dest){
+        dest[0] = m3[4] * m3[8] - m3[5] * m3[7]; //gotta love matrix math
+        dest[1] = m3[2] * m3[7] - m3[1] * m3[8];
+        dest[2] = m3[1] * m3[5] - m3[2] * m3[4];
+        dest[3] = m3[5] * m3[6] - m3[3] * m3[8];
+        dest[4] = m3[0] * m3[8] - m3[2] * m3[6];
+        dest[5] = m3[2] * m3[3] - m3[0] * m3[5];
+        dest[6] = m3[3] * m3[7] - m3[4] * m3[6];
+        dest[7] = m3[1] * m3[6] - m3[0] * m3[7];
+        dest[8] = m3[0] * m3[4] - m3[1] * m3[3];
+    }
 
     public static void debugMatrix4x4(float[] matrix4) {
         StringBuilder debug = new StringBuilder("[ ");

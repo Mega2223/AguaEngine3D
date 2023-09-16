@@ -9,15 +9,10 @@ public class PhysicsContext {
     List<PhysicsSystem> objects = new ArrayList<>();
     List<PhysicsForce> globalForces = new ArrayList<>();
 
-    float drag;
     boolean isActive;
 
-    public PhysicsContext(float drag){
-        this.drag = drag;
-    }
+    public PhysicsContext(){
 
-    public void doLogic(){
-        doLogic(1);
     }
 
     public void doLogic(float time){
@@ -26,7 +21,7 @@ public class PhysicsContext {
             for(PhysicsForce act : globalForces){
                 act.update(sy,time);
             }
-            sy.doLogic(time,drag);
+            sy.doLogic(time);
         }
     }
 
@@ -40,14 +35,6 @@ public class PhysicsContext {
 
     public void remove(PhysicsSystem object){
         objects.remove(object);
-    }
-
-    public float getDrag() {
-        return drag;
-    }
-
-    public void setDrag(float drag) {
-        this.drag = drag;
     }
 
     public boolean isActive() {

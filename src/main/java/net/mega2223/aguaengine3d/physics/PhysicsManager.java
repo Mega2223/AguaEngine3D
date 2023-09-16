@@ -41,5 +41,11 @@ public class PhysicsManager {
         VectorTranslator.subtractFromVector(x1,y1,z1,x2,y2,z2, dest);
         VectorTranslator.normalizeVector(dest);
     }
+    public static void getContactNormal(float[] v1, float[] v2, float[] dest){
+        getContactNormal(v1[0],v1[1],v1[2],v2[0],v2[1],v2[2],dest);
+    }
+    public static void genInnertiaTensor(float[] vertices, float verticeLenght, float[] dest){
+
+    }
 
 }

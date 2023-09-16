@@ -29,4 +29,10 @@ public class SpringForce implements PhysicsForce {
         system.applyForce(buffer);
     }
 
+    public void setCoord(float x, float y, float z){
+        coord[0] = x;
+        coord[1] = y;
+        coord[2] = z;
+    }
+
 }

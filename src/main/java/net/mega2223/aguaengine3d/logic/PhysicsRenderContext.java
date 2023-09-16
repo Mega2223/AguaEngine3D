@@ -16,7 +16,7 @@ public class PhysicsRenderContext {
 
     public PhysicsRenderContext(){
         renderingContext = new RenderingContext();
-        physicsContext = new PhysicsContext(0);
+        physicsContext = new PhysicsContext();
     }
 
     public void doLogic(){

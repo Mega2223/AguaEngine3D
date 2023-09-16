@@ -18,11 +18,11 @@ import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.PhysicsManager;
 import net.mega2223.aguaengine3d.physics.objects.ParticleSystem;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.utils.objects.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.DragForce;
-import net.mega2223.aguaengine3d.physics.utils.objects.RopeForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.SpringForce;
 import org.lwjgl.glfw.GLFW;
 
@@ -86,7 +86,6 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
         });
 
-        //GLFW.glfwMaximizeWindow(manager.getWindow());
         //shader dict setup
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
@@ -112,43 +111,67 @@ public class Gaem3D {
 
         //physics
 
-        PhysicsSystem cubePhysics = new ParticleSystem(1);
-        PhysicsSystem cube2Physics = new ParticleSystem(1);
+        PhysicsSystem cubePhysics = new ParticleSystem(Float.POSITIVE_INFINITY);
+        PhysicsSystem cube2Physics = new ParticleSystem(10);
+        cube2Physics.setCoordY(10);
 
-        ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics);
-        ModelPhysicsAggregate cube2 = new ModelPhysicsAggregate(cubeModel2,cube2Physics){
+        final ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics){
             @Override
             public void doLogic() {
                 super.doLogic();
-                if(VectorTranslator.getDistance(cube.physicsHandler().getCoords(), this.physicsHandler().getCoords())<=1.2F){
-                    CollisionResolver.resolve(cube.physicsHandler(),this.physicsHandler());
+                PhysicsSystem phys = this.physicsHandler;
+                if(phys.getCoordY() < 1){
+                    phys.setCoordY(1);
                 }
             }
         };
+        final ModelPhysicsAggregate cube2 = new ModelPhysicsAggregate(cubeModel2,cube2Physics){
+            @Override
+            public void doLogic() {
+                super.doLogic();
+                float distance = VectorTranslator.getDistance(cube.physicsHandler().getCoords(), this.physicsHandler().getCoords());
+                PhysicsSystem phys = this.physicsHandler;
+                if(distance <= 2){
+                    CollisionResolver.resolveConflict(cube.physicsHandler(), phys, - distance + 2F);
+                    CollisionResolver.resolveCollision(cube.physicsHandler(),this.physicsHandler());
+                }
+                if(phys.getCoordY() < 1){
+                    CollisionResolver.resolveConflict(phys,phys.getCoordX(),-1,phys.getCoordZ(),-phys.getCoordY()+1);
+                    CollisionResolver.resolveCollision(phys,phys.getCoordX(),-1,phys.getCoordZ(),.5F);
+                }
+                /*if(cube.physicsHandler().getCoordY() < 1){
+                    CollisionResolver.resolveConflict(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),0);
+                    CollisionResolver.resolveCollision(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
+                }*/
+            }
+        };
 
-        cube.physicsHandler().addForce(new DragForce(.2F,.1F));
-        cube.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
-        cube2.physicsHandler().addForce(new DragForce(.2F,.1F));
-        cube2.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
+        DragForce drag = new DragForce(.1F, .04F);
+        ConstantForce gravity = new ConstantForce(0, -.01F, 0);
 
+        cube.physicsHandler().addForce(drag);
+        cube.physicsHandler().setCoordY(2);
+        //cube.physicsHandler().addForce(new SpringForce(10F,.01F,0,5,0));
+        cube2.physicsHandler().addForce(drag);
+        //cube2.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
 
-        cube.physicsHandler().addForce(new ConstantForce(0,-.01F,0));
-        cube2.physicsHandler().addForce(new ConstantForce(0,-.01F,0));
+        cube.physicsHandler().addForce(gravity);
+        cube2.physicsHandler().addForce(gravity);
 
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(.25F,0,0);
+                cube.physicsHandler().applyForce(.05F,0,0);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(-.25F,0,0);
+                cube.physicsHandler().applyForce(-.05F,0,0);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(0,0,.25F);
+                cube.physicsHandler().applyForce(0,0,-.05F);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(0,0,-.25F);
+                cube.physicsHandler().applyForce(0,0,.05F);
             }
 
         });

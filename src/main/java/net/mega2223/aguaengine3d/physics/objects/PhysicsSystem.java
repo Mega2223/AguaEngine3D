@@ -14,10 +14,17 @@ public abstract class PhysicsSystem {
     List<PhysicsForce> forces = new ArrayList<>(10); //fixme not performant
 
     public PhysicsSystem(float mass) {
+        this(mass,0,0,0);
+    }
+    public PhysicsSystem(float mass, float x, float y, float z){
+        this(mass,x,y,z,0,0,0);
+    }
+    public PhysicsSystem(float mass, float x, float y, float z, float sX, float sY, float sZ){
         this.inverseMass = 1/mass;
+        coords[0] = x; coords[1] = y; coords[2] = z;
     }
 
-    public void doLogic(float time, float drag){
+    public void doLogic(float time){
         //assureVariablesAreOK(); not necessary as long as no forces generate a NaN value
         for(PhysicsForce act : forces){act.update(this,time);}
         for (int i = 0; i < 3; i++) {
@@ -49,6 +56,19 @@ public abstract class PhysicsSystem {
         accumulatedForce[1]+=y;
         accumulatedForce[2]+=z;
     }
+
+    public void applyForceInRelationToMass(float[] force){
+        for (int i = 0; i < accumulatedForce.length; i++) {
+            accumulatedForce[i] += force[i] * inverseMass;
+        }
+    }
+
+    public void applyForceInRelationToMass(float x, float y, float z){
+        accumulatedForce[0]+=x*inverseMass;
+        accumulatedForce[1]+=y*inverseMass;
+        accumulatedForce[2]+=z*inverseMass;
+    }
+
     public void applyImpulse(float[] impulse){
         for (int i = 0; i < velocity.length; i++) {
             velocity[i] += impulse[i];
@@ -105,6 +125,24 @@ public abstract class PhysicsSystem {
         coords[0] = x;
         coords[1] = y;
         coords[2] = z;
+    }
+
+    public void applyTransformationX(float amount){
+        coords[0] += amount;
+    }
+
+    public void applyTransformationY(float amount){
+        coords[1] += amount;
+    }
+
+    public void applyTransformationZ(float amount){
+        coords[2] += amount;
+    }
+    public void applyTransformation(float[] amount){
+        coords[0] += amount[0];
+        coords[1] += amount[1];
+        coords[2] += amount[2];
+
     }
 
     protected void assureVariablesAreOK(){
