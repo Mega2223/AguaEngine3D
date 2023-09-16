@@ -12,14 +12,17 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.objects.ParticleSystem;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.utils.objects.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.DragForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.RopeForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.SpringForce;
 import org.lwjgl.glfw.GLFW;
 
@@ -102,24 +105,52 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
+        TexturedModel cubeModel2 = TexturedModel.loadTexturedModel(
+                Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+        );
 
         //physics
 
         PhysicsSystem cubePhysics = new ParticleSystem(1);
-        ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics);
+        PhysicsSystem cube2Physics = new ParticleSystem(1);
 
-        cube.physicsHandler().addForce(new DragForce(.3F,.2F));
-        cube.physicsHandler().addForce(new SpringForce(1.2F,.02F,0,6,0));
-        cube.physicsHandler().addForce(new ConstantForce(0,-.05F,0));
+        ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics);
+        ModelPhysicsAggregate cube2 = new ModelPhysicsAggregate(cubeModel2,cube2Physics){
+            @Override
+            public void doLogic() {
+                super.doLogic();
+                if(VectorTranslator.getDistance(cube.physicsHandler().getCoords(), this.physicsHandler().getCoords())<=1.2F){
+                    CollisionResolver.resolve(cube.physicsHandler(),this.physicsHandler());
+                }
+            }
+        };
+
+        cube.physicsHandler().addForce(new DragForce(.2F,.1F));
+        cube.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
+        cube2.physicsHandler().addForce(new DragForce(.2F,.1F));
+        cube2.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
+
+
+        cube.physicsHandler().addForce(new ConstantForce(0,-.01F,0));
+        cube2.physicsHandler().addForce(new ConstantForce(0,-.01F,0));
 
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(0.1F,0,0);
+                cube.physicsHandler().applyForce(.25F,0,0);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(-0.1F,0,0);
+                cube.physicsHandler().applyForce(-.25F,0,0);
             }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(0,0,.25F);
+
+            }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
+                cube.physicsHandler().applyForce(0,0,-.25F);
+            }
+
         });
 
         //interface
@@ -164,7 +195,7 @@ public class Gaem3D {
         };
 
 
-        context.addObject(cube).addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
+        context.addObject(cube).addObject(cube2).addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
 
         context.renderContext().setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)

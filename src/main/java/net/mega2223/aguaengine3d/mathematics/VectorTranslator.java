@@ -42,6 +42,14 @@ public class VectorTranslator {
         }
     }
 
+    public static float getDistance(float[] v1, float[] v2){
+        float sum = 0;
+        for (int i = 0; i < v1.length; i++) {
+            sum+=(v2[i]-v1[i])*(v2[i]-v1[i]);
+        }
+        return (float) Math.sqrt(sum);
+    }
+
     public static void addToAllVectors(float[] vectors, float[] scaleVector){
         addToAllVectors(vectors,scaleVector[0],scaleVector[1],scaleVector[2]);
     }
@@ -64,6 +72,20 @@ public class VectorTranslator {
         vector[0]+=x;
         vector[1]+=y;
         vector[2]+=z;
+    }
+
+    public static void subtractFromVector(float[] v1, float[] v2){
+        subtractFromVector(v1,v2,v1);
+    }
+
+    public static void subtractFromVector(float[] v1, float[] v2, float[] dest){
+        subtractFromVector(v1[0],v1[1],v1[2],v2[0],v2[1],v2[2],dest);
+    }
+
+    public static void subtractFromVector(float x1, float y1, float z1, float x2, float y2, float z2, float[] dest){
+        dest[0] = x1 - x2;
+        dest[1] = y1 - y2;
+        dest[2] = z1 - z2;
     }
 
     public static void flipVector(float[] vector){

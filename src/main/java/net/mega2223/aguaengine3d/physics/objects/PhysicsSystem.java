@@ -49,6 +49,17 @@ public abstract class PhysicsSystem {
         accumulatedForce[1]+=y;
         accumulatedForce[2]+=z;
     }
+    public void applyImpulse(float[] impulse){
+        for (int i = 0; i < velocity.length; i++) {
+            velocity[i] += impulse[i];
+        }
+    }
+
+    public void applyImpulse(float x, float y, float z){
+        velocity[0]+=x;
+        velocity[1]+=y;
+        velocity[2]+=z;
+    }
 
     public void addForce(PhysicsForce force){
         forces.add(force);
