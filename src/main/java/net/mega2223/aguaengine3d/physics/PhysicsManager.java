@@ -27,19 +27,19 @@ public class PhysicsManager {
     public static float getClosingVelocity(float[] p1, float[] p2, float[] v1, float[] v2){
         VectorTranslator.subtractFromVector(v1,v2,buffer1);
         VectorTranslator.subtractFromVector(p1,p2,buffer2);
-        VectorTranslator.normalizeVector(buffer2);
+        VectorTranslator.normalizeVec3(buffer2);
         return VectorTranslator.getScalarProduct(buffer1,buffer2);
     }
     public static float getClosingVelocity(float x1, float y1, float z1, float vx1, float vy1, float vz1, float x2, float y2, float z2, float vx2, float vy2, float vz2){
         VectorTranslator.subtractFromVector(vx1,vy1,vz1,vx2,vy2,vz2, buffer1);
         VectorTranslator.subtractFromVector(x1,y1,z1,x2,y2,z2, buffer2);
-        VectorTranslator.normalizeVector(buffer2);
+        VectorTranslator.normalizeVec3(buffer2);
         return VectorTranslator.getScalarProduct(buffer1,buffer2);
     }
 
     public static void getContactNormal(float x1, float y1, float z1, float x2, float y2, float z2, float[] dest){
         VectorTranslator.subtractFromVector(x1,y1,z1,x2,y2,z2, dest);
-        VectorTranslator.normalizeVector(dest);
+        VectorTranslator.normalizeVec3(dest);
     }
     public static void getContactNormal(float[] v1, float[] v2, float[] dest){
         getContactNormal(v1[0],v1[1],v1[2],v2[0],v2[1],v2[2],dest);

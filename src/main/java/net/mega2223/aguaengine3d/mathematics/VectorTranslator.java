@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class VectorTranslator {
 
-    private static final float[] bufferVector = new float[4];
+    static final float[] bufferVector = new float[4];
 
     public static void scaleVector(float[] vector, float factor,int start){
         for (int i = 0; i < 3; i++) {
@@ -109,14 +109,22 @@ public class VectorTranslator {
         vector[2] = x1*y2-y1*x2;
     }
 
-    public static float getMagnitude(float[] vec3){
+    public static float getMagnitudeVec3(float[] vec3){
         return (float) Math.sqrt(vec3[0]*vec3[0]+vec3[1]*vec3[1]+vec3[2]*vec3[2]);
     }
 
-    public static float getMagnitude(float x, float y, float z){
+    public static float getMagnitudeVec3(float x, float y, float z){
         return (float) Math.sqrt(x*x+y*y+z*z);
     }
-    
+
+    public static float getMagnitude(float[] genericVector){
+        float s = 0;
+        for (int i = 0; i < genericVector.length; i++) {
+            s+= genericVector[i]*genericVector[i];
+        }
+        return (float) Math.sqrt(s);
+    }
+
     public static float getScalarProduct(float[] vec3, float[] vec32){
         return vec3[0]*vec32[0]+vec3[1]*vec32[1]+vec3[2]*vec32[2];
     }
@@ -124,20 +132,56 @@ public class VectorTranslator {
         return x1*x2+y1*y2+z1*z2;
     }
 
-    public static void normalizeVector(float[] vec3){
-        float magnitude = getMagnitude(vec3);
+    public static void normalizeVec3(float[] vector){
+        float magnitude = getMagnitudeVec3(vector);
         if(magnitude == 0){return;}
-        divideVector(vec3, magnitude);
+        divideVector(vector, magnitude);
+    }
+
+    public static void normalize(float[] genericVector){
+        float magnitude = getMagnitude(genericVector);
+        if(magnitude == 0){return;}
+        divideVector(genericVector,magnitude);
     }
 
     public static float getAngleBetweenVectors(float[] vec, float[] vec2){
         //TODO: test this lol
-        float m1 = getMagnitude(vec), m2 = getMagnitude(vec2);
+        float m1 = getMagnitudeVec3(vec), m2 = getMagnitudeVec3(vec2);
         float x1 = vec[0]/m1, y1 = vec[1]/m1, z1 = vec[2]/m1;
         float x2 = vec2[0]/m2, y2 = vec2[1]/m2, z2 = vec2[2]/m2;
         float scalar = getScalarProduct(x1,y1,z1,x2,y2,z2);
         return (float) Math.acos(scalar);
     }
+
+    public static void getRotationRadians(float[] quaternion, float[] ret){
+        double sinr_cosp = 2 * (quaternion[0] * quaternion[1] + quaternion[2] * quaternion[3]);
+        double cosr_cosp = 1 - 2 * (quaternion[1] * quaternion[1] + quaternion[2] * quaternion[2]);
+        ret[0] = (float) Math.atan2(sinr_cosp, cosr_cosp);
+
+        double sinp = Math.sqrt(1 + 2 * (quaternion[0] * quaternion[2] - quaternion[1] * quaternion[3]));
+        double cosp = Math.sqrt(1 - 2 * (quaternion[0] * quaternion[2] - quaternion[1] * quaternion[3]));
+        ret[1] = (float) (2 * Math.atan2(sinp, cosp) - Math.PI / 2);
+
+        double siny_cosp = 2 * (quaternion[0] * quaternion[3] + quaternion[1] * quaternion[2]);
+        double cosy_cosp = 1 - 2 * (quaternion[2] * quaternion[2] + quaternion[3] * quaternion[3]);
+        ret[2] = (float) Math.atan2(siny_cosp, cosy_cosp);
+    }
+
+    public static void getRotationRadians(float w, float x, float y , float z, float[] ret){
+        double sinr_cosp = 2 * (w * x + y * z);
+        double cosr_cosp = 1 - 2 * (x * x + y * y);
+        ret[0] = (float) Math.atan2(sinr_cosp, cosr_cosp);
+
+        float v = 2 * (w * y - x * z);
+        double sinp = Math.sqrt(1 + v);
+        double cosp = Math.sqrt(1 - v);
+        ret[1] = (float) (2 * Math.atan2(sinp, cosp) - Math.PI / 2);
+
+        double siny_cosp = 2 * (w * z + x * y);
+        double cosy_cosp = 1 - 2 * (y * y + z * z);
+        ret[2] = (float) Math.atan2(siny_cosp, cosy_cosp);
+    }
+
 
     public static void debugVector (float[] vec){
         System.out.print("v: [");

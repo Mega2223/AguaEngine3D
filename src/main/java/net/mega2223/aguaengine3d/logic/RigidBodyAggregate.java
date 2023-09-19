@@ -18,7 +18,7 @@ public class RigidBodyAggregate extends ModelPhysicsAggregate{
     @Override
     public void doLogic() {
         super.doLogic();
-        MatrixTranslator.generateRotationMatrix(rMatrix,phys.dirX(),phys.dirY(),phys.dirZ());
+        MatrixTranslator.getRotationMat4FromQuaternion(phys.orienW(),phys.orienX(),phys.orienY(),phys.orienZ(),rMatrix);
         model.getShader().setRotationMatrix(rMatrix);
     }
 }
