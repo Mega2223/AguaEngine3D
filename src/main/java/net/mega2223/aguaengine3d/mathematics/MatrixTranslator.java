@@ -301,6 +301,18 @@ public class MatrixTranslator {
         }
         System.arraycopy(dest, 0, m1, 0, dest.length);
     }
+    public static void multiplyVec4Mat4(float[] vec4, float[] mat4){
+        float[] stolenVector = VectorTranslator.bufferVector;
+        multiplyVec4Mat4(vec4,mat4,stolenVector);
+        System.arraycopy(stolenVector,0,vec4,0,4);
+    }
+    public static void multiplyVec4Mat4(float[] vec4, float[] mat4, float[] dest){
+        Arrays.fill(dest,0);
+        for (int i = 0; i < 16; i++) {
+            int c = i%4, r = i/4;
+            dest[r]+=vec4[c]*mat4[r*4+c];
+        }
+    }
 
     /**
      * resets the current matrix and sets it to a translation

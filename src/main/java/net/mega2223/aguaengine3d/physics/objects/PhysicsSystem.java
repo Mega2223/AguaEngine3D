@@ -161,6 +161,11 @@ public abstract class PhysicsSystem {
         return Float.isNaN(f) || Float.isInfinite(f) ? 0 : f;
     }
 
+    public void toLocalCoords(float[] worldspaceCoords){
+        for (int i = 0; i < 3; i++) {worldspaceCoords[i]-=coords[i];}
+    }
+
+
     /*void addConstantForce(float[] force){
         for (int i = 0; i < constantAcceleration.length; i++) {
             constantAcceleration[i]+=force[i];

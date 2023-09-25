@@ -38,6 +38,8 @@ public class PhysicsUtils {
         dest[6] = t52 * rotationMat[0] + t57 * rotationMat[1] + t62 * rotationMat[2];
         dest[7] = t52 * rotationMat[4] + t57 * rotationMat[5] + t62 * rotationMat[6];
         dest[8] = t52 * rotationMat[8] + t57 * rotationMat[9] + t62 * rotationMat[10];
+        //this assumes a 3x3 innertia tensor with array lenght of 9
+        //may produce math problems in the future
     }
 
     public static void genQuaternionFromAxis(float angleRadians, float x, float y, float z, float[] dest){
@@ -53,9 +55,21 @@ public class PhysicsUtils {
     }
 
     public static void multiplyQuaternions(float[] q1, float[] q2, float[] dest){
-        dest[0] = (q1[0]*q2[0] - q1[1]*q2[2] - q1[2]*q2[2] - q1[3]*q2[3]);
-        dest[1] = (q1[0]*q2[1] + q1[1]*q2[0] - q1[2]*q2[3] - q1[3]*q2[2]);
-        dest[2] = (q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] - q1[3]*q2[1]);
-        dest[3] = (q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] - q1[3]*q2[0]);
+        dest[0] = (q2[0]*q1[0] - q2[1]*q1[1] - q2[2]*q1[2] - q2[3]*q1[3]);
+        dest[1] = (q2[0]*q1[1] + q2[1]*q1[0] - q2[2]*q1[3] + q2[3]*q1[2]);
+        dest[2] = (q2[0]*q1[2] + q2[1]*q1[3] + q2[2]*q1[0] - q2[3]*q1[1]);
+        dest[3] = (q2[0]*q1[3] - q2[1]*q1[2] + q2[2]*q1[1] + q2[3]*q1[0]);
+    }
+    public static void radiansToQuaternion(float x, float y, float z, float[] dest) {
+        double cr = Math.cos(x* 0.5);
+        double sr = Math.sin(x * 0.5);
+        double cp = Math.cos(y * 0.5);
+        double sp = Math.sin(y * 0.5);
+        double cy = Math.cos(z * 0.5);
+        double sy = Math.sin(z * 0.5);
+        dest[0] = (float) (cr * cp * cy + sr * sp * sy);
+        dest[1] = (float) (sr * cp * cy - cr * sp * sy);
+        dest[2] = (float) (cr * sp * cy + sr * cp * sy);
+        dest[3] = (float) (cr * cp * sy - sr * sp * cy);
     }
 }
