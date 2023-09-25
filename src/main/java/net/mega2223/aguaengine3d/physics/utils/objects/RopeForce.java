@@ -24,8 +24,8 @@ public class RopeForce implements PhysicsForce {
         float f = -stiffness * (VectorTranslator.getMagnitudeVec3(buffer) - len);
         if(f >= 0){return;}
         VectorTranslator.normalizeVec3(buffer);
-        VectorTranslator.scaleVector(buffer,f);
-        VectorTranslator.scaleVector(buffer,time);
+        VectorTranslator.scaleVec3(buffer,f);
+        VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
         system.applyForce(buffer);
     }

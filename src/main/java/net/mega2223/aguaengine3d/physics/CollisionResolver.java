@@ -17,8 +17,8 @@ public class CollisionResolver {
                 cx1 = obj1.getCoordX(), cy1 = obj1.getCoordY(), cz1 = obj1.getCoordZ();
 
         PhysicsManager.getContactNormal(cx1,cy1,cz1,pX,pY,pZ, buffer1);
-        VectorTranslator.scaleVector(buffer1, -confDepth/invMass);
-        VectorTranslator.scaleVector(buffer1,obj1.getInverseMass());
+        VectorTranslator.scaleVec3(buffer1, -confDepth/invMass);
+        VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer1);
         obj1.applyTransformation(buffer1);
     }
@@ -33,13 +33,13 @@ public class CollisionResolver {
                 cx2 = obj2.getCoordX(), cy2 = obj2.getCoordY(), cz2 = obj2.getCoordZ();
 
         PhysicsManager.getContactNormal(cx1,cy1,cz1,cx2,cy2,cz2, buffer1);
-        VectorTranslator.scaleVector(buffer1, -confDepth/invMass);
+        VectorTranslator.scaleVec3(buffer1, -confDepth/invMass);
         System.arraycopy(buffer1,0,buffer2,0,3);
-        VectorTranslator.scaleVector(buffer2,obj1.getInverseMass());
+        VectorTranslator.scaleVec3(buffer2,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer2);
         obj1.applyTransformation(buffer2);
         System.arraycopy(buffer1,0,buffer2,0,3);
-        VectorTranslator.scaleVector(buffer2,obj2.getInverseMass());
+        VectorTranslator.scaleVec3(buffer2,obj2.getInverseMass());
         obj2.applyTransformation(buffer2);
     }
 
@@ -55,8 +55,8 @@ public class CollisionResolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,px,py,pz, buffer1);
-        VectorTranslator.scaleVector(buffer1,impulse);
-        VectorTranslator.scaleVector(buffer1,obj1.getInverseMass());
+        VectorTranslator.scaleVec3(buffer1,impulse);
+        VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         obj1.applyImpulse(buffer1);
     }
 
@@ -78,13 +78,13 @@ public class CollisionResolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,cx2,cy2,cz2, buffer1);
-        VectorTranslator.scaleVector(buffer1,impulse);
+        VectorTranslator.scaleVec3(buffer1,impulse);
         System.arraycopy(buffer1,0,buffer2,0,3);
-        VectorTranslator.scaleVector(buffer2,obj1.getInverseMass());
+        VectorTranslator.scaleVec3(buffer2,obj1.getInverseMass());
         obj1.applyImpulse(buffer2);
         VectorTranslator.flipVector(buffer1);
         System.arraycopy(buffer1,0,buffer2,0,3);
-        VectorTranslator.scaleVector(buffer2,obj2.getInverseMass());
+        VectorTranslator.scaleVec3(buffer2,obj2.getInverseMass());
         obj2.applyImpulse(buffer2);
     }
 }

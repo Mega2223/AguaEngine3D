@@ -195,6 +195,7 @@ public class Gaem3D {
         RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
         cube23.physicsHandler().setCoordY(10);
         test.setOrientation(1,1,0,0);
+
         context.addObject(cube23);
 
         context.renderContext().addScript(new ScriptedSequence("The printer") {
@@ -203,8 +204,9 @@ public class Gaem3D {
             protected void preLogic(int itneration, RenderingContext context) {
                 System.arraycopy(camera,0,v,0,3);
                 cube23.physicsHandler().toLocalCoords(v);
-                VectorTranslator.debugVector(v);
+                //VectorTranslator.debugVector(v);
                 //System.out.println();
+                test.applyTorque(0,0,1);
             }
         });
 

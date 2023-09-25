@@ -2,6 +2,8 @@ package net.mega2223.aguaengine3d.physics.objects;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.PhysicsManager;
+import net.mega2223.aguaengine3d.physics.PhysicsUtils;
 
 import java.util.Arrays;
 
@@ -28,7 +30,7 @@ public class RigidBodySystem extends PhysicsSystem {
     @Override
     public void doLogic(float time) {
         super.doLogic(time);
-
+        VectorTranslator.normalize(orientation);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
 
         for (int i = 0; i < 3; i++) {
@@ -36,9 +38,11 @@ public class RigidBodySystem extends PhysicsSystem {
         }
 
         rw[0] = 0;
-        rw[1] = accumulatedTorque[0];
-        rw[2] = accumulatedTorque[1];
-        rw[3] = accumulatedTorque[2];
+        rw[1] = spin[0];
+        rw[2] = spin[1];
+        rw[3] = spin[2];
+        VectorTranslator.debugVector(orientation);
+        PhysicsManager.addScaledQuaternions(orientation,rw,0.0001F);
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);

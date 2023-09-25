@@ -1,19 +1,17 @@
 package net.mega2223.aguaengine3d.mathematics;
 
-import java.util.Arrays;
-
 public class VectorTranslator {
 
     static final float[] bufferVector = new float[4];
 
-    public static void scaleVector(float[] vector, float factor,int start){
+    public static void scaleVec3(float[] vector, float factor, int start){
         for (int i = 0; i < 3; i++) {
             vector[i+start]*=factor;
         }
     }
 
-    public static void scaleVector(float[] vector, float factor){
-        scaleVector(vector,factor,0);
+    public static void scaleVec3(float[] vector, float factor){
+        scaleVec3(vector,factor,0);
     }
 
     public static void scaleAllVectors(float[] vectors, float factor){

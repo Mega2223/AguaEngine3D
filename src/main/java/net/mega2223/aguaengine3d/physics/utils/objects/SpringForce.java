@@ -23,8 +23,8 @@ public class SpringForce implements PhysicsForce {
         buffer[2] = coord[2] - system.getCoordZ();
         float f = -stiffness * (VectorTranslator.getMagnitudeVec3(buffer) - len);
         VectorTranslator.normalizeVec3(buffer);
-        VectorTranslator.scaleVector(buffer,f);
-        VectorTranslator.scaleVector(buffer,time);
+        VectorTranslator.scaleVec3(buffer,f);
+        VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
         system.applyForce(buffer);
     }

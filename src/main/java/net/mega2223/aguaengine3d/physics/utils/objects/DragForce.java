@@ -23,8 +23,8 @@ public class DragForce implements PhysicsForce {
         buffer[1] = y;
         buffer[2] = z;
         VectorTranslator.normalizeVec3(buffer);
-        VectorTranslator.scaleVector(buffer,drag);
-        VectorTranslator.scaleVector(buffer,time);
+        VectorTranslator.scaleVec3(buffer,drag);
+        VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
         system.applyForce(buffer);
     }

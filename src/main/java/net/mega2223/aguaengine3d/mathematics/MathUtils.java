@@ -71,5 +71,10 @@ public class MathUtils {
 
     }
 
+    public static void scaleAllElements(float[] array, float factor){
+        for (int i = 0; i < array.length; i++) {
+            array[i]*=factor;
+        }
+    }
 
 }

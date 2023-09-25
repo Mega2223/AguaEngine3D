@@ -1,12 +1,18 @@
 package net.mega2223.aguaengine3d.physics;
 
+import net.mega2223.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 public class PhysicsManager {
     private PhysicsManager(){}
 
+    //too much?
     private static final float[] buffer1 = new float[3];
     private static final float[] buffer2 = new float[3];
+    private static final float[] bufferQuaternion = new float[4];
+    private static final float[] bufferQuaternion2 = new float[4];
+    private static final float[] bufferQuaternion3 = new float[4];
+
 
     public static float getAcceleration(float mass, float force, boolean isInverseMass){
         return isInverseMass ? force * mass : force * (1/mass);
@@ -45,7 +51,20 @@ public class PhysicsManager {
         getContactNormal(v1[0],v1[1],v1[2],v2[0],v2[1],v2[2],dest);
     }
     public static void genInnertiaTensor(float[] vertices, float verticeLenght, float[] dest){
-
+        //todo
+    }
+    public static void addScaledQuaternions(float[] q1, float[] q2, float scale){
+        addScaledQuaternions(q1,q2,scale,bufferQuaternion);
+        System.arraycopy(bufferQuaternion,0,q1,0,4);
+    }
+    public static void addScaledQuaternions(float[] q1, float[] q2, float scale, float[] dest){
+        System.arraycopy(q2,0,bufferQuaternion3,0,4);
+        MathUtils.scaleAllElements(bufferQuaternion3,scale);
+        PhysicsUtils.multiplyQuaternions(bufferQuaternion3,q1,bufferQuaternion2);
+        dest[0]=q1[0]+bufferQuaternion2[0]*.5F;
+        dest[1]=q1[1]+bufferQuaternion2[1]*.5F;
+        dest[2]=q1[2]+bufferQuaternion2[2]*.5F;
+        dest[3]=q1[3]+bufferQuaternion2[3]*.5F;
     }
 
 }
