@@ -23,10 +23,12 @@ public class RigidBodySystem extends PhysicsSystem {
     private final float[] rw = new float[4]; //stores the rotation quaternion to be used in update operations
     private final float[] rotationMatrix = new float[16];//stores the translation matrix multiplied by the rotation matrix
     private final float[] rotationRadians = new float[3];//to be updated each object update, dependent on the quaternion rotation representation
-    private static final float[] bufferM4 = new float[16];
 
+    //static variables meant to be used for physics calculations
+    private static final float[] bufferM4 = new float[16];
+    private static final float[] bufferVec3 = new float[3];
     @Override
-    public void doLogic(float time) {
+    public void doLogic(float time) { //todo angular dampling
         super.doLogic(time);
         VectorTranslator.normalize(orientation);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
@@ -73,14 +75,13 @@ public class RigidBodySystem extends PhysicsSystem {
         applyForce(fx,fy,fz,px,py,pz,true);
     }
 
-    private static final float[] staticBufferVec3 = new float[3];
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) {
         float dx = relative ? px : px - coords[0];
         float dy = relative ? py : py - coords[1];
         float dz = relative ? pz : pz - coords[2];
         applyForce(fx-dx,fy-dy,fz-dz);
-        VectorTranslator.getCrossProduct(staticBufferVec3,fx,fy,fz,px,py,pz);
-        applyTorque(staticBufferVec3);
+        VectorTranslator.getCrossProduct(bufferVec3,fx,fy,fz,px,py,pz);
+        applyTorque(bufferVec3);
     }
 
 
@@ -88,6 +89,10 @@ public class RigidBodySystem extends PhysicsSystem {
         dest[0] = rx;
         dest[1] = ry;
         dest[2] = rz;
+    }
+
+    void getInverseInertiaTensorTranslated(float[] dest){
+        PhysicsUtils.transformInertiaTensorQuaternion(inverseInnertialTensor,rotationMatrix,dest);
     }
 
     public float orienX(){
@@ -101,6 +106,10 @@ public class RigidBodySystem extends PhysicsSystem {
     }
     public float orienW(){return orientation[0];}
 
+    public float getSpinX(){return spin[0];}
+    public float getSpinY(){return spin[1];}
+    public float getSpinZ(){return spin[2];}
+
     @Override
     public void toLocalCoords(float[] worldspaceCoords) {
         super.toLocalCoords(worldspaceCoords);
@@ -108,7 +117,7 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
 
-    public float[] getOrientation() {
+    public float[] getOrientation() {//todo maybe switch to a void and a array argument?
         return orientation.clone();
     }
 }

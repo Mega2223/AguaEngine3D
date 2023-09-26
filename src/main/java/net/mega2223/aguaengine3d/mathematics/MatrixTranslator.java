@@ -511,6 +511,7 @@ public class MatrixTranslator {
     //todo matrix determinant calculation func
 
     public static void getInverseMatrix3(float[] m3, float[] dest){
+        //todo test this lol
         float v1 = m3[0]*m3[4]; //values for calculating the matrix determinant
         float v2 = m3[0]*m3[5];
         float v3 = m3[1]*m3[3];

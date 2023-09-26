@@ -54,6 +54,7 @@ import java.util.Arrays;
 * Collision stuff
 * Animation stuff
 * Perhaps a static OpenGL manager class?
+* Denote static buffers explicitly as static?
 * */
 
 public class Gaem3D {
@@ -160,7 +161,7 @@ public class Gaem3D {
             }
         };
 
-        DragForce drag = new DragForce(.1F, .04F);
+        DragForce drag = new DragForce(.001F, .04F);
         ConstantForce gravity = new ConstantForce(0, -.01F, 0);
 
         cube.physicsHandler().addForce(drag);
@@ -198,9 +199,12 @@ public class Gaem3D {
         PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
         RigidBodySystem test = new RigidBodySystem(1,tensor);
 
+        test.addForce(drag);
+        test.applyTorque(1,3,1);
+
         RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
         cube23.physicsHandler().setCoordY(10);
-        test.applyForce(0,0.1F,0,0,0,0.1F);
+        test.applyForce(0.1F,0.1F,0,0,0,0.1F);
         context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
             @Override
             protected void preLogic(int itneration, RenderingContext context) {
