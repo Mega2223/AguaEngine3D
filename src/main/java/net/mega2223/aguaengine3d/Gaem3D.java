@@ -198,7 +198,7 @@ public class Gaem3D {
 
         float[] tensor = new float[9];
         PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
-        RigidBodySystem test = new RigidBodySystem(1,tensor);
+        RigidBodySystem test = new RigidBodySystem(1,new float[1],tensor);
 
         test.addForce(drag);
         test.applyTorque(1,3,1);

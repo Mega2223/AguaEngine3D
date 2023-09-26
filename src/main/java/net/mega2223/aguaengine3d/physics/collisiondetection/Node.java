@@ -46,7 +46,7 @@ public class Node implements Collideable{
     @Override
     public boolean collides(float x, float y, float z) {
         x-=coords[0]; y-=coords[1]; z-=coords[2];
-        return Math.sqrt(x*x+y*y+z*z)<=radius;
+        return Math.sqrt(x*x+y*y+z*z)<=radius && (n1.collides(x,y,z)||n2.collides(x,y,z));
     }
 
     public float getRadius() {

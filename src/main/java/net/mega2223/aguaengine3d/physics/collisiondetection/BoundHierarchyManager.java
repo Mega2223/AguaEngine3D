@@ -6,18 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BoundHierarchyManager {
-    InteractionArea a1,a2 = null;
-    List<InteractionArea> areas = new ArrayList<>();
+    Node primeNode = null;
+    List<HitboxInteractionArea> areas = new ArrayList<>();
 
     public BoundHierarchyManager(){
 
     }
 
-    public void generate(){
-        List<Collideable> unlinked = new ArrayList<>();
+    public void generate(List<Collideable> data){
+        List<Collideable> unlinked = new ArrayList<>(data);
+        while(unlinked.size() >= 2){
+            unlinked.add(linkClosestObjects(unlinked,true));
+        }
     }
 
-    static Node linkClosestObjects(List<Collideable> collideables){
+    static Node linkClosestObjects(List<Collideable> collideables, boolean removeObjectsFromList){
         if(collideables.size() < 2){return null;}
         float minDist = VectorTranslator.getDistance(collideables.get(0).getCenter(),collideables.get(1).getCenter());
         int m1 = -1, m2 = -1;
@@ -30,8 +33,13 @@ public class BoundHierarchyManager {
                 if(d < minDist){m1 = i; m2 = j; minDist = d;}
             }
         }
-        return new Node(collideables.get(m1),collideables.get(m2));
+        Collideable col1 = collideables.get(m1);
+        Collideable col2 = collideables.get(m2);
+        if(removeObjectsFromList){collideables.remove(col1);collideables.remove(col2);}
+        return new Node(col1, col2);
     }
 
-
+    public boolean checkForCollision(float x, float y, float z){
+        return primeNode.collides(x,y,z);
+    }
 }

@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection;
 
-public abstract class InteractionArea implements Collideable {
+public abstract class HitboxInteractionArea implements Collideable {
     float[] coords = new float[3];
 
     float getX(){return coords[0];}
@@ -8,7 +8,7 @@ public abstract class InteractionArea implements Collideable {
     float getZ(){return coords[0];}
 
     Hitbox assossiatedHitbox;
-    public InteractionArea(Hitbox assossiatedHitbox){
+    public HitboxInteractionArea(Hitbox assossiatedHitbox){
         this.assossiatedHitbox = assossiatedHitbox;
     }
 

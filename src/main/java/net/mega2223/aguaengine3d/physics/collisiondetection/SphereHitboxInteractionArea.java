@@ -1,9 +1,9 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection;
 
-public class SphereInteractionArea extends InteractionArea{
+public class SphereHitboxInteractionArea extends HitboxInteractionArea {
     float radius;
 
-    public SphereInteractionArea(float radius, Hitbox assossiatedHitbox){
+    public SphereHitboxInteractionArea(float radius, Hitbox assossiatedHitbox){
         super(assossiatedHitbox);
         this.radius = radius;
     }
