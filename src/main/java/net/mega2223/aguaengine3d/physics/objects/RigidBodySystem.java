@@ -9,15 +9,13 @@ import java.util.Arrays;
 
 public class RigidBodySystem extends PhysicsSystem {
 
-    protected final float[] orientation = new float[4]; //quaterinon that stores the orientation and it's axis
+    protected final float[] orientation = {1,0,0,0}; //quaterinon that stores the orientation and it's axis
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
     protected final float[] inverseInnertialTensor = new float[9];
 
     public RigidBodySystem(float mass, float[] innertialTensor) {
         super(mass);
-        spin[0] = 3;
-
         MatrixTranslator.getInverseMatrix3(innertialTensor,this.inverseInnertialTensor);
     }
 
@@ -41,8 +39,8 @@ public class RigidBodySystem extends PhysicsSystem {
         rw[1] = spin[0];
         rw[2] = spin[1];
         rw[3] = spin[2];
-        VectorTranslator.debugVector(orientation);
-        PhysicsManager.addScaledQuaternions(orientation,rw,0.0001F);
+        //VectorTranslator.debugVector(rw);
+        PhysicsManager.addScaledQuaternions(orientation,rw,.1F);
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
@@ -64,12 +62,27 @@ public class RigidBodySystem extends PhysicsSystem {
         accumulatedTorque[1]+=y;
         accumulatedTorque[2]+=z;
     }
+    public void applyTorque(float[] torque){
+        applyTorque(torque[0],torque[1],torque[2]);
+    }
 
     //forces that do not have any specific point will be treated as appiled to the center of mass
     //therefore there's no need to override the method
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
-        
+
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz){
+        applyForce(fx,fy,fz,px,py,pz,true);
     }
+
+    private static final float[] staticBufferVec3 = new float[3];
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) {
+        float dx = relative ? px : px - coords[0];
+        float dy = relative ? py : py - coords[1];
+        float dz = relative ? pz : pz - coords[2];
+        applyForce(fx-dx,fy-dy,fz-dz);
+        VectorTranslator.getCrossProduct(staticBufferVec3,fx,fy,fz,px,py,pz);
+        applyTorque(staticBufferVec3);
+    }
+
 
     public void getWorldspacePos(float rx, float ry, float rz, float[] dest){
         dest[0] = rx;

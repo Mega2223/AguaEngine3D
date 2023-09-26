@@ -101,10 +101,10 @@ public class VectorTranslator {
         getCrossProduct(result,vector[0],vector[1],vector[2],vector2[0],vector2[1],vector2[2]);
     }
 
-    public static void getCrossProduct(float[] vector, float x1,float y1,float z1,float x2,float y2,float z2){
-        vector[0] = y1*z2-z1*y2;
-        vector[1] = z1*x2-x1*z2;
-        vector[2] = x1*y2-y1*x2;
+    public static void getCrossProduct(float[] dest, float x1,float y1,float z1,float x2,float y2,float z2){
+        dest[0] = y1*z2-z1*y2;
+        dest[1] = z1*x2-x1*z2;
+        dest[2] = x1*y2-y1*x2;
     }
 
     public static float getMagnitudeVec3(float[] vec3){

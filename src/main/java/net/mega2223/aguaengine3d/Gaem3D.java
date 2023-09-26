@@ -117,11 +117,17 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
 
+        TexturedModel referenceCube = TexturedModel.loadTexturedModel(
+                Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+        );
+        referenceCube.setCoords(0,.5F,3);
+        context.addObject(referenceCube);
         //physics
 
         PhysicsSystem cubePhysics = new ParticleSystem(Float.POSITIVE_INFINITY);
         PhysicsSystem cube2Physics = new ParticleSystem(10);
-        cube2Physics.setCoordY(10);
+        cube2Physics.setCoordY(5);
 
         final ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics){
             @Override
@@ -194,21 +200,17 @@ public class Gaem3D {
 
         RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
         cube23.physicsHandler().setCoordY(10);
-        test.setOrientation(1,1,0,0);
-
-        context.addObject(cube23);
-
-        context.renderContext().addScript(new ScriptedSequence("The printer") {
-            final float[] v = new float[4];
+        test.applyForce(0,0.1F,0,0,0,0.1F);
+        context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
             @Override
             protected void preLogic(int itneration, RenderingContext context) {
-                System.arraycopy(camera,0,v,0,3);
-                cube23.physicsHandler().toLocalCoords(v);
-                //VectorTranslator.debugVector(v);
-                //System.out.println();
-                test.applyTorque(0,0,1);
+                VectorTranslator.debugVector(test.getCoords());
+                test.setCoords(0,5,0);
             }
         });
+        context.addObject(cube23);
+
+        //est.applyForce(0,-.001F,0,0,-.01F,0);
 
         //interface
 
