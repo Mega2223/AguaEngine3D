@@ -55,6 +55,7 @@ import java.util.Arrays;
 * Animation stuff
 * Perhaps a static OpenGL manager class?
 * Denote static buffers explicitly as static?
+* Interaction radius detection interface
 * */
 
 public class Gaem3D {
@@ -205,13 +206,13 @@ public class Gaem3D {
         RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
         cube23.physicsHandler().setCoordY(10);
         test.applyForce(0.1F,0.1F,0,0,0,0.1F);
-        context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
+        /*context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
             @Override
             protected void preLogic(int itneration, RenderingContext context) {
                 VectorTranslator.debugVector(test.getCoords());
                 test.setCoords(0,5,0);
             }
-        });
+        });*/
         context.addObject(cube23);
 
         //est.applyForce(0,-.001F,0,0,-.01F,0);

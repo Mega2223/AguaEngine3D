@@ -165,6 +165,7 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < 3; i++) {worldspaceCoords[i]-=coords[i];}
     }
 
+    public abstract float getInteractionRadius();
 
     /*void addConstantForce(float[] force){
         for (int i = 0; i < constantAcceleration.length; i++) {

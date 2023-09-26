@@ -77,4 +77,12 @@ public class MathUtils {
         }
     }
 
+    public static float getHighestNInDataset(float[] data){
+        float f = data[0];
+        for (int i = 1; i < data.length; i++) {
+            f = Math.max(f,data[i]);
+        }
+        return f;
+    }
+
 }
