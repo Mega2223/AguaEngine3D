@@ -34,10 +34,10 @@ import java.util.Arrays;
 /*
 * The official AguaEngine3D TODO list:
 * Remove shadow acnes somehow (I hade normals so much it's unreal)
-* Font rendering (unfinished)
+* Font rendering <- unfinished
 * Rewrite texture loading function
 * Convert light objects to structs in shaders
-* The floor is slightly transparent somehow
+* The floor is slightly transparent somehow <- FIXED
 * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
 * Move aero to another module? (also finish it lol) <- DONE
 * Move shadow calculation algorithm to the default shader dictionary
@@ -56,6 +56,7 @@ import java.util.Arrays;
 * Perhaps a static OpenGL manager class?
 * Denote static buffers explicitly as static?
 * Interaction radius detection interface
+* Object declaration instantiation generation annotation?
 * */
 
 public class Gaem3D {
@@ -157,7 +158,7 @@ public class Gaem3D {
                 }
                 /*if(cube.physicsHandler().getCoordY() < 1){
                     CollisionResolver.resolveConflict(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),0);
-                    CollisionResolver.resolveCollision(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
+                    CollisionResolver.getDepth(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
                 }*/
             }
         };
