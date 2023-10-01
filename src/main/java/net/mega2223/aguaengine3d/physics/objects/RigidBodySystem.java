@@ -67,8 +67,19 @@ public class RigidBodySystem extends PhysicsSystem {
         accumulatedTorque[1]+=y;
         accumulatedTorque[2]+=z;
     }
+
+    public void applySpin(float x, float y, float z){
+        spin[0] += x;
+        spin[1] += y;
+        spin[2] += z;
+    }
+
     public void applyTorque(float[] torque){
         applyTorque(torque[0],torque[1],torque[2]);
+    }
+
+    public void applySpin(float[] spin){
+        applySpin(spin[0],spin[1],spin[2]);
     }
 
     //forces that do not have any specific point will be treated as appiled to the center of mass
@@ -87,6 +98,14 @@ public class RigidBodySystem extends PhysicsSystem {
         applyTorque(bufferVec3);
     }
 
+    public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {
+        float dx = relative ? px : px - coords[0];
+        float dy = relative ? py : py - coords[1];
+        float dz = relative ? pz : pz - coords[2];
+        applyImpulse(ix-dx,iy-dy,iz-dz);
+        VectorTranslator.getCrossProduct(bufferVec3,ix,iy,iz,px,py,pz);
+        applySpin(bufferVec3);
+    }
 
     public void getWorldspacePos(float rx, float ry, float rz, float[] dest){
         dest[0] = rx;
@@ -127,5 +146,9 @@ public class RigidBodySystem extends PhysicsSystem {
     @Override
     public float getInteractionRadius() {
         return radius;
+    }
+
+    public void getRotationMatrix(float[] dest){
+        System.arraycopy(rotationMatrix,0,dest,0,16);
     }
 }

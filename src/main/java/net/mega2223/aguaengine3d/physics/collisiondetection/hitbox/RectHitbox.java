@@ -1,26 +1,26 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection.hitbox;
 
+import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
+
 import java.util.Arrays;
 
-public class RectHitbox implements Hitbox{
+public class RectHitbox extends Hitbox {
 
-    float[] coords = new float[3];
-    float[] corners;
+    final float minX, minY, minZ, maxX, maxY, maxZ;
     float radius;
+    PhysicsSystem linkedSystem;
 
     //TODO hitboxes should be rotateable
 
-    public RectHitbox(float bx, float by, float bz, float ex, float ey, float ez){
-        corners = new float[]{
-                Math.min(bx,ex),
-                Math.min(by,ey),
-                Math.min(bz,ez),
-                0,
-                Math.max(bx,ex),
-                Math.max(by,ey),
-                Math.max(bz,ez),
-                0
-        };
+    public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
+        minX = Math.min(bx,ex);
+        minY = Math.min(by,ey);
+        minZ = Math.min(bz,ez);
+        maxX = Math.max(bx,ex);
+        maxY = Math.max(by,ey);
+        maxZ = Math.max(bz,ez);
+
         coords[0] = (ex-bx)*.5F + bx;
         coords[1] = (ey-by)*.5F + by;
         coords[2] = (ez-bz)*.5F + bz;
@@ -28,23 +28,41 @@ public class RectHitbox implements Hitbox{
     }
 
     @Override
-    public float getDepth(float cx, float cy, float cz) {
-        return 0;//todo
+    public void getDepth(float[] dest, float locX, float locY, float locZ) {
+        dest[0] = locX < 0 ? locX - minX : locX + maxX;
+        dest[1] = locY < 0 ? locY - minY : locY + maxY;
+        dest[2] = locZ < 0 ? locZ - minZ : locZ + maxZ;
+    }
+
+    @Override
+    public PhysicsSystem getLinkedSystem() {
+        return linkedSystem;
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    @Override
+    void resolveCollision(float wX, float wY, float wZ, float[] resultingForceDest) {
+        getDepth(resultingForceDest,wX-getX(),wX-getY(),wZ-getZ());
+        CollisionResolver.resolveCollision(linkedSystem,wX,wY,wZ,CollisionResolver.DEF_RESTITUTION);
     }
 
     @Override
     public float getX() {
-        return coords[0];
+        return linkedSystem.getCoordX();
     }
 
     @Override
     public float getY() {
-        return coords[1];
+        return linkedSystem.getCoordY();
     }
 
     @Override
     public float getZ() {
-        return coords[2];
+        return linkedSystem.getCoordZ();
     }
 
     @Override
@@ -54,9 +72,9 @@ public class RectHitbox implements Hitbox{
 
     @Override
     public boolean collides(float x, float y, float z) {
-        return x >= corners[0] && x <= corners[4] &&
-                y >= corners[1] && y <= corners[5] &&
-                z >= corners[2] && z <= corners[6];
+        return x >= minX && x <= maxX &&
+                y >= minY && y <= maxY &&
+                z >= minZ && z <= maxZ;
     }
 
     @Override
@@ -66,19 +84,17 @@ public class RectHitbox implements Hitbox{
 
     private float computeFarthestPointFromCenter(){
         //todo honestly i'm 99% sure there's a better approach
-        float c0 = corners[0], c1 = corners[1], c2 = corners[2],
-                c4 = corners[4], c5 = corners[5], c6 = corners[6];
         return (float) Math.max(
-                Math.sqrt(c0*c0*c1*c1*c2*c2),
-                Math.sqrt(c4*c4*c5*c5*c6*c6)
+                Math.sqrt(maxX*maxX+maxY*maxY+maxZ*maxZ),
+                Math.sqrt(minX*minX+minY*minY+minZ*minZ)
         );
     }
 
     @Override
     public String toString() {
         return "RectHitbox{" +
-                "coords=" + Arrays.toString(coords) +
-                ", corners=" + Arrays.toString(corners) +
+                "coords=" + Arrays.toString(linkedSystem.getCoords()) +
+                ", corners="  + minX + ", " + minY + ", " + minZ + " : " + maxX + ", " + maxY + ", " + maxZ +
                 ", radius=" + radius +
                 '}';
     }
