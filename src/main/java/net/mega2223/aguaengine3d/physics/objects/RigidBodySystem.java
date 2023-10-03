@@ -5,21 +5,20 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.PhysicsManager;
 import net.mega2223.aguaengine3d.physics.PhysicsUtils;
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 
 import java.util.Arrays;
 
 public class RigidBodySystem extends PhysicsSystem {
 
-    protected final float radius;
     protected final float[] orientation = {1,0,0,0}; //quaterinon that stores the orientation and it's axis
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
     protected final float[] inverseInnertialTensor = new float[9];
 
-    public RigidBodySystem(float mass, float[] mesh, float[] innertialTensor) {
+    public RigidBodySystem(float mass, float[] innertialTensor) {
         super(mass);
         MatrixTranslator.getInverseMatrix3(innertialTensor,this.inverseInnertialTensor);
-        radius = MathUtils.getHighestNInDataset(mesh);
     }
 
     //variables below are meant to be buffer for certain operations rather than object specific information
@@ -33,6 +32,7 @@ public class RigidBodySystem extends PhysicsSystem {
     @Override
     public void doLogic(float time) { //todo angular dampling
         super.doLogic(time);
+
         VectorTranslator.normalize(orientation);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
 
@@ -145,7 +145,7 @@ public class RigidBodySystem extends PhysicsSystem {
 
     @Override
     public float getInteractionRadius() {
-        return radius;
+        return boundHitbox == null ? 0 : boundHitbox.getEffectiveInteractionRadius();
     }
 
     public void getRotationMatrix(float[] dest){

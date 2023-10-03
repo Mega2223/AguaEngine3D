@@ -11,4 +11,5 @@ public interface Collidiable {
 
     default float[] getCenter(){return new float[]{getX(),getY(),getZ()};}
     void updateCoords();
+    void doLogic(float time);
 }

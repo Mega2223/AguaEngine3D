@@ -1,6 +1,7 @@
-package net.mega2223.aguaengine3d.physics.collisiondetection.hitbox;
+package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
 import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 
 import java.util.Arrays;
@@ -9,44 +10,49 @@ public class RectHitbox extends Hitbox {
 
     final float minX, minY, minZ, maxX, maxY, maxZ;
     float radius;
-    PhysicsSystem linkedSystem;
-
-    //TODO hitboxes should be rotateable
 
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
+        super(linkedSystem);
+        linkedSystem.bindHitbox(this);
         minX = Math.min(bx,ex);
         minY = Math.min(by,ey);
         minZ = Math.min(bz,ez);
         maxX = Math.max(bx,ex);
         maxY = Math.max(by,ey);
         maxZ = Math.max(bz,ez);
-
-        coords[0] = (ex-bx)*.5F + bx;
-        coords[1] = (ey-by)*.5F + by;
-        coords[2] = (ez-bz)*.5F + bz;
         radius = computeFarthestPointFromCenter();
     }
 
     @Override
-    public void getDepth(float[] dest, float locX, float locY, float locZ) {
-        dest[0] = locX < 0 ? locX - minX : locX + maxX;
-        dest[1] = locY < 0 ? locY - minY : locY + maxY;
-        dest[2] = locZ < 0 ? locZ - minZ : locZ + maxZ;
+    public void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ) {
+        dest[0] = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
+        dest[1] = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
+        dest[2] = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
     }
 
     @Override
-    public PhysicsSystem getLinkedSystem() {
-        return linkedSystem;
+    public float getDepth(float locX, float locY, float locZ) {
+        if (collides(locX,locY,locZ)){
+            float deX = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
+            float deY = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
+            float deZ = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
+            return Math.abs(Math.max(Math.max(deX,deY),deZ));
+        }
+        return 0;
     }
 
     @Override
-    public void update() {
+    public void update(float time) {
 
     }
 
     @Override
-    void resolveCollision(float wX, float wY, float wZ, float[] resultingForceDest) {
-        getDepth(resultingForceDest,wX-getX(),wX-getY(),wZ-getZ());
+    public void resolveCollision(float wX, float wY, float wZ, float[] resultingForceDest) {
+        float locX = wX - getX();
+        float locY = wX - getY();
+        float locZ = wZ - getZ();
+        getAxisDepthRelative(resultingForceDest, locX, locY, locZ);
+        CollisionResolver.resolveConflict(linkedSystem,wX,wY,wZ,getDepth(locX,wY-getY(), locZ));
         CollisionResolver.resolveCollision(linkedSystem,wX,wY,wZ,CollisionResolver.DEF_RESTITUTION);
     }
 

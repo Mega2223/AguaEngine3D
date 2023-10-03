@@ -1,5 +1,7 @@
 package net.mega2223.aguaengine3d.physics.objects;
 
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,8 @@ public abstract class PhysicsSystem {
     protected final float inverseMass;
 
     List<PhysicsForce> forces = new ArrayList<>(10); //fixme not performant
+
+    Hitbox boundHitbox = null;
 
     public PhysicsSystem(float mass) {
         this(mass,0,0,0);
@@ -163,6 +167,14 @@ public abstract class PhysicsSystem {
 
     public void toLocalCoords(float[] worldspaceCoords){
         for (int i = 0; i < 3; i++) {worldspaceCoords[i]-=coords[i];}
+    }
+
+    public Hitbox getBoundHitbox() {
+        return boundHitbox;
+    }
+    /**Can only be done once*/
+    public void bindHitbox(Hitbox boundHitbox) {
+        if(this.boundHitbox == null){this.boundHitbox = boundHitbox;}
     }
 
     public abstract float getInteractionRadius();

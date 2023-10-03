@@ -7,9 +7,19 @@ import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
 
 public abstract class Hitbox implements Collidiable {
     //it's up to the superclass wether it returns 0 or a negative number for non colliding objects
-    public abstract void getDepth(float[] dest, float locX, float locY, float locZ);
+    public abstract void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ);
+
+    public abstract float getDepth(float locX, float locY, float locZ);
 
     private static final float[] buffer = new float[16];
+
+    protected final PhysicsSystem linkedSystem;
+    protected final boolean isRigidBody;
+
+    protected Hitbox(PhysicsSystem linkedSystem){
+        this.linkedSystem = linkedSystem;
+        isRigidBody = linkedSystem instanceof RigidBodySystem;
+    }
 
     public void getTranslatedVector(float[] worldVec4, float[] dest){
         dest[0] = worldVec4[0] - getX();
@@ -22,9 +32,11 @@ public abstract class Hitbox implements Collidiable {
         }
     }
 
-    abstract PhysicsSystem getLinkedSystem();
+    public PhysicsSystem getLinkedSystem(){return linkedSystem;};
 
-    abstract void update();
+    public abstract void update(float time);
 
-    abstract void resolveCollision(float localX, float localY, float localZ, float[] resultingForceDest);
+    protected abstract void resolveCollision(float localX, float localY, float localZ, float[] resultingForceDest);
+
+
 }

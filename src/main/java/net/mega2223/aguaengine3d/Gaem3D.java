@@ -1,8 +1,6 @@
 package net.mega2223.aguaengine3d;
 
 
-import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.ScriptedSequence;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.BitmapFont;
@@ -23,11 +21,9 @@ import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.PhysicsUtils;
 import net.mega2223.aguaengine3d.physics.objects.*;
-import net.mega2223.aguaengine3d.physics.utils.objects.ConstantForce;
-import net.mega2223.aguaengine3d.physics.utils.objects.DragForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Arrays;
 
 @SuppressWarnings({"unused"})
 
@@ -98,7 +94,7 @@ public class Gaem3D {
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
-        //tests
+        //scenery setup
 
         TexturedModel chessFloor = new TexturedModel(
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
@@ -106,6 +102,7 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
+        //tests
 
         TexturedModel cubeModel = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
@@ -126,6 +123,7 @@ public class Gaem3D {
         );
         referenceCube.setCoords(0,.5F,3);
         context.addObject(referenceCube);
+
         //physics
 
         PhysicsSystem cubePhysics = new ParticleSystem(Float.POSITIVE_INFINITY);
@@ -158,7 +156,7 @@ public class Gaem3D {
                 }
                 /*if(cube.physicsHandler().getCoordY() < 1){
                     CollisionResolver.resolveConflict(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),0);
-                    CollisionResolver.getDepth(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
+                    CollisionResolver.getAxisDepthRelative(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
                 }*/
             }
         };
@@ -199,7 +197,7 @@ public class Gaem3D {
 
         float[] tensor = new float[9];
         PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
-        RigidBodySystem test = new RigidBodySystem(1,new float[1],tensor);
+        RigidBodySystem test = new RigidBodySystem(1,tensor);
 
         test.addForce(drag);
         test.applyTorque(1,3,1);

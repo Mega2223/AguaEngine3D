@@ -1,16 +1,16 @@
-package net.mega2223.aguaengine3d.physics.utils.objects;
+package net.mega2223.aguaengine3d.physics.utils.objects.forces;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsForce;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 
-public class SpringForce implements PhysicsForce {
+public class RopeForce implements PhysicsForce {
     final float[] coord;
     final float len;
     final float stiffness;
     protected float[] buffer = new float[3];
 
-    public SpringForce(float len, float stiffness, float cX, float cY, float cZ){
+    public RopeForce(float len, float stiffness, float cX, float cY, float cZ){
         coord = new float[]{cX,cY,cZ};
         this.len = len;
         this.stiffness = stiffness;
@@ -22,17 +22,12 @@ public class SpringForce implements PhysicsForce {
         buffer[1] = coord[1] - system.getCoordY();
         buffer[2] = coord[2] - system.getCoordZ();
         float f = -stiffness * (VectorTranslator.getMagnitudeVec3(buffer) - len);
+        if(f >= 0){return;}
         VectorTranslator.normalizeVec3(buffer);
         VectorTranslator.scaleVec3(buffer,f);
         VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
         system.applyForce(buffer);
-    }
-
-    public void setCoord(float x, float y, float z){
-        coord[0] = x;
-        coord[1] = y;
-        coord[2] = z;
     }
 
 }

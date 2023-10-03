@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.physics.utils.objects;
+package net.mega2223.aguaengine3d.physics.utils.objects.forces;
 
 import net.mega2223.aguaengine3d.physics.objects.PhysicsForce;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;

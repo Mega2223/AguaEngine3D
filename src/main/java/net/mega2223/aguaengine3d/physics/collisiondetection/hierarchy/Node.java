@@ -33,6 +33,11 @@ public class Node implements Collidiable {
 
     }
 
+    @Override
+    public void doLogic(float time) {
+
+    }
+
     public Node(float radius, float x, float y, float z, Collidiable n1, Collidiable n2){
         this.radius = radius;
         this.n1 = n1;

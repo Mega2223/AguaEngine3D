@@ -2,7 +2,7 @@ package net.mega2223.aguaengine3d.tests;
 
 import net.mega2223.aguaengine3d.physics.collisiondetection.BoundHierarchyManager;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
-import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.RectHitbox;
+import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.RectHitbox;
 
 public class NodeHierarchyGeneratorTest {
 

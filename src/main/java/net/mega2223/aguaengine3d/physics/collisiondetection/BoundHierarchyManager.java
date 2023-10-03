@@ -12,13 +12,12 @@ import java.util.List;
 public class BoundHierarchyManager {
     protected static final String PREFIX = "| ";
     Node primeNode = null;
-    List<Hitbox> hitboxes = new ArrayList<>();
 
     public BoundHierarchyManager(){
 
     }
 
-    public void generate(){
+    public void generate(List<Hitbox> hitboxes){
         List<Collidiable> unlinked = new ArrayList<>(hitboxes);
         while(unlinked.size() > 2){
             unlinked.add(linkClosestObjects(unlinked,true));
@@ -54,17 +53,6 @@ public class BoundHierarchyManager {
 
     public boolean checkForCollision(float x, float y, float z){
         return primeNode.collides(x,y,z);
-    }
-
-    public void addHitbox(net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox area){
-        hitboxes.add(area);
-    }
-    public void removeHitbox(net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox area){
-        hitboxes.remove(area);
-    }
-
-    public List<net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox> getHitboxes() {
-        return Collections.unmodifiableList(hitboxes);
     }
 
     public static void displayHierarchy(BoundHierarchyManager man){

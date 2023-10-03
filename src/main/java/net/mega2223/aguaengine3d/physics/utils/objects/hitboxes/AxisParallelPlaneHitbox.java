@@ -1,0 +1,64 @@
+package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
+
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
+import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
+
+public class AxisParallelPlaneHitbox extends Hitbox {
+    final protected float coordY;
+    protected AxisParallelPlaneHitbox(PhysicsSystem linkedSystem, float cy) {
+        super(linkedSystem);
+        coordY = cy;
+    }
+
+    @Override
+    public boolean collides(float x, float y, float z) {
+        return y<=coordY;
+    }
+
+    @Override
+    public float getEffectiveInteractionRadius() {
+        return Float.POSITIVE_INFINITY;
+    }
+
+    @Override
+    public float getX() {
+        return 0;
+    }
+
+    @Override
+    public float getY() {
+        return coordY;
+    }
+
+    @Override
+    public float getZ() {
+        return 0;
+    }
+
+    @Override
+    public void updateCoords() {
+
+    }
+
+    @Override
+    public void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ) {
+        dest[0] = 0;
+        dest[1] = Math.max(0,locY-this.coordY);
+        dest[2] = 0;
+    }
+
+    @Override
+    public float getDepth(float locX, float locY, float locZ) {
+        return Math.min(-locY-this.coordY,0);
+    }
+
+    @Override
+    protected void update() {
+
+    }
+
+    @Override
+    protected void resolveCollision(float localX, float localY, float localZ, float[] resultingForceDest) {
+
+    }
+}
