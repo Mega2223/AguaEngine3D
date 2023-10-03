@@ -11,18 +11,16 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
-import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.logic.RigidBodyAggregate;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
-import net.mega2223.aguaengine3d.physics.CollisionResolver;
-import net.mega2223.aguaengine3d.physics.PhysicsUtils;
 import net.mega2223.aguaengine3d.physics.objects.*;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.AxisParallelPlaneHitbox;
+import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.SphereHitbox;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unused"})
@@ -121,57 +119,31 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
-        referenceCube.setCoords(0,.5F,3);
-        context.addObject(referenceCube);
+        referenceCube.setCoords(0,3F,3);
+        //context.addObject(referenceCube);
 
         //physics
 
-        PhysicsSystem cubePhysics = new ParticleSystem(Float.POSITIVE_INFINITY);
-        PhysicsSystem cube2Physics = new ParticleSystem(10);
-        cube2Physics.setCoordY(5);
-
-        final ModelPhysicsAggregate cube = new ModelPhysicsAggregate(cubeModel,cubePhysics){
-            @Override
-            public void doLogic() {
-                super.doLogic();
-                PhysicsSystem phys = this.physicsHandler;
-                if(phys.getCoordY() < 1){
-                    phys.setCoordY(1);
-                }
-            }
-        };
-        final ModelPhysicsAggregate cube2 = new ModelPhysicsAggregate(cubeModel2,cube2Physics){
-            @Override
-            public void doLogic() {
-                super.doLogic();
-                float distance = VectorTranslator.getDistance(cube.physicsHandler().getCoords(), this.physicsHandler().getCoords());
-                PhysicsSystem phys = this.physicsHandler;
-                if(distance <= 2){
-                    CollisionResolver.resolveConflict(cube.physicsHandler(), phys, - distance + 2F);
-                    CollisionResolver.resolveCollision(cube.physicsHandler(),this.physicsHandler());
-                }
-                if(phys.getCoordY() < 1){
-                    CollisionResolver.resolveConflict(phys,phys.getCoordX(),-1,phys.getCoordZ(),-phys.getCoordY()+1);
-                    CollisionResolver.resolveCollision(phys,phys.getCoordX(),-1,phys.getCoordZ(),.5F);
-                }
-                /*if(cube.physicsHandler().getCoordY() < 1){
-                    CollisionResolver.resolveConflict(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),0);
-                    CollisionResolver.getAxisDepthRelative(cube.physicsHandler(),cube.physicsHandler().getCoordX(),-1,cube.physicsHandler().getCoordZ(),.5F);
-                }*/
-            }
-        };
-
-        DragForce drag = new DragForce(.001F, .04F);
+        DragForce drag = new DragForce(.04F, .04F);
         ConstantForce gravity = new ConstantForce(0, -.01F, 0);
+
+        RigidBodySystem c1s = new RigidBodySystem(1,new float[9]);
+        RigidBodySystem c2s = new RigidBodySystem(1,new float[9]);
+        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s);
+        RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,c2s);
 
         cube.physicsHandler().addForce(drag);
         cube.physicsHandler().setCoordY(2);
-        //cube.physicsHandler().addForce(new SpringForce(10F,.01F,0,5,0));
         cube2.physicsHandler().addForce(drag);
-        //cube2.physicsHandler().addForce(new SpringForce(3F,.01F,0,5,0));
 
         cube.physicsHandler().addForce(gravity);
         cube2.physicsHandler().addForce(gravity);
+
+        new SphereHitbox(cube.physicsHandler(),1);
+        new SphereHitbox(cube2.physicsHandler(),1);
+
+        context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
+
 
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
@@ -195,24 +167,24 @@ public class Gaem3D {
 
         //physics
 
-        float[] tensor = new float[9];
-        PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
-        RigidBodySystem test = new RigidBodySystem(1,tensor);
-
-        test.addForce(drag);
-        test.applyTorque(1,3,1);
-
-        RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
-        cube23.physicsHandler().setCoordY(10);
-        test.applyForce(0.1F,0.1F,0,0,0,0.1F);
-        /*context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
-            @Override
-            protected void preLogic(int itneration, RenderingContext context) {
-                VectorTranslator.debugVector(test.getCoords());
-                test.setCoords(0,5,0);
-            }
-        });*/
-        context.addObject(cube23);
+//        float[] tensor = new float[9];
+//        PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
+//        RigidBodySystem test = new RigidBodySystem(1,tensor);
+//
+//        test.addForce(drag);
+//        test.applyTorque(1,3,1);
+//
+//        RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
+//        cube23.physicsHandler().setCoordY(10);
+//        test.applyForce(0.1F,0.1F,0,0,0,0.1F);
+//        /*context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
+//            @Override
+//            protected void preLogic(int itneration, RenderingContext context) {
+//                VectorTranslator.debugVector(test.getCoords());
+//                test.setCoords(0,5,0);
+//            }
+//        });*/
+//        context.addObject(cube23);
 
         //est.applyForce(0,-.001F,0,0,-.01F,0);
 

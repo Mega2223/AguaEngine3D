@@ -1,11 +1,13 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 
 import java.util.Arrays;
 
 public class Node implements Collidiable {
-    final float[] coords = new float[3];
+
     float radius;
 
     final Collidiable n1;
@@ -16,8 +18,8 @@ public class Node implements Collidiable {
         this.n2 = n2;
         updateCoords();
     }
+    protected float[] coords = new float[4];
 
-    @Override
     public void updateCoords() {
         //TODO way too much object instantiation here since the getCenter method creates a clone each call
         System.arraycopy(n2.getCenter(),0,coords,0,3);
@@ -30,12 +32,23 @@ public class Node implements Collidiable {
                 VectorTranslator.getDistance(coords,n1c) + n1.getEffectiveInteractionRadius(),
                 VectorTranslator.getDistance(coords,n2c) + n2.getEffectiveInteractionRadius()
         );
-
+        if(n1 instanceof Node){((Node) n1).updateCoords();}
+        if(n2 instanceof Node){((Node) n2).updateCoords();}
     }
 
     @Override
     public void doLogic(float time) {
 
+    }
+
+    @Override
+    public void resolveForHitbox(Hitbox hitbox) {
+        float ix = hitbox.getX(), iy = hitbox.getY(), iz = hitbox.getZ(), ir = hitbox.getEffectiveInteractionRadius();
+        float px = getX(), py = getY(), pz = getZ(), pr = getEffectiveInteractionRadius();
+        if(CollisionResolver.checkIfSpheresCollide(ix,iy,iz,ir, px, py, pz, pr)){
+            n1.resolveForHitbox(hitbox);
+            n2.resolveForHitbox(hitbox);
+        }
     }
 
     public Node(float radius, float x, float y, float z, Collidiable n1, Collidiable n2){

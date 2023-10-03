@@ -132,4 +132,11 @@ public class CollisionResolver {
         VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         obj1.applyImpulse(buffer1[0],buffer1[1],buffer1[2], px,py,pz,false);
     }
+
+    public static boolean checkIfSpheresCollide(float c1x, float c1y, float c1z, float c1r, float c2x, float c2y, float c2z, float c2r){
+        float x = c2x - c1x;
+        float y = c2y - c1y;
+        float z = c2z - c1z;
+        return Math.sqrt(x*x+y*y+z*z) <= c1r + c2r;
+    }
 }

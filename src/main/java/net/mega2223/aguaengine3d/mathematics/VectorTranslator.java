@@ -48,6 +48,11 @@ public class VectorTranslator {
         return (float) Math.sqrt(sum);
     }
 
+    public static float getDistance(float x1, float y1, float z1, float x2, float y2, float z2){
+        float x = x2 - x1, y = y2 - y1, z = z2 - y1;
+        return (float) Math.sqrt(x*x+y*y+z*z);
+    }
+
     public static void addToAllVectors(float[] vectors, float[] scaleVector){
         addToAllVectors(vectors,scaleVector[0],scaleVector[1],scaleVector[2]);
     }

@@ -1,5 +1,7 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy;
 
+import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
+
 public interface Collidiable {
     boolean collides(float x, float y, float z);
     default boolean collides(float[] coord){
@@ -9,7 +11,7 @@ public interface Collidiable {
 
     float getX(); float getY(); float getZ();
 
-    default float[] getCenter(){return new float[]{getX(),getY(),getZ()};}
-    void updateCoords();
+    default float[] getCenter(){return new float[]{getX(),getY(),getZ(),0};}
     void doLogic(float time);
+    void resolveForHitbox(Hitbox hitbox);
 }

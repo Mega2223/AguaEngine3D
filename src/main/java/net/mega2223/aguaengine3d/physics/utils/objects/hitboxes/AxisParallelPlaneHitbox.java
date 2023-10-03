@@ -5,8 +5,8 @@ import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 
 public class AxisParallelPlaneHitbox extends Hitbox {
     final protected float coordY;
-    protected AxisParallelPlaneHitbox(PhysicsSystem linkedSystem, float cy) {
-        super(linkedSystem);
+    public AxisParallelPlaneHitbox(float cy) {
+        super();
         coordY = cy;
     }
 
@@ -36,7 +36,7 @@ public class AxisParallelPlaneHitbox extends Hitbox {
     }
 
     @Override
-    public void updateCoords() {
+    public void doLogic(float time) {
 
     }
 
@@ -49,16 +49,11 @@ public class AxisParallelPlaneHitbox extends Hitbox {
 
     @Override
     public float getDepth(float locX, float locY, float locZ) {
-        return Math.min(-locY-this.coordY,0);
+        return Math.max(-locY+this.coordY,0);
     }
 
     @Override
-    protected void update() {
-
-    }
-
-    @Override
-    protected void resolveCollision(float localX, float localY, float localZ, float[] resultingForceDest) {
+    protected void resolveCollision(Hitbox hitbox) {
 
     }
 }

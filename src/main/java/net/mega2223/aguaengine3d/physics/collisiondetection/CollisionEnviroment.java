@@ -9,26 +9,37 @@ import java.util.List;
 public class CollisionEnviroment {
     BoundHierarchyManager hierarchyManager = new BoundHierarchyManager();
     ArrayList<Hitbox> hitboxes = new ArrayList<>();
+    ArrayList<Hitbox> infiniteHitboxes = new ArrayList<>();
 
-    CollisionEnviroment(){
+    public CollisionEnviroment(){
 
     }
 
-    public void update(float time){
-        for (int i = 0; i < hitboxes.size(); i++) {
-            hitboxes.get(i).update(time);
+    public void doLogic(float time){
+        if(hierarchyManager.primeNode == null){
+            hierarchyManager.generate(hitboxes);
         }
+        for (int i = 0; i < hitboxes.size(); i++) {
+            hitboxes.get(i).doLogic(time);
+            hierarchyManager.resolveForHitbox(hitboxes.get(i));
+        }
+        hierarchyManager.update();
     }
 
     public void updateTopografy(){
         hierarchyManager.generate(getFiniteHitboxes());
     }
 
-    public void addHitbox(net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox area){
-        hitboxes.add(area);
+    public void addHitbox(Hitbox area){
+        if(area!=null&&!hitboxes.contains(area)){
+            hitboxes.add(area);
+            if(Float.isInfinite(area.getEffectiveInteractionRadius())){
+                infiniteHitboxes.add(area);
+            }
+        }
     }
 
-    public void removeHitbox(net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox area){
+    public void removeHitbox(Hitbox area){
         hitboxes.remove(area);
     }
 
@@ -37,13 +48,7 @@ public class CollisionEnviroment {
     }
 
     public List<Hitbox> getFiniteHitboxes(){
-        ArrayList<Hitbox> ret = new ArrayList<>(hitboxes.size());
-        for (Hitbox act : hitboxes) {
-            if (Float.isFinite(act.getEffectiveInteractionRadius())) {
-                ret.add(act);
-            }
-        }
-        return Collections.unmodifiableList(ret);
+        return Collections.unmodifiableList(infiniteHitboxes);
     }
 
     public BoundHierarchyManager getHierarchyManager() {

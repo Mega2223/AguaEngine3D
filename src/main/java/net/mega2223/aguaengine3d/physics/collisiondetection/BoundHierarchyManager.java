@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy.Collidiable;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy.Node;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
@@ -26,7 +27,10 @@ public class BoundHierarchyManager {
     }
     /***updates the coordinates of the bouding ranges without changing the chain topografy*/
     public void update(){
-
+        primeNode.updateCoords();
+    }
+    public void resolveForHitbox(Hitbox hitbox){
+       primeNode.resolveForHitbox(hitbox);
     }
 
     static Node linkClosestObjects(List<Collidiable> collisionAreas, boolean removeObjectsFromList){

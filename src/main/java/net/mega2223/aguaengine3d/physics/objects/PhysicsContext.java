@@ -1,15 +1,18 @@
 package net.mega2223.aguaengine3d.physics.objects;
 
+import net.mega2223.aguaengine3d.physics.collisiondetection.CollisionEnviroment;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class PhysicsContext {
 
-    List<PhysicsSystem> objects = new ArrayList<>();
-    List<PhysicsForce> globalForces = new ArrayList<>();
+    final List<PhysicsSystem> objects = new ArrayList<>();
+    final List<PhysicsForce> globalForces = new ArrayList<>();
 
     boolean isActive;
+    final CollisionEnviroment collisionEnviroment = new CollisionEnviroment();
 
     public PhysicsContext(){
 
@@ -23,6 +26,7 @@ public class PhysicsContext {
             }
             sy.doLogic(time);
         }
+        collisionEnviroment.doLogic(time);
     }
 
     public List<PhysicsSystem> getObjects() {
@@ -31,6 +35,7 @@ public class PhysicsContext {
 
     public void addObject(PhysicsSystem object){
         objects.add(object);
+        collisionEnviroment.addHitbox(object.boundHitbox);
     }
 
     public void remove(PhysicsSystem object){
@@ -57,4 +62,7 @@ public class PhysicsContext {
         return Collections.unmodifiableList(globalForces);
     }
 
+    public CollisionEnviroment getCollisionEnviroment() {
+        return collisionEnviroment;
+    }
 }

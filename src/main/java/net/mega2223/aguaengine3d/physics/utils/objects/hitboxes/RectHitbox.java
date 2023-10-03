@@ -42,18 +42,13 @@ public class RectHitbox extends Hitbox {
     }
 
     @Override
-    public void update(float time) {
+    public void doLogic(float time) {
 
     }
 
     @Override
-    public void resolveCollision(float wX, float wY, float wZ, float[] resultingForceDest) {
-        float locX = wX - getX();
-        float locY = wX - getY();
-        float locZ = wZ - getZ();
-        getAxisDepthRelative(resultingForceDest, locX, locY, locZ);
-        CollisionResolver.resolveConflict(linkedSystem,wX,wY,wZ,getDepth(locX,wY-getY(), locZ));
-        CollisionResolver.resolveCollision(linkedSystem,wX,wY,wZ,CollisionResolver.DEF_RESTITUTION);
+    protected void resolveCollision(Hitbox hitbox) {
+
     }
 
     @Override
@@ -69,11 +64,6 @@ public class RectHitbox extends Hitbox {
     @Override
     public float getZ() {
         return linkedSystem.getCoordZ();
-    }
-
-    @Override
-    public void updateCoords() {
-
     }
 
     @Override
