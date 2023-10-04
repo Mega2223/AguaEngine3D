@@ -13,6 +13,7 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.logic.RigidBodyAggregate;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -20,6 +21,7 @@ import net.mega2223.aguaengine3d.physics.objects.*;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.AxisParallelPlaneHitbox;
+import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.RectHitbox;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.SphereHitbox;
 import org.lwjgl.glfw.GLFW;
 
@@ -119,7 +121,7 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
-        referenceCube.setCoords(0,3F,3);
+        referenceCube.setCoords(0,6F,3);
         //context.addObject(referenceCube);
 
         //physics
@@ -129,7 +131,13 @@ public class Gaem3D {
 
         RigidBodySystem c1s = new RigidBodySystem(1,new float[9]);
         RigidBodySystem c2s = new RigidBodySystem(1,new float[9]);
-        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s);
+        c2s.applyImpulse(0.00001F,0,0);
+        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s){
+            @Override
+            public void doLogic() {
+                VectorTranslator.debugVector(this.physicsHandler.getCoords());
+            }
+        };
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,c2s);
 
         cube.physicsHandler().addForce(drag);
@@ -139,8 +147,8 @@ public class Gaem3D {
         cube.physicsHandler().addForce(gravity);
         cube2.physicsHandler().addForce(gravity);
 
-        new SphereHitbox(cube.physicsHandler(),1);
-        new SphereHitbox(cube2.physicsHandler(),1);
+        new RectHitbox(cube.physicsHandler(),-1,-1,-1,1,1,1);
+        new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
 

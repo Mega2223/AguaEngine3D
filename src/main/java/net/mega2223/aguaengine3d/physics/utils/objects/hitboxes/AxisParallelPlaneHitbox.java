@@ -56,4 +56,11 @@ public class AxisParallelPlaneHitbox extends Hitbox {
     protected void resolveCollision(Hitbox hitbox) {
 
     }
+
+    @Override
+    public void getContactNormal(float x, float y, float z, float[] dest) {
+        dest[0] = 0;
+        dest[1] = getDepth(x,y,z);
+        dest[2] = 0;
+    }
 }

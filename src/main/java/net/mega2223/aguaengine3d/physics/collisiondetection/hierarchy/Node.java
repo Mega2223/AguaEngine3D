@@ -51,6 +51,11 @@ public class Node implements Collidiable {
         }
     }
 
+    public void forceResolveForHitbox(Hitbox hitbox){
+        n1.resolveForHitbox(hitbox);
+        n2.resolveForHitbox(hitbox);
+    }
+
     public Node(float radius, float x, float y, float z, Collidiable n1, Collidiable n2){
         this.radius = radius;
         this.n1 = n1;

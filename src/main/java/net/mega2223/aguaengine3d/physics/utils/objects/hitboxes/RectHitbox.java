@@ -1,14 +1,19 @@
 package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.PhysicsManager;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
+import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
 
 import java.util.Arrays;
 
 public class RectHitbox extends Hitbox {
 
     final float minX, minY, minZ, maxX, maxY, maxZ;
+    final float[] pointBuffer = new float[32];
+    private static final float[] bufferVec3 = new float[3];
     float radius;
 
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
@@ -21,6 +26,7 @@ public class RectHitbox extends Hitbox {
         maxY = Math.max(by,ey);
         maxZ = Math.max(bz,ez);
         radius = computeFarthestPointFromCenter();
+        updatePointBuffer();
     }
 
     @Override
@@ -48,7 +54,28 @@ public class RectHitbox extends Hitbox {
 
     @Override
     protected void resolveCollision(Hitbox hitbox) {
-
+        if(hitbox instanceof AxisParallelPlaneHitbox){
+            AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
+            for (int i = 0; i < 32; i+=4) {
+                float px = pointBuffer[i] + getX();
+                float py = pointBuffer[i + 1] + getY();
+                float pz = pointBuffer[i + 2] + getZ();
+                float d = act.getDepth(px, py, pz);
+                if(d <= 0){continue;}
+                act.getContactNormal(px,py,pz,bufferVec3);
+                CollisionResolver.resolveConflict(linkedSystem,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
+                VectorTranslator.debugVector(linkedSystem.getCoords());
+                //todo custom collision normals
+                if(isRigidBody){
+                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
+                } else {
+                    CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
+                }
+            }
+        }
+        if(hitbox instanceof RectHitbox){
+            RectHitbox act = (RectHitbox) hitbox;
+        }
     }
 
     @Override
@@ -93,5 +120,16 @@ public class RectHitbox extends Hitbox {
                 ", corners="  + minX + ", " + minY + ", " + minZ + " : " + maxX + ", " + maxY + ", " + maxZ +
                 ", radius=" + radius +
                 '}';
+    }
+
+    void updatePointBuffer(){
+        pointBuffer[0] = minX; pointBuffer[1] = minY; pointBuffer[2] = minZ; pointBuffer[3] = 0;
+        pointBuffer[4] = maxX; pointBuffer[5] = minY; pointBuffer[6] = minZ; pointBuffer[7] = 0;
+        pointBuffer[8] = minX; pointBuffer[9] = minY; pointBuffer[10] = maxZ; pointBuffer[11] = 0;
+        pointBuffer[28] = maxX; pointBuffer[29] = minY; pointBuffer[30] = maxZ; pointBuffer[31] = 0;
+        pointBuffer[12] = minX; pointBuffer[13] = maxY; pointBuffer[14] = minZ; pointBuffer[15] = 0;
+        pointBuffer[16] = maxX; pointBuffer[17] = maxY; pointBuffer[18] = minZ; pointBuffer[19] = 0;
+        pointBuffer[20] = minX; pointBuffer[21] = maxY; pointBuffer[22] = maxZ; pointBuffer[23] = 0;
+        pointBuffer[24] = maxX; pointBuffer[25] = maxY; pointBuffer[26] = maxZ; pointBuffer[27] = 0;
     }
 }

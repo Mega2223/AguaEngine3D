@@ -21,7 +21,7 @@ public class CollisionEnviroment {
         }
         for (int i = 0; i < hitboxes.size(); i++) {
             hitboxes.get(i).doLogic(time);
-            hierarchyManager.resolveForHitbox(hitboxes.get(i));
+            hierarchyManager.forceResolveForHitbox(hitboxes.get(i));
         }
         hierarchyManager.update();
     }

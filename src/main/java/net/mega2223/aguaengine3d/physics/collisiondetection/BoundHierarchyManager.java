@@ -32,6 +32,9 @@ public class BoundHierarchyManager {
     public void resolveForHitbox(Hitbox hitbox){
        primeNode.resolveForHitbox(hitbox);
     }
+    public void forceResolveForHitbox(Hitbox hitbox){
+        primeNode.resolveForHitbox(hitbox);
+    }
 
     static Node linkClosestObjects(List<Collidiable> collisionAreas, boolean removeObjectsFromList){
         if(collisionAreas.size() < 2){return null;}

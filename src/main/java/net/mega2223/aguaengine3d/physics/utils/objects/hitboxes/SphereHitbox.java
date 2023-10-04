@@ -66,18 +66,15 @@ public class SphereHitbox extends Hitbox {
             CollisionResolver.resolveConflict(getLinkedSystem(),px,py,pz,d);
         }
         else if(hitbox instanceof SphereHitbox){
-            float x = getX(), y = getY(), z = getZ(),
-            ox = hitbox.getX(), oy = hitbox.getY(), oz = hitbox.getZ();
-            x-=ox; y-= oy; z-=oz;
-            float m = VectorTranslator.getMagnitudeVec3(x,y,z);
-            float d = VectorTranslator.getDistance(x,y,z,ox,oy,oz);
-            if(m>0){x/=m;y/=m;z/=m;}
-            x*=radius;y*=radius;z*=radius;
-            x+=ox;y+=oy;z+=oz;
-            d = -(d-(radius + ((SphereHitbox) hitbox).radius));
-            if(x+y+z > 0){System.out.println("Contact: " + x + ", " + y + ", " + z);}
-            //CollisionResolver.resolveConflict(getLinkedSystem(),x,y,z,d);
-            CollisionResolver.resolveCollision(getLinkedSystem(),x, y, z,CollisionResolver.DEF_RESTITUTION);
+            SphereHitbox sh = (SphereHitbox) hitbox;
+            float x = (sh.getX() - getX())/2, y = (sh.getY() - getY())/2, z = (sh.getZ() - getZ());
+            x += sh.getX(); y+= sh.getY(); z+= sh.getZ();
+            float dis = VectorTranslator.getDistance(getX(), getY(), getZ(), sh.getX(), sh.getY(), sh.getZ()) / 2;
+            System.out.println(dis);
+            float d = (radius+sh.radius)/2 - dis;
+            //if(d>0){System.out.println(d);}
+            CollisionResolver.resolveCollision(getLinkedSystem(),x,y,z,CollisionResolver.DEF_RESTITUTION);
+            CollisionResolver.resolveConflict(getLinkedSystem(),x,y,z,d);
         }
     }
 }
