@@ -121,7 +121,7 @@ public class Gaem3D {
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
-        referenceCube.setCoords(0,6F,3);
+        referenceCube.setCoords(0,16F,3);
         //context.addObject(referenceCube);
 
         //physics
@@ -131,42 +131,38 @@ public class Gaem3D {
 
         RigidBodySystem c1s = new RigidBodySystem(1,new float[9]);
         RigidBodySystem c2s = new RigidBodySystem(1,new float[9]);
-        c2s.applyImpulse(0.00001F,0,0);
-        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s){
-            @Override
-            public void doLogic() {
-                VectorTranslator.debugVector(this.physicsHandler.getCoords());
-            }
-        };
+
+        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s);
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,c2s);
 
         cube.physicsHandler().addForce(drag);
-        cube.physicsHandler().setCoordY(2);
         cube2.physicsHandler().addForce(drag);
+        c2s.applyForce(.1F,.1F,0);
+        c1s.applyForce(.2F,.1F,0);
 
         cube.physicsHandler().addForce(gravity);
         cube2.physicsHandler().addForce(gravity);
+        cube2.physicsHandler().setCoordX(5);
 
         new RectHitbox(cube.physicsHandler(),-1,-1,-1,1,1,1);
         new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
 
-
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(.05F,0,0);
+                cube2.physicsHandler().applyForce(.05F,0,0);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(-.05F,0,0);
+                cube2.physicsHandler().applyForce(-.05F,0,0);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(0,0,-.05F);
+                cube2.physicsHandler().applyForce(0,0,-.05F);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
-                cube.physicsHandler().applyForce(0,0,.05F);
+                cube2.physicsHandler().applyForce(0,0,.05F);
             }
 
         });

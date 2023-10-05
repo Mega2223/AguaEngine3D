@@ -2,7 +2,6 @@ package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.CollisionResolver;
-import net.mega2223.aguaengine3d.physics.PhysicsManager;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
@@ -39,9 +38,9 @@ public class RectHitbox extends Hitbox {
     @Override
     public float getDepth(float locX, float locY, float locZ) {
         if (collides(locX,locY,locZ)){
-            float deX = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
-            float deY = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
-            float deZ = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
+            float deX = locX < 0 ? Math.max(0,locX - minX + getX()) : Math.min(locX - maxX + getX(),0);
+            float deY = locY < 0 ? Math.max(0,locY - minY + getY()) : Math.min(locY - maxY + getY(),0);
+            float deZ = locZ < 0 ? Math.max(0,locZ - minZ + getZ()) : Math.min(locZ - maxZ + getZ(),0);
             return Math.abs(Math.max(Math.max(deX,deY),deZ));
         }
         return 0;
@@ -54,6 +53,7 @@ public class RectHitbox extends Hitbox {
 
     @Override
     protected void resolveCollision(Hitbox hitbox) {
+        if(hitbox == this){return;}
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
             for (int i = 0; i < 32; i+=4) {
@@ -63,8 +63,7 @@ public class RectHitbox extends Hitbox {
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
                 act.getContactNormal(px,py,pz,bufferVec3);
-                CollisionResolver.resolveConflict(linkedSystem,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
-                VectorTranslator.debugVector(linkedSystem.getCoords());
+                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
                 //todo custom collision normals
                 if(isRigidBody){
                     CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
@@ -75,6 +74,21 @@ public class RectHitbox extends Hitbox {
         }
         if(hitbox instanceof RectHitbox){
             RectHitbox act = (RectHitbox) hitbox;
+            for (int i = 0; i < 32; i+=4) {
+                float px = pointBuffer[i] + getX();
+                float py = pointBuffer[i + 1] + getY();
+                float pz = pointBuffer[i + 2] + getZ();
+                float d = act.getDepth(px, py, pz);
+                if(d <= 0){continue;}
+                act.getContactNormal(px,py,pz,bufferVec3);
+                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
+
+                if(isRigidBody){
+                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
+                } else {
+                    CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
+                }
+            }
         }
     }
 
@@ -95,9 +109,9 @@ public class RectHitbox extends Hitbox {
 
     @Override
     public boolean collides(float x, float y, float z) {
-        return x >= minX && x <= maxX &&
-                y >= minY && y <= maxY &&
-                z >= minZ && z <= maxZ;
+        return x >= minX + getX() && x <= maxX + getX() &&
+                y >= minY + getY() && y <= maxY + getY()&&
+                z >= minZ + getZ() && z <= maxZ + getZ();
     }
 
     @Override
@@ -122,7 +136,7 @@ public class RectHitbox extends Hitbox {
                 '}';
     }
 
-    void updatePointBuffer(){
+    protected void updatePointBuffer(){
         pointBuffer[0] = minX; pointBuffer[1] = minY; pointBuffer[2] = minZ; pointBuffer[3] = 0;
         pointBuffer[4] = maxX; pointBuffer[5] = minY; pointBuffer[6] = minZ; pointBuffer[7] = 0;
         pointBuffer[8] = minX; pointBuffer[9] = minY; pointBuffer[10] = maxZ; pointBuffer[11] = 0;
@@ -131,5 +145,22 @@ public class RectHitbox extends Hitbox {
         pointBuffer[16] = maxX; pointBuffer[17] = maxY; pointBuffer[18] = minZ; pointBuffer[19] = 0;
         pointBuffer[20] = minX; pointBuffer[21] = maxY; pointBuffer[22] = maxZ; pointBuffer[23] = 0;
         pointBuffer[24] = maxX; pointBuffer[25] = maxY; pointBuffer[26] = maxZ; pointBuffer[27] = 0;
+    }
+
+    @Override
+    public void getContactNormal(float x, float y, float z, float[] dest) {
+        float deX = getX() - x;
+        float deY = getY() - y;
+        float deZ = getZ() - z;
+
+        Arrays.fill(dest,0);
+        if(deX > deY && deX > deZ){
+            dest[0] = deX;
+        } else if (deY > deX && deY > deZ){
+            dest[1] = deY;
+        } else {
+            dest[2] = deZ;
+        }
+        VectorTranslator.debugVector(dest);
     }
 }
