@@ -28,6 +28,17 @@ public abstract class Hitbox implements Collidiable {
         linkedSystem = null;
     }
 
+    public void getTranslatedVector(float x, float y, float z, float[] dest){
+        dest[0] = x - getX();
+        dest[1] = y - getY();
+        dest[2] = z- getZ();
+        PhysicsSystem linkedSystem = getLinkedSystem();
+        if(isRigidBody){
+            ((RigidBodySystem) linkedSystem).getRotationMatrix(buffer);
+            MatrixTranslator.multiplyVec4Mat4(dest,buffer);
+        }
+    }
+
     public void getTranslatedVector(float[] worldVec4, float[] dest){
         dest[0] = worldVec4[0] - getX();
         dest[1] = worldVec4[1] - getY();

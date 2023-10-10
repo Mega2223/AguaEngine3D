@@ -20,6 +20,7 @@ import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.objects.*;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
+import net.mega2223.aguaengine3d.physics.utils.objects.forces.SpringForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.AxisParallelPlaneHitbox;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.RectHitbox;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.SphereHitbox;
@@ -110,42 +111,39 @@ public class Gaem3D {
         );
         TexturedModel cubeModel2 = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\grass.png")
         );
         TexturedModel cubeModel3 = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\tijolo.png")
         );
-
         TexturedModel referenceCube = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
         referenceCube.setCoords(0,16F,3);
         //context.addObject(referenceCube);
 
         //physics
 
-        DragForce drag = new DragForce(.04F, .04F);
         ConstantForce gravity = new ConstantForce(0, -.01F, 0);
 
-        RigidBodySystem c1s = new RigidBodySystem(1,new float[9]);
-        RigidBodySystem c2s = new RigidBodySystem(1,new float[9]);
+        RigidBodySystem cube1Physics = new RigidBodySystem(1,new float[9]);
+        cube1Physics.setCoords(0,3,0);
+        RigidBodySystem cube2Physics = new RigidBodySystem(1,new float[9]);
 
-        RigidBodyAggregate cube = new RigidBodyAggregate(cubeModel,c1s);
-        RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,c2s);
+        RigidBodyAggregate cube1 = new RigidBodyAggregate(cubeModel,cube1Physics);
+        RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,cube2Physics);
 
-        cube.physicsHandler().addForce(drag);
-        cube2.physicsHandler().addForce(drag);
-        c2s.applyForce(.1F,.1F,0);
-        c1s.applyForce(.2F,.1F,0);
+        context.physContext().addForce(new DragForce(0.1F,0.1F));
+        context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
-        cube.physicsHandler().addForce(gravity);
+        cube1.physicsHandler().addForce(gravity);
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
 
-        new RectHitbox(cube.physicsHandler(),-1,-1,-1,1,1,1);
-        new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
+        //new RectHitbox(cube.physicsHandler(),-1,-1,-1,1,1,1);
+        //new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
 
@@ -164,82 +162,20 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
                 cube2.physicsHandler().applyForce(0,0,.05F);
             }
-
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
+                cube1Physics.applyTorque(0,1F,0);
+            }
         });
-
-        context.addObject(cube).addObject(cube2);
+        context.addObject(cube1).addObject(cube2);
 
         //physics
 
-//        float[] tensor = new float[9];
-//        PhysicsUtils.generateInertiaTensor(10,10,10,tensor);
-//        RigidBodySystem test = new RigidBodySystem(1,tensor);
-//
-//        test.addForce(drag);
-//        test.applyTorque(1,3,1);
-//
-//        RigidBodyAggregate cube23 = new RigidBodyAggregate(cubeModel3, test);
-//        cube23.physicsHandler().setCoordY(10);
-//        test.applyForce(0.1F,0.1F,0,0,0,0.1F);
-//        /*context.renderContext().addScript(new ScriptedSequence("THE PRINTER") {
-//            @Override
-//            protected void preLogic(int itneration, RenderingContext context) {
-//                VectorTranslator.debugVector(test.getCoords());
-//                test.setCoords(0,5,0);
-//            }
-//        });*/
-//        context.addObject(cube23);
-
-        //est.applyForce(0,-.001F,0,0,-.01F,0);
-
-        //interface
-
-        String bitmapFile = Utils.FONTS_DIR + "\\consolas\\Consolas.png";
-
-
-        InterfaceComponent comp = new InterfaceComponent(
-                new float[]{.5F, .5F, 0, 0, .5F, 0, 0, 0, 0, .5F, 0, 0, 0, 0, 0, 0},
-                new int[]{0, 1, 2, 3, 2, 1},
-                new float[]{0, 0, 0, 1, 1, 0, 1, 1},
-                3,
-                1
-        ) {
-            @Override
-            public void doLogic(int itneration) {
-                setAspectRatio(manager.getAspectRatio());
-            }
-        };
-
-
-        BitmapFont font = TextManipulator.decompileCSV(
-                Utils.FONTS_DIR+"\\consolas\\Consolas.csv",
-                bitmapFile
-        );
-
-        assert font != null;
-        InterfaceComponent og = font.genFromString("Teste :)");
-        InterfaceComponent text = new InterfaceComponent(og,
-                new DisplayComponentShaderProgram(new DisplayComponentShaderProgram(og.getCastShader())){
-                    @Override
-                    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
-                        MatrixTranslator.generateStaticInterfaceProjectionMatrix(translationMatrix,getAspectRatio(),0,0,0,1,.5F,1);
-                        super.setUniforms(interation, translationMatrix, projectionMatrix);
-                    }
-                }
-        ){
-            @Override
-            public void doLogic(int itneration) {
-                getCastShader().setAspectRatio(manager.getAspectRatio());
-            }
-        };
-
-
-        context/*.addObject(cube).addObject(cube2)*/.addObject(chessFloor)/*.addObject(comp).*/.addObject(text);
+        context.addObject(chessFloor);
 
         context.renderContext().setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(10, 20);
+                .setFogDetails(30, 20);
 
         RenderingManager.printErrorQueue();
 

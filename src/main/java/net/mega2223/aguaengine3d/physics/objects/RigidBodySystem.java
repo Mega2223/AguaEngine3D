@@ -139,6 +139,8 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
 
+
+
     public float[] getOrientation() {//todo maybe switch to a void and a array argument?
         return orientation.clone();
     }
@@ -150,5 +152,15 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void getRotationMatrix(float[] dest){
         System.arraycopy(rotationMatrix,0,dest,0,16);
+    }
+
+    @Override
+    public String toString() {
+        return "RigidBodySystem{" +
+                "orientation=" + Arrays.toString(orientation) +
+                ", spin=" + Arrays.toString(spin) +
+                ", rotationRadians=" + Arrays.toString(rotationRadians) +
+                ", position= " + Arrays.toString(this.coords) +
+                '}';
     }
 }

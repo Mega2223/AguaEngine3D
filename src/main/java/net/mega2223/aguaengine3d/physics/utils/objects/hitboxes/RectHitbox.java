@@ -5,6 +5,7 @@ import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
+import org.lwjgl.system.CallbackI;
 
 import java.util.Arrays;
 
@@ -12,7 +13,7 @@ public class RectHitbox extends Hitbox {
 
     final float minX, minY, minZ, maxX, maxY, maxZ;
     final float[] pointBuffer = new float[32];
-    private static final float[] bufferVec3 = new float[3];
+    private static final float[] bufferVec3 = new float[4];
     float radius;
 
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
@@ -38,9 +39,9 @@ public class RectHitbox extends Hitbox {
     @Override
     public float getDepth(float locX, float locY, float locZ) {
         if (collides(locX,locY,locZ)){
-            float deX = locX < 0 ? Math.max(0,locX - minX + getX()) : Math.min(locX - maxX + getX(),0);
-            float deY = locY < 0 ? Math.max(0,locY - minY + getY()) : Math.min(locY - maxY + getY(),0);
-            float deZ = locZ < 0 ? Math.max(0,locZ - minZ + getZ()) : Math.min(locZ - maxZ + getZ(),0);
+            float deX = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
+            float deY = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
+            float deZ = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
             return Math.abs(Math.max(Math.max(deX,deY),deZ));
         }
         return 0;
@@ -57,9 +58,12 @@ public class RectHitbox extends Hitbox {
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
             for (int i = 0; i < 32; i+=4) {
-                float px = pointBuffer[i] + getX();
-                float py = pointBuffer[i + 1] + getY();
-                float pz = pointBuffer[i + 2] + getZ();
+                bufferVec3[0] = pointBuffer[i];
+                bufferVec3[1]  = pointBuffer[i + 1];
+                bufferVec3[2]  = pointBuffer[i + 2];
+                linkedSystem.toLocalCoords(bufferVec3);
+                VectorTranslator.debugVector(bufferVec3);
+                float px = bufferVec3[0], py = bufferVec3[1], pz = bufferVec3[2];
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
                 act.getContactNormal(px,py,pz,bufferVec3);
@@ -84,6 +88,9 @@ public class RectHitbox extends Hitbox {
                 CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
 
                 if(isRigidBody){
+                    System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
+                    System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
+                    System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
                     CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
                 } else {
                     CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
@@ -106,7 +113,7 @@ public class RectHitbox extends Hitbox {
     public float getZ() {
         return linkedSystem.getCoordZ();
     }
-
+    //todo rotations :P:P:P:P
     @Override
     public boolean collides(float x, float y, float z) {
         return x >= minX + getX() && x <= maxX + getX() &&
@@ -149,18 +156,17 @@ public class RectHitbox extends Hitbox {
 
     @Override
     public void getContactNormal(float x, float y, float z, float[] dest) {
-        float deX = getX() - x;
-        float deY = getY() - y;
-        float deZ = getZ() - z;
-
-        Arrays.fill(dest,0);
-        if(deX > deY && deX > deZ){
-            dest[0] = deX;
-        } else if (deY > deX && deY > deZ){
-            dest[1] = deY;
+        getTranslatedVector(x,y,z,bufferVec3);
+        float rX = maxX - minX, rY = maxY - minY, rZ = maxZ - minZ;
+        float absX = Math.abs(bufferVec3[0]);
+        float abxY = Math.abs(bufferVec3[1]);
+        float absZ = Math.abs(bufferVec3[2]);
+        if(absX > abxY && absX > absZ){
+            dest[0] = 0;
+        } else if (abxY > absX && abxY > absZ){
+            dest[1] = 0;
         } else {
-            dest[2] = deZ;
+            dest[2] = 0;
         }
-        VectorTranslator.debugVector(dest);
     }
 }

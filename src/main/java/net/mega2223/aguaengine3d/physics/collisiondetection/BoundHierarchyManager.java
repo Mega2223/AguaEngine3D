@@ -19,6 +19,9 @@ public class BoundHierarchyManager {
     }
 
     public void generate(List<Hitbox> hitboxes){
+        if(hitboxes.size() < 2){
+            return;
+        }
         List<Collidiable> unlinked = new ArrayList<>(hitboxes);
         while(unlinked.size() > 2){
             unlinked.add(linkClosestObjects(unlinked,true));
@@ -27,12 +30,15 @@ public class BoundHierarchyManager {
     }
     /***updates the coordinates of the bouding ranges without changing the chain topografy*/
     public void update(){
+        if(!isPrimeNodeValid()){return;}
         primeNode.updateCoords();
     }
     public void resolveForHitbox(Hitbox hitbox){
-       primeNode.resolveForHitbox(hitbox);
+        if(!isPrimeNodeValid()){return;}
+        primeNode.resolveForHitbox(hitbox);
     }
     public void forceResolveForHitbox(Hitbox hitbox){
+        if(!isPrimeNodeValid()){return;}
         primeNode.resolveForHitbox(hitbox);
     }
 
@@ -59,6 +65,7 @@ public class BoundHierarchyManager {
     }
 
     public boolean checkForCollision(float x, float y, float z){
+        if(!isPrimeNodeValid()){return false;}
         return primeNode.collides(x,y,z);
     }
 
@@ -67,6 +74,7 @@ public class BoundHierarchyManager {
         appendObject(man.primeNode, PREFIX, out);
         System.out.println(out);
     }
+
     private static void appendObject(Collidiable object, String prefix, StringBuilder toAppend){
         if(object instanceof Node){
             Collidiable obj1 = ((Node) object).getN1();
@@ -78,4 +86,6 @@ public class BoundHierarchyManager {
             toAppend.append(prefix).append(object).append("\n");
         }
     }
+
+    protected boolean isPrimeNodeValid(){return primeNode != null;}
 }

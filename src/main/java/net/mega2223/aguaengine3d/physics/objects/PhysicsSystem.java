@@ -166,7 +166,7 @@ public abstract class PhysicsSystem {
     }
 
     public void toLocalCoords(float[] worldspaceCoords){
-        for (int i = 0; i < 3; i++) {worldspaceCoords[i]-=coords[i];}
+        for (int i = 0; i < 3; i++) {worldspaceCoords[i]+=coords[i];}
     }
 
     public Hitbox getBoundHitbox() {
