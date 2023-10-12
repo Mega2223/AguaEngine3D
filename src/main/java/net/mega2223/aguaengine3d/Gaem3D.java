@@ -64,6 +64,7 @@ public class Gaem3D {
     protected static final int D = 512;
     private static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
+    public static float timeToSimulate = 0F;
     static WindowManager manager;
     static PhysicsRenderContext context = new PhysicsRenderContext();
 
@@ -87,6 +88,15 @@ public class Gaem3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_PAGE_UP)==GLFW.GLFW_PRESS){
+                timeToSimulate += 0.01F;
+                timeToSimulate = Math.max(0,Math.min(timeToSimulate,2));
+            }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_PAGE_DOWN)==GLFW.GLFW_PRESS){
+                timeToSimulate -= 0.01F;
+                timeToSimulate = Math.max(0,Math.min(timeToSimulate,2));
+            }
+
         });
 
         //shader dict setup
@@ -136,13 +146,13 @@ public class Gaem3D {
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,cube2Physics);
 
         context.physContext().addForce(new DragForce(0.1F,0.1F));
-        context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
+        //context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
         cube1.physicsHandler().addForce(gravity);
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
 
-        //new RectHitbox(cube.physicsHandler(),-1,-1,-1,1,1,1);
+        new RectHitbox(cube1.physicsHandler(),-1,-1,-1,1,1,1);
         //new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
@@ -150,7 +160,6 @@ public class Gaem3D {
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
                 cube2.physicsHandler().applyForce(.05F,0,0);
-
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
                 cube2.physicsHandler().applyForce(-.05F,0,0);
@@ -163,10 +172,10 @@ public class Gaem3D {
                 cube2.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyTorque(0,1F,0);
+                cube1Physics.applyTorque(0,0,.01F);
             }
         });
-        context.addObject(cube1).addObject(cube2);
+        context.addObject(cube1);//.addObject(cube2);
 
         //physics
 
@@ -192,7 +201,7 @@ public class Gaem3D {
             lastLoop = System.currentTimeMillis();
             if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
+                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ") Sim time: " + timeToSimulate);
                 framesLastSecond = 0;
 
             }
@@ -217,7 +226,7 @@ public class Gaem3D {
     protected static void doRenderLogic() {
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 100.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
-        context.doLogic();
+        context.doLogic(timeToSimulate);
         manager.fitViewport();
         context.doRender(proj);
         RenderingManager.printErrorQueue();

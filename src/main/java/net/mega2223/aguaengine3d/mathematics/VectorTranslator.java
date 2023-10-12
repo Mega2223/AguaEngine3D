@@ -177,7 +177,9 @@ public class VectorTranslator {
 
         float v = 2 * (w * y - x * z);
         double sinp = Math.sqrt(1 + v);
+        sinp = Double.isNaN(sinp) ? 0 : sinp;
         double cosp = Math.sqrt(1 - v);
+        cosp = Double.isNaN(cosp) ? 0 : cosp;
         ret[1] = (float) (2 * Math.atan2(sinp, cosp) - Math.PI / 2);
 
         double siny_cosp = 2 * (w * z + x * y);

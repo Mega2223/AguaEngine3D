@@ -30,9 +30,8 @@ public class RigidBodySystem extends PhysicsSystem {
     private static final float[] bufferM4 = new float[16];
     private static final float[] bufferVec3 = new float[3];
     @Override
-    public void doLogic(float time) { //todo angular dampling
+    public void doLogic(float time) {
         super.doLogic(time);
-
         VectorTranslator.normalize(orientation);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
 
@@ -49,9 +48,12 @@ public class RigidBodySystem extends PhysicsSystem {
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
-
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
-        MatrixTranslator.generateRotationMatrix(rotationMatrix, rotationRadians[0], rotationRadians[1], rotationRadians[2]);
+        MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
+
+        for (int i = 0; i < 3; i++) {
+            coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
+        }
     }
 
     public void setOrientation(float w, float x, float y, float z){
@@ -134,12 +136,17 @@ public class RigidBodySystem extends PhysicsSystem {
 
     @Override
     public void toLocalCoords(float[] worldspaceCoords) {
-        super.toLocalCoords(worldspaceCoords);
         MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,rotationMatrix);
+        super.toLocalCoords(worldspaceCoords);
     }
 
-
-
+    @Override
+    public void toWorldspaceCoords(float[] localCoords) {
+        //the inverse of a rotation matrix is it's transpose
+        MatrixTranslator.getTransposeMatrix4(rotationMatrix,bufferM4);
+        MatrixTranslator.multiplyVec4Mat4(localCoords,bufferM4);
+        super.toWorldspaceCoords(localCoords);
+    }
 
     public float[] getOrientation() {//todo maybe switch to a void and a array argument?
         return orientation.clone();

@@ -57,18 +57,21 @@ public class RectHitbox extends Hitbox {
         if(hitbox == this){return;}
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
+            VectorTranslator.debugVector(linkedSystem.getCoords());
             for (int i = 0; i < 32; i+=4) {
                 bufferVec3[0] = pointBuffer[i];
                 bufferVec3[1]  = pointBuffer[i + 1];
                 bufferVec3[2]  = pointBuffer[i + 2];
-                linkedSystem.toLocalCoords(bufferVec3);
                 VectorTranslator.debugVector(bufferVec3);
+                linkedSystem.toWorldspaceCoords(bufferVec3);
                 float px = bufferVec3[0], py = bufferVec3[1], pz = bufferVec3[2];
+                VectorTranslator.debugVector(bufferVec3);
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
                 act.getContactNormal(px,py,pz,bufferVec3);
-                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
-                //todo custom collision normals
+                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);//todo custom collision normals
+                VectorTranslator.debugVector(bufferVec3);
+
                 if(isRigidBody){
                     CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
                 } else {
@@ -88,9 +91,9 @@ public class RectHitbox extends Hitbox {
                 CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
 
                 if(isRigidBody){
-                    System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
-                    System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
-                    System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
+                    //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
+                    //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
+                    //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
                     CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
                 } else {
                     CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
