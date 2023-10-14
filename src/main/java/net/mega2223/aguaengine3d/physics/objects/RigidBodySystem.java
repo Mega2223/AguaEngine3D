@@ -102,7 +102,6 @@ public class RigidBodySystem extends PhysicsSystem {
         bufferVec3[0] = px; bufferVec3[1] = py; bufferVec3[2] = pz;
         if(!relative){toLocalCoords(bufferVec3);}
         applyForce(fx-bufferVec3[0],fy-bufferVec3[1],fz-bufferVec3[2]);
-        VectorTranslator.debugVector(fx-bufferVec3[0],fy-bufferVec3[1],fz-bufferVec3[2]);
         VectorTranslator.getCrossProduct(bufferVec3,fx,fy,fz,px,py,pz);
         applyTorque(bufferVec3);
     }
@@ -136,8 +135,8 @@ public class RigidBodySystem extends PhysicsSystem {
 
     @Override
     public void toLocalCoords(float[] worldspaceCoords) {
-        MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,rotationMatrix);
         super.toLocalCoords(worldspaceCoords);
+        MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,rotationMatrix);
     }
 
     @Override

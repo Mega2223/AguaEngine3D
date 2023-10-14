@@ -53,12 +53,18 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < accumulatedForce.length; i++) {
             accumulatedForce[i] += force[i];
         }
+        if(force[0]!=0||force[2]!=0){//todo remove this
+            return;
+        }
     }
 
     public void applyForce(float x, float y, float z){
         accumulatedForce[0]+=x;
         accumulatedForce[1]+=y;
         accumulatedForce[2]+=z;
+        if(x!=0||z!=0){//todo remove this
+            return;
+        }
     }
 
     public void applyForceInRelationToMass(float[] force){
@@ -77,12 +83,18 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < velocity.length; i++) {
             velocity[i] += impulse[i];
         }
+        if(impulse[0]!=0||impulse[2]!=0){//todo remove this
+            return;
+        }
     }
 
     public void applyImpulse(float x, float y, float z){
         velocity[0]+=x;
         velocity[1]+=y;
         velocity[2]+=z;
+        if(x!=0||z!=0){//todo remove this
+            return;
+        }
     }
 
     public void addForce(PhysicsForce force){
@@ -146,7 +158,11 @@ public abstract class PhysicsSystem {
         coords[0] += amount[0];
         coords[1] += amount[1];
         coords[2] += amount[2];
-
+    }
+    public void applyTransformation(float x, float y, float z){
+        coords[0] += x;
+        coords[1] += y;
+        coords[2] += z;
     }
 
     private void assureVariablesAreOK(){

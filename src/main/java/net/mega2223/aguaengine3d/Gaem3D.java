@@ -55,6 +55,7 @@ import org.lwjgl.glfw.GLFW;
 * Interaction radius detection interface
 * Object declaration instantiation generation annotation?
 * Standardize array arguments
+* Should each physics context have it's own restitution variable?
 * */
 
 public class Gaem3D {
@@ -97,7 +98,6 @@ public class Gaem3D {
                 timeToSimulate -= 0.01F;
                 timeToSimulate = Math.max(0,Math.min(timeToSimulate,2));
             }
-
         });
 
         //shader dict setup
@@ -160,17 +160,17 @@ public class Gaem3D {
 
         manager.addUpdateEvent(()->{
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){
-                cube2.physicsHandler().applyForce(.05F,0,0);
+                cube1.physicsHandler().applyForce(.05F,0,0);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){
-                cube2.physicsHandler().applyForce(-.05F,0,0);
+                cube1.physicsHandler().applyForce(-.05F,0,0);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){
-                cube2.physicsHandler().applyForce(0,0,-.05F);
+                cube1.physicsHandler().applyForce(0,0,-.05F);
 
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
-                cube2.physicsHandler().applyForce(0,0,.05F);
+                cube1.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
                 cube1Physics.applyForce(0,.1F,0,0,0,0,true);

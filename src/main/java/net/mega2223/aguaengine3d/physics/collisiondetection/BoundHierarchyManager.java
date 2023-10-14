@@ -1,13 +1,11 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy.Collidiable;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy.Node;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class BoundHierarchyManager {

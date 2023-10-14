@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.CollisionSolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
@@ -51,13 +51,12 @@ public class RectHitbox extends Hitbox {
     public void doLogic(float time) {
 
     }
+    static private final float[] contactResolutionBuffer = new float[6];
 
     @Override
     protected void resolveCollision(Hitbox hitbox) {
         if(hitbox == this){return;}
-        ((RigidBodySystem)linkedSystem).getWorldspacePointVelocity(0,0,1,bufferVec2);
-        VectorTranslator.debugVector("SPEED OF PSEUDO-VERTICE: ",bufferVec2);
-
+        Arrays.fill(contactResolutionBuffer,0);
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
             for (int i = 0; i < 32; i+=4) {
@@ -73,13 +72,19 @@ public class RectHitbox extends Hitbox {
                 if(isRigidBody){
                     RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
                     linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
-                    CollisionResolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2],CollisionResolver.DEF_RESTITUTION);
+                    //CollisionSolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
+                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
                 } else {
-                    CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
+                    //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
+                    CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                 }
-                CollisionResolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
-            }
 
+            }
+            linkedSystem.applyTransformation(contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
+            VectorTranslator.debugVector(contactResolutionBuffer);
+            if(isRigidBody){
+                ((RigidBodySystem) linkedSystem).applyTorque(contactResolutionBuffer[3],contactResolutionBuffer[4], contactResolutionBuffer[5]);
+            }
         }
         else if(hitbox instanceof RectHitbox){
             RectHitbox act = (RectHitbox) hitbox;
@@ -90,14 +95,14 @@ public class RectHitbox extends Hitbox {
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
                 act.getContactNormal(px,py,pz, bufferVec);
-                CollisionResolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
+                CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                 if(isRigidBody){
                     //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
                     //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
                     //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
-                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],CollisionResolver.DEF_RESTITUTION);
+                    CollisionSolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
                 } else {
-                    CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
+                    CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
                 }
             }
         }

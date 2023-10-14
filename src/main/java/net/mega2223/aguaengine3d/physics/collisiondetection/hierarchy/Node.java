@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.physics.collisiondetection.hierarchy;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.physics.CollisionResolver;
+import net.mega2223.aguaengine3d.physics.CollisionSolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class Node implements Collidiable {
     public void resolveForHitbox(Hitbox hitbox) {
         float ix = hitbox.getX(), iy = hitbox.getY(), iz = hitbox.getZ(), ir = hitbox.getEffectiveInteractionRadius();
         float px = getX(), py = getY(), pz = getZ(), pr = getEffectiveInteractionRadius();
-        if(CollisionResolver.checkIfSpheresCollide(ix,iy,iz,ir, px, py, pz, pr)){
+        if(CollisionSolver.checkIfSpheresCollide(ix,iy,iz,ir, px, py, pz, pr)){
             n1.resolveForHitbox(hitbox);
             n2.resolveForHitbox(hitbox);
         }
