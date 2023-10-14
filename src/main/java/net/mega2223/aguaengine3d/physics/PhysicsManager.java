@@ -66,5 +66,13 @@ public class PhysicsManager {
         dest[2]=q1[2]+bufferQuaternion2[2]*.5F;
         dest[3]=q1[3]+bufferQuaternion2[3]*.5F;
     }
+    public static void addScaledQuaternions(float[] dest,float q1w, float q1x, float q1y, float q1z, float q2w, float q2x, float q2y, float q2z, float scale){
+        q2w *=scale;q2x *=scale;q2y *=scale;q2z *=scale;
+        PhysicsUtils.multiplyQuaternions(bufferQuaternion2,q2w,q2x,q2y,q2z,q1w,q1x,q1y,q1z);
+        dest[0]=q1w+bufferQuaternion2[0]*.5F;
+        dest[1]=q1x+bufferQuaternion2[1]*.5F;
+        dest[2]=q1y+bufferQuaternion2[2]*.5F;
+        dest[3]=q1z+bufferQuaternion2[3]*.5F;
+    }
 
 }

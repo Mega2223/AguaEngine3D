@@ -149,7 +149,7 @@ public abstract class PhysicsSystem {
 
     }
 
-    protected void assureVariablesAreOK(){
+    private void assureVariablesAreOK(){
         for (int i = 0; i < coords.length; i++) {
             coords[i] = getOkVersion(coords[i]);
         }

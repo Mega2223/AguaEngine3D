@@ -187,12 +187,22 @@ public class VectorTranslator {
         ret[2] = (float) Math.atan2(siny_cosp, cosy_cosp);
     }
 
+    public static void debugVector (String prefix, float... vec){
+        System.out.print(prefix + ": [");
+        for (int i = 0; i < vec.length - 1; i++) {
+            System.out.print(vec[i] + ",");
+        }
+        System.out.print(vec[vec.length-1]+"]\n");
+    }
 
-    public static void debugVector (float[] vec){
+    public static void debugVector (float... vec){
         System.out.print("v: [");
         for (int i = 0; i < vec.length - 1; i++) {
             System.out.print(vec[i] + ",");
         }
         System.out.print(vec[vec.length-1]+"]\n");
     }
+
+
+
 }

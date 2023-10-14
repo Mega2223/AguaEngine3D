@@ -1,16 +1,15 @@
 package net.mega2223.aguaengine3d.physics.objects;
 
-import net.mega2223.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.PhysicsManager;
 import net.mega2223.aguaengine3d.physics.PhysicsUtils;
-import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 
 import java.util.Arrays;
 
 public class RigidBodySystem extends PhysicsSystem {
 
+    protected static final float ANGULAR_MOMENTUM_SCALE_FACTOR = .1F;
     protected final float[] orientation = {1,0,0,0}; //quaterinon that stores the orientation and it's axis
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
@@ -44,7 +43,7 @@ public class RigidBodySystem extends PhysicsSystem {
         rw[2] = spin[1];
         rw[3] = spin[2];
         //VectorTranslator.debugVector(rw);
-        PhysicsManager.addScaledQuaternions(orientation,rw,.1F);
+        PhysicsManager.addScaledQuaternions(orientation,rw, .1F);
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
@@ -61,6 +60,14 @@ public class RigidBodySystem extends PhysicsSystem {
         orientation[1] = x;
         orientation[2] = y;
         orientation[3] = z;
+        VectorTranslator.normalize(orientation);
+    }
+    public void addToOrientation(float x, float y, float z){
+        rw[0] = 0;
+        rw[1] = x;
+        rw[2] = y;
+        rw[3] = z;
+        PhysicsManager.addScaledQuaternions(orientation,rw, ANGULAR_MOMENTUM_SCALE_FACTOR);
         VectorTranslator.normalize(orientation);
     }
 
@@ -92,27 +99,20 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) {
-        float dx = relative ? px : px - coords[0];
-        float dy = relative ? py : py - coords[1];
-        float dz = relative ? pz : pz - coords[2];
-        applyForce(fx-dx,fy-dy,fz-dz);
+        bufferVec3[0] = px; bufferVec3[1] = py; bufferVec3[2] = pz;
+        if(!relative){toLocalCoords(bufferVec3);}
+        applyForce(fx-bufferVec3[0],fy-bufferVec3[1],fz-bufferVec3[2]);
+        VectorTranslator.debugVector(fx-bufferVec3[0],fy-bufferVec3[1],fz-bufferVec3[2]);
         VectorTranslator.getCrossProduct(bufferVec3,fx,fy,fz,px,py,pz);
         applyTorque(bufferVec3);
     }
 
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {
-        float dx = relative ? px : px - coords[0];
-        float dy = relative ? py : py - coords[1];
-        float dz = relative ? pz : pz - coords[2];
-        applyImpulse(ix-dx,iy-dy,iz-dz);
+        bufferVec3[0] = px; bufferVec3[1] = py; bufferVec3[2] = pz;
+        if(!relative){toLocalCoords(bufferVec3);}
+        applyImpulse(ix-bufferVec3[0],iy-bufferVec3[1],iz-bufferVec3[2]);
         VectorTranslator.getCrossProduct(bufferVec3,ix,iy,iz,px,py,pz);
         applySpin(bufferVec3);
-    }
-
-    public void getWorldspacePos(float rx, float ry, float rz, float[] dest){
-        dest[0] = rx;
-        dest[1] = ry;
-        dest[2] = rz;
     }
 
     void getInverseInertiaTensorTranslated(float[] dest){
@@ -159,6 +159,15 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void getRotationMatrix(float[] dest){
         System.arraycopy(rotationMatrix,0,dest,0,16);
+    }
+
+    public void getWorldspacePointVelocity(float px, float py, float pz, float[] dest){
+        dest[0] = px; dest[1] = py; dest[2] = pz;
+        MatrixTranslator.multiplyVec4Mat4(dest,rotationMatrix);
+        VectorTranslator.getCrossProduct(dest,spin,dest);
+        for (int i = 0; i < 3; i++) {
+            dest[i] += velocity[i];
+        }
     }
 
     @Override

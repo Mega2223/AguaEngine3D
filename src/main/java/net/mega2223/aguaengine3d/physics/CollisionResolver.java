@@ -143,11 +143,17 @@ public class CollisionResolver {
     }
 
     public static void resolveCollision(RigidBodySystem obj, float px, float py, float pz, float cnX, float cnY, float cnZ,final float restitution){
-        float vx1 = obj.getVelocityX(), vy1 = obj.getVelocityY(), vz1 = obj.getVelocityZ(),
-                cx1 = obj.getCoordX(), cy1 = obj.getCoordY(), cz1 = obj.getCoordZ();
+        float vx1 = obj.getVelocityX(), vy1 = obj.getVelocityY(), vz1 = obj.getVelocityZ();
+        resolveCollision(obj,px,py,pz,vx1,vy1,vz1,cnX,cnY,cnZ,restitution);
+    }
+    public static void resolveCollision(RigidBodySystem obj, float px, float py, float pz, float vx1, float vy1, float vz1, float cnX, float cnY, float cnZ,final float restitution) {
+        resolveCollision(obj, px, py, pz, vx1, vy1, vz1,0,0,0, cnX, cnY, cnZ, restitution);
+    }
 
-        float separatingVelocity = - PhysicsManager.getClosingVelocity(cx1,cy1,cz1,vx1,vy1,vz1,px,py,pz,0,0,0);
-        if(separatingVelocity >0 ){return;}
+    public static void resolveCollision(RigidBodySystem obj, float px, float py, float pz, float vx1, float vy1, float vz1, float vx2, float vy2, float vz2, float cnX, float cnY, float cnZ,final float restitution){
+        float cx1 = obj.getCoordX(), cy1 = obj.getCoordY(), cz1 = obj.getCoordZ();
+        float separatingVelocity = - PhysicsManager.getClosingVelocity(cx1,cy1,cz1,vx1,vy1,vz1,px,py,pz,vx2,vy2,vz2);
+        if(separatingVelocity > 0){return;}
         float sep = separatingVelocity * restitution;
         float deltaV = sep - separatingVelocity;
         float inverseMass = obj.getInverseMass();
@@ -156,7 +162,7 @@ public class CollisionResolver {
         buffer1[0] = cnX;buffer1[1] = cnY;buffer1[2] = cnZ;
         VectorTranslator.scaleVec3(buffer1,impulse);
         VectorTranslator.scaleVec3(buffer1,obj.getInverseMass());
-        obj.applyImpulse(buffer1[0],buffer1[1],buffer1[2]);
+        obj.applyImpulse(buffer1[0],buffer1[1],buffer1[2],px,py,pz,true);
     }
 
     public static boolean checkIfSpheresCollide(float c1x, float c1y, float c1z, float c1r, float c2x, float c2y, float c2z, float c2r){

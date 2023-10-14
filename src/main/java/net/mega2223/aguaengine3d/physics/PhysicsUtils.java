@@ -60,6 +60,13 @@ public class PhysicsUtils {
         dest[2] = (q2[0]*q1[2] + q2[1]*q1[3] + q2[2]*q1[0] - q2[3]*q1[1]);
         dest[3] = (q2[0]*q1[3] - q2[1]*q1[2] + q2[2]*q1[1] + q2[3]*q1[0]);
     }
+    public static void multiplyQuaternions(float[] dest, float q1w, float q1x, float q1y, float q1z, float q2w, float q2x, float q2y, float q2z){
+        dest[0] = (q2w * q1w - q2x * q1x - q2y * q1y - q2z * q1z);
+        dest[1] = (q2w * q1x + q2x * q1w - q2y * q1z + q2z * q1y);
+        dest[2] = (q2w * q1y + q2x * q1z + q2y * q1w - q2z * q1x);
+        dest[3] = (q2w * q1z - q2x * q1y + q2y * q1x + q2z * q1w);
+    }
+
     public static void radiansToQuaternion(float x, float y, float z, float[] dest) {
         double cr = Math.cos(x* 0.5);
         double sr = Math.sin(x * 0.5);

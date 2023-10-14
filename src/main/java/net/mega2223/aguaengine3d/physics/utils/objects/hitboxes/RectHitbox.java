@@ -5,7 +5,6 @@ import net.mega2223.aguaengine3d.physics.CollisionResolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
-import org.lwjgl.system.CallbackI;
 
 import java.util.Arrays;
 
@@ -13,7 +12,8 @@ public class RectHitbox extends Hitbox {
 
     final float minX, minY, minZ, maxX, maxY, maxZ;
     final float[] pointBuffer = new float[32];
-    private static final float[] bufferVec3 = new float[4];
+    private static final float[] bufferVec = new float[4];
+    private static final float[] bufferVec2 = new float[4];
     float radius;
 
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
@@ -55,31 +55,33 @@ public class RectHitbox extends Hitbox {
     @Override
     protected void resolveCollision(Hitbox hitbox) {
         if(hitbox == this){return;}
+        ((RigidBodySystem)linkedSystem).getWorldspacePointVelocity(0,0,1,bufferVec2);
+        VectorTranslator.debugVector("SPEED OF PSEUDO-VERTICE: ",bufferVec2);
+
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
-            VectorTranslator.debugVector(linkedSystem.getCoords());
             for (int i = 0; i < 32; i+=4) {
-                bufferVec3[0] = pointBuffer[i];
-                bufferVec3[1]  = pointBuffer[i + 1];
-                bufferVec3[2]  = pointBuffer[i + 2];
-                VectorTranslator.debugVector(bufferVec3);
-                linkedSystem.toWorldspaceCoords(bufferVec3);
-                float px = bufferVec3[0], py = bufferVec3[1], pz = bufferVec3[2];
-                VectorTranslator.debugVector(bufferVec3);
+                bufferVec2[0] = pointBuffer[i];
+                bufferVec2[1]  = pointBuffer[i + 1];
+                bufferVec2[2]  = pointBuffer[i + 2];
+                linkedSystem.toWorldspaceCoords(bufferVec2);
+                float px = bufferVec2[0], py = bufferVec2[1], pz = bufferVec2[2];
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
-                act.getContactNormal(px,py,pz,bufferVec3);
-                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);//todo custom collision normals
-                VectorTranslator.debugVector(bufferVec3);
+                act.getContactNormal(px,py,pz, bufferVec);
 
                 if(isRigidBody){
-                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
+                    RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
+                    linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
+                    CollisionResolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2],CollisionResolver.DEF_RESTITUTION);
                 } else {
                     CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
                 }
+                CollisionResolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
             }
+
         }
-        if(hitbox instanceof RectHitbox){
+        else if(hitbox instanceof RectHitbox){
             RectHitbox act = (RectHitbox) hitbox;
             for (int i = 0; i < 32; i+=4) {
                 float px = pointBuffer[i] + getX();
@@ -87,14 +89,13 @@ public class RectHitbox extends Hitbox {
                 float pz = pointBuffer[i + 2] + getZ();
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
-                act.getContactNormal(px,py,pz,bufferVec3);
-                CollisionResolver.resolveConflict(linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],d);
-
+                act.getContactNormal(px,py,pz, bufferVec);
+                CollisionResolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                 if(isRigidBody){
                     //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
                     //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
                     //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
-                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz,bufferVec3[0],bufferVec3[1],bufferVec3[2],CollisionResolver.DEF_RESTITUTION);
+                    CollisionResolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],CollisionResolver.DEF_RESTITUTION);
                 } else {
                     CollisionResolver.resolveCollision(linkedSystem,px,py,pz,CollisionResolver.DEF_RESTITUTION);
                 }
@@ -159,11 +160,11 @@ public class RectHitbox extends Hitbox {
 
     @Override
     public void getContactNormal(float x, float y, float z, float[] dest) {
-        getTranslatedVector(x,y,z,bufferVec3);
+        getTranslatedVector(x,y,z, bufferVec);
         float rX = maxX - minX, rY = maxY - minY, rZ = maxZ - minZ;
-        float absX = Math.abs(bufferVec3[0]);
-        float abxY = Math.abs(bufferVec3[1]);
-        float absZ = Math.abs(bufferVec3[2]);
+        float absX = Math.abs(bufferVec[0]);
+        float abxY = Math.abs(bufferVec[1]);
+        float absZ = Math.abs(bufferVec[2]);
         if(absX > abxY && absX > absZ){
             dest[0] = 0;
         } else if (abxY > absX && abxY > absZ){

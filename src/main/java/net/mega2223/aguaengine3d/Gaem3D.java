@@ -54,6 +54,7 @@ import org.lwjgl.glfw.GLFW;
 * Denote static buffers explicitly as static?
 * Interaction radius detection interface
 * Object declaration instantiation generation annotation?
+* Standardize array arguments
 * */
 
 public class Gaem3D {
@@ -152,7 +153,7 @@ public class Gaem3D {
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
 
-        new RectHitbox(cube1.physicsHandler(),-1,-1,-1,1,1,1);
+        RectHitbox cube1Hitbox =  new RectHitbox(cube1.physicsHandler(),-1,-1,-1,1,1,1);
         //new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
@@ -172,8 +173,13 @@ public class Gaem3D {
                 cube2.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyTorque(0,0,.01F);
+                cube1Physics.applyForce(0,.1F,0,0,0,0,true);
             }
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
+                //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
+                cube1Physics.applyTorque(0.1F,0,0);
+            }
+
         });
         context.addObject(cube1);//.addObject(cube2);
 
