@@ -11,12 +11,14 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
+import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.logic.RigidBodyAggregate;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.physics.PhysicsUtils;
 import net.mega2223.aguaengine3d.physics.objects.*;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
@@ -66,12 +68,14 @@ public class Gaem3D {
     protected static final int D = 512;
     private static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
-    public static float timeToSimulate = 1F;
+    public static float timeToSimulate = .00001F;
     static WindowManager manager;
     static PhysicsRenderContext context = new PhysicsRenderContext();
 
     static float[] trans = new float[16];
     static float[] proj = new float[16];
+
+    static RigidBodyAggregate test;
 
     public static void main(String[] args) {
 
@@ -130,9 +134,9 @@ public class Gaem3D {
         );
         TexturedModel referenceCube = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
         );
-        referenceCube.setCoords(0,16F,3);
+        referenceCube.setCoords(0,4f,3);
         //context.addObject(referenceCube);
 
         //physics
@@ -140,23 +144,26 @@ public class Gaem3D {
         ConstantForce gravity = new ConstantForce(0, -.01F, 0);
 
         RigidBodySystem cube1Physics = new RigidBodySystem(1,new float[9]);
-        cube1Physics.setCoords(0,3,0);
+        cube1Physics.setCoords(0,4,0);
+        cube1Physics.setOrientation(1,0,.5F,.5F);
         RigidBodySystem cube2Physics = new RigidBodySystem(1,new float[9]);
 
         RigidBodyAggregate cube1 = new RigidBodyAggregate(cubeModel,cube1Physics);
+        test = cube1;
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,cube2Physics);
 
-        //context.physContext().addForce(new DragForce(0.1F,0.1F));
+        context.physContext().addForce(new DragForce(0.1F,1.1F));
+        context.addObject(referenceCube);
         //context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
-        //cube1.physicsHandler().addForce(gravity);
+        cube1.physicsHandler().addForce(gravity);
         //cube1Physics.setOrientation(1,0,-1,-0.5F);
 
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
 
         RectHitbox cube1Hitbox =  new RectHitbox(cube1.physicsHandler(),-1,-1,-1,1,1,1);
-        //new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
+        new RectHitbox(cube2.physicsHandler(),-1,-1,-1,1,1,1);
 
         context.physContext().getCollisionEnviroment().addHitbox(new AxisParallelPlaneHitbox(0));
 
@@ -169,17 +176,16 @@ public class Gaem3D {
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){
                 cube1.physicsHandler().applyForce(0,0,-.05F);
-
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){
                 cube1.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyForce(0,.1F,0,0,0,0.1F,true);
+                cube1Physics.applyForce(0,1,0,0,0,0.3F,true,false);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
-                cube1Physics.applyForce(0,0.1F,0,0,0f,0.1F,false);
+                cube1Physics.applyForce(0,1,0,0,0,0.3F,true,true);
             }
 
         });
@@ -228,7 +234,7 @@ public class Gaem3D {
     }
 
     protected static void doLogic() {
-
+        //test.physicsHandler().applyTransformation();
     }
 
     protected static void doRenderLogic() {

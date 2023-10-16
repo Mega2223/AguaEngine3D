@@ -49,14 +49,13 @@ public class CollisionSolver {
         float angularInertia = linearInertia;//todo
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
-        obj1.applyForce(0,1,0,buffer1[0],buffer1[1],buffer1[2]);
-//        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
+        obj1.applyForce(cnX/100,cnY/100,cnZ/100,buffer1[0],buffer1[1],buffer1[2],true,false);
+        //VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
 //        VectorTranslator.scaleVec3(buffer2,1);
 //        VectorTranslator.flipVector(buffer2);
 //        obj1.applyOrientationTransform(buffer2[0],buffer2[1], buffer2[2]);
-        VectorTranslator.debugVector("CONTACT RELATIVE: ",buffer1);
-        VectorTranslator.debugVector("RESOLUTION: ",buffer2);
-        VectorTranslator.debugVector("CONTACT NORMAL:",cnX,cnY,cnZ);
+       VectorTranslator.debugVector("FORÇA:",cnX,cnY,cnZ);
+       VectorTranslator.debugVector("EM:",buffer1);
         //System.exit(0);
     }
 
@@ -91,7 +90,7 @@ public class CollisionSolver {
         VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer1);
         dest[0] +=  buffer1[0]; dest[1] += buffer1[1]; dest[2] += buffer2[2];
-        float angularInertia = linearInertia*1.00000005960464478F;//todo remember innertia tensors? lol
+        float angularInertia = linearInertia*1.0000000596046447754F;//todo remember innertia tensors? lol
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
         VectorTranslator.debugVector("LOCAL VERTEX:",buffer1);

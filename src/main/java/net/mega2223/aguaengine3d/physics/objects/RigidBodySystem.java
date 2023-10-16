@@ -37,7 +37,7 @@ public class RigidBodySystem extends PhysicsSystem {
 
         for (int i = 0; i < 3; i++) {
             spin[i] += accumulatedAngularTransformations[i];
-            spin[i] += accumulatedTorque[i];
+            spin[i] += accumulatedTorque[i] * time;
         }
 
         rw[0] = 0;
@@ -95,17 +95,27 @@ public class RigidBodySystem extends PhysicsSystem {
     //therefore there's no need to override the method
 
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz){
-        applyForce(fx,fy,fz,px,py,pz,true);
+        applyForce(fx,fy,fz,px,py,pz,true,true);
     }
 
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) { //FIXME
-        bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
-        if(!relative){
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relativeCoords, boolean relativeForce) { //FIXME
+        if(!relativeCoords){
+            bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz; bufferVec[3] = 0;
             toLocalCoords(bufferVec);
+            px = bufferVec[0]; py = bufferVec[1]; pz = bufferVec[2];
         }
-        //applyForce(fx*bufferVec3[0],fy*bufferVec3[1],fz*bufferVec3[2]);
-        VectorTranslator.debugVector("ROT:",bufferVec);
-        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,bufferVec[0],bufferVec[1],bufferVec[2]);
+        if(!relativeForce){
+            bufferVec[0] = fx; bufferVec[1] = fy; bufferVec[2] = fz; bufferVec[3] = 0;
+            toLocalCoords(bufferVec);
+            fx = bufferVec[0]; fy = bufferVec[1]; fz = bufferVec[2];
+        }
+
+        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
+        float ffx = bufferVec[0] - Math.min(Math.abs(px), bufferVec[0]);
+        float ffy = bufferVec[1] - Math.min(Math.abs(py), bufferVec[1]);
+        float ffz = bufferVec[2] - Math.min(Math.abs(pz), bufferVec[2]);
+        //VectorTranslator.debugVector("FF",ffx,ffy,ffz);
+        //applyForce(ffx, ffy, ffz);
         //System.out.println("FX: " + fx + " FY: " + fy + "FZ: " + fz + " PX: " + px + "PY: " + px + " PZ: " + pz);
         VectorTranslator.debugVector("ROT:",bufferVec);
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
