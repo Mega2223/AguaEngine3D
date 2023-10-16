@@ -13,6 +13,7 @@ public class RigidBodySystem extends PhysicsSystem {
     protected final float[] orientation = {1,0,0,0}; //quaterinon that stores the orientation and it's axis
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
+    protected final float[] accumulatedAngularTransformations = new float[3];
     protected final float[] inverseInnertialTensor = new float[9];
 
     public RigidBodySystem(float mass, float[] innertialTensor) {
@@ -27,7 +28,7 @@ public class RigidBodySystem extends PhysicsSystem {
 
     //static variables meant to be used for physics calculations
     private static final float[] bufferM4 = new float[16];
-    private static final float[] bufferVec3 = new float[3];
+    private static final float[] bufferVec = new float[4];
     @Override
     public void doLogic(float time) {
         super.doLogic(time);
@@ -35,6 +36,7 @@ public class RigidBodySystem extends PhysicsSystem {
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
 
         for (int i = 0; i < 3; i++) {
+            spin[i] += accumulatedAngularTransformations[i];
             spin[i] += accumulatedTorque[i];
         }
 
@@ -53,6 +55,7 @@ public class RigidBodySystem extends PhysicsSystem {
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
+        Arrays.fill(accumulatedAngularTransformations,0);
     }
 
     public void setOrientation(float w, float x, float y, float z){
@@ -62,13 +65,10 @@ public class RigidBodySystem extends PhysicsSystem {
         orientation[3] = z;
         VectorTranslator.normalize(orientation);
     }
-    public void addToOrientation(float x, float y, float z){
-        rw[0] = 0;
-        rw[1] = x;
-        rw[2] = y;
-        rw[3] = z;
-        PhysicsManager.addScaledQuaternions(orientation,rw, ANGULAR_MOMENTUM_SCALE_FACTOR);
-        VectorTranslator.normalize(orientation);
+    public void applyOrientationTransform(float x, float y, float z){
+        accumulatedAngularTransformations[0]+=x;
+        accumulatedAngularTransformations[1]+=y;
+        accumulatedAngularTransformations[2]+=z;
     }
 
     public void applyTorque(float x, float y, float z){
@@ -98,20 +98,25 @@ public class RigidBodySystem extends PhysicsSystem {
         applyForce(fx,fy,fz,px,py,pz,true);
     }
 
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) {
-        bufferVec3[0] = px; bufferVec3[1] = py; bufferVec3[2] = pz;
-        if(!relative){toLocalCoords(bufferVec3);}
-        applyForce(fx-bufferVec3[0],fy-bufferVec3[1],fz-bufferVec3[2]);
-        VectorTranslator.getCrossProduct(bufferVec3,fx,fy,fz,px,py,pz);
-        applyTorque(bufferVec3);
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relative) { //FIXME
+        bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
+        if(!relative){
+            toLocalCoords(bufferVec);
+        }
+        //applyForce(fx*bufferVec3[0],fy*bufferVec3[1],fz*bufferVec3[2]);
+        VectorTranslator.debugVector("ROT:",bufferVec);
+        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,bufferVec[0],bufferVec[1],bufferVec[2]);
+        //System.out.println("FX: " + fx + " FY: " + fy + "FZ: " + fz + " PX: " + px + "PY: " + px + " PZ: " + pz);
+        VectorTranslator.debugVector("ROT:",bufferVec);
+        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
     }
 
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {
-        bufferVec3[0] = px; bufferVec3[1] = py; bufferVec3[2] = pz;
-        if(!relative){toLocalCoords(bufferVec3);}
-        applyImpulse(ix-bufferVec3[0],iy-bufferVec3[1],iz-bufferVec3[2]);
-        VectorTranslator.getCrossProduct(bufferVec3,ix,iy,iz,px,py,pz);
-        applySpin(bufferVec3);
+        bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
+        if(!relative){toLocalCoords(bufferVec);}
+        applyImpulse(ix- bufferVec[0],iy- bufferVec[1],iz- bufferVec[2]);
+        VectorTranslator.getCrossProduct(bufferVec,ix,iy,iz,px,py,pz);
+        applySpin(bufferVec);
     }
 
     void getInverseInertiaTensorTranslated(float[] dest){

@@ -11,6 +11,7 @@ public abstract class PhysicsSystem {
     protected final float[] coords = new float[4];
     protected final float[] velocity = new float[3];
     protected final float[] accumulatedForce = new float[3];
+    protected final float[] accumulatedTranslations = new float[3];
     protected final float inverseMass;
 
     List<PhysicsForce> forces = new ArrayList<>(10); //fixme not performant
@@ -32,10 +33,12 @@ public abstract class PhysicsSystem {
         //assureVariablesAreOK(); not necessary as long as no forces generate a NaN value
         for(PhysicsForce act : forces){act.update(this,time);}
         for (int i = 0; i < 3; i++) {
+            coords[i]+=accumulatedTranslations[i];
             coords[i] += velocity[i]* time;
             velocity[i] += accumulatedForce[i];
         }
         Arrays.fill(accumulatedForce,0);
+        Arrays.fill(accumulatedTranslations,0);
     }
 
     public float getInverseMass(){
@@ -53,18 +56,12 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < accumulatedForce.length; i++) {
             accumulatedForce[i] += force[i];
         }
-        if(force[0]!=0||force[2]!=0){//todo remove this
-            return;
-        }
     }
 
     public void applyForce(float x, float y, float z){
         accumulatedForce[0]+=x;
         accumulatedForce[1]+=y;
         accumulatedForce[2]+=z;
-        if(x!=0||z!=0){//todo remove this
-            return;
-        }
     }
 
     public void applyForceInRelationToMass(float[] force){
@@ -83,18 +80,12 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < velocity.length; i++) {
             velocity[i] += impulse[i];
         }
-        if(impulse[0]!=0||impulse[2]!=0){//todo remove this
-            return;
-        }
     }
 
     public void applyImpulse(float x, float y, float z){
         velocity[0]+=x;
         velocity[1]+=y;
         velocity[2]+=z;
-        if(x!=0||z!=0){//todo remove this
-            return;
-        }
     }
 
     public void addForce(PhysicsForce force){
@@ -144,25 +135,25 @@ public abstract class PhysicsSystem {
     }
 
     public void applyTransformationX(float amount){
-        coords[0] += amount;
+        accumulatedTranslations[0] += amount;
     }
 
     public void applyTransformationY(float amount){
-        coords[1] += amount;
+        accumulatedTranslations[1] += amount;
     }
 
     public void applyTransformationZ(float amount){
-        coords[2] += amount;
+        accumulatedTranslations[2] += amount;
     }
     public void applyTransformation(float[] amount){
-        coords[0] += amount[0];
-        coords[1] += amount[1];
-        coords[2] += amount[2];
+        accumulatedTranslations[0] += amount[0];
+        accumulatedTranslations[1] += amount[1];
+        accumulatedTranslations[2] += amount[2];
     }
     public void applyTransformation(float x, float y, float z){
-        coords[0] += x;
-        coords[1] += y;
-        coords[2] += z;
+        accumulatedTranslations[0] += x;
+        accumulatedTranslations[1] += y;
+        accumulatedTranslations[2] += z;
     }
 
     private void assureVariablesAreOK(){

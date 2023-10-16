@@ -19,11 +19,11 @@ public class CollisionEnviroment {
         if(hierarchyManager.primeNode == null){
             hierarchyManager.generate(hitboxes);
         }
-        for (int i = 0; i < hitboxes.size(); i++) {
-            hitboxes.get(i).doLogic(time);
-            hierarchyManager.forceResolveForHitbox(hitboxes.get(i));
-        }
         hierarchyManager.update();
+        for (int i = 0; i < hitboxes.size(); i++) {
+            hierarchyManager.forceResolveForHitbox(hitboxes.get(i));
+            hitboxes.get(i).doLogic(time);
+        }
     }
 
     public void updateTopografy(){

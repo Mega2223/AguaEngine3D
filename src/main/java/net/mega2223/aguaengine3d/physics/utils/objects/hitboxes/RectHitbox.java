@@ -1,6 +1,5 @@
 package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.CollisionSolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
@@ -73,17 +72,16 @@ public class RectHitbox extends Hitbox {
                     RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
                     linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
                     //CollisionSolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
-                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
+                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                 } else {
                     //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
                     CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                 }
 
             }
-            linkedSystem.applyTransformation(contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
-            VectorTranslator.debugVector(contactResolutionBuffer);
             if(isRigidBody){
-                ((RigidBodySystem) linkedSystem).applyTorque(contactResolutionBuffer[3],contactResolutionBuffer[4], contactResolutionBuffer[5]);
+                ((RigidBodySystem) linkedSystem).applyTransformation(contactResolutionBuffer);
+                //((RigidBodySystem) linkedSystem).applyOrientationTransform(contactResolutionBuffer[3], contactResolutionBuffer[4], contactResolutionBuffer[5]);
             }
         }
         else if(hitbox instanceof RectHitbox){

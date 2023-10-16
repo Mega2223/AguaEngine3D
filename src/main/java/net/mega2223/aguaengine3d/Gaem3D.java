@@ -66,7 +66,7 @@ public class Gaem3D {
     protected static final int D = 512;
     private static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
-    public static float timeToSimulate = 0F;
+    public static float timeToSimulate = 1F;
     static WindowManager manager;
     static PhysicsRenderContext context = new PhysicsRenderContext();
 
@@ -146,10 +146,12 @@ public class Gaem3D {
         RigidBodyAggregate cube1 = new RigidBodyAggregate(cubeModel,cube1Physics);
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,cube2Physics);
 
-        context.physContext().addForce(new DragForce(0.1F,0.1F));
+        //context.physContext().addForce(new DragForce(0.1F,0.1F));
         //context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
-        cube1.physicsHandler().addForce(gravity);
+        //cube1.physicsHandler().addForce(gravity);
+        //cube1Physics.setOrientation(1,0,-1,-0.5F);
+
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
 
@@ -173,11 +175,11 @@ public class Gaem3D {
                 cube1.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyForce(0,.1F,0,0,0,0,true);
+                cube1Physics.applyForce(0,.1F,0,0,0,0.1F,true);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
-                cube1Physics.applyTorque(0.1F,0,0);
+                cube1Physics.applyForce(0,0.1F,0,0,0f,0.1F,false);
             }
 
         });

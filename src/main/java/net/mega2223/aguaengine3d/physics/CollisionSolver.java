@@ -6,7 +6,7 @@ import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
 
 public class CollisionSolver {
 
-    public static final float DEF_RESTITUTION = .9F;
+    public static final float DEF_RESTITUTION = .999F;
 
     private CollisionSolver(){} //TODO deltaT variable
 
@@ -49,33 +49,17 @@ public class CollisionSolver {
         float angularInertia = linearInertia;//todo
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
-        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
-        VectorTranslator.scaleVec3(buffer2,1);
-        VectorTranslator.flipVector(buffer2);
-        obj1.addToOrientation(buffer2[0],buffer2[1], buffer2[2]);
+        obj1.applyForce(0,1,0,buffer1[0],buffer1[1],buffer1[2]);
+//        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
+//        VectorTranslator.scaleVec3(buffer2,1);
+//        VectorTranslator.flipVector(buffer2);
+//        obj1.applyOrientationTransform(buffer2[0],buffer2[1], buffer2[2]);
         VectorTranslator.debugVector("CONTACT RELATIVE: ",buffer1);
         VectorTranslator.debugVector("RESOLUTION: ",buffer2);
         VectorTranslator.debugVector("CONTACT NORMAL:",cnX,cnY,cnZ);
         //System.exit(0);
     }
-    public static void resolveConflict(RigidBodySystem obj1, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float[] dest){
-        if(confDepth <= 0){return;}
-        float invMass = obj1.getInverseMass();
-        if(invMass <= 0){return;}
-        buffer1[0] = cnX;buffer1[1] = cnY;buffer1[2] = cnZ;
-        float linearInertia = -confDepth / invMass * .5F;
-        VectorTranslator.scaleVec3(buffer1, linearInertia);
-        VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
-        VectorTranslator.flipVector(buffer1);
-        dest[0] +=  buffer1[0]; dest[1] += buffer1[1]; dest[2] += buffer2[2];
-        float angularInertia = linearInertia;//todo remember innertia tensors? lol
-        buffer1[0] += pX; buffer1[1] += pY; buffer1[2] += pZ;
-        obj1.toLocalCoords(buffer1);
-        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
-        VectorTranslator.scaleVec3(buffer2,1);
-        VectorTranslator.flipVector(buffer2);
-        dest[3] += buffer2[0]; dest[4] += buffer2[1]; dest[5] += buffer2[2];
-    }
+
 
     public static void resolveConflict(PhysicsSystem obj1, PhysicsSystem obj2, final float confDepth){
         if(confDepth <= 0){return;}
@@ -97,7 +81,7 @@ public class CollisionSolver {
         obj2.applyTransformation(buffer2);
     }
 
-    public static void resolveConflict(float inverseMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth){
+    public static void resolveConflict(RigidBodySystem obj1, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float[] dest){
         if(confDepth <= 0){return;}
         float invMass = obj1.getInverseMass();
         if(invMass <= 0){return;}
@@ -106,19 +90,17 @@ public class CollisionSolver {
         VectorTranslator.scaleVec3(buffer1, linearInertia);
         VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer1);
-        obj1.applyTransformation(buffer1);
-
-        float angularInertia = linearInertia;//todo
+        dest[0] +=  buffer1[0]; dest[1] += buffer1[1]; dest[2] += buffer2[2];
+        float angularInertia = linearInertia*1.00000005960464478F;//todo remember innertia tensors? lol
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
+        VectorTranslator.debugVector("LOCAL VERTEX:",buffer1);
         VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
         VectorTranslator.scaleVec3(buffer2,1);
         VectorTranslator.flipVector(buffer2);
-        obj1.addToOrientation(buffer2[0],buffer2[1], buffer2[2]);
-        VectorTranslator.debugVector("CONTACT RELATIVE: ",buffer1);
-        VectorTranslator.debugVector("RESOLUTION: ",buffer2);
-        VectorTranslator.debugVector("CONTACT NORMAL:",cnX,cnY,cnZ);
-        //System.exit(0);
+        VectorTranslator.debugVector("RESULTING ROTATION:",buffer2);
+        dest[3] += buffer2[0]; dest[4] += buffer2[1]; dest[5] += buffer2[2];
+
     }
 
     public static void resolveCollision(PhysicsSystem obj1, float px, float py, float pz, final float restitution){
