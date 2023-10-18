@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics;
 
+import net.mega2223.aguaengine3d.Gaem3D;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
 import net.mega2223.aguaengine3d.physics.objects.RigidBodySystem;
@@ -40,23 +41,18 @@ public class CollisionSolver {
         float invMass = obj1.getInverseMass();
         if(invMass <= 0){return;}
         buffer1[0] = cnX;buffer1[1] = cnY;buffer1[2] = cnZ;
-        float linearInertia = -confDepth / invMass * .5F;
-        VectorTranslator.scaleVec3(buffer1, linearInertia);
+        float linearInertia = -confDepth / invMass;
+        VectorTranslator.scaleVec3(buffer1, linearInertia*0.75F);
+        Gaem3D.lookTest[0] = pX;
+        Gaem3D.lookTest[1] = pY;
+        Gaem3D.lookTest[2] = pZ;
         VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer1);
         obj1.applyTransformation(buffer1);
+        VectorTranslator.getCrossProduct(buffer2,pX,pY,pZ,cnX,cnY,cnZ);
+        //obj1.applyForce(0,0.1F,0,0,0F,0.1F);
+        VectorTranslator.debugVector("CONTACT NORMAL:",cnX,cnY,cnZ);
 
-        float angularInertia = linearInertia;//todo
-        buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
-        obj1.toLocalCoords(buffer1);
-        obj1.applyForce(cnX/100,cnY/100,cnZ/100,buffer1[0],buffer1[1],buffer1[2],true,false);
-        //VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
-//        VectorTranslator.scaleVec3(buffer2,1);
-//        VectorTranslator.flipVector(buffer2);
-//        obj1.applyOrientationTransform(buffer2[0],buffer2[1], buffer2[2]);
-       VectorTranslator.debugVector("FORÇA:",cnX,cnY,cnZ);
-       VectorTranslator.debugVector("EM:",buffer1);
-        //System.exit(0);
     }
 
 
@@ -93,12 +89,11 @@ public class CollisionSolver {
         float angularInertia = linearInertia*1.0000000596046447754F;//todo remember innertia tensors? lol
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
-        VectorTranslator.debugVector("LOCAL VERTEX:",buffer1);
-        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
-        VectorTranslator.scaleVec3(buffer2,1);
-        VectorTranslator.flipVector(buffer2);
-        VectorTranslator.debugVector("RESULTING ROTATION:",buffer2);
-        dest[3] += buffer2[0]; dest[4] += buffer2[1]; dest[5] += buffer2[2];
+        dest[3] += buffer1[0]; dest[4] += buffer1[1]; dest[5] += buffer1[2];
+//        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
+//        VectorTranslator.scaleVec3(buffer2,1);
+//        VectorTranslator.flipVector(buffer2);
+//        dest[3] += buffer2[0]; dest[4] += buffer2[1]; dest[5] += buffer2[2];
 
     }
 

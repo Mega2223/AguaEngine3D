@@ -1,5 +1,7 @@
 package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.CollisionSolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
@@ -13,6 +15,7 @@ public class RectHitbox extends Hitbox {
     final float[] pointBuffer = new float[32];
     private static final float[] bufferVec = new float[4];
     private static final float[] bufferVec2 = new float[4];
+    private static final float[] bufferM4 = new float[16];
     float radius;
 
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
@@ -56,6 +59,7 @@ public class RectHitbox extends Hitbox {
     protected void resolveCollision(Hitbox hitbox) {
         if(hitbox == this){return;}
         Arrays.fill(contactResolutionBuffer,0);
+        float contacts = 0;
         if(hitbox instanceof AxisParallelPlaneHitbox){
             AxisParallelPlaneHitbox  act = (AxisParallelPlaneHitbox) hitbox;
             for (int i = 0; i < 32; i+=4) {
@@ -66,22 +70,18 @@ public class RectHitbox extends Hitbox {
                 float px = bufferVec2[0], py = bufferVec2[1], pz = bufferVec2[2];
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
+                contacts+=1F;
                 act.getContactNormal(px,py,pz, bufferVec);
-
                 if(isRigidBody){
                     RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
                     linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
                     //CollisionSolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
-                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
+                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
                 } else {
                     //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
-                    CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
+                    //CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
                 }
 
-            }
-            if(isRigidBody){
-                ((RigidBodySystem) linkedSystem).applyTransformation(contactResolutionBuffer);
-                //((RigidBodySystem) linkedSystem).applyOrientationTransform(contactResolutionBuffer[3], contactResolutionBuffer[4], contactResolutionBuffer[5]);
             }
         }
         else if(hitbox instanceof RectHitbox){
@@ -104,6 +104,16 @@ public class RectHitbox extends Hitbox {
                 }
             }
         }
+        bufferVec[0] = contacts == 0 ? contactResolutionBuffer[3] : contactResolutionBuffer[3]/contacts;
+        bufferVec[1] = contacts == 0 ? contactResolutionBuffer[4] : contactResolutionBuffer[4]/contacts;
+        bufferVec[2] = contacts == 0 ? contactResolutionBuffer[5] : contactResolutionBuffer[5]/contacts;
+        bufferVec[3] = 0;
+        ((RigidBodySystem)linkedSystem).getRotationMatrix(bufferM4);
+        MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
+        VectorTranslator.scaleVec3(bufferVec,10);
+        ((RigidBodySystem)linkedSystem).applyRotationTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
+
+        VectorTranslator.debugVector("RESOLUTION",contactResolutionBuffer);
     }
 
     @Override

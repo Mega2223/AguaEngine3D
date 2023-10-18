@@ -1,20 +1,14 @@
 package net.mega2223.aguaengine3d;
 
 
-import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.BitmapFont;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.TextManipulator;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
-import net.mega2223.aguaengine3d.logic.ModelPhysicsAggregate;
 import net.mega2223.aguaengine3d.logic.RigidBodyAggregate;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.logic.PhysicsRenderContext;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -22,10 +16,8 @@ import net.mega2223.aguaengine3d.physics.PhysicsUtils;
 import net.mega2223.aguaengine3d.physics.objects.*;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.ConstantForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.forces.DragForce;
-import net.mega2223.aguaengine3d.physics.utils.objects.forces.SpringForce;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.AxisParallelPlaneHitbox;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.RectHitbox;
-import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.SphereHitbox;
 import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings({"unused"})
@@ -58,6 +50,7 @@ import org.lwjgl.glfw.GLFW;
 * Object declaration instantiation generation annotation?
 * Standardize array arguments
 * Should each physics context have it's own restitution variable?
+* Static function that creates objects with bound buffers
 * */
 
 public class Gaem3D {
@@ -66,7 +59,7 @@ public class Gaem3D {
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     protected static final String TITLE = "3 DIMENSÇÕES";
     protected static final int D = 512;
-    private static final float[] camera = {0, .9f, 0, 0};
+    public static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
     public static float timeToSimulate = .00001F;
     static WindowManager manager;
@@ -122,7 +115,7 @@ public class Gaem3D {
 
         TexturedModel cubeModel = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\DEBUG.png")
         );
         TexturedModel cubeModel2 = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
@@ -134,7 +127,7 @@ public class Gaem3D {
         );
         TexturedModel referenceCube = TexturedModel.loadTexturedModel(
                 Utils.readFile(Utils.MODELS_DIR + "\\cube.obj").split("\n"), new TextureShaderProgram(),
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\DEBUG.png")
         );
         referenceCube.setCoords(0,4f,3);
         //context.addObject(referenceCube);
@@ -157,7 +150,9 @@ public class Gaem3D {
         //context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
         cube1.physicsHandler().addForce(gravity);
-        //cube1Physics.setOrientation(1,0,-1,-0.5F);
+        float[] test = new float[4];
+        PhysicsUtils.radiansToQuaternion(0,1,0,test);
+        cube1Physics.setOrientation(test[0],test[1],test[2],test[3]);
 
         cube2.physicsHandler().addForce(gravity);
         cube2.physicsHandler().setCoordX(5);
@@ -181,11 +176,11 @@ public class Gaem3D {
                 cube1.physicsHandler().applyForce(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyForce(0,1,0,0,0,0.3F,true,false);
+                cube1Physics.applyForce(0,1,0,0,0,0.3F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
-                cube1Physics.applyForce(0,1,0,0,0,0.3F,true,true);
+                cube1Physics.applyForce(0,1,0,0,0,0.3F);
             }
 
         });
@@ -233,13 +228,21 @@ public class Gaem3D {
         }
     }
 
+    static float[] f =  {0,0.1F,0,0};
+    static float[] c = {0,0,.1F};
+    static float[] fb = new float[4];
+    static float[] rm = new float[16];
     protected static void doLogic() {
-        //test.physicsHandler().applyTransformation();
+//        ((RigidBodySystem)test.physicsHandler()).getRotationMatrix(rm);
+//        MatrixTranslator.multiplyVec4Mat4(f,rm, fb);
+//        ((RigidBodySystem)test.physicsHandler()).applyForce(fb[0],fb[1],fb[2],c[0],c[1],c[2]);
     }
-
+    public static float[] lookTest = {0,0,0};
     protected static void doRenderLogic() {
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 100.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
+        //MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
+        MatrixTranslator.applyLookTransformation(proj,camera,lookTest[0],lookTest[1],lookTest[2]);
+
         context.doLogic(timeToSimulate);
         manager.fitViewport();
         context.doRender(proj);

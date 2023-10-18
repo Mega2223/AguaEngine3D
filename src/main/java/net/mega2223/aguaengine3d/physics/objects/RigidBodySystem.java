@@ -41,21 +41,22 @@ public class RigidBodySystem extends PhysicsSystem {
         }
 
         rw[0] = 0;
-        rw[1] = spin[0];
-        rw[2] = spin[1];
-        rw[3] = spin[2];
+        rw[1] = spin[0]*time;
+        rw[2] = spin[1]*time;
+        rw[3] = spin[2]*time;
         //VectorTranslator.debugVector(rw);
         PhysicsManager.addScaledQuaternions(orientation,rw, .1F);
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
+        Arrays.fill(accumulatedAngularTransformations,0);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
         MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
 
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
-        Arrays.fill(accumulatedAngularTransformations,0);
+
     }
 
     public void setOrientation(float w, float x, float y, float z){
@@ -94,31 +95,25 @@ public class RigidBodySystem extends PhysicsSystem {
     //forces that do not have any specific point will be treated as appiled to the center of mass
     //therefore there's no need to override the method
 
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz){
-        applyForce(fx,fy,fz,px,py,pz,true,true);
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz) { //FIXME position not going quite well tbh
+        VectorTranslator.debugVector("APPLYING",fx,fy,fz);
+        VectorTranslator.debugVector("AT",px,py,pz);
+        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz); //todo ?
+        float ffx = bufferVec[0] - px;
+        float ffy = bufferVec[1] - py;
+        float ffz = bufferVec[2] - pz;
+        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
     }
 
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz, boolean relativeCoords, boolean relativeForce) { //FIXME
-        if(!relativeCoords){
-            bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz; bufferVec[3] = 0;
-            toLocalCoords(bufferVec);
-            px = bufferVec[0]; py = bufferVec[1]; pz = bufferVec[2];
-        }
-        if(!relativeForce){
-            bufferVec[0] = fx; bufferVec[1] = fy; bufferVec[2] = fz; bufferVec[3] = 0;
-            toLocalCoords(bufferVec);
-            fx = bufferVec[0]; fy = bufferVec[1]; fz = bufferVec[2];
-        }
-
-        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
-        float ffx = bufferVec[0] - Math.min(Math.abs(px), bufferVec[0]);
-        float ffy = bufferVec[1] - Math.min(Math.abs(py), bufferVec[1]);
-        float ffz = bufferVec[2] - Math.min(Math.abs(pz), bufferVec[2]);
-        //VectorTranslator.debugVector("FF",ffx,ffy,ffz);
-        //applyForce(ffx, ffy, ffz);
-        //System.out.println("FX: " + fx + " FY: " + fy + "FZ: " + fz + " PX: " + px + "PY: " + px + " PZ: " + pz);
-        VectorTranslator.debugVector("ROT:",bufferVec);
+    public void applyRotationTransformation(float fx, float fy, float fz, float px, float py, float pz) { //FIXME position not going quite well tbh
+        VectorTranslator.debugVector("TRANSFORMING",fx,fy,fz);
+        VectorTranslator.debugVector("AT",px,py,pz);
+        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz); //todo ?
+        float ffx = px;
+        float ffy = py;
+        float ffz = pz;
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
+        applyTransformation(ffx,ffy,ffz);
     }
 
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {
@@ -149,17 +144,17 @@ public class RigidBodySystem extends PhysicsSystem {
     public float getSpinZ(){return spin[2];}
 
     @Override
-    public void toLocalCoords(float[] worldspaceCoords) {
-        super.toLocalCoords(worldspaceCoords);
+    public void toWorldspaceCoords(float[] worldspaceCoords) {
         MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,rotationMatrix);
+        super.toWorldspaceCoords(worldspaceCoords);
     }
 
     @Override
-    public void toWorldspaceCoords(float[] localCoords) {
+    public void toLocalCoords(float[] localCoords) {
+        super.toLocalCoords(localCoords);
         //the inverse of a rotation matrix is it's transpose
         MatrixTranslator.getTransposeMatrix4(rotationMatrix,bufferM4);
         MatrixTranslator.multiplyVec4Mat4(localCoords,bufferM4);
-        super.toWorldspaceCoords(localCoords);
     }
 
     public float[] getOrientation() {//todo maybe switch to a void and a array argument?
@@ -173,6 +168,14 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void getRotationMatrix(float[] dest){
         System.arraycopy(rotationMatrix,0,dest,0,16);
+    }
+
+    public void toLocalRotation(float[] vec){
+        MatrixTranslator.multiplyVec4Mat4(vec,rotationMatrix);
+    }
+
+    public void toGlobalRotation(float[] vec){
+        MatrixTranslator.multiplyVec4Mat4(vec,rotationMatrix);
     }
 
     public void getWorldspacePointVelocity(float px, float py, float pz, float[] dest){
