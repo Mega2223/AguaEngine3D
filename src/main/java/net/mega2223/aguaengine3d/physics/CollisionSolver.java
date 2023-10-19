@@ -81,14 +81,15 @@ public class CollisionSolver {
         float invMass = obj1.getInverseMass();
         if(invMass <= 0){return;}
         buffer1[0] = cnX;buffer1[1] = cnY;buffer1[2] = cnZ;
-        float linearInertia = -confDepth / invMass * .5F;
+        float linearInertia = -confDepth / invMass * .95F;
         VectorTranslator.scaleVec3(buffer1, linearInertia);
         VectorTranslator.scaleVec3(buffer1,obj1.getInverseMass());
         VectorTranslator.flipVector(buffer1);
         dest[0] +=  buffer1[0]; dest[1] += buffer1[1]; dest[2] += buffer2[2];
-        float angularInertia = linearInertia*1.0000000596046447754F;//todo remember innertia tensors? lol
+        float angularInertia = 1F-linearInertia;
         buffer1[0] = pX; buffer1[1] = pY; buffer1[2] = pZ;
         obj1.toLocalCoords(buffer1);
+        VectorTranslator.scaleVec3(buffer1,angularInertia);
         dest[3] += buffer1[0]; dest[4] += buffer1[1]; dest[5] += buffer1[2];
 //        VectorTranslator.getCrossProduct(buffer2,buffer1[0],buffer1[1],buffer1[2],cnX,cnY,cnZ);
 //        VectorTranslator.scaleVec3(buffer2,1);

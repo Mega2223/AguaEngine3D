@@ -110,7 +110,6 @@ public class RectHitbox extends Hitbox {
         bufferVec[3] = 0;
         ((RigidBodySystem)linkedSystem).getRotationMatrix(bufferM4);
         MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
-        VectorTranslator.scaleVec3(bufferVec,10);
         ((RigidBodySystem)linkedSystem).applyRotationTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
 
         VectorTranslator.debugVector("RESOLUTION",contactResolutionBuffer);

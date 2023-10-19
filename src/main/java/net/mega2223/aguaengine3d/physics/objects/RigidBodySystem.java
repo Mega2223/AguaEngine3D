@@ -106,14 +106,9 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
     public void applyRotationTransformation(float fx, float fy, float fz, float px, float py, float pz) { //FIXME position not going quite well tbh
-        VectorTranslator.debugVector("TRANSFORMING",fx,fy,fz);
-        VectorTranslator.debugVector("AT",px,py,pz);
-        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz); //todo ?
-        float ffx = px;
-        float ffy = py;
-        float ffz = pz;
+        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyTransformation(ffx,ffy,ffz);
+        applyTransformation(px,py,pz);
     }
 
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {

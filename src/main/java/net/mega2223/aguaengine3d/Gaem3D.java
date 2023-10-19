@@ -145,7 +145,7 @@ public class Gaem3D {
         test = cube1;
         RigidBodyAggregate cube2 = new RigidBodyAggregate(cubeModel2,cube2Physics);
 
-        context.physContext().addForce(new DragForce(0.1F,1.1F));
+        context.physContext().addForce(new DragForce(0.4F,1.1F));
         context.addObject(referenceCube);
         //context.physContext().addForce(new SpringForce(2,.1F,0,5,0));
 
@@ -180,7 +180,7 @@ public class Gaem3D {
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
-                cube1Physics.applyForce(0,1,0,0,0,0.3F);
+                cube1Physics.applyForce(0,1,.5F,0,0,0.3F);
             }
 
         });
