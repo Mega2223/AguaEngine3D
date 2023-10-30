@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d.physics.utils.objects.hitboxes;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.CollisionSolver;
 import net.mega2223.aguaengine3d.physics.collisiondetection.hitbox.Hitbox;
 import net.mega2223.aguaengine3d.physics.objects.PhysicsSystem;
@@ -75,13 +74,8 @@ public class RectHitbox extends Hitbox {
                 if(isRigidBody){
                     RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
                     linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
-                    //CollisionSolver.resolveCollision(linkedSystemRigid,px,py,pz,bufferVec2[0],bufferVec2[1],bufferVec2[2],bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
-                    CollisionSolver.resolveConflict((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
-                } else {
-                    //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
-                    //CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
-                }
-
+                    CollisionSolver.resolveConflict((RigidBodySystem) linkedSystem,px,py,pz,bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
+                } //todo missing else statement
             }
         }
         else if(hitbox instanceof RectHitbox){
@@ -93,13 +87,15 @@ public class RectHitbox extends Hitbox {
                 float d = act.getDepth(px, py, pz);
                 if(d <= 0){continue;}
                 act.getContactNormal(px,py,pz, bufferVec);
-                CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
+
                 if(isRigidBody){
+                    CollisionSolver.resolveConflict((RigidBodySystem) linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                     //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
                     //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
                     //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
                     //CollisionSolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
                 } else {
+                    CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
                     //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
                 }
             }
@@ -110,7 +106,7 @@ public class RectHitbox extends Hitbox {
         bufferVec[3] = 0;
         ((RigidBodySystem)linkedSystem).getRotationMatrix(bufferM4);
         MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
-        ((RigidBodySystem)linkedSystem).applyRotationTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
+        ((RigidBodySystem)linkedSystem).applyRotationalTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
 
     }
 

@@ -101,7 +101,7 @@ public class RigidBodySystem extends PhysicsSystem {
         applyForce(fx*px,fy*py,fz*pz);
     }
 
-    public void applyRotationTransformation(float tx, float ty, float tz, float px, float py, float pz) {
+    public void applyRotationalTransformation(float tx, float ty, float tz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,tx,ty,tz,px,py,pz);
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
         applyTransformation(-tx*Math.abs(px),-ty*Math.abs(py),-tz*Math.abs(pz));
