@@ -98,9 +98,9 @@ public class RectHitbox extends Hitbox {
                     //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
                     //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
                     //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
-                    CollisionSolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
+                    //CollisionSolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
                 } else {
-                    CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
+                    //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
                 }
             }
         }
@@ -112,7 +112,6 @@ public class RectHitbox extends Hitbox {
         MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
         ((RigidBodySystem)linkedSystem).applyRotationTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
 
-        VectorTranslator.debugVector("RESOLUTION",contactResolutionBuffer);
     }
 
     @Override

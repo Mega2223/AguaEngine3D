@@ -180,7 +180,7 @@ public class Gaem3D {
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyForce(0,.1F,0,0,0,.1F,true);
-                cube1Physics.applyForce(0,1,.5F,0,0,0.3F);
+                cube1Physics.applyForce(2,1,2,0,0,0.3F);
             }
 
         });
@@ -228,20 +228,14 @@ public class Gaem3D {
         }
     }
 
-    static float[] f =  {0,0.1F,0,0};
-    static float[] c = {0,0,.1F};
-    static float[] fb = new float[4];
-    static float[] rm = new float[16];
+
     protected static void doLogic() {
-//        ((RigidBodySystem)test.physicsHandler()).getRotationMatrix(rm);
-//        MatrixTranslator.multiplyVec4Mat4(f,rm, fb);
-//        ((RigidBodySystem)test.physicsHandler()).applyForce(fb[0],fb[1],fb[2],c[0],c[1],c[2]);
+
     }
-    public static float[] lookTest = {0,0,0};
+
     protected static void doRenderLogic() {
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 100.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        //MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
-        MatrixTranslator.applyLookTransformation(proj,camera,lookTest[0],lookTest[1],lookTest[2]);
+        MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
 
         context.doLogic(timeToSimulate);
         manager.fitViewport();

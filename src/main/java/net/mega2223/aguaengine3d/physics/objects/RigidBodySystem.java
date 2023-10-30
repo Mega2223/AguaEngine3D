@@ -95,25 +95,20 @@ public class RigidBodySystem extends PhysicsSystem {
     //forces that do not have any specific point will be treated as appiled to the center of mass
     //therefore there's no need to override the method
 
-    public void applyForce(float fx, float fy, float fz, float px, float py, float pz) { //FIXME position not going quite well tbh
-        VectorTranslator.debugVector("APPLYING",fx,fy,fz);
-        VectorTranslator.debugVector("AT",px,py,pz);
-        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz); //todo ?
-        float ffx = bufferVec[0] - px;
-        float ffy = bufferVec[1] - py;
-        float ffz = bufferVec[2] - pz;
-        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
-    }
-
-    public void applyRotationTransformation(float fx, float fy, float fz, float px, float py, float pz) { //FIXME position not going quite well tbh
+    public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
-        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyTransformation(px,py,pz);
+        applyTorque(bufferVec[0], bufferVec[1], bufferVec[2]);
+        applyForce(fx*px,fy*py,fz*pz);
     }
 
-    public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz, boolean relative) {
+    public void applyRotationTransformation(float tx, float ty, float tz, float px, float py, float pz) {
+        VectorTranslator.getCrossProduct(bufferVec,tx,ty,tz,px,py,pz);
+        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
+        applyTransformation(-tx*Math.abs(px),-ty*Math.abs(py),-tz*Math.abs(pz));
+    }
+
+    public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
-        if(!relative){toLocalCoords(bufferVec);}
         applyImpulse(ix- bufferVec[0],iy- bufferVec[1],iz- bufferVec[2]);
         VectorTranslator.getCrossProduct(bufferVec,ix,iy,iz,px,py,pz);
         applySpin(bufferVec);
