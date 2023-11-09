@@ -50,33 +50,24 @@ public class RenderingContext {
 
     private final float[] bufferTransMatrix = new float[16];
 
-    ShaderProgram testShaderProgram = null;
-
     public void doRender(float[] projectionMatrix){
         if(!areFBOSValid){initFBOS();}
         //todo shadow render pipeline
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
-        for(Model o : objects){//scene render
-            float[] coords = o.getCoords();
-            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix, coords);
-            o.getShader().setUniforms(itneration, bufferTransMatrix,projectionMatrix);
-            o.draw();
-        }
+        doCustomRender(projectionMatrix);
     }
 
-    /**Assumes that the rendering context is already in place*/
+    /** Assumes that the rendering context is already in place */
     public void doCustomRender(float[] projectionMatrix){
         for(Model m : objects){
-            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,m.getCoords());
-            m.getShader().setUniforms(itneration,bufferTransMatrix,projectionMatrix);
+            m.setUniforms(itneration,projectionMatrix);
             m.draw();
         }
     }
 
     public void doCustomRenderForceShader(float[] projectionMatrix, ShaderProgram shaderProgram){
         for(Model m : objects){
-            MatrixTranslator.generateTranslationMatrix(bufferTransMatrix,m.getCoords());
-            shaderProgram.setUniforms(itneration,bufferTransMatrix,projectionMatrix);
+            m.setUniforms(itneration,projectionMatrix);
             m.drawForceShader(shaderProgram);
         }
     }

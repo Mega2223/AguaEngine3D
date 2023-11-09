@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 
 /*
 * The official AguaEngine3D TODO list:
-* Remove shadow acnes somehow (I hade normals so much it's unreal)
+* Remove shadow acnes somehow (I hate normals so much it's unreal)
 * Font rendering <- unfinished
 * Rewrite texture loading function
 * Convert light objects to structs in shaders
@@ -28,7 +28,7 @@ import org.lwjgl.glfw.GLFW;
 * Logo and Readme.md
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support)
-* Optimize OpenGL calls
+* Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
 * Model blueprint class
 * Coverage testing
 * Sound stuff
@@ -37,11 +37,13 @@ import org.lwjgl.glfw.GLFW;
 * Collision stuff
 * Animation stuff
 * Perhaps a static OpenGL manager class?
-* Denote static buffers explicitly as static?
+* Denote static buffers explicitly as static? <- DONE afaik
 * Interaction radius detection interface
 * Object declaration instantiation generation annotation?
 * Standardize array arguments
-* Should each physics context have it's own restitution variable?
+* Calculate the restitution variable lol
+* Also the physics module needs the friction force
+* Paralell contact is weid currently
 * Static function that creates objects with bound buffers
 * */
 

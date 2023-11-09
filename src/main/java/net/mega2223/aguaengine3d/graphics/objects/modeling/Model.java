@@ -1,14 +1,16 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 
 import static net.mega2223.aguaengine3d.graphics.utils.RenderingManager.drawnIndexBufferVBO;
 
-public class Model {
+public class Model implements Renderable {
 
     public static final int SHADER_VERTEX_DATA_LOCATION = 0;
     public static final int SHADER_TEXTURE_DATA_LOCATION = 1;
@@ -23,12 +25,13 @@ public class Model {
     protected int indicesVBO = -1;
     protected int textureCoordsVBO = -1;
 
+    protected static final float[] bufferTranslationMatrix = new float[16];
+
     public Model(float[] vertices, int[] indexes, ShaderProgram shader){
         this.setVertices(vertices);
         this.setIndices(indexes);
         this.setShader(shader);
     }
-
 
     public static Model loadModel(String[] objData, ShaderProgram shader){
 
@@ -124,7 +127,6 @@ public class Model {
         this.setIndicesVBO(indicesVBO);
     }
 
-
     public void unloadVBOS(){
         GL30.glDeleteBuffers(getIndicesVBO());
         GL30.glDeleteBuffers(getVerticesVBO());
@@ -188,6 +190,11 @@ public class Model {
 
     public void setTextureCoordsVBO(int textureCoordsVBO) {
         this.textureCoordsVBO = textureCoordsVBO;
+    }
+
+    public void setUniforms(int itneration, float[] projectionMatrix){
+        MatrixTranslator.generateTranslationMatrix(bufferTranslationMatrix,coords);
+        shader.setUniforms(itneration,bufferTranslationMatrix,projectionMatrix);
     }
 
 }
