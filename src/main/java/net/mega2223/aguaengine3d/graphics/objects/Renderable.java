@@ -8,5 +8,6 @@ public interface Renderable {
     void drawForceShader(ShaderProgram shader);
     void doLogic(int itneration);
     void setUniforms(int itneration, float[] projectionMatrix);
+    ShaderProgram getShader(); //ideally this would not be here but RenderingManager needs it
 
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RenderingContext {
 
-    protected final List<Model> objects = new ArrayList<>();
+    protected final List<Renderable> objects = new ArrayList<>();
     protected final List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
 
     int itneration = 0;
@@ -41,7 +41,7 @@ public class RenderingContext {
         for(ScriptedSequence s : scripts){
             s.preLogic(itneration,this);
         }
-        for(Model o : objects){o.doLogic(itneration);}
+        for(Renderable o : objects){o.doLogic(itneration);}
         for(ScriptedSequence s : scripts){
             s.postLogic(itneration,this);
         }
@@ -59,20 +59,20 @@ public class RenderingContext {
 
     /** Assumes that the rendering context is already in place */
     public void doCustomRender(float[] projectionMatrix){
-        for(Model m : objects){
+        for(Renderable m : objects){
             m.setUniforms(itneration,projectionMatrix);
             m.draw();
         }
     }
 
     public void doCustomRenderForceShader(float[] projectionMatrix, ShaderProgram shaderProgram){
-        for(Model m : objects){
+        for(Renderable m : objects){
             m.setUniforms(itneration,projectionMatrix);
             m.drawForceShader(shaderProgram);
         }
     }
 
-    public List<Model> getObjects(){
+    public List<Renderable> getObjects(){
         return objects.subList(0,objects.size());
     }
 
@@ -89,7 +89,7 @@ public class RenderingContext {
         this.backGroundColor = backGroundColor;
         GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
-        for (Model ac : getObjects()){
+        for (Renderable ac : getObjects()){
             int p = ac.getShader().getID();
             int c = GL30.glGetUniformLocation(p,"fogColor");
             GL30.glUseProgram(p);
@@ -103,7 +103,7 @@ public class RenderingContext {
         this.backGroundColor[2] = b;
         GL30.glClearColor(backGroundColor[0],backGroundColor[1],backGroundColor[2],backGroundColor[3]);
         //sets the fog color uniform variable for every shader
-        for (Model ac : getObjects()){
+        for (Renderable ac : getObjects()){
             int p = ac.getShader().getID();
             int c = GL30.glGetUniformLocation(p,"fogColor");
             GL30.glUseProgram(p);
@@ -115,7 +115,7 @@ public class RenderingContext {
     public void setFogDetails(float dist, float dissolve){
         fogDetails[0] = dist;
         fogDetails[1] = dissolve;
-        for (Model o : objects) {
+        for (Renderable o : objects) {
             //todo sub optimal uniform call
             GL30.glUseProgram(o.getShader().getID());
             GL30.glUniform1f(GL30.glGetUniformLocation(o.getShader().getID(), "fogStart"),dist);
@@ -133,7 +133,7 @@ public class RenderingContext {
 
     }
     public RenderingContext setLight(int index, float x, float y, float z, float brightness){
-        for (Model o : objects){
+        for (Renderable o : objects){
             o.getShader().setLight(index,x,y,z,brightness);
         }
         lights[index][0] = x;
@@ -150,7 +150,7 @@ public class RenderingContext {
         lightColors[index][2] = b;
         lightColors[index][3] = influence;
 
-        for (Model o : objects){
+        for (Renderable o : objects){
             o.getShader().setLightColor(index, r, g, b, influence);
         }
         return this;

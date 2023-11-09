@@ -163,9 +163,11 @@ public class Model implements Renderable {
     public float[] getCoords(){
         return coords.clone();
     }
+
     public void setCoords(float[] coords){
         System.arraycopy(coords, 0, this.coords, 0, this.coords.length);
     }
+
     public void setCoords(float x, float y, float z){coords[0] = x; coords[1] = y; coords[2] = z;}
 
     public int getVerticesVBO() {

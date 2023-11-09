@@ -65,8 +65,8 @@ public class LightSpaceRenderingManager {
     }
 
     void setLightspaceProjMatricesUniforms(int index,float[] projection, float[] translation){
-        List<Model> objects = associatedRenderingContext.getObjects();
-        for(Model ac : objects){
+        List<Renderable> objects = associatedRenderingContext.getObjects();
+        for(Renderable ac : objects){
             ShaderProgram shader = ac.getShader();
             GL30.glUseProgram(shader.getID());
             int projLoc = GL30.glGetUniformLocation(shader.getID(),"lightspace_projections["+index+"]");
@@ -78,8 +78,8 @@ public class LightSpaceRenderingManager {
 
     public void setDoShadowMapping(int index, boolean state){
         doShadowMapping[index] = state;
-        List<Model> objects = associatedRenderingContext.getObjects();
-        for(Model m : objects){
+        List<Renderable> objects = associatedRenderingContext.getObjects();
+        for(Renderable m : objects){
             m.getShader().setRenderShadows(index,state);
         }
     }
