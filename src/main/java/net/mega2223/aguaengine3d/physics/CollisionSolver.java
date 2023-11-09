@@ -55,15 +55,11 @@ public class CollisionSolver {
         dest[3] += bufferVec1[0]; dest[4] += bufferVec1[1]; dest[5] += bufferVec1[2];
     }
 
-    //Conflict solving to be injected into the destination variable
-
     public static void resolveConflict(RigidBodySystem obj, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] dest){
         obj.getRotationMatrix(bufferMatrix);
         MatrixTranslator.getTransposeMatrix4(bufferMatrix);
         resolveConflict(obj.getInverseMass(), pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix, dest);
     }
-
-    //Conflict solving without the destination variable
 
     public static void resolveConflict(PhysicsSystem obj, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
         Arrays.fill(bufferCollRes,0);
@@ -179,6 +175,7 @@ public class CollisionSolver {
         float vx1 = obj.getVelocityX(), vy1 = obj.getVelocityY(), vz1 = obj.getVelocityZ();
         resolveCollision(obj,px,py,pz,vx1,vy1,vz1,cnX,cnY,cnZ,restitution);
     }
+
     public static void resolveCollision(RigidBodySystem obj, float px, float py, float pz, float vx1, float vy1, float vz1, float cnX, float cnY, float cnZ,final float restitution) {
         resolveCollision(obj, px, py, pz, vx1, vy1, vz1,0,0,0, cnX, cnY, cnZ, restitution);
     }
