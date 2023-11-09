@@ -26,11 +26,11 @@ public class RenderingContext {
 
     }
 
-    public RenderingContext addObjects(List<Model> toAdd){
-        for(Model ac : toAdd){addObject(ac);}
+    public RenderingContext addObjects(List<Renderable> toAdd){
+        for(Renderable ac : toAdd){addObject(ac);}
         return this;
     }
-    public RenderingContext addObject(Model toAdd){
+    public RenderingContext addObject(Renderable toAdd){
         objects.add(toAdd);
         this.synchronizeUniforms(toAdd.getShader());
         return this;

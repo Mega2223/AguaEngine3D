@@ -48,7 +48,7 @@ public class Line implements Renderable {
     @Override
     public void drawForceShader(ShaderProgram shader) {
         shader.preRenderLogic(); // <- these are kinda redundant since SolidColorShaderProgram does not do anything with the pre or post logic
-        RenderingManager.drawArrayVBO(verticesVBO,GL30.GL_LINE,4,shader,vertices.length);
+        RenderingManager.drawArrayVBO(verticesVBO,GL30.GL_LINES,4,shader,vertices.length);
         shader.postRenderLogic();
     }
 

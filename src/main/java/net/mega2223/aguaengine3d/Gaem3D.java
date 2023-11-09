@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
@@ -101,6 +102,10 @@ public class Gaem3D {
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(30, 20);
+
+        Line line = new Line(1,0,0);
+        line.setEnd(0,3,0);
+        context.addObject(line);
 
         //Render Logic be like:
         long unrendered = 0;
