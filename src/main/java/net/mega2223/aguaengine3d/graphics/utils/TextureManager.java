@@ -53,36 +53,18 @@ public class TextureManager {
     }
 
     public static int loadTexture(BufferedImage image){
-        int width, height;
-        int[] pixels;
-        width = image.getWidth();
-        height = image.getHeight();
-        pixels = new int[width * height];
-        image.getRGB(0, 0, width, height, pixels, 0, width);
 
-        int[] data = new int[width * height];
-        for (int i = 0; i < width * height; i++) {
-            int a = (pixels[i] & 0xff000000) >> 24;
-            int r = (pixels[i] & 0xff0000) >> 16;
-            int g = (pixels[i] & 0xff00) >> 8;
-            int b = (pixels[i] & 0xff);
-
-            data[i] = a << 24 | b << 16 | g << 8 | r;
-        }
-
-        int result = GL30.glGenTextures();
-        GL30.glBindTexture(GL30.GL_TEXTURE_2D, result);
+        int texture = GL30.glGenTextures();
+        GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
         GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
         GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
 
-        IntBuffer buffer = ByteBuffer.allocateDirect(data.length << 2)
-                .order(ByteOrder.nativeOrder()).asIntBuffer();
-        buffer.put(data).flip();
+        IntBuffer data = genFromImage(image);
 
-        GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_RGBA, width, height, 0, GL30.GL_RGBA,
-                GL30.GL_UNSIGNED_BYTE, buffer);
+        GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_RGBA, image.getWidth(), image.getHeight(), 0, GL30.GL_RGBA,
+                GL30.GL_UNSIGNED_BYTE, data);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
-        return result;
+        return texture;
     }
 
     public static int generateImageTexture(int w, int h){
@@ -94,6 +76,7 @@ public class TextureManager {
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
         return texture;
     }
+
     public static int generateDepthTexture(int w, int h){
         int texture = GL30.glGenTextures();
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
@@ -101,6 +84,15 @@ public class TextureManager {
         GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
         GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
+
+        return texture;
+    }
+
+    public static int generateCubemapTexture(){
+        int texture = GL30.glGenTextures();
+        GL30.glBindTexture(GL30.GL_TEXTURE_CUBE_MAP,texture);
+
+
 
         return texture;
     }
@@ -131,6 +123,24 @@ public class TextureManager {
         return ret;
     }
 
+    public static IntBuffer genFromImage(BufferedImage image){
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int[] pixels = new int[width * height];
+        image.getRGB(0, 0, width, height, pixels, 0, width);
+        int[] data = new int[width * height];
+        for (int i = 0; i < width * height; i++) {
+            int a = (pixels[i] & 0xff000000) >> 24;
+            int r = (pixels[i] & 0xff0000) >> 16;
+            int g = (pixels[i] & 0xff00) >> 8;
+            int b = (pixels[i] & 0xff);
+            data[i] = a << 24 | b << 16 | g << 8 | r;
+        }
+        IntBuffer buffer = ByteBuffer.allocateDirect(data.length << 2)
+                .order(ByteOrder.nativeOrder()).asIntBuffer();
+        buffer.put(data).flip();
+        return buffer;
+    }
 
 
 }

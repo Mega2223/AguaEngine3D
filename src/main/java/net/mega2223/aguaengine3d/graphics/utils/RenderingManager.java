@@ -172,7 +172,7 @@ public class RenderingManager {
     public static void printErrorQueue(){
         int e = GL30.glGetError();
         while (e != GL30.GL_NO_ERROR){
-            System.out.println("Error: " + e);
+            System.out.println("Error: 0X" + Integer.toHexString(e));
             e = GL30.glGetError();
         }
     }
