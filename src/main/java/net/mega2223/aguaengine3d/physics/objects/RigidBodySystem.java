@@ -98,7 +98,7 @@ public class RigidBodySystem extends PhysicsSystem {
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
         applyTorque(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyForce(fx*px,fy*py,fz*pz);
+        applyAcceleration(fx*px,fy*py,fz*pz);
     }
 
     public void applyRotationalTransformation(float tx, float ty, float tz, float px, float py, float pz) {

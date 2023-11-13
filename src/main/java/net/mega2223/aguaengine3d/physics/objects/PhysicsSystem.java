@@ -52,40 +52,42 @@ public abstract class PhysicsSystem {
         return coords.clone();
     }
 
-    public void applyForce(float[] force){
+    public void applyAcceleration(float[] force){
         for (int i = 0; i < accumulatedForce.length; i++) {
             accumulatedForce[i] += force[i];
         }
     }
-
-    public void applyForce(float x, float y, float z){
+    /** Applies a direct transform on the acceleration variable regradless of object mass*/
+    public void applyAcceleration(float x, float y, float z){
         accumulatedForce[0]+=x;
         accumulatedForce[1]+=y;
         accumulatedForce[2]+=z;
     }
 
-    public void applyForceInRelationToMass(float[] force){
+    public void applyForce(float[] force){
         for (int i = 0; i < accumulatedForce.length; i++) {
             accumulatedForce[i] += force[i] * inverseMass;
         }
     }
 
-    public void applyForceInRelationToMass(float x, float y, float z){
+    /**Applies force, taking object mass into account*/
+    public void applyForce(float x, float y, float z){
         accumulatedForce[0]+=x*inverseMass;
         accumulatedForce[1]+=y*inverseMass;
         accumulatedForce[2]+=z*inverseMass;
+    }
+
+    /**Applies a direct change to the object's speed regardless of mass*/
+    public void applyImpulse(float x, float y, float z){
+        velocity[0]+=x;
+        velocity[1]+=y;
+        velocity[2]+=z;
     }
 
     public void applyImpulse(float[] impulse){
         for (int i = 0; i < velocity.length; i++) {
             velocity[i] += impulse[i];
         }
-    }
-
-    public void applyImpulse(float x, float y, float z){
-        velocity[0]+=x;
-        velocity[1]+=y;
-        velocity[2]+=z;
     }
 
     public void addForce(PhysicsForce force){
@@ -184,8 +186,8 @@ public abstract class PhysicsSystem {
         return boundHitbox;
     }
     /**Can only be done once*/
-    public void bindHitbox(Hitbox boundHitbox) {
-        if(this.boundHitbox == null){this.boundHitbox = boundHitbox;}
+    public boolean bindHitbox(Hitbox boundHitbox) {
+        if(this.boundHitbox == null){this.boundHitbox = boundHitbox; return true;} return false;
     }
 
     public abstract float getInteractionRadius();

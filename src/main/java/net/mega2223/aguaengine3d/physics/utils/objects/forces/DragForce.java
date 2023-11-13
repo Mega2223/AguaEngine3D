@@ -28,7 +28,7 @@ public class DragForce implements PhysicsForce {
         VectorTranslator.scaleVec3(buffer,drag);
         VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
-        system.applyForce(buffer);
+        system.applyAcceleration(buffer);
     }
 
     private void calculateForAngularMomentum(RigidBodySystem system, float time){

@@ -26,7 +26,7 @@ public class SpringForce implements PhysicsForce {
         VectorTranslator.scaleVec3(buffer,f);
         VectorTranslator.scaleVec3(buffer,time);
         VectorTranslator.flipVector(buffer);
-        system.applyForce(buffer);
+        system.applyAcceleration(buffer);
     }
 
     public void setCoord(float x, float y, float z){
