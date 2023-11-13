@@ -315,6 +315,11 @@ public class MatrixTranslator {
         }
     }
 
+    public static void multiplyVec3Mat3(float[] vec3, float[] mat3){
+        multiplyVec3Mat3(vec3,mat3,VectorTranslator.bufferVector);
+        System.arraycopy(VectorTranslator.bufferVector,0,vec3,0,3);
+    }
+
     public static void multiplyVec3Mat3(float[] vec3, float[] mat3, float[] dest){
         Arrays.fill(dest,0);
         for (int i = 0; i < 9; i++) {
@@ -517,23 +522,16 @@ public class MatrixTranslator {
         }
     }
 
-    //todo matrix determinant calculation func
-
     public static void getInverseMatrix3(float[] m3, float[] dest){
-        //todo test this lol
-        float v1 = m3[0]*m3[4]; //values for calculating the matrix determinant
+        float determinantMatrix3 = getDeterminantMatrix3(m3);
+        if(determinantMatrix3 == 0){throw new UnsupportedOperationException("Matrix does not have a determinant.");}
+        float v1 = m3[0]*m3[4];
         float v2 = m3[0]*m3[5];
         float v3 = m3[1]*m3[3];
         float v4 = m3[2]*m3[3];
         float v5 = m3[1]*m3[6];
         float v6 = m3[2]*m3[6];
-
-        float d = (v1*dest[8] - v2*dest[7] - v3*dest[8] +
-                    v4*dest[7] + v5*dest[5] - v6*dest[4]);
-
-        if (d == 0.0f) return; //maybe clone m3 or the identity matrix into dest?
-
-        float inv = 1/d;
+        float inv = 1/determinantMatrix3;
         dest[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
         dest[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
         dest[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
@@ -551,6 +549,11 @@ public class MatrixTranslator {
             int c = i%3;
             dest[r+c*3] = m3[r*3+c];
         }
+    }
+
+    public static float getDeterminantMatrix3(float[] mat3){
+        return (mat3[0]*mat3[4]*mat3[8] + mat3[1]*mat3[5]*mat3[6] + mat3[2]*mat3[3]*mat3[7])-
+                (mat3[6]*mat3[4]*mat3[2] + mat3[7]*mat3[5]*mat3[0] + mat3[8]*mat3[3]*mat3[1]);
     }
 
     public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] dest){

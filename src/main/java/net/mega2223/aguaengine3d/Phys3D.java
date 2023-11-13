@@ -56,12 +56,10 @@ public class Phys3D {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_PAGE_UP)==GLFW.GLFW_PRESS){
-                timeToSimulate += 0.01F;
-                timeToSimulate = Math.max(0,Math.min(timeToSimulate,2));
+                timeToSimulate = Math.max(0,Math.min(timeToSimulate + 0.01F,2));
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_PAGE_DOWN)==GLFW.GLFW_PRESS){
-                timeToSimulate -= 0.01F;
-                timeToSimulate = Math.max(0,Math.min(timeToSimulate,2));
+                timeToSimulate = Math.max(0,Math.min(timeToSimulate - 0.01F,2));
             }
         });
 
@@ -104,10 +102,12 @@ public class Phys3D {
 
         ConstantForce gravity = new ConstantForce(0, -.01F, 0);
 
-        RigidBodySystem cube1Physics = new RigidBodySystem(1,new float[9]);
+        float[] innertiaTensor = new float[9];
+        PhysicsUtils.generateTensorForRect(1,1,1,1,innertiaTensor);
+        RigidBodySystem cube1Physics = new RigidBodySystem(1,innertiaTensor);
         cube1Physics.setCoords(0,4,0);
         cube1Physics.setOrientation(1,0,.5F,.5F);
-        RigidBodySystem cube2Physics = new RigidBodySystem(1,new float[9]);
+        RigidBodySystem cube2Physics = new RigidBodySystem(1,innertiaTensor);
 
         RigidBodyAggregate cube1 = new RigidBodyAggregate(cubeModel,cube1Physics);
         test = cube1;
@@ -144,7 +144,7 @@ public class Phys3D {
                 cube1.physicsHandler().applyAcceleration(0,0,.05F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_ENTER)==GLFW.GLFW_PRESS){
-                cube1Physics.applyForce(0,1,0,0,0,0.3F);
+                cube1Physics.applyTorque(0,0,0.1F);
             }
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_K)==GLFW.GLFW_PRESS){
                 //cube1Physics.applyAcceleration(0,.1F,0,0,0,.1F,true);

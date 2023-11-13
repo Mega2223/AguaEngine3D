@@ -1,25 +1,23 @@
 package net.mega2223.aguaengine3d.physics;
 
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-
 public class PhysicsUtils {
     private PhysicsUtils(){}
 
     public static void generateTensorForRect(float vx, float vy, float vz, float mass,float[] dest){
-        generateInertiaTensor(
-                1/12F * mass * (vy*vy+vz*vz),
-                1/12F * mass * (vx*vx + vz*vz),
-                1/12F * mass * (vx*vx + vy*vy),dest
+        genericInertiaTensor(
+                (1/12F) * mass * (vy*vy + vz*vz),
+                (1/12F) * mass * (vx*vx + vz*vz),
+                (1/12F) * mass * (vx*vx + vy*vy),dest
                 );
     }
 
-    public static void generateInertiaTensor(float mx, float my, float mz, float[] dest){
+    public static void genericInertiaTensor(float mx, float my, float mz, float[] dest){
         dest[0] = mx;
         dest[4] = my;
         dest[8] = mz;
     }
-
-    public static void transformInertiaTensorQuaternion(float[] inn3, float[] rotationMat, float[] dest){
+    //not sure this works lmao
+    public static void rotateInertiaTensor(float[] inn3, float[] rotationMat, float[] dest){
         float t4 = rotationMat[0] * inn3[0] + rotationMat[1] * inn3[3] + rotationMat[2] * inn3[6];
         float t9 = rotationMat[0] * inn3[1] + rotationMat[1] * inn3[4] + rotationMat[2] * inn3[7];
         float t14 = rotationMat[0] * inn3[2] + rotationMat[1] * inn3[5] + rotationMat[2] * inn3[8];

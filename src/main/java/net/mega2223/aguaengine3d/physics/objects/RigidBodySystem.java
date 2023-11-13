@@ -52,7 +52,7 @@ public class RigidBodySystem extends PhysicsSystem {
         Arrays.fill(accumulatedAngularTransformations,0);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
         MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
-        PhysicsUtils.transformInertiaTensorQuaternion(inverseInnertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
+        PhysicsUtils.rotateInertiaTensor(inverseInnertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
@@ -96,7 +96,7 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
     public void applyTorque(float[] torque){
-        MatrixTranslator.multiplyVec3Mat3(torque,inverseInnertialTensorWorldspace,bufferVec);
+        MatrixTranslator.multiplyVec3Mat3(torque,inverseInnertialTensorWorldspace);
         accumulatedTorque[0] += bufferVec[0];
         accumulatedTorque[1] += bufferVec[1];
         accumulatedTorque[2] += bufferVec[2];
@@ -119,7 +119,7 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
     void getInverseInertiaTensorTranslated(float[] dest){
-        PhysicsUtils.transformInertiaTensorQuaternion(inverseInnertialTensor,rotationMatrix,dest);
+        PhysicsUtils.rotateInertiaTensor(inverseInnertialTensor,rotationMatrix,dest);
     }
 
     public float orienX(){
