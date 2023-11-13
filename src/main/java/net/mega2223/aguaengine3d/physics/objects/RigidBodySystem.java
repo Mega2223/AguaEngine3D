@@ -25,7 +25,7 @@ public class RigidBodySystem extends PhysicsSystem {
     private final float[] rw = new float[4]; //stores the rotation quaternion to be used in update operations
     private final float[] rotationMatrix = new float[16];//stores the translation matrix multiplied by the rotation matrix
     private final float[] rotationRadians = new float[3];//to be updated each object update, dependent on the quaternion rotation representation
-
+    private final float[] inverseInnertialTensorWorldspace = new float[9];//stores the inverse inertia tensor in worldspace coords, updates each itneration
     //static variables meant to be used for physics calculations
     private static final float[] bufferM4 = new float[16];
     private static final float[] bufferVec = new float[4];
@@ -41,18 +41,18 @@ public class RigidBodySystem extends PhysicsSystem {
         }
 
         rw[0] = 0;
-        rw[1] = spin[0]*time;
-        rw[2] = spin[1]*time;
-        rw[3] = spin[2]*time;
+        rw[1] = spin[0];
+        rw[2] = spin[1];
+        rw[3] = spin[2];
         //VectorTranslator.debugVector(rw);
-        PhysicsManager.addScaledQuaternions(orientation,rw, .1F);
+        PhysicsManager.addScaledQuaternions(orientation,rw, .1F); //todo should this really be .1F? INVESTIGATE NOW !!!!!!!!
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
         Arrays.fill(accumulatedAngularTransformations,0);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
         MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
-
+        PhysicsUtils.transformInertiaTensorQuaternion(inverseInnertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
@@ -72,26 +72,6 @@ public class RigidBodySystem extends PhysicsSystem {
         accumulatedAngularTransformations[2]+=z;
     }
 
-    public void applyTorque(float x, float y, float z){
-        accumulatedTorque[0]+=x;
-        accumulatedTorque[1]+=y;
-        accumulatedTorque[2]+=z;
-    }
-
-    public void applySpin(float x, float y, float z){
-        spin[0] += x;
-        spin[1] += y;
-        spin[2] += z;
-    }
-
-    public void applyTorque(float[] torque){
-        applyTorque(torque[0],torque[1],torque[2]);
-    }
-
-    public void applySpin(float[] spin){
-        applySpin(spin[0],spin[1],spin[2]);
-    }
-
     //forces that do not have any specific point will be treated as appiled to the center of mass
     //therefore there's no need to override the method
 
@@ -106,12 +86,36 @@ public class RigidBodySystem extends PhysicsSystem {
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
         applyTransformation(-tx*Math.abs(px),-ty*Math.abs(py),-tz*Math.abs(pz));
     }
-
+    /**Applies impulse with rotation component*/
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
         applyImpulse(ix- bufferVec[0],iy- bufferVec[1],iz- bufferVec[2]);
         VectorTranslator.getCrossProduct(bufferVec,ix,iy,iz,px,py,pz);
+        //No idea why it's not I x T but it works so
         applySpin(bufferVec);
+    }
+
+    public void applyTorque(float[] torque){
+        MatrixTranslator.multiplyVec3Mat3(torque,inverseInnertialTensorWorldspace,bufferVec);
+        accumulatedTorque[0] += bufferVec[0];
+        accumulatedTorque[1] += bufferVec[1];
+        accumulatedTorque[2] += bufferVec[2];
+    }
+
+    public void applyTorque(float x, float y, float z){
+        bufferVec[0] = x; bufferVec[1] = y; bufferVec[2] = z;
+        applyTorque(bufferVec);
+    }
+
+    /** Applies immediate change to angular velocity regardless of Inertia tensor */
+    public void applySpin(float x, float y, float z){
+        spin[0] += x;
+        spin[1] += y;
+        spin[2] += z;
+    }
+
+    public void applySpin(float[] spin){
+        applySpin(spin[0],spin[1],spin[2]);
     }
 
     void getInverseInertiaTensorTranslated(float[] dest){

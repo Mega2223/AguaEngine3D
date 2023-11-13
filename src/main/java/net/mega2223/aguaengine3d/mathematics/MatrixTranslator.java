@@ -193,7 +193,6 @@ public class MatrixTranslator {
         vec3[startIndex + 2] = (float) (Azx * nX + Azy * nY + Azz * nZ);
     }
 
-
     public static void rotateVector2(float[] vec2, float[] anchorVec, double rotationRadians) {
         rotateVector2(vec2, vec2[0], vec2[1], anchorVec[0], anchorVec[1], rotationRadians);
     }
@@ -301,16 +300,26 @@ public class MatrixTranslator {
         }
         System.arraycopy(dest, 0, m1, 0, dest.length);
     }
+
     public static void multiplyVec4Mat4(float[] vec4, float[] mat4){
         float[] stolenVector = VectorTranslator.bufferVector;
         multiplyVec4Mat4(vec4,mat4,stolenVector);
         System.arraycopy(stolenVector,0,vec4,0,4);
     }
+
     public static void multiplyVec4Mat4(float[] vec4, float[] mat4, float[] dest){
         Arrays.fill(dest,0);
         for (int i = 0; i < 16; i++) {
             int c = i%4, r = i/4;
             dest[r]+=vec4[c]*mat4[r*4+c];
+        }
+    }
+
+    public static void multiplyVec3Mat3(float[] vec3, float[] mat3, float[] dest){
+        Arrays.fill(dest,0);
+        for (int i = 0; i < 9; i++) {
+            int c = i%3, r = i/3;
+            dest[r]+=vec3[c]*mat3[r*3+c];
         }
     }
 
