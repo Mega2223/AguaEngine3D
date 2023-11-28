@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.tests;
+package net.mega2223.aguaengine3d.generictests;
 
 @SuppressWarnings("ALL")
 public class TriDimRotTest {

@@ -33,11 +33,10 @@ public class Line implements Renderable {
 
     void updateVerticesVBO(){
         if(verticesVBO == -1){
-            verticesVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
-        } else {
-            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,verticesVBO);
-            GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER,0,vertices);
+            verticesVBO = GL30.glGenBuffers();
         }
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,verticesVBO);//fixme this keeps throwing a 0X502 error at my face for some reason
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER,vertices,GL30.GL_DYNAMIC_DRAW);
     }
 
     @Override

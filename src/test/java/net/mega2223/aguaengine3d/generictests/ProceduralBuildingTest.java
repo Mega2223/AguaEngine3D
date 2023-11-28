@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.tests;
+package net.mega2223.aguaengine3d.generictests;
 
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;

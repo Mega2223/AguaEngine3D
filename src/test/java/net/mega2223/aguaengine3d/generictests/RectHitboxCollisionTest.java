@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.tests;
+package net.mega2223.aguaengine3d.generictests;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.utils.objects.hitboxes.RectHitbox;
