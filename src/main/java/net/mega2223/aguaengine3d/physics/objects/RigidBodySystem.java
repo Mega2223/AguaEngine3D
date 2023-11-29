@@ -13,7 +13,7 @@ public class RigidBodySystem extends PhysicsSystem {
     protected final float[] orientation = {1,0,0,0}; //quaterinon that stores the orientation and it's axis
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
-    protected final float[] accumulatedAngularTransformations = new float[3];
+    protected final float[] orientationTransforms = new float[3];
     protected final float[] inverseInnertialTensor = new float[9];
 
     public RigidBodySystem(float mass, float[] innertialTensor) {
@@ -29,34 +29,34 @@ public class RigidBodySystem extends PhysicsSystem {
     //static variables meant to be used for physics calculations
     private static final float[] bufferM4 = new float[16];
     private static final float[] bufferVec = new float[4];
+
     @Override
     public void doLogic(float time) {
         super.doLogic(time);
-        VectorTranslator.normalize(orientation);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3],rotationRadians);
 
         for (int i = 0; i < 3; i++) {
-            spin[i] += accumulatedAngularTransformations[i];
-            spin[i] += accumulatedTorque[i] * time;
+            spin[i] += accumulatedTorque[i];
         }
 
         rw[0] = 0;
-        rw[1] = spin[0];
-        rw[2] = spin[1];
-        rw[3] = spin[2];
-        //VectorTranslator.debugVector(rw);
+        rw[1] = spin[0] * time + orientationTransforms[0];
+        rw[2] = spin[1] * time + orientationTransforms[1];
+        rw[3] = spin[2] * time + orientationTransforms[2];
+        //VectorTranslator.debugVector(rw); 
         PhysicsManager.addScaledQuaternions(orientation,rw, .1F); //todo should this really be .1F? INVESTIGATE NOW !!!!!!!!
 
         //VectorTranslator.debugVector(orientation);
         Arrays.fill(accumulatedTorque,0);
-        Arrays.fill(accumulatedAngularTransformations,0);
+        Arrays.fill(orientationTransforms,0);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
         MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
         PhysicsUtils.rotateInertiaTensor(inverseInnertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
-
+        VectorTranslator.normalize(orientation);
+        if(VectorTranslator.getMagnitude(orientation) == 0){orientation[0] = 1;}
     }
 
     public void setOrientation(float w, float x, float y, float z){
@@ -67,25 +67,27 @@ public class RigidBodySystem extends PhysicsSystem {
         VectorTranslator.normalize(orientation);
     }
     public void applyOrientationTransform(float x, float y, float z){
-        accumulatedAngularTransformations[0]+=x;
-        accumulatedAngularTransformations[1]+=y;
-        accumulatedAngularTransformations[2]+=z;
+        orientationTransforms[0]+=x;
+        orientationTransforms[1]+=y;
+        orientationTransforms[2]+=z;
     }
 
     //forces that do not have any specific point will be treated as appiled to the center of mass
-    //therefore there's no need to override the method
+    //therefore there's no need to override the original superclass method
 
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
+        MatrixTranslator.debugMatrix3x3(inverseInnertialTensorWorldspace);
         applyTorque(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyAcceleration(fx*px,fy*py,fz*pz);
+        applyForce(Math.max(fx-px,0),Math.max(fy-py,0),Math.max(fz-pz,0));
     }
 
     public void applyRotationalTransformation(float tx, float ty, float tz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,tx,ty,tz,px,py,pz);
         applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyTransformation(-tx*Math.abs(px),-ty*Math.abs(py),-tz*Math.abs(pz));
+        applyTransformation(Math.max(tx-px,0),Math.max(ty-py,0),Math.max(tz-pz,0));
     }
+
     /**Applies impulse with rotation component*/
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
@@ -97,9 +99,10 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void applyTorque(float[] torque){
         MatrixTranslator.multiplyVec3Mat3(torque,inverseInnertialTensorWorldspace);
-        accumulatedTorque[0] += bufferVec[0];
-        accumulatedTorque[1] += bufferVec[1];
-        accumulatedTorque[2] += bufferVec[2];
+        MatrixTranslator.debugMatrix3x3(inverseInnertialTensorWorldspace);
+        accumulatedTorque[0] += torque[0];
+        accumulatedTorque[1] += torque[1];
+        accumulatedTorque[2] += torque[2];
     }
 
     public void applyTorque(float x, float y, float z){
@@ -139,15 +142,15 @@ public class RigidBodySystem extends PhysicsSystem {
 
     @Override
     public void toWorldspaceCoords(float[] worldspaceCoords) {
-        MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,rotationMatrix);
+        //the inverse of a rotation matrix is it's transpose
+        MatrixTranslator.getTransposeMatrix4(rotationMatrix,bufferM4);
+        MatrixTranslator.multiplyVec4Mat4(worldspaceCoords,bufferM4);
         super.toWorldspaceCoords(worldspaceCoords);
     }
 
     @Override
     public void toLocalCoords(float[] localCoords) {
         super.toLocalCoords(localCoords);
-        //the inverse of a rotation matrix is it's transpose
-        MatrixTranslator.getTransposeMatrix4(rotationMatrix,bufferM4);
         MatrixTranslator.multiplyVec4Mat4(localCoords,bufferM4);
     }
 
