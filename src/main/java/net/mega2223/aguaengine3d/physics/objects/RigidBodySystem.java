@@ -14,11 +14,11 @@ public class RigidBodySystem extends PhysicsSystem {
     protected final float[] spin = new float[3];
     protected final float[] accumulatedTorque = new float[3];
     protected final float[] orientationTransforms = new float[3];
-    protected final float[] inverseInnertialTensor = new float[9];
+    protected final float[] inverseInertialTensor = new float[9];
 
     public RigidBodySystem(float mass, float[] innertialTensor) {
         super(mass);
-        MatrixTranslator.getInverseMatrix3(innertialTensor,this.inverseInnertialTensor);
+        MatrixTranslator.getInverseMatrix3(innertialTensor,this.inverseInertialTensor);
     }
 
     //variables below are meant to be buffer for certain operations rather than object specific information
@@ -51,7 +51,7 @@ public class RigidBodySystem extends PhysicsSystem {
         Arrays.fill(orientationTransforms,0);
         VectorTranslator.getRotationRadians(orientation[0],orientation[1],orientation[2],orientation[3], rotationRadians);
         MatrixTranslator.getRotationMat4FromQuaternion(orienW(),orienX(),orienY(),orienZ(),rotationMatrix);
-        PhysicsUtils.rotateInertiaTensor(inverseInnertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
+        PhysicsUtils.rotateInertiaTensor(inverseInertialTensor,rotationMatrix,inverseInnertialTensorWorldspace);
         for (int i = 0; i < 3; i++) {
             coords[i] = Float.isNaN(coords[i]) ? 0 : coords[i];
         }
@@ -77,7 +77,6 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
-        MatrixTranslator.debugMatrix3x3(inverseInnertialTensorWorldspace);
         applyTorque(bufferVec[0], bufferVec[1], bufferVec[2]);
         applyForce(Math.max(fx-px,0),Math.max(fy-py,0),Math.max(fz-pz,0));
     }
@@ -122,7 +121,7 @@ public class RigidBodySystem extends PhysicsSystem {
     }
 
     void getInverseInertiaTensorTranslated(float[] dest){
-        PhysicsUtils.rotateInertiaTensor(inverseInnertialTensor,rotationMatrix,dest);
+        PhysicsUtils.rotateInertiaTensor(inverseInertialTensor,rotationMatrix,dest);
     }
 
     public float orienX(){
@@ -165,6 +164,10 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void getRotationMatrix(float[] dest){
         System.arraycopy(rotationMatrix,0,dest,0,16);
+    }
+
+    public void getInverseInertiaTensor(float[] dest){
+        System.arraycopy(inverseInertialTensor,0,dest,0,dest.length);
     }
 
     public void toLocalRotation(float[] vec){

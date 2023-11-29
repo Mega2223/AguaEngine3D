@@ -102,10 +102,12 @@ public class Gaem3D {
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(30, 20);
-
+        RenderingManager.printErrorQueue();
         Line line = new Line(1,0,0);
+        RenderingManager.printErrorQueue();
         line.setEnd(0,3,0);
         context.addObject(line);
+        RenderingManager.printErrorQueue();
 
         //Render Logic be like:
         long unrendered = 0;

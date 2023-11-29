@@ -11,78 +11,106 @@ public class CollisionSolver {
 
     public static final float DEF_RESTITUTION = .5F;
 
-    private CollisionSolver(){} //TODO deltaT variable
+    private CollisionSolver(){}
 
     private static final float[] bufferVec1 = new float[4];
     private static final float[] bufferVec2 = new float[4];
-    private static final float[] bufferMatrix = new float[16];
+
+    private static final float[] bufferMatrix4 = new float[16];
+    private static final float[] bufferMatrix3 = new float[9];
     private static final float[] bufferCollRes = new float[6];
 
     // The below methods are the ones responsible for solving contact equations.
-    // The template for collision resolution vectors is:
+    // The template for collision the resolution vector is:
     // [0,1,2] = contact transformation, [3,4,5] = relative point to apply the transformation (0 if not RigidBody)
 
-    public static void resolveConflict(float invMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float tX, float tY, float tZ, float[] dest){
+    public static void resolveConflict(float totalInvMass, float localInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float tX, float tY, float tZ, float[] dest){
         //BASE METHOD FOR RESOLVING PARTICLE COLLISIONS
-        //TODO not using local coords
-        //also FIXME lmao
         if(confDepth <= 0){return;}
-        if(invMass <= 0){return;}
-        bufferVec1[0] = cnX;
-        bufferVec1[1] = cnY;
-        bufferVec1[2] = cnZ;
-        VectorTranslator.scaleVec3(bufferVec1, -confDepth/invMass);
-        VectorTranslator.scaleVec3(bufferVec1,invMass);
-        VectorTranslator.flipVector(bufferVec1);
-        dest[0] += bufferVec1[0]; dest[1] += bufferVec1[1]; dest[2] += bufferVec1[2];
-    }
-
-    public static void resolveConflict(float invMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth, float tX, float tY, float tZ, float[] transposeRotationMatrix, float[] dest){
-        //BASE METHOD FOR RESOLVING RIGIDBODY COLLISIONS
-        //Todo: INNERTIA TENSORS
-        if(depth <= 0||invMass<=0){return;}
+        if(totalInvMass <= 0){return;}
         bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
-        float linearInertia = -depth / invMass; //TODO?: partial enfim
-        VectorTranslator.scaleVec3(bufferVec1, linearInertia);
-        VectorTranslator.scaleVec3(bufferVec1,invMass);
+        VectorTranslator.scaleVec3(bufferVec1, -confDepth/totalInvMass);
+        VectorTranslator.scaleVec3(bufferVec1,totalInvMass);
         VectorTranslator.flipVector(bufferVec1);
-        dest[0] +=  bufferVec1[0]; dest[1] += bufferVec1[1]; dest[2] += bufferVec1[2];
-        float angularInertia = 1;
-        bufferVec1[0] = pX; bufferVec1[1] = pY; bufferVec1[2] = pZ;
-        bufferVec1[0]-=tX; bufferVec1[1]-=tY; bufferVec1[2]-=tZ;
-        MatrixTranslator.multiplyVec4Mat4(bufferVec1,transposeRotationMatrix);
-        VectorTranslator.scaleVec3(bufferVec1,angularInertia);
-        dest[3] += bufferVec1[0]; dest[4] += bufferVec1[1]; dest[5] += bufferVec1[2];
+        dest[0] += bufferVec1[0]*localInvMass; dest[1] += bufferVec1[1]*localInvMass; dest[2] += bufferVec1[2]*localInvMass;
+    }
+    // transformations > position
+    public static void resolveConflict(float totalInvMass, float localInvMass, float[] localInverseInertiaTensor, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth, float tX, float tY, float tZ, float[] rotationMatrix, float[] dest){
+        //BASE METHOD FOR RESOLVING RIGIDBODY COLLISIONS
+        //Todo: INERTIA
+        if(depth <= 0||totalInvMass<=0){return;}
+        bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
+        final float linearInertia = totalInvMass;
+//        VectorTranslator.scaleVec3(bufferVec1, linearInertia);
+//        VectorTranslator.scaleVec3(bufferVec1,totalInvMass);
+//        VectorTranslator.flipVector(bufferVec1);
+//
+        //do not ask me how the code below works
+        bufferVec2[0] = pX + tX; bufferVec2[1] = pY + tY; bufferVec2[2] = pZ + tZ;
+        bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
+        VectorTranslator.getCrossProduct(bufferVec2,bufferVec1);
+        MatrixTranslator.multiplyVec3Mat3(bufferVec2,localInverseInertiaTensor);
+        //bufferVec2 now stores the angular inertia in worldspace coords
+        bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
+        VectorTranslator.getCrossProduct(bufferVec1,bufferVec2);
+        VectorTranslator.flipVector(bufferVec1);
+        bufferVec2[0] = cnX; bufferVec2[1] = cnY; bufferVec2[2] = cnZ;
+        float angularInertia = VectorTranslator.getScalarProduct(bufferVec1,bufferVec2);
+        float totalInertia = angularInertia + linearInertia;
+        float linearTransform = (depth * linearInertia)/totalInertia;
+        float angularTransform = (depth * angularInertia)/totalInertia;
+        VectorTranslator.scaleVec3(bufferVec2,linearTransform);
+
+        dest[0] += bufferVec2[0]; dest[1] += bufferVec2[1]; dest[2] += bufferVec2[2];
+
+        dest[3] += 0; dest[4] += 0; dest[5] += 0;
+        VectorTranslator.debugVector(dest);
+
+
     }
 
-    public static void resolveConflict(RigidBodySystem obj, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] dest){
-        obj.getRotationMatrix(bufferMatrix);
-        MatrixTranslator.getTransposeMatrix4(bufferMatrix);
-        resolveConflict(obj.getInverseMass(), pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix, dest);
+    public static void resolveConflict(RigidBodySystem obj, float totalInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] dest){
+        obj.getRotationMatrix(bufferMatrix4);
+        obj.getInverseInertiaTensor(bufferMatrix3);
+        resolveConflict(totalInvMass, obj.getInverseMass(), bufferMatrix3, pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix4, dest);
     }
 
-    public static void resolveConflict(PhysicsSystem obj, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
+    public static void resolveConflict(PhysicsSystem obj, float totalInvMass,float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
         Arrays.fill(bufferCollRes,0);
-        resolveConflict(obj.getInverseMass(),pX,pY,pZ,cnX,cnY,cnZ,obj.getCoordX(),obj.getCoordY(),obj.getCoordZ(),depth, bufferCollRes);
+        resolveConflict(totalInvMass, obj.getInverseMass(),pX,pY,pZ,cnX,cnY,cnZ,obj.getCoordX(),obj.getCoordY(),obj.getCoordZ(),depth, bufferCollRes);
         obj.applyTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
     }
 
-    public static void resolveConflict(PhysicsSystem obj, float pX, float pY, float pZ, float depth){
+    public static void resolveConflict(PhysicsSystem obj, float totalInvMass, float pX, float pY, float pZ, float depth){
         Arrays.fill(bufferCollRes,0);
-        float vx1 = obj.getVelocityX(), vy1 = obj.getVelocityY(), vz1 = obj.getVelocityZ(),
-                cx1 = obj.getCoordX(), cy1 = obj.getCoordY(), cz1 = obj.getCoordZ();
+        float cx1 = obj.getCoordX(), cy1 = obj.getCoordY(), cz1 = obj.getCoordZ();
         PhysicsManager.getContactNormal(cx1,cy1,cz1,pX,pY,pZ, bufferVec1);
-        resolveConflict(obj.getInverseMass(),pX,pY,pZ, bufferVec1[0], bufferVec1[1], bufferVec1[2],obj.getCoordX(),obj.getCoordY(),obj.getCoordZ(),depth, bufferCollRes);
+        resolveConflict(totalInvMass, obj.getInverseMass(),pX,pY,pZ, bufferVec1[0], bufferVec1[1], bufferVec1[2],obj.getCoordX(),obj.getCoordY(),obj.getCoordZ(),depth, bufferCollRes);
         obj.applyTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
     }
 
-    public static void resolveConflict(RigidBodySystem obj, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
+    public static void resolveConflict(PhysicsSystem obj1, PhysicsSystem obj2, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth){
+        final float totalInvMass = obj1.getInverseMass() + obj2.getInverseMass();
         Arrays.fill(bufferCollRes,0);
-        obj.getRotationMatrix(bufferMatrix);
-        resolveConflict(obj.getInverseMass(), pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix, bufferCollRes);
-        obj.applyRotationalTransformation(bufferCollRes[3], bufferCollRes[4], bufferCollRes[5], bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
+        float cx = obj1.getCoordX(), cy = obj1.getCoordY(), cz = obj1.getCoordZ();
+        PhysicsManager.getContactNormal(cx,cy,cz,pX,pY,pZ, bufferVec1);
+        resolveConflict(totalInvMass, obj1.getInverseMass(),pX,pY,pZ, bufferVec1[0], bufferVec1[1], bufferVec1[2],obj1.getCoordX(),obj1.getCoordY(),obj1.getCoordZ(),depth, bufferCollRes);
+        obj1.applyTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
+
+        Arrays.fill(bufferCollRes,0);
+        cx = obj2.getCoordX(); cy = obj2.getCoordY(); cz = obj2.getCoordZ();
+        PhysicsManager.getContactNormal(cx,cy,cz,pX,pY,pZ, bufferVec1);
+        resolveConflict(totalInvMass, obj2.getInverseMass(),pX,pY,pZ, bufferVec1[0], bufferVec1[1], bufferVec1[2],obj2.getCoordX(),obj2.getCoordY(),obj2.getCoordZ(),depth, bufferCollRes);
+        obj2.applyTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
     }
 
+    public static void resolveConflict(RigidBodySystem obj, float totalInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
+        Arrays.fill(bufferCollRes,0);
+        obj.getRotationMatrix(bufferMatrix4);
+        obj.getInverseInertiaTensor(bufferMatrix3);
+        resolveConflict(totalInvMass, obj.getInverseMass(), bufferMatrix3, pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix4, bufferCollRes);
+        obj.applyRotationalTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2], bufferCollRes[3], bufferCollRes[4], bufferCollRes[5]);
+    }
     //COLLISION RESOLVING METHODS
 
     public static void resolveCollision(PhysicsSystem obj1, float px, float py, float pz, final float restitution){

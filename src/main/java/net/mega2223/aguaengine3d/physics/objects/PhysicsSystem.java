@@ -10,7 +10,7 @@ public abstract class PhysicsSystem {
 
     protected final float[] coords = new float[4];
     protected final float[] velocity = new float[3];
-    protected final float[] accumulatedForce = new float[3];
+    protected final float[] accumulatedAcceleration = new float[3];
     protected final float[] accumulatedTranslations = new float[3];
     protected final float inverseMass;
 
@@ -35,9 +35,9 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < 3; i++) {
             coords[i]+=accumulatedTranslations[i];
             coords[i] += velocity[i]* time;
-            velocity[i] += accumulatedForce[i];
+            velocity[i] += accumulatedAcceleration[i];
         }
-        Arrays.fill(accumulatedForce,0);
+        Arrays.fill(accumulatedAcceleration,0);
         Arrays.fill(accumulatedTranslations,0);
     }
 
@@ -53,28 +53,28 @@ public abstract class PhysicsSystem {
     }
 
     public void applyAcceleration(float[] force){
-        for (int i = 0; i < accumulatedForce.length; i++) {
-            accumulatedForce[i] += force[i];
+        for (int i = 0; i < accumulatedAcceleration.length; i++) {
+            accumulatedAcceleration[i] += force[i];
         }
     }
     /** Applies a direct transform on the acceleration variable regradless of object mass*/
     public void applyAcceleration(float x, float y, float z){
-        accumulatedForce[0]+=x;
-        accumulatedForce[1]+=y;
-        accumulatedForce[2]+=z;
+        accumulatedAcceleration[0]+=x;
+        accumulatedAcceleration[1]+=y;
+        accumulatedAcceleration[2]+=z;
     }
 
     public void applyForce(float[] force){
-        for (int i = 0; i < accumulatedForce.length; i++) {
-            accumulatedForce[i] += force[i] * inverseMass;
+        for (int i = 0; i < accumulatedAcceleration.length; i++) {
+            accumulatedAcceleration[i] += force[i] * inverseMass;
         }
     }
 
     /**Applies force, taking object mass into account*/
     public void applyForce(float x, float y, float z){
-        accumulatedForce[0]+=x*inverseMass;
-        accumulatedForce[1]+=y*inverseMass;
-        accumulatedForce[2]+=z*inverseMass;
+        accumulatedAcceleration[0]+=x*inverseMass;
+        accumulatedAcceleration[1]+=y*inverseMass;
+        accumulatedAcceleration[2]+=z*inverseMass;
     }
 
     /**Applies a direct change to the object's speed regardless of mass*/
@@ -165,8 +165,8 @@ public abstract class PhysicsSystem {
         for (int i = 0; i < velocity.length; i++) {
             velocity[i] = getOkVersion(velocity[i]);
         }
-        for (int i = 0; i < accumulatedForce.length; i++) {
-            accumulatedForce[i] = getOkVersion(accumulatedForce[i]);
+        for (int i = 0; i < accumulatedAcceleration.length; i++) {
+            accumulatedAcceleration[i] = getOkVersion(accumulatedAcceleration[i]);
         }
     }
 

@@ -17,6 +17,9 @@ public class RectHitbox extends Hitbox {
     private static final float[] bufferM4 = new float[16];
     float radius;
 
+    public float[] lastCollisionCoords = new float[4]; //TODO: REMOVE THIS!!!
+    public final float[] lastCollisionBuffer = new float[4]; //TODO: REMOVE THIS!!!
+
     public RectHitbox(PhysicsSystem linkedSystem, float bx, float by, float bz, float ex, float ey, float ez){
         super(linkedSystem);
         linkedSystem.bindHitbox(this);
@@ -73,40 +76,21 @@ public class RectHitbox extends Hitbox {
                 act.getContactNormal(px,py,pz, bufferVec);
                 if(isRigidBody){
                     RigidBodySystem linkedSystemRigid = (RigidBodySystem) this.linkedSystem;
-                    linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
-                    CollisionSolver.resolveConflict((RigidBodySystem) linkedSystem,px,py,pz,bufferVec[0], bufferVec[1], bufferVec[2],d,contactResolutionBuffer);
+                    //linkedSystemRigid.getWorldspacePointVelocity(bufferVec2[0],bufferVec2[1],bufferVec2[2], bufferVec2);
+                    CollisionSolver.resolveConflict(linkedSystemRigid,linkedSystem.getInverseMass(),px,py,pz,bufferVec[0], bufferVec[1], bufferVec[2],d);
                 } //todo missing else statement
             }
         }
-        else if(hitbox instanceof RectHitbox){
-            RectHitbox act = (RectHitbox) hitbox;
-            for (int i = 0; i < 32; i+=4) {
-                float px = pointBuffer[i] + getX();
-                float py = pointBuffer[i + 1] + getY();
-                float pz = pointBuffer[i + 2] + getZ();
-                float d = act.getDepth(px, py, pz);
-                if(d <= 0){continue;}
-                act.getContactNormal(px,py,pz, bufferVec);
 
-                if(isRigidBody){
-                    CollisionSolver.resolveConflict((RigidBodySystem) linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
-                    //System.out.println("COLLISION: s1= " + getX() + ", " + getY() + ", " + getZ() + " s2 = " + hitbox.getX() + ", " + hitbox.getY() + ", " + hitbox.getZ());
-                    //System.out.println("CONTACT POINT: " + px + ", " + py + ", " + pz);
-                    //System.out.println("RESOLUTION = " + bufferVec3[0] + ", " + bufferVec3[1] + ", " + bufferVec3[2]);
-                    //CollisionSolver.resolveCollision((RigidBodySystem)linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2], CollisionSolver.DEF_RESTITUTION);
-                } else {
-                    CollisionSolver.resolveConflict(linkedSystem,px,py,pz, bufferVec[0], bufferVec[1], bufferVec[2],d);
-                    //CollisionSolver.resolveCollision(linkedSystem,px,py,pz, CollisionSolver.DEF_RESTITUTION);
-                }
-            }
-        }
-        bufferVec[0] = contacts == 0 ? contactResolutionBuffer[3] : contactResolutionBuffer[3]/contacts;
-        bufferVec[1] = contacts == 0 ? contactResolutionBuffer[4] : contactResolutionBuffer[4]/contacts;
-        bufferVec[2] = contacts == 0 ? contactResolutionBuffer[5] : contactResolutionBuffer[5]/contacts;
-        bufferVec[3] = 0;
-        ((RigidBodySystem)linkedSystem).getRotationMatrix(bufferM4);
-        MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
-        ((RigidBodySystem)linkedSystem).applyRotationalTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
+//        bufferVec[0] = contacts == 0 ? contactResolutionBuffer[3] : contactResolutionBuffer[3]/contacts;
+//        bufferVec[1] = contacts == 0 ? contactResolutionBuffer[4] : contactResolutionBuffer[4]/contacts;
+//        bufferVec[2] = contacts == 0 ? contactResolutionBuffer[5] : contactResolutionBuffer[5]/contacts;
+//        bufferVec[3] = 0;
+//        System.arraycopy(bufferVec,0,lastCollisionBuffer,0,3);
+//        System.arraycopy(contactResolutionBuffer,0,lastCollisionCoords,0,3);
+//        ((RigidBodySystem)linkedSystem).getRotationMatrix(bufferM4);
+//        MatrixTranslator.multiplyVec4Mat4(bufferVec,bufferM4);
+//        ((RigidBodySystem)linkedSystem).applyRotationalTransformation(bufferVec[0],bufferVec[1],bufferVec[2],contactResolutionBuffer[0],contactResolutionBuffer[1],contactResolutionBuffer[2]);
 
     }
 
@@ -163,6 +147,10 @@ public class RectHitbox extends Hitbox {
         pointBuffer[16] = maxX; pointBuffer[17] = maxY; pointBuffer[18] = minZ; pointBuffer[19] = 0;
         pointBuffer[20] = minX; pointBuffer[21] = maxY; pointBuffer[22] = maxZ; pointBuffer[23] = 0;
         pointBuffer[24] = maxX; pointBuffer[25] = maxY; pointBuffer[26] = maxZ; pointBuffer[27] = 0;
+    }
+
+    public void getAllPoints(float[] dest){
+        System.arraycopy(pointBuffer,0,dest,0,dest.length);
     }
 
     @Override

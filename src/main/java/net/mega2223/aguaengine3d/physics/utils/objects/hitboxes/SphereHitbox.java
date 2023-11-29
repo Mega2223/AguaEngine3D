@@ -61,8 +61,8 @@ public class SphereHitbox extends Hitbox {
             float py = this.getY() - radius;
             float pz = this.getZ();
             float d = hitbox.getDepth(px, py, pz);
-            CollisionSolver.resolveCollision(getLinkedSystem(), px, py, pz, CollisionSolver.DEF_RESTITUTION);
-            CollisionSolver.resolveConflict(getLinkedSystem(),px,py,pz,d);
+            CollisionSolver.resolveCollision(linkedSystem, px, py, pz, CollisionSolver.DEF_RESTITUTION);
+            CollisionSolver.resolveConflict(linkedSystem,linkedSystem.getInverseMass(),px,py,pz,d); //APH should simulate virtually infinite mass
         }
         else if(hitbox instanceof SphereHitbox){
             SphereHitbox sh = (SphereHitbox) hitbox;
@@ -72,8 +72,8 @@ public class SphereHitbox extends Hitbox {
             System.out.println(dis);
             float d = (radius+sh.radius)/2 - dis;
             //if(d>0){System.out.println(d);}
-            CollisionSolver.resolveCollision(getLinkedSystem(),x,y,z, CollisionSolver.DEF_RESTITUTION);
-            CollisionSolver.resolveConflict(getLinkedSystem(),x,y,z,d);
+            CollisionSolver.resolveCollision(linkedSystem,x,y,z, CollisionSolver.DEF_RESTITUTION);
+            CollisionSolver.resolveConflict(linkedSystem,linkedSystem.getInverseMass(),x,y,z,d);
         }
     }
 }
