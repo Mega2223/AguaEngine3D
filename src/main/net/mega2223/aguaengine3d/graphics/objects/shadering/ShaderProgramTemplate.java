@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.aguaengine3d.graphics.objects.LightSpaceRenderingManager;
+import net.mega2223.aguaengine3d.graphics.objects.LightspaceRenderingManager;
 import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
@@ -34,7 +34,7 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
             lightSpacePositions[i] = GL30.glGetUniformLocation(getID(),"lightspace_projections["+i+"]");
             lightSpaceTranslations[i] = GL30.glGetUniformLocation(getID(),"lightspace_translations["+i+"]");
             shadowmapSamplers[i] = GL30.glGetUniformLocation(getID(),"shadowmaps["+i+"]");
-            GL30.glUniform1i(shadowmapSamplers[i], LightSpaceRenderingManager.FIRST_TEXTURE_LIGHTMAP_LOC+i);
+            GL30.glUniform1i(shadowmapSamplers[i], LightspaceRenderingManager.FIRST_TEXTURE_LIGHTMAP_LOC+i);
         }
 
     }

@@ -1,6 +1,5 @@
 package net.mega2223.aguaengine3d.graphics.objects;
 
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DepthBufferShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -10,10 +9,10 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
-public class LightSpaceRenderingManager {
+public class LightspaceRenderingManager {
 
     public static final int FIRST_TEXTURE_LIGHTMAP_LOC = 3; // 3 - 13
-    static final int SHADOW_RES = 2048;
+    static final int SHADOW_RES = 512;
 
     boolean[] doShadowMapping = new boolean[ShaderProgram.MAX_LIGHTS];
     int[][] shadowMappingFBOS = new int[ShaderProgram.MAX_LIGHTS][];
@@ -21,13 +20,14 @@ public class LightSpaceRenderingManager {
 
     final RenderingContext associatedRenderingContext;
 
-    LightSpaceRenderingManager(RenderingContext context){
+    LightspaceRenderingManager(RenderingContext context){
         associatedRenderingContext = context;
     }
 
     public void applyRenderMaps(){
         //GL30.glActiv
     }
+
     float[] bufferM4 = new float[16];
     float[] bufferM42 = new float[16];
 

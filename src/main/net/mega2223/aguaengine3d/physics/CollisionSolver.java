@@ -22,7 +22,7 @@ public class CollisionSolver {
 
     // The below methods are the ones responsible for solving contact equations.
     // The template for collision the resolution vector is:
-    // [0,1,2] = contact transformation, [3,4,5] = relative point to apply the transformation (0 if not RigidBody)
+    // [0,1,2] = contact transformation, [3,4,5] = contact rotation
 
     public static void resolveConflict(float totalInvMass, float localInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float tX, float tY, float tZ, float[] dest){
         //BASE METHOD FOR RESOLVING PARTICLE COLLISIONS
@@ -37,15 +37,10 @@ public class CollisionSolver {
     // transformations > position
     public static void resolveConflict(float totalInvMass, float localInvMass, float[] localInverseInertiaTensor, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth, float tX, float tY, float tZ, float[] rotationMatrix, float[] dest){
         //BASE METHOD FOR RESOLVING RIGIDBODY COLLISIONS
-        //Todo: INERTIA
-        if(depth <= 0||totalInvMass<=0){return;}
-        bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
-        final float linearInertia = totalInvMass;
-//        VectorTranslator.scaleVec3(bufferVec1, linearInertia);
-//        VectorTranslator.scaleVec3(bufferVec1,totalInvMass);
-//        VectorTranslator.flipVector(bufferVec1);
-//
+
         //do not ask me how the code below works
+        if(depth <= 0||totalInvMass<=0){return;}
+        final float linearInertia = totalInvMass;
         bufferVec2[0] = pX + tX; bufferVec2[1] = pY + tY; bufferVec2[2] = pZ + tZ;
         bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
         VectorTranslator.getCrossProduct(bufferVec2,bufferVec1);
@@ -60,13 +55,10 @@ public class CollisionSolver {
         float linearTransform = (depth * linearInertia)/totalInertia;
         float angularTransform = (depth * angularInertia)/totalInertia;
         VectorTranslator.scaleVec3(bufferVec2,linearTransform);
-
         dest[0] += bufferVec2[0]; dest[1] += bufferVec2[1]; dest[2] += bufferVec2[2];
-
-        dest[3] += 0; dest[4] += 0; dest[5] += 0;
-        VectorTranslator.debugVector(dest);
-
-
+        bufferVec2[0] = pX + tX; bufferVec2[1] = pY + tY; bufferVec2[2] = pZ + tZ;
+        //VectorTranslator.getCrossProduct();
+        System.out.println(angularInertia);
     }
 
     public static void resolveConflict(RigidBodySystem obj, float totalInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] dest){
@@ -109,7 +101,8 @@ public class CollisionSolver {
         obj.getRotationMatrix(bufferMatrix4);
         obj.getInverseInertiaTensor(bufferMatrix3);
         resolveConflict(totalInvMass, obj.getInverseMass(), bufferMatrix3, pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix4, bufferCollRes);
-        obj.applyRotationalTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2], bufferCollRes[3], bufferCollRes[4], bufferCollRes[5]);
+        obj.applyTransformation(bufferCollRes[0], bufferCollRes[1], bufferCollRes[2]);
+        obj.applyOrientationTransform(bufferCollRes[3], bufferCollRes[4], bufferCollRes[5]);
     }
     //COLLISION RESOLVING METHODS
 

@@ -88,12 +88,21 @@ public class TextureManager {
         return texture;
     }
 
-    public static int generateCubemapTexture(){
+    public static int generateCubemapTexture(BufferedImage[] textures){
         int texture = GL30.glGenTextures();
         GL30.glBindTexture(GL30.GL_TEXTURE_CUBE_MAP,texture);
+        for (int i = 0; i < 6; i++) {
+            BufferedImage act = textures[i];
+            IntBuffer data = genFromImage(act);
+            int current = GL30.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
+            GL30.glTexImage2D(
+                    current,
+                    0, GL30.GL_RGBA, act.getWidth(), act.getHeight(), 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, data
+            );
 
-
-
+        }
+        GL30.glTexParameteri(GL30.GL_TEXTURE_CUBE_MAP, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
+        GL30.glTexParameteri(GL30.GL_TEXTURE_CUBE_MAP, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
         return texture;
     }
 

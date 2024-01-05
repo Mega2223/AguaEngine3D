@@ -1,13 +1,10 @@
 package net.mega2223.aguaengine3d.graphics.objects;
 
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.*;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RenderingContext {
@@ -20,7 +17,7 @@ public class RenderingContext {
     final float[] fogDetails = new float[2];
     protected boolean active = false;
     protected boolean areFBOSValid = false;
-    private final LightSpaceRenderingManager lightSpaceRenderingManager = new LightSpaceRenderingManager(this);
+    private final LightspaceRenderingManager lightSpaceRenderingManager = new LightspaceRenderingManager(this);
 
     public RenderingContext(){
 
@@ -189,7 +186,7 @@ public class RenderingContext {
         areFBOSValid = true;
     }
     //for testing purposes
-    public LightSpaceRenderingManager getLightSpaceRenderingManager() {
+    public LightspaceRenderingManager getLightSpaceRenderingManager() {
         return lightSpaceRenderingManager;
     }
 }

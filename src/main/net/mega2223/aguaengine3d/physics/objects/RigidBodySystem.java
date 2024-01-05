@@ -81,11 +81,11 @@ public class RigidBodySystem extends PhysicsSystem {
         applyForce(Math.max(fx-px,0),Math.max(fy-py,0),Math.max(fz-pz,0));
     }
 
-    public void applyRotationalTransformation(float tx, float ty, float tz, float px, float py, float pz) {
-        VectorTranslator.getCrossProduct(bufferVec,tx,ty,tz,px,py,pz);
-        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
-        applyTransformation(Math.max(tx-px,0),Math.max(ty-py,0),Math.max(tz-pz,0));
-    }
+//    public void applyRotationalTransformation(float tx, float ty, float tz, float px, float py, float pz) {
+//        VectorTranslator.getCrossProduct(bufferVec,tx,ty,tz,px,py,pz);
+//        applyOrientationTransform(bufferVec[0], bufferVec[1], bufferVec[2]);
+//        applyTransformation(Math.max(tx-px,0),Math.max(ty-py,0),Math.max(tz-pz,0));
+//    }
 
     /**Applies impulse with rotation component*/
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
@@ -98,7 +98,7 @@ public class RigidBodySystem extends PhysicsSystem {
 
     public void applyTorque(float[] torque){
         MatrixTranslator.multiplyVec3Mat3(torque,inverseInnertialTensorWorldspace);
-        MatrixTranslator.debugMatrix3x3(inverseInnertialTensorWorldspace);
+        //todo should I put the multiplication in the doLogic function?
         accumulatedTorque[0] += torque[0];
         accumulatedTorque[1] += torque[1];
         accumulatedTorque[2] += torque[2];
