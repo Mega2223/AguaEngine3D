@@ -4,6 +4,7 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
@@ -52,8 +53,9 @@ import java.io.IOException;
 * Standardize array arguments
 * Calculate the restitution variable lol
 * Also the physics module needs the friction force
-* Paralell contact is weid currently
+* Parallel contact is weird currently
 * Static function that creates objects with bound buffers
+* Shader recompile function
 * */
 
 public class Gaem3D {
@@ -124,7 +126,9 @@ public class Gaem3D {
         CubemapInterpreterShaderProgram sh = new CubemapInterpreterShaderProgram(id);
         context.addScript(sh.genRotationUpdateRunnable(camera));
         Model mod = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),sh);
-
+        float[] v = mod.getRelativeVertices();
+        //ModelUtils.scaleAllVertices(v,.5F);
+        mod.setVertices(v);
         context.addObject(mod);
         //Render Logic be like:
         long unrendered = 0;

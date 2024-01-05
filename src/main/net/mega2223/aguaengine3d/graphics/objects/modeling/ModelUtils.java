@@ -119,6 +119,18 @@ public class ModelUtils {
         stream.close();
     }
 
+    public static void translateAllVertices(float[] vertices, float x, float y, float z){
+        for (int i = 0; i < vertices.length; i+=4) {
+            vertices[i] += x; vertices[i+1] += y; vertices[i+2] += z;
+        }
+    }
+
+    public static void scaleAllVertices(float[] vertices, float factor){
+        for (int i = 0; i < vertices.length; i+=4) {
+            vertices[i] *= factor; vertices[i+1] *= factor; vertices[i+2] *= factor;
+        }
+    }
+
     public static void debugIndices(Model model){
         int[] indices = model.indices;
         float[] vertices = model.vertices;
