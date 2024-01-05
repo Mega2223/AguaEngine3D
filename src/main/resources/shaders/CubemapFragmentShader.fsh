@@ -1,7 +1,7 @@
 #version 330 core
 
 in vec3 dir;
-uniform sampler2D cubemap;
+uniform samplerCube cubemap;
 
 out vec4 color;
 

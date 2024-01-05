@@ -3,7 +3,10 @@ package net.mega2223.aguaengine3d;
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
@@ -12,6 +15,11 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 @SuppressWarnings({"unused"})
 
@@ -62,7 +70,7 @@ public class Gaem3D {
     static float[] trans = new float[16];
     static float[] proj = new float[16];
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         //GLFW
         manager = new WindowManager(300, 300, TITLE);
@@ -103,12 +111,21 @@ public class Gaem3D {
                 .setActive(true)
                 .setFogDetails(30, 20);
         RenderingManager.printErrorQueue();
-        Line line = new Line(1,0,0);
+        //Line line = new Line(1,0,0);
         RenderingManager.printErrorQueue();
-        line.setEnd(0,3,0);
-        context.addObject(line);
+        //line.setEnd(0,3,0);
+        //context.addObject(line);
         RenderingManager.printErrorQueue();
+        //tests
+        BufferedImage texture = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
+        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{
+                texture,texture,texture,texture,texture,texture
+        });
+        CubemapInterpreterShaderProgram sh = new CubemapInterpreterShaderProgram(id);
+        context.addScript(sh.genRotationUpdateRunnable(camera));
+        Model mod = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),sh);
 
+        context.addObject(mod);
         //Render Logic be like:
         long unrendered = 0;
         long lastLoop = System.currentTimeMillis();
