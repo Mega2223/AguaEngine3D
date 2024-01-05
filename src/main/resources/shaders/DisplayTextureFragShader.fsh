@@ -15,12 +15,15 @@ uniform vec4 fogColor = vec4(.5,.5,.6,1);
 uniform vec4[MAX_LIGHTS] lights; //4th location is brightness
 uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 uniform bool doShadowMapping = false;
+uniform int useAlphaForFog = 0;
 
 out vec4 color;
 
 //--@calculateLightInfluenceFunction
 
 //--@stepToVarFunction
+
+//--@mixFogFunction
 
 void main(){
 
@@ -34,12 +37,6 @@ void main(){
         color = mix(color,mixedColor,lightInfluence);
     }
 
-    //fog calculations
-    float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
-    fogInfluence-=fogStart;
-    fogInfluence/=fogDissolve;
-    fogInfluence = clamp(fogInfluence,0,1);
-    color = mix(color,fogColor,fogInfluence);
-
+    mixFog();
 }
 

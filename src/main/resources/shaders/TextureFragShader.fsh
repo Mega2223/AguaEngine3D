@@ -44,18 +44,7 @@ float calculateLightInfluence(vec4 light,vec4 coord){
 
 //--@stepToVarFunction
 
-//-@mixFogFunction
-void mixFog(){
-    float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
-    fogInfluence-=fogStart;
-    fogInfluence/=fogDissolve;
-    fogInfluence = clamp(fogInfluence,0,1);
-    if(useAlphaForFog == 0){
-        color = mix(color,fogColor,fogInfluence);
-    } else {
-        color.a = 1-fogInfluence;
-    }
-}
+//--@mixFogFunction
 
 void main(){
     vec4 textureColor = texture(samplerTexture,texturePosition);
