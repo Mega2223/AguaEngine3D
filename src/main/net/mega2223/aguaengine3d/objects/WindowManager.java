@@ -38,7 +38,7 @@ public class WindowManager {
         GL30.glEnable(GL30.GL_DEPTH_TEST);
         GL30.glEnable(GL30.GL_BLEND);
         GL30.glDisable(GL30.GL_CULL_FACE);
-        GL30.glDepthFunc(GL30.GL_LESS);
+        GL30.glDepthFunc(GL30.GL_ALWAYS);
         GL30.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 
         GLFW.glfwShowWindow(windowName);

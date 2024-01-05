@@ -8,6 +8,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
@@ -16,6 +17,7 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL30;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -106,7 +108,6 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
-        context.addObject(chessFloor);
 
         context.setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)
@@ -118,18 +119,20 @@ public class Gaem3D {
         //line.setEnd(0,3,0);
         //context.addObject(line);
         RenderingManager.printErrorQueue();
+
+        //skybox
+        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
+        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{cat,cat,cat,cat,cat,cat});
+        CubemapInterpreterShaderProgram cubemapShader = new CubemapInterpreterShaderProgram(id);
+        context.addScript(cubemapShader.genRotationUpdateRunnable(camera));
+        Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
+        context.addObject(cubemap);
+
         //tests
-        BufferedImage texture = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
-        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{
-                texture,texture,texture,texture,texture,texture
-        });
-        CubemapInterpreterShaderProgram sh = new CubemapInterpreterShaderProgram(id);
-        context.addScript(sh.genRotationUpdateRunnable(camera));
-        Model mod = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),sh);
-        float[] v = mod.getRelativeVertices();
-        //ModelUtils.scaleAllVertices(v,.5F);
-        mod.setVertices(v);
-        context.addObject(mod);
+        Model cubeNotMap = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram());
+        context.addObject(chessFloor);
+        context.addObject(cubeNotMap);
+
         //Render Logic be like:
         long unrendered = 0;
         long lastLoop = System.currentTimeMillis();

@@ -13,17 +13,18 @@ uniform int itneration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
+uniform int useAlphaForFog = 0;
 
 uniform vec4[MAX_LIGHTS] lights; //4th location is brightness
 uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 
 //lightspace calculations for shadow rendering, off by default
-uniform sampler2D[MAX_LIGHTS] shadowmaps;
+uniform sampler2D[MAX_LIGHTS] shadowmaps;//fixme OpenGL does not like sampler arrays JUST IN SOME MACHINES FOR SOME REASON >:(
 uniform int[MAX_LIGHTS] doShadowMapping;
 
 out vec4 color;
 
-float calculateShadowAt(int index){ //fixme this may crash low-end gpus
+float calculateShadowAt(int index){
     vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
     if(tr.x > 1 || tr.y > 1 || tr.z > 1 || tr.x < -1 || tr.y < -1 || tr.z < -1 ){return 1;}
@@ -43,6 +44,19 @@ float calculateLightInfluence(vec4 light,vec4 coord){
 
 //--@stepToVarFunction
 
+//-@mixFogFunction
+void mixFog(){
+    float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
+    fogInfluence-=fogStart;
+    fogInfluence/=fogDissolve;
+    fogInfluence = clamp(fogInfluence,0,1);
+    if(useAlphaForFog == 0){
+        color = mix(color,fogColor,fogInfluence);
+    } else {
+        color.a = 1-fogInfluence;
+    }
+}
+
 void main(){
     vec4 textureColor = texture(samplerTexture,texturePosition);
     for(int i = 0; i < MAX_LIGHTS; i++){
@@ -51,15 +65,9 @@ void main(){
         lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
         lightInfluence = clamp(lightInfluence,0,1);
         color = mix(color,mixedColor,lightInfluence);
-        color.a = textureColor.a;
     }
-
-    //fog calculations
-    float fogInfluence = (distance(worldCoord,vec4(0,0,0,0)));
-    fogInfluence-=fogStart;
-    fogInfluence/=fogDissolve;
-    fogInfluence = clamp(fogInfluence,0,1);
-    color = mix(color,fogColor,fogInfluence);
+    color.a = textureColor.a;
+    mixFog();
 
 }
 
