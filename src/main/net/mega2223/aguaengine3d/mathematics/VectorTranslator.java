@@ -127,6 +127,9 @@ public class VectorTranslator {
         }
         return (float) Math.sqrt(s);
     }
+    public static float get2DScalarProduct(float[] vec, float[] vec2){
+        return vec[0]*vec2[0] + vec[1]*vec2[1];
+    }
 
     public static float getScalarProduct(float[] vec3, float[] vec32){
         return vec3[0]*vec32[0]+vec3[1]*vec32[1]+vec3[2]*vec32[2];

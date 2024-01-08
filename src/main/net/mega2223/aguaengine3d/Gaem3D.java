@@ -112,7 +112,7 @@ public class Gaem3D {
         context.setLight(0, 0, 10, 0, 10)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(30, 20);
+                .setFogDetails(30000, 20);
         RenderingManager.printErrorQueue();
         //Line line = new Line(1,0,0);
         RenderingManager.printErrorQueue();
@@ -121,8 +121,10 @@ public class Gaem3D {
         RenderingManager.printErrorQueue();
 
         //skybox
-        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
-        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{cat,cat,cat,cat,cat,cat});
+        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\imgsky.png"));
+        BufferedImage sky = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\sky.png"));
+
+        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{sky,cat,sky,sky,sky,sky});
         CubemapInterpreterShaderProgram cubemapShader = new CubemapInterpreterShaderProgram(id);
         context.addScript(cubemapShader.genRotationUpdateRunnable(camera));
         Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
