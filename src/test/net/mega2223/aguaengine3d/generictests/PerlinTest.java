@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.generictests;
 
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.WaveNoise;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
@@ -14,10 +15,10 @@ import java.io.IOException;
 //▒▓░▐▌
 public class PerlinTest {
     public static void main(String[] args) throws IOException {
-        int X = 15, Z = 15;
-        PerlinNoise noise = new PerlinNoise(X, Z);
-        //WaveNoise noise = new WaveNoise(2,0,2,0);
-        final int scale = 100;
+        int X = 10, Z = 10;
+        Noise noise = new PerlinNoise(X, Z);
+        //noise = new WaveNoise(2,0,2,0);
+        final int scale = 200;
         int width = X * scale; int height = Z * scale;
         BufferedImage output = new BufferedImage(width, height,BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics = output.createGraphics(); graphics.setColor(Color.black);

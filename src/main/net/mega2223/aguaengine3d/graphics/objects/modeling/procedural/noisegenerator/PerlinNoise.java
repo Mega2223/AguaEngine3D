@@ -6,7 +6,7 @@ public class PerlinNoise extends StandardNoise implements Noise{
     final float[][][] vectorSpace;
     private final Random r = new Random();
     public PerlinNoise(int x, int z) {
-        vectorSpace = new float[x][z][2];
+        vectorSpace = new float[x+1][z+1][2];
         populateVectorSpace();
     }
 
@@ -32,13 +32,27 @@ public class PerlinNoise extends StandardNoise implements Noise{
         } catch (ArrayIndexOutOfBoundsException ignored){
             return -1;
         }
+        //so much for perfomance
+        float displXC = x - xC; float displZC = z - zC;
+        float displXF = x - xF; float displZF = z - zF;
 
-        float dx = x - xF, dz = z - zF;
-        float dot1 = dx * v1[0] + dz * v1[1];
-        float dot2 = dx * v2[0] + dz * v2[1];
-        float dot3 = dx * v3[0] + dz * v3[1];
-        float dot4 = dx * v4[0] + dz * v4[1];
+        float dCC = displXC * v1[0] + displZC * v1[1];
+        float dFC = displXF * v2[0] + displZC * v2[1];
+        float dCF = displXC * v3[0] + displZF * v3[1];
+        float dFF = displXF * v4[0] + displZF * v4[1];
 
-        return (dot1 + dot2 + dot3 + dot4)/4;
+        //float noise = interpolate(interpolate(dCC,dCF,x-xF),interpolate(dFC,dFF,x-xF),z-zF);
+        float n1 = interpolate(dFF,dCF,x-xF);
+        float n2 = interpolate(dFC,dCC,x-xF);
+        float noise = interpolate(n1,n2,z-zF);
+        return Math.max(-1,Math.min(noise,1));
+    }
+
+    private static float interpolate(float v1, float v2, float p){
+        //p = Math.min(v1,v2)+p*(v2-v1);
+        p = p * (v2-v1) + v1;
+        //System.out.println(p);
+        return p;
+        //return (v2-v1)+p;
     }
 }
