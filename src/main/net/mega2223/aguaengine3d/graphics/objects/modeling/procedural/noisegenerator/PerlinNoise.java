@@ -22,6 +22,10 @@ public class PerlinNoise extends StandardNoise implements Noise{
 
     @Override
     public float get(float x, float z) {
+        return get(x,z,false);
+    }
+
+    public float get(float x, float z, boolean normalize) {
         x = xToLocal(x); z = zToLocal(z);
         int xF = (int) Math.floor(x); int xC = (int) Math.ceil(x);
         int zF = (int) Math.floor(z); int zC = (int) Math.ceil(z);
@@ -35,24 +39,36 @@ public class PerlinNoise extends StandardNoise implements Noise{
         //so much for perfomance
         float displXC = x - xC; float displZC = z - zC;
         float displXF = x - xF; float displZF = z - zF;
+        float dCCX = displXC; float dCCZ = displZC;
+        float dFCX = displXF; float dFCZ = displZC;
+        float dCFX = displXC; float dCFZ = displZF;
+        float dFFX = displXF; float dFFZ = displZF;
 
-        float dCC = displXC * v1[0] + displZC * v1[1];
-        float dFC = displXF * v2[0] + displZC * v2[1];
-        float dCF = displXC * v3[0] + displZF * v3[1];
-        float dFF = displXF * v4[0] + displZF * v4[1];
+        if(normalize){
+            float sqrtDCC = (float) Math.sqrt(dCCX * dCCX + dCCZ * dCCZ);
+            float sqrtDFC = (float) Math.sqrt(dFCX * dFCX + dFCZ * dFCZ);
+            float sqrtDCF = (float) Math.sqrt(dCFX * dCFX + dCFZ * dCFZ);
+            float sqrtDFF = (float) Math.sqrt(dFFX * dFFX + dFFZ * dFFZ);
+            dCCX /= sqrtDCC; dCCZ /= sqrtDCC;
+            dFCX /= sqrtDFC; dFCZ /= sqrtDFC;
+            dCFX /= sqrtDCF; dCFZ /= sqrtDCF;
+            dFFX /= sqrtDFF; dFFZ /= sqrtDFF;
+        }
 
-        //float noise = interpolate(interpolate(dCC,dCF,x-xF),interpolate(dFC,dFF,x-xF),z-zF);
-        float n1 = interpolate(dFF,dCF,x-xF);
-        float n2 = interpolate(dFC,dCC,x-xF);
-        float noise = interpolate(n1,n2,z-zF);
+        float dCC = dCCX * v1[0] + dCCZ * v1[1];
+        float dFC = dFCX * v2[0] + dFCZ * v2[1];
+        float dCF = dCFX * v3[0] + dCFZ * v3[1];
+        float dFF = dFFX * v4[0] + dFFZ * v4[1];
+
+        float n1 = interpolate(dFF,dCF,displXF);
+        float n2 = interpolate(dFC,dCC,displXF);
+        float noise = interpolate(n1,n2,displZF);
         return Math.max(-1,Math.min(noise,1));
     }
 
     private static float interpolate(float v1, float v2, float p){
-        //p = Math.min(v1,v2)+p*(v2-v1);
-        p = p * (v2-v1) + v1;
         //System.out.println(p);
-        return p;
+        return p * (v2-v1) + v1;
         //return (v2-v1)+p;
     }
 }

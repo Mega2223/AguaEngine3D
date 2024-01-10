@@ -28,9 +28,9 @@ public class PerlinTest {
             for (int j = 0; j < height; j++) {
                 float x = ((float) i)/scale, z = ((float) j)/scale;
                 float v = noise.get(x,z);
-                int stren = (int) ((v + 1) * (255 / 2));
-                int col = stren & 0XFFFF;
-                output.setRGB(i,j,stren);
+                int col = Math.min(Math.max((int)(v*(255)),-255),255);
+                col = col > 0 ? col : (-col)<<8;
+                output.setRGB(i,j,col);
             }
         }
         ImageIO.write(output,"png",new File(Utils.USER_DIR+"\\src\\test\\out\\img.png"));
