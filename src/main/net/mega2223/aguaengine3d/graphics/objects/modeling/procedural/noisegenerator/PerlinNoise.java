@@ -31,14 +31,15 @@ public class PerlinNoise extends TransformableNoise implements Noise{
         int zF = (int) Math.floor(z); int zC = (int) Math.ceil(z);
         int xCI = xC < vectorSpace.length ? xC : 0;
         int zCI = zC < vectorSpace.length ? zC : 0;
+        int xFI = xF < vectorSpace.length ? xF : 0;
+        int zFI = zF < vectorSpace.length ? zF : 0;
 
         float[] v1, v2, v3, v4;
-        try{
-            v1 = vectorSpace[xCI][zCI]; v2 = vectorSpace[xF][zCI];
-            v3 = vectorSpace[xCI][zF]; v4 = vectorSpace[xF][zF];
-        } catch (ArrayIndexOutOfBoundsException ignored){
-            return 0;
-        }
+        v1 = vectorSpace[xCI][zCI];
+        v2 = vectorSpace[xFI][zCI];
+        v3 = vectorSpace[xCI][zFI];
+        v4 = vectorSpace[xFI][zFI];
+
         //so much for perfomance
         float displXC = x - xC; float displZC = z - zC;
         float displXF = x - xF; float displZF = z - zF;

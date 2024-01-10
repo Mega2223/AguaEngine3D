@@ -6,8 +6,13 @@ import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.WaveNoise;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
@@ -109,10 +114,10 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
 
-        context.setLight(0, 0, 10, 0, 10)
+        context.setLight(0, 0, 10, 0, 160000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(30000, 20);
+                .setFogDetails(40, 200);
         RenderingManager.printErrorQueue();
         //Line line = new Line(1,0,0);
         RenderingManager.printErrorQueue();
@@ -130,9 +135,18 @@ public class Gaem3D {
         Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
         context.addObject(cubemap);
 
+        //terrain
+        PerlinNoise noise1 = new PerlinNoise(256,256); noise1.setHeightScale(20);
+        StackedNoises noises = new StackedNoises(); //noises.add(noise1);
+        WaveNoise noise = new WaveNoise(15, 0, 15, 0);
+        noise.setHeightScale(1);
+        noises.add(noise);
+        noises.add(noise1);
+        context.addObject(Noise.NoiseToModel(noises,512,512,.02F,new SolidColorShaderProgram(.2F,.4F,.3F)));
+
         //tests
         Model cubeNotMap = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram());
-        context.addObject(chessFloor);
+        //context.addObject(chessFloor);
         context.addObject(cubeNotMap);
 
         //Render Logic be like:
@@ -172,7 +186,7 @@ public class Gaem3D {
     }
 
     protected static void doRenderLogic() {
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 100.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 2000.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
         context.doLogic();
         manager.fitViewport();
