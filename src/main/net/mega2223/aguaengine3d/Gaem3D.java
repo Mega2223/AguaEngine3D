@@ -114,16 +114,16 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
 
-        context.setLight(0, 0, 10, 0, 160000)
+        context.setLight(0, 0, 10, 0, 1000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(40, 200);
+                .setFogDetails(800, 200);
         RenderingManager.printErrorQueue();
         //Line line = new Line(1,0,0);
-        RenderingManager.printErrorQueue();
+        //RenderingManager.printErrorQueue();
         //line.setEnd(0,3,0);
         //context.addObject(line);
-        RenderingManager.printErrorQueue();
+        //RenderingManager.printErrorQueue();
 
         //skybox
         BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\imgsky.png"));
@@ -132,18 +132,27 @@ public class Gaem3D {
         int id = TextureManager.generateCubemapTexture(new BufferedImage[]{sky,cat,sky,sky,sky,sky});
         CubemapInterpreterShaderProgram cubemapShader = new CubemapInterpreterShaderProgram(id);
         context.addScript(cubemapShader.genRotationUpdateRunnable(camera));
-        Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
-        context.addObject(cubemap);
+       // Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
+        //context.addObject(cubemap);
 
         //terrain
-        PerlinNoise noise1 = new PerlinNoise(256,256); noise1.setHeightScale(20);
-        StackedNoises noises = new StackedNoises(); //noises.add(noise1);
-        WaveNoise noise = new WaveNoise(15, 0, 15, 0);
-        noise.setHeightScale(1);
-        noises.add(noise);
-        noises.add(noise1);
-        context.addObject(Noise.NoiseToModel(noises,512,512,.02F,new SolidColorShaderProgram(.2F,.4F,.3F)));
+        PerlinNoise perlin = new PerlinNoise(4,4); perlin.setHeightScale(27);
+        StackedNoises noises = new StackedNoises(); //noises.add(perlin);
+        int vectorSpaceSize = 64; int modelScale = 16; int polyScale = 64;
+        WaveNoise wave = new WaveNoise(16, 3, 16, 0);
+        //noises.add(wave);
+        noises.add(perlin); noises.add(wave);
+        Model actualNoise = Noise.NoiseToModel(noises, polyScale, polyScale, 1F / polyScale, modelScale, new SolidColorShaderProgram(.2F, .4F, .3F));
+        context.addObject(actualNoise);
+        Model water = new Model(
+                new float[]{0,0,0,0, 0,0,polyScale*modelScale,0, polyScale*modelScale,0,0,0, polyScale*modelScale,0,polyScale*modelScale,0},
+                new int[]{0,1,2,1,2,3},
+                new SolidColorShaderProgram(.2F,.2F,.8F,.7F)
+        );
+        actualNoise.setCoords(-(polyScale*modelScale)/2F,0,-(polyScale*modelScale)/2F);
+        water.setCoords(-(polyScale*modelScale)/2F,0,-(polyScale*modelScale)/2F);
 
+        context.addObject(water);
         //tests
         Model cubeNotMap = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram());
         //context.addObject(chessFloor);
@@ -186,7 +195,7 @@ public class Gaem3D {
     }
 
     protected static void doRenderLogic() {
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 2000.0f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
         context.doLogic();
         manager.fitViewport();

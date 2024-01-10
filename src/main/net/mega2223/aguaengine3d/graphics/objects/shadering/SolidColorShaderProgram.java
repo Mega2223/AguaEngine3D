@@ -11,9 +11,10 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
 
     private final int program;
     private final float[] color;
-    public SolidColorShaderProgram(float r, float g, float b){this(r,g,b,null);}
-    public SolidColorShaderProgram(float r, float g, float b, ShaderDictonary dict){
-        color = new float[]{r,g,b};
+    public SolidColorShaderProgram(float r, float g, float b){this(r,g,b,1);}
+    public SolidColorShaderProgram(float r, float g, float b, float a){this(r,g,b,a,null);}
+    public SolidColorShaderProgram(float r, float g, float b, float a, ShaderDictonary dict){
+        color = new float[]{r,g,b,a};
         program = ShaderManager.loadShaderFromFiles(new String[]{
                 VERTEX_SH,FRAG_SH
         },dict);
@@ -31,7 +32,7 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
     public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
         super.setUniforms(interation, translationMatrix, projectionMatrix);
-        GL30.glUniform4f(uniformColorLocation,color[0],color[1],color[2],1);
+        GL30.glUniform4f(uniformColorLocation,color[0],color[1],color[2],color[3]);
 
     }
 

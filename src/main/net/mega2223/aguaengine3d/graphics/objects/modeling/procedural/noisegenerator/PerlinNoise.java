@@ -4,9 +4,15 @@ import java.util.Random;
 
 public class PerlinNoise extends TransformableNoise implements Noise{
     final float[][][] vectorSpace;
-    private final Random r = new Random();
-    public PerlinNoise(int x, int z) {
+    final int DX, DZ;
+    private final Random r;
+    public PerlinNoise(int x,int z){
+        this(x,z,new Random().nextLong());
+    }
+    public PerlinNoise(int x, int z, long seed) {
         vectorSpace = new float[x][z][2];
+        DX = x; DZ = z;
+        r = new Random(seed);
         populateVectorSpace();
     }
 
@@ -29,10 +35,10 @@ public class PerlinNoise extends TransformableNoise implements Noise{
         x = xToLocal(x); z = zToLocal(z);
         int xF = (int) Math.floor(x); int xC = (int) Math.ceil(x);
         int zF = (int) Math.floor(z); int zC = (int) Math.ceil(z);
-        int xCI = xC < vectorSpace.length ? xC : 0;
-        int zCI = zC < vectorSpace.length ? zC : 0;
-        int xFI = xF < vectorSpace.length ? xF : 0;
-        int zFI = zF < vectorSpace.length ? zF : 0;
+        int xCI = xC % DX;
+        int zCI = zC % DZ;
+        int xFI = xF % DX;
+        int zFI = zF % DZ;
 
         float[] v1, v2, v3, v4;
         v1 = vectorSpace[xCI][zCI];

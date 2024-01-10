@@ -30,15 +30,15 @@ public interface Noise {
         return output;
     }
 
-    static Model NoiseToModel(Noise noise, int width, int depth, float scale, ShaderProgram program){
+    static Model NoiseToModel(Noise noise, int width, int depth, float samplingScale, float modelScale, ShaderProgram program){
         float[] vertices = new float[4*width*depth];
         List<Integer> indiceList = new ArrayList<>();
         for (int i = 0; i < vertices.length; i+=4) {
             int ii = i/4;
             int x = ii%width, z = ii/depth;
-            vertices[i] = x;
-            vertices[i+1] = noise.get(x*scale,z*scale);
-            vertices[i+2] = z;
+            vertices[i] = x * modelScale;
+            vertices[i+1] = noise.get(x*samplingScale,z*samplingScale)  * modelScale;
+            vertices[i+2] = z  * modelScale;
         }
         for (int i = 0; i < width*depth; i++) {
             if(!(i%width>=width-1||i/depth>=depth-1)){
