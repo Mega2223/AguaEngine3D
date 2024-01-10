@@ -2,11 +2,11 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegene
 
 import java.util.Random;
 
-public class PerlinNoise extends StandardNoise implements Noise{
+public class PerlinNoise extends TransformableNoise implements Noise{
     final float[][][] vectorSpace;
     private final Random r = new Random();
     public PerlinNoise(int x, int z) {
-        vectorSpace = new float[x+1][z+1][2];
+        vectorSpace = new float[x][z][2];
         populateVectorSpace();
     }
 
@@ -29,12 +29,15 @@ public class PerlinNoise extends StandardNoise implements Noise{
         x = xToLocal(x); z = zToLocal(z);
         int xF = (int) Math.floor(x); int xC = (int) Math.ceil(x);
         int zF = (int) Math.floor(z); int zC = (int) Math.ceil(z);
+        int xCI = xC < vectorSpace.length ? xC : 0;
+        int zCI = zC < vectorSpace.length ? zC : 0;
+
         float[] v1, v2, v3, v4;
         try{
-            v1 = vectorSpace[xC][zC]; v2 = vectorSpace[xF][zC];
-            v3 = vectorSpace[xC][zF]; v4 = vectorSpace[xF][zF];
+            v1 = vectorSpace[xCI][zCI]; v2 = vectorSpace[xF][zCI];
+            v3 = vectorSpace[xCI][zF]; v4 = vectorSpace[xF][zF];
         } catch (ArrayIndexOutOfBoundsException ignored){
-            return -1;
+            return 0;
         }
         //so much for perfomance
         float displXC = x - xC; float displZC = z - zC;
@@ -63,7 +66,7 @@ public class PerlinNoise extends StandardNoise implements Noise{
         float n1 = interpolate(dFF,dCF,displXF);
         float n2 = interpolate(dFC,dCC,displXF);
         float noise = interpolate(n1,n2,displZF);
-        return Math.max(-1,Math.min(noise,1));
+        return super.applyTransformations(Math.max(-1,Math.min(noise,1)));
     }
 
     private static float interpolate(float v1, float v2, float p){

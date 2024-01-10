@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator;
 
-public class WaveNoise extends StandardNoise{
+public class WaveNoise extends TransformableNoise {
     final float freqX, offsetX, freqZ, offsetZ;
     public WaveNoise(float freqX, float offsetX, float freqZ, float offsetZ){
         this.freqX = freqX; this.offsetX = offsetX; this.freqZ = freqZ; this.offsetZ = offsetZ;
