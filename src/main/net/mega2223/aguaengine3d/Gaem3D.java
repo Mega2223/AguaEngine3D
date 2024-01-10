@@ -41,13 +41,13 @@ import java.io.IOException;
 * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
 * Move aero to another module? (also finish it lol) <- DONE
 * Move shadow calculation algorithm to the default shader dictionary
-* Cubemap support (for lights and skyboxes)
+* Cubemap support (for lights and skyboxes) <- Done
 * Logo and Readme.md
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support)
 * Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
-* Model blueprint class
-* Coverage testing
+* Model blueprint class <- Done
+* Coverage testing <- what
 * Sound stuff
 * Physics stuff
 * Trigger stuff
@@ -55,14 +55,15 @@ import java.io.IOException;
 * Animation stuff
 * Perhaps a static OpenGL manager class?
 * Denote static buffers explicitly as static? <- DONE afaik
-* Interaction radius detection interface
+* Interaction radius detection interface <- Done
 * Object declaration instantiation generation annotation?
 * Standardize array arguments
-* Calculate the restitution variable lol
+* Calculate the restitution variable lol <- Done?
 * Also the physics module needs the friction force
 * Parallel contact is weird currently
 * Static function that creates objects with bound buffers
 * Shader recompile function
+* Render order priority variable/method?
 * */
 
 public class Gaem3D {
@@ -87,7 +88,7 @@ public class Gaem3D {
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
-            float speed = .15F;
+            float speed = .075F;
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += speed*c;camera[0] += speed*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= speed*c;camera[0] -= speed*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += speed*c;camera[2]-= speed*s;}
@@ -107,6 +108,11 @@ public class Gaem3D {
 
         //scenery setup
 
+        context.setLight(0, 0, 10, 0, 1000)
+                .setBackGroundColor(.5f, .5f, .6f)
+                .setActive(true)
+                .setFogDetails(100, 100);
+
         TexturedModel chessFloor = new TexturedModel(
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
                 new int[]{0, 1, 2, 2, 1, 3},
@@ -114,49 +120,20 @@ public class Gaem3D {
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
         );
 
-        context.setLight(0, 0, 10, 0, 1000)
-                .setBackGroundColor(.5f, .5f, .6f)
-                .setActive(true)
-                .setFogDetails(800, 200);
-        RenderingManager.printErrorQueue();
-        //Line line = new Line(1,0,0);
-        //RenderingManager.printErrorQueue();
-        //line.setEnd(0,3,0);
-        //context.addObject(line);
-        //RenderingManager.printErrorQueue();
-
-        //skybox
-        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\imgsky.png"));
-        BufferedImage sky = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\sky.png"));
-
-        int id = TextureManager.generateCubemapTexture(new BufferedImage[]{sky,cat,sky,sky,sky,sky});
-        CubemapInterpreterShaderProgram cubemapShader = new CubemapInterpreterShaderProgram(id);
-        context.addScript(cubemapShader.genRotationUpdateRunnable(camera));
-       // Model cubemap = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),cubemapShader);
-        //context.addObject(cubemap);
-
-        //terrain
-        PerlinNoise perlin = new PerlinNoise(4,4); perlin.setHeightScale(27);
-        StackedNoises noises = new StackedNoises(); //noises.add(perlin);
-        int vectorSpaceSize = 64; int modelScale = 16; int polyScale = 64;
-        WaveNoise wave = new WaveNoise(16, 3, 16, 0);
-        //noises.add(wave);
-        noises.add(perlin); noises.add(wave);
-        Model actualNoise = Noise.NoiseToModel(noises, polyScale, polyScale, 1F / polyScale, modelScale, new SolidColorShaderProgram(.2F, .4F, .3F));
-        context.addObject(actualNoise);
         Model water = new Model(
-                new float[]{0,0,0,0, 0,0,polyScale*modelScale,0, polyScale*modelScale,0,0,0, polyScale*modelScale,0,polyScale*modelScale,0},
+                new float[]{200,0,200,0, 200,0,-200,0, -200,0,200,0, -200,0,-200,0},
                 new int[]{0,1,2,1,2,3},
                 new SolidColorShaderProgram(.2F,.2F,.8F,.7F)
         );
-        actualNoise.setCoords(-(polyScale*modelScale)/2F,0,-(polyScale*modelScale)/2F);
-        water.setCoords(-(polyScale*modelScale)/2F,0,-(polyScale*modelScale)/2F);
-
-        context.addObject(water);
-        //tests
-        Model cubeNotMap = TexturedModel.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),new TextureShaderProgram());
+        water.setCoords(0,-.1F,0);
         //context.addObject(chessFloor);
-        context.addObject(cubeNotMap);
+        context.addObject(water);
+
+        PerlinNoise noise = new PerlinNoise(16,16);
+        noise.setHeightScale(4);
+        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
+        grass.setCoords(-200,1,-200);
+        context.addObject(grass);
 
         //Render Logic be like:
         long unrendered = 0;
