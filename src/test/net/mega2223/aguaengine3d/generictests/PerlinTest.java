@@ -15,10 +15,10 @@ import java.io.IOException;
 //▒▓░▐▌
 public class PerlinTest {
     public static void main(String[] args) throws IOException {
-        int X = 10, Z = 10;
+        int X = 6, Z = 6;
         Noise noise = new PerlinNoise(X, Z);
         //noise = new WaveNoise(2,0,2,0);
-        final int scale = 200;
+        final int scale = 400;
         int width = X * scale; int height = Z * scale;
         BufferedImage output = new BufferedImage(width, height,BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics = output.createGraphics(); graphics.setColor(Color.black);

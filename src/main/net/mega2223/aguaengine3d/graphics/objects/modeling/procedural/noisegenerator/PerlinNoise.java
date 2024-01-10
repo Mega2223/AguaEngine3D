@@ -67,8 +67,8 @@ public class PerlinNoise extends StandardNoise implements Noise{
     }
 
     private static float interpolate(float v1, float v2, float p){
-        //System.out.println(p);
-        return p * (v2-v1) + v1;
-        //return (v2-v1)+p;
+        p = Math.max(Math.min(p, 1), 0);
+        //return p * (v2-v1) + v1;
+        return (v2 - v1) * (3F - p * 2F) * p * p + v1;
     }
 }
