@@ -2,6 +2,8 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.UniformNoise;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -124,6 +126,12 @@ public class StructureUtils {
         return new float[]{
                 bX,bY,0,0 ,eX,bY,0,0 , eX,eY,0,0 , bX,eY,0,0
         };
+    }
+
+    public static Model generatePlane(int size, int complexity, ShaderProgram program){
+        float invComplexity = 1F/complexity;
+        UniformNoise noise = new UniformNoise(0); //why rewrite code amirite
+        return Noise.NoiseToModel(noise,size*complexity,size*complexity,1F/complexity,1,program);
     }
 
 }

@@ -1,9 +1,11 @@
-package net.mega2223.aguaengine3d;
+package net.mega2223.aguaengine3d.featureshowcase;
 
-
+import net.mega2223.aguaengine3d.featureshowcase.utils.GrassShaderProgram;
+import net.mega2223.aguaengine3d.featureshowcase.utils.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
@@ -20,53 +22,17 @@ import java.io.IOException;
 
 @SuppressWarnings({"unused"})
 
-/*
-* The official AguaEngine3D TODO list:
-* Remove shadow acnes somehow (I hate normals so much it's unreal)
-* Font rendering <- unfinished
-* Rewrite texture loading function
-* Convert light objects to structs in shaders
-* The floor is slightly transparent somehow <- FIXED
-* Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
-* Move aero to another module? (also finish it lol) <- DONE
-* Move shadow calculation algorithm to the default shader dictionary
-* Cubemap support (for lights and skyboxes) <- Done
-* Logo and Readme.md
-* Figure out why the FPS loop is weird
-* Improvements on procedural building generation (aka multi building and scaling support)
-* Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
-* Model blueprint class <- Done
-* Coverage testing <- what
-* Sound stuff
-* Physics stuff
-* Trigger stuff
-* Collision stuff
-* Animation stuff
-* Perhaps a static OpenGL manager class?
-* Denote static buffers explicitly as static? <- DONE afaik
-* Interaction radius detection interface <- Done
-* Object declaration instantiation generation annotation?
-* Standardize array arguments
-* Calculate the restitution variable lol <- Done?
-* Also the physics module needs the friction force
-* Parallel contact is weird currently
-* Static function that creates objects with bound buffers
-* Shader recompile function
-* Render order priority variable/method?
-* */
-
-public class Gaem3D {
+public class ProceduralTerrainGenerator {
 
     public static final int TARGET_FPS = 120;
-    public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
-    protected static final String TITLE = "3 DIMENSÇÕES";
-    protected static final int D = 512;
+    public static final float[] SKY_COLOR = {.5f, .5f, .5f, 1};
+    public static float SPEED = .075F;
+    protected static final String TITLE = "Geração de terreno :)";
     public static final float[] camera = {0, .9f, 0, 0};
     public static int framesElapsed = 0;
     static WindowManager manager;
     static RenderingContext context;
 
-    static float[] trans = new float[16];
     static float[] proj = new float[16];
 
     public static void main(String[] args) throws IOException {
@@ -77,15 +43,14 @@ public class Gaem3D {
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
-            float speed = .075F;
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += speed*c;camera[0] += speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= speed*c;camera[0] -= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += speed*c;camera[2]-= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= speed*c;camera[2]+= speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += SPEED*c;camera[0] += SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= SPEED*c;camera[0] -= SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += SPEED*c;camera[2]-= SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= SPEED*c;camera[2]+= SPEED*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += SPEED;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= SPEED;}
         });
 
         //shader dict setup
@@ -93,43 +58,35 @@ public class Gaem3D {
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+
+        //scene setup
+
         context = new RenderingContext();
-
-        //scenery setup
-
         context.setLight(0, 0, 10, 0, 1000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
                 .setFogDetails(100, 100);
 
-        TexturedModel chessFloor = new TexturedModel(
-                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
-                new int[]{0, 1, 2, 2, 1, 3},
-                new float[]{0, 0, 100, 0, 0, 100, 100, 100},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
-        );
 
-        Model water = new Model(
-                new float[]{200,0,200,0, 200,0,-200,0, -200,0,200,0, -200,0,-200,0},
-                new int[]{0,1,2,1,2,3},
-                new SolidColorShaderProgram(.2F,.2F,.8F,.7F)
-        );
-        water.setCoords(0,-.1F,0);
-        //context.addObject(chessFloor);
-        context.addObject(water);
+        GrassShaderProgram grassShaderProgram = new GrassShaderProgram();
+        WaterShaderProgram waterShaderProgram = new WaterShaderProgram();
+
+        Model water = StructureUtils.generatePlane(400,1,waterShaderProgram);
+
+        water.setCoords(-200,-.1F,0-200);
 
         PerlinNoise noise = new PerlinNoise(16,16);
         noise.setHeightScale(4);
-        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
+        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
         grass.setCoords(-200,1,-200);
-        context.addObject(grass);
 
-        //Render Logic be like:
+        context.addObject(grass);
+        context.addObject(water);
+        //Render Logic:
         long unrendered = 0;
         long lastLoop = System.currentTimeMillis();
         int framesLastSecond = 0;
         long fLSLastUpdate = 0;
-        //long lastCycleDuration = 0; STOP SCREAMING AT ME INTELLIJ I GET IT
         context.setActive(true);
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
@@ -137,19 +94,16 @@ public class Gaem3D {
             lastLoop = System.currentTimeMillis();
             if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
+                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " y:" + camera[1] +  " z:" + camera[2] + ")");
                 framesLastSecond = 0;
 
             }
             if (unrendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();
-                //cpu logic
                 doLogic();
-                //render logic
                 doRenderLogic();
                 unrendered = 0;
                 framesElapsed++;
-                //lastCycleDuration = System.currentTimeMillis() - cycleStart;
                 framesLastSecond++;
             }
         }
