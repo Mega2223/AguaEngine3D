@@ -6,8 +6,8 @@
 
     <groupId>net.Mega2223</groupId>
     <artifactId>AguaEngine3D</artifactId>
-    <packaging>pom</packaging>
-    <version>BETA-0.1-U</version>
+    <packaging>jar</packaging>
+    <version>BETA-0.2-U</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
