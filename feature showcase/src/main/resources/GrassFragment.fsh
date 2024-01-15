@@ -1,8 +1,8 @@
 #version 330 core
 
 in vec4 worldCoord;
-in vec4 objectiveCoord;
-
+in vec4 objectiveCoords;
+in vec3 normal;
 //--@maxLightsConstant
 
 uniform vec4 color2; // uniform color
@@ -19,13 +19,17 @@ out vec4 color;
 const vec4 green = vec4(.05,.6,.05,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
+const vec4 test = vec4(1,1,1,1);
+
 
 void main(){
-    float greenBias = (objectiveCoord.y-1.5F)*.75F;
+    float greenBias = (objectiveCoords.y-1.5F)*.75F;
     greenBias = clamp(greenBias,0,1);
     color = mix(yellow,green,greenBias);
-    float browBias = (-objectiveCoord.y-.85)*.5F;
+    float browBias = (-objectiveCoords.y-.85)*.5F;
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
+    color = mix(color,test,dot(normal,clamp(vec3(1,0,0),-1,1)));
+
     mixFog();
 }
