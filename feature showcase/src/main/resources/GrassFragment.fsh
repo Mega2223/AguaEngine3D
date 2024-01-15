@@ -19,7 +19,7 @@ out vec4 color;
 const vec4 green = vec4(.05,.6,.05,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
-const vec4 test = vec4(1,1,1,1);
+const vec4 test = vec4(1,1,0,1);
 
 
 void main(){
@@ -29,7 +29,8 @@ void main(){
     float browBias = (-objectiveCoords.y-.85)*.5F;
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
-    color = mix(color,test,dot(normal,clamp(vec3(1,0,0),-1,1)));
+    float s = 0; float c = 1;
+    color = mix(color,test,dot(normal,clamp(vec3(c,s,c/2),-1,1)));
 
     mixFog();
 }
