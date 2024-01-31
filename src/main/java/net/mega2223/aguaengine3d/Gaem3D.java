@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d;
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
@@ -12,6 +13,7 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
@@ -115,14 +117,10 @@ public class Gaem3D {
                 new SolidColorShaderProgram(.2F,.2F,.8F,.7F)
         );
         water.setCoords(0,-.1F,0);
-        //context.addObject(chessFloor);
-        context.addObject(water);
 
-        PerlinNoise noise = new PerlinNoise(16,16);
-        noise.setHeightScale(4);
-        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
-        grass.setCoords(-200,1,-200);
-        context.addObject(grass);
+        context.addObject(chessFloor);
+
+        VectorTranslator.debugVector(ModelUtils.generateNormals(chessFloor,true));
 
         //Render Logic be like:
         long unrendered = 0;

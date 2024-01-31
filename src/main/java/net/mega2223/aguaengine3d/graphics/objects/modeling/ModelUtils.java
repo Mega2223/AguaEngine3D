@@ -11,6 +11,7 @@ import java.util.List;
 public class ModelUtils {
 
     private ModelUtils(){}
+    private static final float[] bufferVec4 = new float[4];
 
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
         return mergeModels(models,texture,models[0].getShader());
@@ -129,6 +130,62 @@ public class ModelUtils {
         for (int i = 0; i < vertices.length; i+=4) {
             vertices[i] *= factor; vertices[i+1] *= factor; vertices[i+2] *= factor;
         }
+    }
+
+    public static float[] generateNormals(Model model,boolean clockwise){
+        return generateNormals(model.getRelativeVertices(),model.getIndices(),clockwise);
+    }
+
+    public static float[] generateNormals(float[] vertices, int[] indices, boolean clockwise){
+        boolean[] figuredOutYet = new boolean[vertices.length];
+        float[] ret =  new float[vertices.length];
+        //int[] connectedPrimitives = new int[vertices.length/4];
+        float[][] primitiveNormals = new float[indices.length/3][3];
+
+        //Figures out the normals for each triangle
+        for (int i = 0; i < indices.length; i+= 3) {
+            int v0loc = 4 * indices[i]; int v1loc = 4 * indices[i + 1]; int v2loc = 4 * indices[i + 2];
+            float v0x = vertices[v0loc]; float v0y = vertices[v0loc +1]; float v0z = vertices[v0loc +2];
+            float v1x = vertices[v1loc]; float v1y = vertices[v1loc +1]; float v1z = vertices[v1loc +2];
+            float v2x = vertices[v2loc]; float v2y = vertices[v2loc +1]; float v2z = vertices[v2loc +2];
+
+            float vAx = v1x - v0x; float vAy = v1y - v0y; float vAz = v1z - v0z;
+            float vBx = v2x - v0x; float vBy = v2y - v0y; float vBz = v2z - v0z;
+
+            VectorTranslator.getCrossProduct(bufferVec4,vAx,vAy,vAz,vBx,vBy,vBz);
+            VectorTranslator.normalize(bufferVec4);
+            if(clockwise){VectorTranslator.flipVector(bufferVec4);}
+            primitiveNormals[i/3][0] = bufferVec4[0];
+            primitiveNormals[i/3][1] = bufferVec4[1];
+            primitiveNormals[i/3][2] = bufferVec4[2];
+
+            /*connectedPrimitives[indices[i]]++;
+            connectedPrimitives[indices[i+1]]++;
+            connectedPrimitives[indices[i+2]]++;*/
+        }
+
+        //Calculates the average vector between the normal of each connected primitive
+        for (int i = 0; i < vertices.length; i+=4) {
+            float xC = 0, yC = 0, zC = 0;
+            int primitiveCount = 0, id = i/4;
+            for (int j = 0; j < indices.length; j++) {
+                if (indices[j] == id) {
+                    //connectedPrimitives[id]--;
+                    primitiveCount++;
+                    xC += primitiveNormals[j/3][0];
+                    yC += primitiveNormals[j/3][1];
+                    zC += primitiveNormals[j/3][2];
+                }
+            }
+            ret[i] = xC / primitiveCount; ret[i+1] = yC / primitiveCount; ret[i+2] = zC / primitiveCount;
+        }
+
+        /*for (int i = 0; i < connectedPrimitives.length; i++) {
+            if(connectedPrimitives[i]!=0){
+                System.out.println("There was a miscount at " + i + " while generating a model normal");
+            }
+        }*/
+        return ret;
     }
 
     public static void debugIndices(Model model){
