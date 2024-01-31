@@ -105,7 +105,7 @@ public class Gaem3D {
         context.setLight(0, 0, 10, 0, 1000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(100, 100);
+                .setFogDetails(100, 1000);
 
         TexturedModel chessFloor = new TexturedModel(
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
@@ -121,20 +121,27 @@ public class Gaem3D {
         );
         water.setCoords(0,-.1F,0);
 
-        context.addObject(chessFloor);
+
+        PerlinNoise noise = new PerlinNoise(16,16);
+        noise.setHeightScale(4);
+        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
+        context.addObject(grass);
+
+
+        //context.addObject(chessFloor);
         //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
         Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj"),new SolidColorShaderProgram(0,1,0));
-        context.addObject(cube);
+        context.addObject(grass);
 
-        float[] vertices = cube.getRelativeVertices();
-        float[] normals = ModelUtils.generateNormals(cube, false);
-        VectorTranslator.debugVector(normals);
-        for (int i = 0; i < normals.length; i+=4) {
-            Line toAdd = new Line(1, 0, 0);
-            toAdd.setStart(vertices[i],vertices[i+1],vertices[i+2]);
-            toAdd.setEnd(vertices[i] + normals[i], vertices[i+1] + normals[i+1], vertices[i+2] + normals[i+2]);
-            context.addObject(toAdd);
-        }
+        float[] vertices = grass.getRelativeVertices();
+        float[] normals = grass.getNormals();
+        //VectorTranslator.debugVector(normals);
+//        for (int i = 0; i < normals.length; i+=4) {
+//            Line toAdd = new Line(1, 0, 0);
+//            toAdd.setStart(vertices[i],vertices[i+1],vertices[i+2]);
+//            toAdd.setEnd(vertices[i] + normals[i], vertices[i+1] + normals[i+1], vertices[i+2] + normals[i+2]);
+//            context.addObject(toAdd);
+//        }
 
         //Render Logic be like:
         long unrendered = 0;

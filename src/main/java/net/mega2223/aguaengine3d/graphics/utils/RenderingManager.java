@@ -12,6 +12,9 @@ import java.nio.ByteBuffer;
  */
 public class RenderingManager {
     public static final int VERT_DATA_LOC = 0;
+    public static final int TEXTURE_COORDS_LOC = 1;
+    public static final int NORMAL_DATA_LOC = 2;
+
 
     private RenderingManager() {
     }

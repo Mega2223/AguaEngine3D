@@ -7,6 +7,7 @@ in vec4 gl_FragCoord;
 in vec4 worldCoord;
 in vec4 objectiveCoord;
 in vec4[MAX_LIGHTS] lightSpacePos;
+in vec4 fragmentNormal;
 
 uniform sampler2D samplerTexture;
 uniform int itneration;

@@ -2,6 +2,8 @@
 
 layout(location = 0) in vec4 vertexPosition_modelspace;
 layout(location = 1) in vec2 textureCoords;
+layout(location = 2) in vec4 vertexNormal;
+
 
 //--@maxLightsConstant
 
@@ -15,6 +17,7 @@ uniform int[MAX_LIGHTS] doShadowMapping;
 out vec2 texturePosition;
 out vec4 worldCoord;
 out vec4 objectiveCoord;
+out vec4 fragmentNormal;
 out vec4[MAX_LIGHTS] lightSpacePos;
 
 void main(){
@@ -27,6 +30,7 @@ void main(){
     objectiveCoord = toTrans * translation;
     worldCoord = gl_Position;
     texturePosition = textureCoords;
+    fragmentNormal = vertexNormal;
 
     for(int i = 0; i < MAX_LIGHTS; i++){
         lightSpacePos[i] = lightspace_projections[i] * (toTrans);

@@ -22,16 +22,23 @@ public class Model implements Renderable {
 
     protected ShaderProgram shader;
 
-    protected int verticesVBO = -1;
+    protected int vertexVBO = -1;
     protected int indicesVBO = -1;
     protected int textureCoordsVBO = -1;
+    protected int normalsVBO = -1;
 
     protected static final float[] bufferTranslationMatrix = new float[16];
 
-    public Model(float[] vertices, int[] indexes, ShaderProgram shader){
-        this.setVertices(vertices);
-        this.setIndices(indexes);
-        this.setShader(shader);
+    public Model(float[] vertices, int[] indices, float[] normals, ShaderProgram shader){
+        this.vertices = vertices;
+        this.indices = indices;
+        this.shader = shader;
+        this.normals = normals;
+    }
+
+    public Model(float[] vertices, int[] indices, ShaderProgram shader){
+        this(vertices,indices,null,shader);
+        this.normals = ModelUtils.generateNormals(this,true);
     }
 
     public static Model loadModel(String objData, ShaderProgram shader){
@@ -103,6 +110,10 @@ public class Model implements Renderable {
         return vertices.clone();
     }
 
+    public float[] getNormals() {
+        return normals.clone();
+    }
+
     public void setVertices(float[] vertices) {
         this.vertices = vertices.clone();
         unloadVBOS();
@@ -126,19 +137,24 @@ public class Model implements Renderable {
     }
 
     protected void initVBOS(){
-        int verticeVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_DYNAMIC_DRAW);
-        int indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_DYNAMIC_DRAW);
-        this.setVerticesVBO(verticeVBO);
+        int vertexVBO = RenderingManager.genArrayBufferObject(vertices, GL30.GL_STATIC_DRAW);
+        int indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_STATIC_DRAW);
+        int normalsVBO = RenderingManager.genArrayBufferObject(normals,GL30.GL_STATIC_DRAW);
+        this.setVertexVBO(vertexVBO);
         this.setIndicesVBO(indicesVBO);
+        this.normalsVBO = normalsVBO;
+        GL30.glUseProgram(shader.getID());
     }
 
     public void unloadVBOS(){
         GL30.glDeleteBuffers(getIndicesVBO());
-        GL30.glDeleteBuffers(getVerticesVBO());
+        GL30.glDeleteBuffers(getVertexVBO());
         GL30.glDeleteBuffers(getTextureCoordsVBO());
+        GL30.glDeleteBuffers(this.normalsVBO);
         setIndicesVBO(-1);
-        setVerticesVBO(-1);
+        setVertexVBO(-1);
         setTextureCoordsVBO(-1);
+        this.normalsVBO = -1;
     }
 
     public void draw(){
@@ -151,8 +167,12 @@ public class Model implements Renderable {
         }
         shader.preRenderLogic();
         GL30.glUseProgram(shader.getID());
-        drawnIndexBufferVBO(getVerticesVBO(),GL30.GL_TRIANGLES,4,shader, getIndicesVBO(), indices.length);
+        GL30.glEnableVertexAttribArray(RenderingManager.NORMAL_DATA_LOC);
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER,normalsVBO);
+        GL30.glVertexAttribPointer(RenderingManager.NORMAL_DATA_LOC, 4, GL30.GL_FLOAT, false, 0, 0L);
+        drawnIndexBufferVBO(getVertexVBO(),GL30.GL_TRIANGLES,4,shader, getIndicesVBO(), indices.length);
         shader.postRenderLogic();
+        GL30.glDisableVertexAttribArray(RenderingManager.NORMAL_DATA_LOC);
     }
 
     //for subclasses
@@ -162,7 +182,7 @@ public class Model implements Renderable {
 
     /** @noinspection BooleanMethodIsAlwaysInverted*/
     public boolean areVBOSInitialized(){
-        return getVerticesVBO() != -1 && getIndicesVBO() != -1;
+        return getVertexVBO() != -1 && getIndicesVBO() != -1;
     }
 
     public float[] getCoords(){
@@ -175,12 +195,12 @@ public class Model implements Renderable {
 
     public void setCoords(float x, float y, float z){coords[0] = x; coords[1] = y; coords[2] = z;}
 
-    public int getVerticesVBO() {
-        return verticesVBO;
+    public int getVertexVBO() {
+        return vertexVBO;
     }
 
-    public void setVerticesVBO(int verticesVBO) {
-        this.verticesVBO = verticesVBO;
+    public void setVertexVBO(int verticesVBO) {
+        this.vertexVBO = verticesVBO;
     }
 
     public int getIndicesVBO() {

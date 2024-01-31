@@ -1,7 +1,9 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
+import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import org.lwjgl.opengl.GL30;
 
@@ -57,21 +59,21 @@ public class TexturedModel extends Model{
             initVBOS();
         }
 
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, getTextureCoordsVBO());
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, getTextureShift(),GL30.GL_DYNAMIC_DRAW);
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, getTextureCoordsVBO()); //FIXME isso é necessário?
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, getTextureShift(),GL30.GL_STATIC_DRAW);
 
         GL30.glUseProgram(shader.getID());
         GL30.glEnable(GL30.GL_TEXTURE_2D);
-        GL30.glEnableVertexAttribArray(1);
+        GL30.glEnableVertexAttribArray(RenderingManager.TEXTURE_COORDS_LOC);
         //GL30.texparamet
-        GL30.glVertexAttribPointer(1,2,GL30.GL_FLOAT,false,0,0L);
+        GL30.glVertexAttribPointer(RenderingManager.TEXTURE_COORDS_LOC,2,GL30.GL_FLOAT,false,0,0L);
         GL30.glActiveTexture(GL30.GL_TEXTURE0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         //GL30.glTexImage2D();
         super.drawForceShader(shader);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,0);
         GL30.glDisable(GL30.GL_TEXTURE_2D);
-        GL30.glDisableVertexAttribArray(1);
+        GL30.glDisableVertexAttribArray(RenderingManager.TEXTURE_COORDS_LOC);
     }
 
     /**loads data from a .obj datafront format string array,

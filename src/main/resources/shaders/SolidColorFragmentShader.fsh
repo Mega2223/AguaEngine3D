@@ -2,6 +2,7 @@
 
 in vec4 worldCoord;
 in vec4 objectiveCoord;
+in vec4 fragmentNormal;
 
 //--@maxLightsConstant
 
@@ -31,7 +32,7 @@ void main(){
         vec4 mixedColor = mix(color2, lightColors[i], lightColors[i].a);
         color = mix(color,mixedColor,lightInfluence);
     }
-
+    float v = dot(fragmentNormal.xyz,normalize(vec3(2,1,0)));
+    color = mix(color,vec4(0,0,0,1),v);
     mixFog();
-
 }
