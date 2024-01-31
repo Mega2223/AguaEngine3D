@@ -85,4 +85,14 @@ public class MathUtils {
         return f;
     }
 
+    public static float linearInterpolation(float v1, float v2, float p){
+        p = Math.max(Math.min(p, 1), 0);
+        return p * (v2-v1) + v1;
+    }
+
+    public static float cubicInterpolation(float v1, float v2, float p){
+        p = Math.max(Math.min(p, 1), 0);
+        return (v2 - v1) * (3F - p * 2F) * p * p + v1;
+    }
+
 }

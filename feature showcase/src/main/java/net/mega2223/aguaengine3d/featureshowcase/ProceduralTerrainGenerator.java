@@ -10,6 +10,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegener
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -22,7 +23,9 @@ import java.io.IOException;
 public class ProceduralTerrainGenerator {
 
     public static final int TARGET_FPS = 120;
-    public static final float[] SKY_COLOR = {.5f, .5f, .5f, 1};
+    public static final float[] BRIGHT_SKY_COLOR = {.5f, .5f, .6f, 1};
+    public static final float[] DARK_SKY_COLOR = {.1F,.1F,.3F,1};
+
     public static float SPEED = .075F;
     protected static final String TITLE = "Geração de terreno :)";
     public static final float[] camera = {0, .9f, 0, 0};
@@ -106,9 +109,15 @@ public class ProceduralTerrainGenerator {
         }
     }
 
+    static float[] skyColorBuffer = new float[3];
+    static final float DAY_LEN = 2400F;
 
     protected static void doLogic() {
-
+        float inf = (float) Math.sin(framesElapsed / DAY_LEN - Math.PI * .5F) * .5F + .5F;
+        for (int i = 0; i < 3; i++) {
+            skyColorBuffer[i] = MathUtils.linearInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
+        }
+        context.setBackGroundColor(skyColorBuffer[0],skyColorBuffer[1],skyColorBuffer[2]);
     }
 
     protected static void doRenderLogic() {

@@ -3,6 +3,7 @@
 in vec4 worldCoord;
 in vec4 objectiveCoords;
 in vec3 normal;
+
 //--@maxLightsConstant
 
 uniform vec4 color2; // uniform color
@@ -11,6 +12,7 @@ uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
 
 uniform int useAlphaForFog = 0;
+uniform int iteration;
 
 out vec4 color;
 
@@ -19,7 +21,7 @@ out vec4 color;
 const vec4 green = vec4(.05,.6,.05,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
-const vec4 test = vec4(1,1,0,1);
+const vec4 test = vec4(0,0,0,1);
 
 
 void main(){
@@ -29,8 +31,10 @@ void main(){
     float browBias = (-objectiveCoords.y-.85)*.5F;
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
-    float s = 0; float c = 1;
-    color = mix(color,test,dot(normal,clamp(vec3(c,s,c/2),-1,1)));
+    float s = sin(float(iteration)/2400F); float c = cos(float(iteration)/2400F);
+    float dp = dot(normal,normalize(vec3(s,c,s/2)));
+    dp = clamp(dp,.3F,1);
+    color = mix(color,fogColor,dp);
 
     mixFog();
 }
