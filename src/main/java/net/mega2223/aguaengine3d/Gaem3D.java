@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -40,9 +41,9 @@ import java.io.IOException;
 * Model blueprint class <- Done
 * Coverage testing <- what
 * Sound stuff
-* Physics stuff
+* Physics stuff <- WIP lol
 * Trigger stuff
-* Collision stuff
+* Collision stuff <- WIP
 * Animation stuff
 * Perhaps a static OpenGL manager class?
 * Denote static buffers explicitly as static? <- DONE afaik
@@ -55,6 +56,8 @@ import java.io.IOException;
 * Static function that creates objects with bound buffers
 * Shader recompile function
 * Render order priority variable/method?
+* Rewrite the normal handling code
+* Model editor (maybe a inbuilt tools tools package)
 * */
 
 public class Gaem3D {
@@ -119,8 +122,19 @@ public class Gaem3D {
         water.setCoords(0,-.1F,0);
 
         context.addObject(chessFloor);
+        //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
+        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj"),new SolidColorShaderProgram(0,1,0));
+        context.addObject(cube);
 
-        VectorTranslator.debugVector(ModelUtils.generateNormals(chessFloor,true));
+        float[] vertices = cube.getRelativeVertices();
+        float[] normals = ModelUtils.generateNormals(cube, false);
+        VectorTranslator.debugVector(normals);
+        for (int i = 0; i < normals.length; i+=4) {
+            Line toAdd = new Line(1, 0, 0);
+            toAdd.setStart(vertices[i],vertices[i+1],vertices[i+2]);
+            toAdd.setEnd(vertices[i] + normals[i], vertices[i+1] + normals[i+1], vertices[i+2] + normals[i+2]);
+            context.addObject(toAdd);
+        }
 
         //Render Logic be like:
         long unrendered = 0;

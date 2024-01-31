@@ -16,6 +16,7 @@ public class Model implements Renderable {
     public static final int SHADER_TEXTURE_DATA_LOCATION = 1;
 
     protected float[] vertices; //each vertex has 4 attributes
+    protected float[] normals; //each vertex has a normal
     protected float[] coords = {0,0,0,0};
     protected int[] indices;
 
@@ -33,8 +34,11 @@ public class Model implements Renderable {
         this.setShader(shader);
     }
 
-    public static Model loadModel(String[] objData, ShaderProgram shader){
+    public static Model loadModel(String objData, ShaderProgram shader){
+        return loadModel(objData.split("\n"),shader);
+    }
 
+    public static Model loadModel(String[] objData, ShaderProgram shader){
         ArrayList<String> existingVerticeCombinations = new ArrayList<>();
         ArrayList<Float> vertices = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
@@ -62,10 +66,11 @@ public class Model implements Renderable {
             String type = split[0];
             if (type.equalsIgnoreCase("f") && split.length == 4) {
                 for (int j = 1; j < split.length; j++) {
-                    int index = existingVerticeCombinations.indexOf(split[j]);
+                    String act = split[j]; act = act.split("/")[0]; //removes the texture coordinate since the Model class does not support them
+                    int index = existingVerticeCombinations.indexOf(act);
                     if (index == -1) {
-                        existingVerticeCombinations.add(split[j]);
-                        index = existingVerticeCombinations.indexOf(split[j]);
+                        existingVerticeCombinations.add(act);
+                        index = existingVerticeCombinations.indexOf(act);
                     }
                     indices.add(index);
                 }

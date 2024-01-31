@@ -137,7 +137,6 @@ public class ModelUtils {
     }
 
     public static float[] generateNormals(float[] vertices, int[] indices, boolean clockwise){
-        boolean[] figuredOutYet = new boolean[vertices.length];
         float[] ret =  new float[vertices.length];
         //int[] connectedPrimitives = new int[vertices.length/4];
         float[][] primitiveNormals = new float[indices.length/3][3];
@@ -167,17 +166,17 @@ public class ModelUtils {
         //Calculates the average vector between the normal of each connected primitive
         for (int i = 0; i < vertices.length; i+=4) {
             float xC = 0, yC = 0, zC = 0;
-            int primitiveCount = 0, id = i/4;
+            int id = i/4;
             for (int j = 0; j < indices.length; j++) {
                 if (indices[j] == id) {
                     //connectedPrimitives[id]--;
-                    primitiveCount++;
                     xC += primitiveNormals[j/3][0];
                     yC += primitiveNormals[j/3][1];
                     zC += primitiveNormals[j/3][2];
                 }
             }
-            ret[i] = xC / primitiveCount; ret[i+1] = yC / primitiveCount; ret[i+2] = zC / primitiveCount;
+            float mag = (float) Math.sqrt(xC*xC+yC*yC+zC*zC);
+            ret[i] = xC/mag; ret[i+1] = yC/mag; ret[i+2] = zC/mag;
         }
 
         /*for (int i = 0; i < connectedPrimitives.length; i++) {
