@@ -18,7 +18,7 @@ out vec4 color;
 
 //--@mixFogFunction
 
-const vec4 green = vec4(.05,.6,.05,1);
+const vec4 green = vec4(.05,.25,.05,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
 const vec4 test = vec4(0,0,0,1);

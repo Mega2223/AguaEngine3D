@@ -164,17 +164,21 @@ public class ModelUtils {
         }
 
         //Calculates the average vector between the normal of each connected primitive
-        for (int i = 0; i < vertices.length; i+=4) {
-            float xC = 0, yC = 0, zC = 0;
-            int id = i/4;
-            for (int j = 0; j < indices.length; j++) {
-                if (indices[j] == id) {
-                    //connectedPrimitives[id]--;
-                    xC += primitiveNormals[j/3][0];
-                    yC += primitiveNormals[j/3][1];
-                    zC += primitiveNormals[j/3][2];
-                }
+        float[][] normalBuffer = new float[vertices.length/4][4];
+        for (int j = 0; j < indices.length; j+=3) {
+            int id = j/3;
+            float[] normal = primitiveNormals[id];
+            int loc1 = indices[j]; int loc2 = indices[j+1]; int loc3 = indices[j+2];
+            for (int i = 0; i < 3; i++) {
+                normalBuffer[loc1][i] += primitiveNormals[id][i];
+                normalBuffer[loc2][i] += primitiveNormals[id][i];
+                normalBuffer[loc3][i] += primitiveNormals[id][i];
             }
+        }
+
+        for (int i = 0; i < vertices.length; i+=4) {
+            int id = i/4;
+            float xC = normalBuffer[id][0], yC =  normalBuffer[id][1], zC =  normalBuffer[id][2];
             float mag = (float) Math.sqrt(xC*xC+yC*yC+zC*zC);
             ret[i] = xC/mag; ret[i+1] = yC/mag; ret[i+2] = zC/mag;
         }

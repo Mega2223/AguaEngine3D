@@ -121,12 +121,10 @@ public class Gaem3D {
         );
         water.setCoords(0,-.1F,0);
 
-
         PerlinNoise noise = new PerlinNoise(16,16);
         noise.setHeightScale(4);
         Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
         context.addObject(grass);
-
 
         //context.addObject(chessFloor);
         //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
