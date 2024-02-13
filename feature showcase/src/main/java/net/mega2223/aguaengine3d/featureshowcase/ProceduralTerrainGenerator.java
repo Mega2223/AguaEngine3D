@@ -121,7 +121,11 @@ public class ProceduralTerrainGenerator {
         for (int i = 0; i < all.length; i++) {
             System.out.println("V"+i+": " + verts[all[i]*4] + ", " + verts[all[i]*4+1] + ", " + verts[all[i]*4+2]);
         }
-
+        System.out.println("LEN: " + largestDist);
+        System.out.println("\n\n");
+        for (int i = 0; i < verts.length; i+=4) {
+            System.out.println(i/4 + ": " + verts[i] + ", " + verts[i+1] + ", " + verts[i+2]);
+        }
         context.addObject(grass);
         context.addObject(water);
         //Render Logic:

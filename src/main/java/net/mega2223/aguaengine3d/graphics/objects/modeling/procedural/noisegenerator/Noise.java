@@ -58,17 +58,18 @@ public interface Noise {
     static Model NoiseToModel(Noise noise, float minX, float minZ, float maxX, float maxZ, float step, float xzScale, float yScale, ShaderProgram program){
         int samples = (int) Math.ceil((maxX - minX) * (maxZ - minZ) / (step * step));
         List<Float> verticeList = new ArrayList<>(samples*4);
-        List<Integer> indiceList = new ArrayList<>(samples*4);
-        int i = 0, rowSize = (int) Math.ceil((maxX - minX)/step);
+        List<Integer> indexList = new ArrayList<>(samples*4);
+
+        int i = 0, rowSize = (int) Math.ceil(((maxX - minX)/step)+.001F);
         for (float x = minX; x < maxX; x+=step) {
             for (float z = minZ; z < maxZ; z+=step) {
                 verticeList.add(x*xzScale); verticeList.add(noise.get(x,z)*yScale);
                 verticeList.add(z*xzScale); verticeList.add(0F);
-                if(x + step + step < maxX && z + step < maxZ){
-                    indiceList.add(i); indiceList.add(i+1); indiceList.add(i+rowSize);
+                if(x + step < maxX && z + step < maxZ){
+                    indexList.add(i); indexList.add(i+1); indexList.add(i+rowSize);
                 }
                 if (x > minX && z > minZ){
-                    indiceList.add(i); indiceList.add(i-1); indiceList.add(i-rowSize);
+                    indexList.add(i); indexList.add(i-1); indexList.add(i-rowSize);
                 }
                 i++;
             }
@@ -76,8 +77,8 @@ public interface Noise {
         float[] vertices = new float[verticeList.size()];
         System.out.println("V: " + vertices.length / 4);
         for (int j = 0; j < vertices.length; j++) {vertices[j] = verticeList.get(j);}
-        int[] indices = new int[indiceList.size()];
-        for (i = 0; i < indices.length; i++) {indices[i] = indiceList.get(i);}
+        int[] indices = new int[indexList.size()];
+        for (i = 0; i < indices.length; i++) {indices[i] = indexList.get(i);}
         for (int j = 0; j < indices.length; j++) {
             if(indices[j]>=vertices.length / 4){throw new RuntimeException(j + ": " + indices[j]);}
         }
