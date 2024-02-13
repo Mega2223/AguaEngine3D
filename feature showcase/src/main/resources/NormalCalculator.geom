@@ -5,10 +5,12 @@ layout (triangle_strip, max_vertices = 3) out;
 
 in vec4 objectiveCoord[];
 in vec4 worldCoords[];
+in vec4 vertexShNormal[];
 
 out vec4 worldCoord;
 out vec4 objectiveCoords;
-out vec3 normal;
+out vec3 primitiveNormal;
+out vec4 perVertexNormal;
 
 void main() {
     vec3 nor = cross(
@@ -19,7 +21,8 @@ void main() {
         objectiveCoords = objectiveCoord[i];
         gl_Position = gl_in[i].gl_Position;
         worldCoord = worldCoords[i];
-        normal = normalize(nor);
+        primitiveNormal = normalize(nor);
+        perVertexNormal = vertexShNormal[i];
         EmitVertex();
     }
     EndPrimitive();

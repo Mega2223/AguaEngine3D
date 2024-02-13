@@ -144,6 +144,7 @@ public class ModelUtils {
         //Figures out the normals for each triangle
         for (int i = 0; i < indices.length; i+= 3) {
             int v0loc = 4 * indices[i]; int v1loc = 4 * indices[i + 1]; int v2loc = 4 * indices[i + 2];
+            if(v0loc > vertices.length || v1loc >= vertices.length || v2loc >= vertices.length){continue;}
             float v0x = vertices[v0loc]; float v0y = vertices[v0loc +1]; float v0z = vertices[v0loc +2];
             float v1x = vertices[v1loc]; float v1y = vertices[v1loc +1]; float v1z = vertices[v1loc +2];
             float v2x = vertices[v2loc]; float v2y = vertices[v2loc +1]; float v2z = vertices[v2loc +2];
@@ -169,6 +170,7 @@ public class ModelUtils {
             int id = j/3;
             float[] normal = primitiveNormals[id];
             int loc1 = indices[j]; int loc2 = indices[j+1]; int loc3 = indices[j+2];
+            if (loc3 >= normalBuffer.length){continue;}
             for (int i = 0; i < 3; i++) {
                 normalBuffer[loc1][i] += primitiveNormals[id][i];
                 normalBuffer[loc2][i] += primitiveNormals[id][i];

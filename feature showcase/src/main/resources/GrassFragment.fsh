@@ -2,7 +2,8 @@
 
 in vec4 worldCoord;
 in vec4 objectiveCoords;
-in vec3 normal;
+in vec3 primitiveNormal;
+in vec4 perVertexNormal;
 
 //--@maxLightsConstant
 
@@ -18,7 +19,7 @@ out vec4 color;
 
 //--@mixFogFunction
 
-const vec4 green = vec4(.05,.25,.05,1);
+const vec4 green = vec4(.35,.55,.35,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
 const vec4 test = vec4(0,0,0,1);
@@ -32,8 +33,10 @@ void main(){
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
     float s = sin(float(iteration)/2400F); float c = cos(float(iteration)/2400F);
-    float dp = dot(normal,normalize(vec3(s,c,s/2)));
-    dp = clamp(dp,.3F,1);
+    float dp = dot(perVertexNormal.xyz,normalize(vec3(s,-c,1)));
+    float brightness = -c*2;
+    dp += brightness * .5F;
+    dp = clamp(dp, -0.6, 1);
     color = mix(color,fogColor,dp);
 
     mixFog();

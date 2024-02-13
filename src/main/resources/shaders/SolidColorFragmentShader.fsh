@@ -33,6 +33,6 @@ void main(){
         color = mix(color,mixedColor,lightInfluence);
     }
     float v = dot(fragmentNormal.xyz,normalize(vec3(2,1,0)));
-    color = mix(color,vec4(0,0,0,1),v);
+    color = mix(color,vec4(0.1,0.1,0.1,1),clamp(v,0,1));
     mixFog();
 }

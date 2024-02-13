@@ -35,10 +35,10 @@ public class PerlinNoise extends TransformableNoise implements Noise{
         x = xToLocal(x); z = zToLocal(z);
         int xF = (int) Math.floor(x); int xC = (int) Math.ceil(x);
         int zF = (int) Math.floor(z); int zC = (int) Math.ceil(z);
-        int xCI = xC % DX;
-        int zCI = zC % DZ;
-        int xFI = xF % DX;
-        int zFI = zF % DZ;
+        int xCI = xC < 0 ? DX - (-xC % DX) - 1 : xC % DX;
+        int zCI = zC < 0 ? DZ - (-zC % DZ) - 1 : zC % DZ;
+        int xFI = xF < 0 ? DX - (-xF % DX) - 1 : xF % DX;
+        int zFI = zF < 0 ? DZ - (-zF % DZ) - 1 : zF % DZ;
 
         float[] v1, v2, v3, v4;
         v1 = vectorSpace[xCI][zCI];

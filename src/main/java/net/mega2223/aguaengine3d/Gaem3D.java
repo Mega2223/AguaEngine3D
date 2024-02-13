@@ -66,7 +66,7 @@ public class Gaem3D {
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     protected static final String TITLE = "3 DIMENSÇÕES";
     protected static final int D = 512;
-    public static final float[] camera = {0, .9f, 0, 0};
+    public static final float[] camera = {0, 4, 0, 0};
     public static int framesElapsed = 0;
     static WindowManager manager;
     static RenderingContext context;
@@ -82,7 +82,7 @@ public class Gaem3D {
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
-            float speed = .075F;
+            float speed = .075F * 12;
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += speed*c;camera[0] += speed*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= speed*c;camera[0] -= speed*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += speed*c;camera[2]-= speed*s;}
@@ -102,10 +102,10 @@ public class Gaem3D {
 
         //scenery setup
 
-        context.setLight(0, 0, 10, 0, 1000)
+        context.setLight(0, 0, 10, 0, 10000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(100, 1000);
+                .setFogDetails(500, 1000);
 
         TexturedModel chessFloor = new TexturedModel(
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
@@ -117,13 +117,13 @@ public class Gaem3D {
         Model water = new Model(
                 new float[]{200,0,200,0, 200,0,-200,0, -200,0,200,0, -200,0,-200,0},
                 new int[]{0,1,2,1,2,3},
-                new SolidColorShaderProgram(.2F,.2F,.8F,.7F)
+                new SolidColorShaderProgram(.2F,.2F,.6F,.7F)
         );
         water.setCoords(0,-.1F,0);
 
         PerlinNoise noise = new PerlinNoise(16,16);
-        noise.setHeightScale(4);
-        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,new SolidColorShaderProgram(.1F,.6F,.1F));
+        noise.setHeightScale(27);
+        Model grass = Noise.NoiseToModel(noise,512,512,2.5F/92F,500F/64F,new SolidColorShaderProgram(.1F,.5F,.1F));
         context.addObject(grass);
 
         //context.addObject(chessFloor);

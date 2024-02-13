@@ -23,8 +23,8 @@ import java.io.IOException;
 public class ProceduralTerrainGenerator {
 
     public static final int TARGET_FPS = 120;
-    public static final float[] BRIGHT_SKY_COLOR = {.5f, .5f, .6f, 1};
-    public static final float[] DARK_SKY_COLOR = {.1F,.1F,.3F,1};
+    public static final float[] BRIGHT_SKY_COLOR = {.8f, .8f, .95f, 1};
+    public static final float[] DARK_SKY_COLOR = {.0F,.0F,.01F,1};
 
     public static float SPEED = .075F;
     protected static final String TITLE = "Geração de terreno :)";
@@ -73,12 +73,13 @@ public class ProceduralTerrainGenerator {
 
         Model water = StructureUtils.generatePlane(400,1,waterShaderProgram);
 
-        water.setCoords(-200,-.1F,0-200);
+        water.setCoords(-200,-.1F,-200);
 
-        PerlinNoise noise = new PerlinNoise(16,16);
+        PerlinNoise noise = new PerlinNoise(10,10);
         noise.setHeightScale(4);
-        Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
-        grass.setCoords(-200,1,-200);
+        //Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
+        int siz = 5;
+        Model grass = Noise.NoiseToModel(noise,-siz,-siz, siz, siz,.11F,200F/ siz,10F,grassShaderProgram);
 
         context.addObject(grass);
         context.addObject(water);
@@ -113,9 +114,9 @@ public class ProceduralTerrainGenerator {
     static final float DAY_LEN = 2400F;
 
     protected static void doLogic() {
-        float inf = (float) Math.sin(framesElapsed / DAY_LEN - Math.PI * .5F) * .5F + .5F;
+        float inf = (float) -Math.cos(framesElapsed / DAY_LEN) * .5F + .5F;
         for (int i = 0; i < 3; i++) {
-            skyColorBuffer[i] = MathUtils.linearInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
+            skyColorBuffer[i] = MathUtils.cubicInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
         }
         context.setBackGroundColor(skyColorBuffer[0],skyColorBuffer[1],skyColorBuffer[2]);
     }
