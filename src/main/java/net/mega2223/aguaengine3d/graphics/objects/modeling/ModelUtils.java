@@ -192,6 +192,41 @@ public class ModelUtils {
         }*/
         return ret;
     }
+    public static void figureOutLargestTriangle(Model mod){
+        float[] vertices = mod.getRelativeVertices();
+        int[] ind = mod.getIndices();
+        int largestIndex = 0; float largestDist = 0;
+        for (int i = 0; i < ind.length; i+=3) {
+            int i0 = ind[i];int i1 = ind[i+1];int i2 = ind[i+2];
+            float x0 = vertices[i0*4], y0 = vertices[i0*4+1], z0 = vertices[i0*4+2];
+            float x1 = vertices[i1*4], y1 = vertices[i1*4+1], z1 = vertices[i1*4+2];
+            float x2 = vertices[i2*4], y2 = vertices[i2*4+1], z2 = vertices[i2*4+2];
+            float dist = (float) Math.abs(Math.sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0)+(z1-z0)*(z1-z0)));
+            boolean isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+            dist = (float) Math.abs(Math.sqrt((x2-x0)*(x2-x0)+(y2-y0)*(y2-y0)+(z2-z0)*(z2-z0)));
+            isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+            dist = (float) Math.abs(Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)));
+            isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+        }
+        System.out.println("LARGEST TRIANGLE: ");
+        int v1 = ind[largestIndex], v2 = ind[largestIndex + 1], v3 = ind[largestIndex + 2];
+        int[] all = {v1,v2,v3};
+        System.out.println(largestIndex/3 + ": " + v1 + ", " + v2 + ", " + v3);
+        for (int i = 0; i < all.length; i++) {
+            System.out.println("V"+i+": " + vertices[all[i]*4] + ", " + vertices[all[i]*4+1] + ", " + vertices[all[i]*4+2]);
+        }
+        System.out.println("LEN: " + largestDist);
+        System.out.println("\n\n");
+        for (int i = 0; i < vertices.length; i+=4) {
+            System.out.println(i/4 + ": " + vertices[i] + ", " + vertices[i+1] + ", " + vertices[i+2]);
+        }
+    }
 
     public static void debugIndices(Model model){
         int[] indices = model.indices;

@@ -33,8 +33,8 @@ void main(){
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
 
-    float dp = dot(perVertexNormal.xyz,vec3(0,0,1));
-    dp = clamp(dp, 0, 1);
+    float dp = dot(perVertexNormal.xyz,normalize(vec3(1,0,1)));
+    dp = clamp(dp*2F, 0, 1);
     dp = (3F - dp * 2F) * dp * dp;
     color = mix(color,vec4(0,0,0,1),dp);
 

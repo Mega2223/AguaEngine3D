@@ -3,6 +3,8 @@
 in vec4 worldCoord;
 in vec4 objectiveCoord;
 
+in vec4 perVertexNormal;
+
 //--@maxLightsConstant
 
 uniform vec4 color2; // uniform color
@@ -18,5 +20,11 @@ out vec4 color;
 
 void main(){
     color = vec4(.4,.4,1,1);
+
+    float dp = dot(perVertexNormal.xyz,normalize(vec3(1,0,1)));
+    dp = clamp(dp*1.5F, 0, 1);
+    dp = (3F - dp * 2F) * dp * dp;
+    color = mix(color,vec4(0,0,0,1),dp);
+
     mixFog();
 }

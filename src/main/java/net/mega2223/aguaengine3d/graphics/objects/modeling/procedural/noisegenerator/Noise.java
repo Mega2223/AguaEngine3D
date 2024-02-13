@@ -13,13 +13,28 @@ public interface Noise {
     float get(float x, float z);
 
     static BufferedImage NoiseToImage(Noise noise, int width, int height, float scale){
+        return NoiseToImage(noise,width,height,0,0,scale);
+    }
+    static BufferedImage NoiseToImage(Noise noise, int width, int height, float displacementX, float displacementZ, float scale){
+        return NoiseToImage(noise,width,height,displacementX,displacementZ,scale,false);
+    }
+    static BufferedImage NoiseToImage(Noise noise, int width, int height, float displacementX, float displacementZ, float scale, boolean normalize){
         BufferedImage output = new BufferedImage(width, height,BufferedImage.TYPE_3BYTE_BGR);
         Graphics2D graphics = output.createGraphics(); graphics.setColor(Color.black);
         graphics.drawRect(0,0,width,height);
+        float n = 1;
+        if(normalize){
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    float x = ((float)i)*scale, z = ((float) j)*scale;
+                    n = Math.max(Math.abs(noise.get(x+displacementX,z+displacementZ)),n);
+                }
+            }
+        }
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 float x = ((float)i)*scale, z = ((float) j)*scale;
-                float v = noise.get(x,z);
+                float v = noise.get(x+displacementX,z+displacementZ)/n;
                 int col = Math.min(Math.max((int)(v*(255)),-255),255);
                 col = col > 0 ? col : (-col) << 8;
                 output.setRGB(i,j,col);
