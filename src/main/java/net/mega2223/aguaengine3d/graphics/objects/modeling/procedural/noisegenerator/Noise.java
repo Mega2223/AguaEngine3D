@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegene
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -63,7 +64,7 @@ public interface Noise {
             for (float z = minZ; z < maxZ; z+=step) {
                 verticeList.add(x*xzScale); verticeList.add(noise.get(x,z)*yScale);
                 verticeList.add(z*xzScale); verticeList.add(0F);
-                if(x + step < maxX && z + step < maxZ){
+                if(x + step + step < maxX && z + step < maxZ){
                     indiceList.add(i); indiceList.add(i+1); indiceList.add(i+rowSize);
                 }
                 if (x > minX && z > minZ){
@@ -73,9 +74,13 @@ public interface Noise {
             }
         }
         float[] vertices = new float[verticeList.size()];
+        System.out.println("V: " + vertices.length / 4);
         for (int j = 0; j < vertices.length; j++) {vertices[j] = verticeList.get(j);}
         int[] indices = new int[indiceList.size()];
         for (i = 0; i < indices.length; i++) {indices[i] = indiceList.get(i);}
+        for (int j = 0; j < indices.length; j++) {
+            if(indices[j]>=vertices.length / 4){throw new RuntimeException(j + ": " + indices[j]);}
+        }
         return new Model(vertices,indices,program);
     }
 }

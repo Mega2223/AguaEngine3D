@@ -19,7 +19,7 @@ out vec4 color;
 
 //--@mixFogFunction
 
-const vec4 green = vec4(.35,.55,.35,1);
+const vec4 green = vec4(.15,.35,.15,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
 const vec4 test = vec4(0,0,0,1);
@@ -32,12 +32,11 @@ void main(){
     float browBias = (-objectiveCoords.y-.85)*.5F;
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
-    float s = sin(float(iteration)/2400F); float c = cos(float(iteration)/2400F);
-    float dp = dot(perVertexNormal.xyz,normalize(vec3(s,-c,1)));
-    float brightness = -c*2;
-    dp += brightness * .5F;
-    dp = clamp(dp, -0.6, 1);
-    color = mix(color,fogColor,dp);
+
+    float dp = dot(perVertexNormal.xyz,vec3(0,0,1));
+    dp = clamp(dp, 0, 1);
+    dp = (3F - dp * 2F) * dp * dp;
+    color = mix(color,vec4(0,0,0,1),dp);
 
     mixFog();
 }

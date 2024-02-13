@@ -7,6 +7,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
@@ -75,11 +76,51 @@ public class ProceduralTerrainGenerator {
 
         water.setCoords(-200,-.1F,-200);
 
-        PerlinNoise noise = new PerlinNoise(10,10);
-        noise.setHeightScale(4);
+        PerlinNoise perlin1 = new PerlinNoise(7,7);
+        PerlinNoise perlin2 = new PerlinNoise(8,8);
+        PerlinNoise perlin3 = new PerlinNoise(6,6);
+
+        StackedNoises stackedNoises = new StackedNoises();
+        perlin1.setTranslations(0,0,3.43F,3.43F);
+        perlin1.setHeightScale(5);
+        perlin2.setTranslations(0,0,.832F,.832F);
+        perlin2.setHeightScale(1);
+        perlin3.setTranslations(0,0,6.789F,6.789F);
+        perlin3.setHeightScale(4);
+        stackedNoises.add(perlin1);
+        stackedNoises.add(perlin2);
+        stackedNoises.add(perlin3);
         //Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
         int siz = 5;
-        Model grass = Noise.NoiseToModel(noise,-siz,-siz, siz, siz,.11F,200F/ siz,10F,grassShaderProgram);
+        Model grass = Noise.NoiseToModel(stackedNoises,-siz,-siz, siz, siz,.1F,200F/ siz,6F,grassShaderProgram);
+        float[] verts = grass.getRelativeVertices();
+        int[] ind = grass.getIndices();
+        int largestIndex = 0; float largestDist = 0;
+        for (int i = 0; i < ind.length; i+=3) {
+            int i0 = ind[i];int i1 = ind[i+1];int i2 = ind[i+2];
+            float x0 = verts[i0*4], y0 = verts[i0*4+1], z0 = verts[i0*4+2];
+            float x1 = verts[i1*4], y1 = verts[i1*4+1], z1 = verts[i1*4+2];
+            float x2 = verts[i2*4], y2 = verts[i2*4+1], z2 = verts[i2*4+2];
+            float dist = (float) Math.abs(Math.sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0)+(z1-z0)*(z1-z0)));
+            boolean isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+            dist = (float) Math.abs(Math.sqrt((x2-x0)*(x2-x0)+(y2-y0)*(y2-y0)+(z2-z0)*(z2-z0)));
+            isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+            dist = (float) Math.abs(Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2)));
+            isLarger = dist > largestDist;
+            largestIndex = isLarger ? i : largestIndex;
+            largestDist = isLarger ? dist : largestDist;
+        }
+        System.out.println("LARGEST TRIANGLE: ");
+        int v1 = ind[largestIndex], v2 = ind[largestIndex + 1], v3 = ind[largestIndex + 2];
+        int[] all = {v1,v2,v3};
+        System.out.println(largestIndex/3 + ": " + v1 + ", " + v2 + ", " + v3);
+        for (int i = 0; i < all.length; i++) {
+            System.out.println("V"+i+": " + verts[all[i]*4] + ", " + verts[all[i]*4+1] + ", " + verts[all[i]*4+2]);
+        }
 
         context.addObject(grass);
         context.addObject(water);
@@ -111,14 +152,15 @@ public class ProceduralTerrainGenerator {
     }
 
     static float[] skyColorBuffer = new float[3];
-    static final float DAY_LEN = 2400F;
+    static final float DAY_LEN = 240F;
 
     protected static void doLogic() {
         float inf = (float) -Math.cos(framesElapsed / DAY_LEN) * .5F + .5F;
         for (int i = 0; i < 3; i++) {
-            skyColorBuffer[i] = MathUtils.cubicInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
+            //skyColorBuffer[i] = MathUtils.cubicInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
         }
-        context.setBackGroundColor(skyColorBuffer[0],skyColorBuffer[1],skyColorBuffer[2]);
+        //context.setBackGroundColor(skyColorBuffer[0],skyColorBuffer[1],skyColorBuffer[2]);
+        context.setBackGroundColor(BRIGHT_SKY_COLOR[0],BRIGHT_SKY_COLOR[1],BRIGHT_SKY_COLOR[2]);
     }
 
     protected static void doRenderLogic() {
