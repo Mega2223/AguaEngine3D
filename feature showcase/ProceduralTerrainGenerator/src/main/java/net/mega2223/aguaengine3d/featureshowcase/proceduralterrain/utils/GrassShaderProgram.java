@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.featureshowcase.utils;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils;
 
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;
@@ -12,9 +12,9 @@ public class GrassShaderProgram extends ShaderProgramTemplate implements ShaderP
     int itneration_uni_loc = -1;
     public GrassShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\GrassFragment.fsh",
-                Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\Vertex.vsh",
-                Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\NormalCalculator.geom"
+                Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\GrassFragment.fsh",
+                Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\Vertex.vsh",
+                Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\NormalCalculator.geom"
         }
         );
         initUniforms();

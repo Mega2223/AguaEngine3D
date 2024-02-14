@@ -58,6 +58,7 @@ import java.io.IOException;
 * Render order priority variable/method?
 * Rewrite the normal handling code
 * Model editor (maybe a inbuilt tools tools package)
+* Interpolation interface and objects
 * */
 
 public class Gaem3D {

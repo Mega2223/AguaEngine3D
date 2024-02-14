@@ -7,7 +7,10 @@
     <groupId>net.mega2223</groupId>
     <artifactId>FeatureShowcase</artifactId>
     <version>0.1</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+    <modules>
+        <module>ProceduralTerrainGenerator</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -31,7 +34,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.mega2223.aguaengine3d.featureshowcase.ProceduralTerrainGenerator</mainClass>
+                            <mainClass>net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.ProceduralTerrainGenerator</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

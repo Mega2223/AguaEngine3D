@@ -1,7 +1,7 @@
-package net.mega2223.aguaengine3d.featureshowcase;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralterrain;
 
-import net.mega2223.aguaengine3d.featureshowcase.utils.GrassShaderProgram;
-import net.mega2223.aguaengine3d.featureshowcase.utils.WaterShaderProgram;
+import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.GrassShaderProgram;
+import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
@@ -13,7 +13,6 @@ import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
-import net.mega2223.aguaengine3d.mathematics.MathUtils;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -82,19 +81,19 @@ public class ProceduralTerrainGenerator {
         water.setCoords(-200,-.1F,-200);
 
         PerlinNoise perlin2 = new PerlinNoise(8,8);
-        PerlinNoise perlin1 = new PerlinNoise(8,8);
-        PerlinNoise perlin3 = new PerlinNoise(8,8);
-        PerlinNoise perlin4 = new PerlinNoise(8,8);
+        PerlinNoise perlin1 = new PerlinNoise(12,12);
+        PerlinNoise perlin3 = new PerlinNoise(16,16);
+        PerlinNoise perlin4 = new PerlinNoise(20,20);
 
         StackedNoises stackedNoises = new StackedNoises();
         perlin1.setTranslations(0,0,8F,8F);
-        perlin1.setHeightScale(2F);
+        perlin1.setHeightScale(3F);
         perlin2.setTranslations(0,0,2F,2F);
-        perlin2.setHeightScale(1.5F);
+        perlin2.setHeightScale(3F/2);
         perlin3.setTranslations(0,0,1F,1F);
-        perlin3.setHeightScale(1F);
-        perlin4.setTranslations(0,0,1F/3F,1F/3F);
-        perlin4.setHeightScale(1F);
+        perlin3.setHeightScale(3F/3);
+        perlin4.setTranslations(0,0,.5F,.5F);
+        perlin4.setHeightScale(3F/4);
 
         stackedNoises.add(perlin1);
         stackedNoises.add(perlin2);
@@ -111,17 +110,19 @@ public class ProceduralTerrainGenerator {
         List<Noise> noises = stackedNoises.getNoises();
         for (int i = 0; i < noises.size(); i++) {
             ImageIO.write(
-                    Noise.NoiseToImage(noises.get(i),1024,1024,-siz,-siz,(2*siz)/1024F,true),
-                    "png",new File(Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\noises\\noise_"+(i+1)+".png"));
+                    Noise.NoiseToImage(noises.get(i),1024,1024,-siz,-siz,(2*siz)/1024F,new float[]{0,1,0},new float[]{0,0,1},false),
+                    "png",new File(Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\noises\\noise_"+(i+1)+".png"));
         }
         ImageIO.write(
-                Noise.NoiseToImage(stackedNoises,1024,1024,-siz,-siz,(2*siz)/1024F,true),
-                "png",new File(Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\noises\\all.png"));
+                Noise.NoiseToImage(stackedNoises,1024,1024,-siz,-siz,(2*siz)/1024F,new float[]{0,1,0},new float[]{0,0,1},false),
+                "png",new File(Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\noises\\all.png"));
 
-        Model grass = Noise.NoiseToModel(stackedNoises,-siz,-siz, siz, siz,.1F,200F/ siz,6F,grassShaderProgram);
+        Model grass = Noise.NoiseToModel(stackedNoises,-siz,-siz, siz, siz,.1F,200F/ siz,10F,grassShaderProgram);
 
         context.addObject(grass);
         context.addObject(water);
+
+
         //Render Logic:
         long unrendered = 0;
         long lastLoop = System.currentTimeMillis();

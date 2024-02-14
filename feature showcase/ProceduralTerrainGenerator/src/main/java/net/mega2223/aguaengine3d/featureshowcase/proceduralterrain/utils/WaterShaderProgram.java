@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.featureshowcase.utils;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils;
 
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;
@@ -9,8 +9,8 @@ public class WaterShaderProgram extends ShaderProgramTemplate implements ShaderP
     int itneration_uni_loc = -1;
     public WaterShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                        Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\WaterFragment.fsh",
-                        Utils.USER_DIR+"\\feature showcase\\src\\main\\resources\\WaterVertex.vsh"
+                        Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\WaterFragment.fsh",
+                        Utils.USER_DIR+"\\feature showcase\\ProceduralTerrainGenerator\\src\\main\\resources\\WaterVertex.vsh"
                 }
         );
         initUniforms();
