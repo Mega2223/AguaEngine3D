@@ -18,9 +18,9 @@ void main(){
     float itfl = float(itneration);
     gl_Position.y += sin(itfl*.00025F)*.5F;
     float z = vertexPosition_modelspace.z; float x = vertexPosition_modelspace.x;
-    //gl_Position.y += sin(x + (itfl *.0125F)) * .2F;
-    //gl_Position.y += sin(z + 2.33123F + (itfl *.015F)) * .2F;
-    //gl_Position.y += sin((z * .003F) + (x * -0025F) + 3.123F - (itfl *.0025F)) * .45F;
+    gl_Position.y += sin(x + (itfl *.0125F)) * .2F;
+    gl_Position.y += sin(z + 2.33123F + (itfl *.015F)) * .2F;
+    gl_Position.y += sin((z * .003F) + (x * -0025F) + 3.123F - (itfl *.0025F)) * .45F;
 
     gl_Position.w = 1;
 

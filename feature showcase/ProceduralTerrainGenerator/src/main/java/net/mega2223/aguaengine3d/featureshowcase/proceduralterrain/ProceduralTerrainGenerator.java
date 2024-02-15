@@ -4,6 +4,7 @@ import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.GrassSh
 import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
@@ -40,7 +41,7 @@ public class ProceduralTerrainGenerator {
     static RenderingContext context;
 
     static float[] proj = new float[16];
-
+    static StackedNoises stackedNoises;
     public static void main(String[] args) throws IOException {
 
         //GLFW
@@ -86,7 +87,7 @@ public class ProceduralTerrainGenerator {
         PerlinNoise perlin3 = new PerlinNoise(16,16);
         PerlinNoise perlin4 = new PerlinNoise(20,20);
 
-        StackedNoises stackedNoises = new StackedNoises();
+        stackedNoises = new StackedNoises();
         perlin1.setTranslations(0,0,8F,8F);
         perlin1.setHeightScale(3F);
         perlin2.setTranslations(0,0,2F,2F);
@@ -96,19 +97,21 @@ public class ProceduralTerrainGenerator {
         perlin4.setTranslations(0,0,.5F,.5F);
         perlin4.setHeightScale(3F/4);
 
-//        stackedNoises.add(perlin1);
-//        stackedNoises.add(perlin2);
-//        stackedNoises.add(perlin3);
-//        stackedNoises.add(perlin4);
-        RadialNoise radial1 = new RadialNoise(0, 0, 0.4F, RadialNoise.LINEAR,true);
-        radial1.setTranslations(0,0,1,1);
+        stackedNoises.add(perlin1);
+        stackedNoises.add(perlin2);
+        stackedNoises.add(perlin3);
+        stackedNoises.add(perlin4);
+        RadialNoise radial1 = new RadialNoise(0, 0, 0.5F, RadialNoise.SQUARE,true);
+        radial1.setTranslations(0,0,2.5F,2.5F);
         radial1.setDislocation(.5F);
+
         stackedNoises.add(radial1);
 
-        ProceduralBuilding build = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",new TextureShaderProgram());
-        int[][] map = new int[16][16];
-
-        context.addObject(build.generate(map,0));
+//        ProceduralBuilding build = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",new TextureShaderProgram());
+//        int[][] map = new int[16][16];
+//        TexturedModel generate = build.generate(map, 0);
+//        generate.setCoords(-8,stackedNoises.get(0,0),-8);
+//        context.addObject(generate);
 
         //Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
         int siz = 5;
@@ -164,6 +167,7 @@ public class ProceduralTerrainGenerator {
             //skyColorBuffer[i] = MathUtils.cubicInterpolation(BRIGHT_SKY_COLOR[i],DARK_SKY_COLOR[i],inf);
         }
         //context.setBackGroundColor(skyColorBuffer[0],skyColorBuffer[1],skyColorBuffer[2]);
+        camera[1] = stackedNoises.get(camera[0]/40,camera[2]/40) * 10 + 1.5F;
         context.setBackGroundColor(BRIGHT_SKY_COLOR[0],BRIGHT_SKY_COLOR[1],BRIGHT_SKY_COLOR[2]);
     }
 
