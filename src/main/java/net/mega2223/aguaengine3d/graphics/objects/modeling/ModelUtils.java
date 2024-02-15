@@ -14,9 +14,11 @@ public class ModelUtils {
     private static final float[] bufferVec4 = new float[4];
 
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
+        if(models.length == 0){return null;}
         return mergeModels(models,texture,models[0].getShader());
     }
     public static TexturedModel mergeModels(TexturedModel[] models, int texture, ShaderProgram program){
+        if(models.length == 0){return null;}
         List<Float> verticeList = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
         List<Float> textureCoordList = new ArrayList<>();
