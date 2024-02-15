@@ -1,0 +1,6 @@
+name=TheOnlyFloorLOL
+validAbove=%any%
+height=1
+bias=1
+blocks=StrZ,Cross,StrX
+compartibleHeights=0

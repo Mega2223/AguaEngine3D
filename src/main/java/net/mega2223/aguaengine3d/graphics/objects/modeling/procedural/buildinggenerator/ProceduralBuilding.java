@@ -26,6 +26,7 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     protected int texture;
     protected ShaderProgram shaderProgram;
     protected boolean shouldConsiderMiddleBlocks = true;
+    public boolean implicitlyAssumeNoBuildOK = true;
 
     ArrayList<ProceduralBuildingBlock> allBlocks = new ArrayList<>();
     ArrayList<ProceduralBuildingFloor> allFloors = new ArrayList<>();
@@ -72,6 +73,8 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
                     continue;
                 case "shouldRenderMiddle":
                     shouldConsiderMiddleBlocks = Boolean.parseBoolean(cmd[1]);
+                case "assumeNoBuildOK":
+                    implicitlyAssumeNoBuildOK = Boolean.parseBoolean(cmd[1]);
             }
 
         }
@@ -90,8 +93,10 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
             allBlocks.add(block);
         }
     }
-
     public TexturedModel generate(int[][] pattern, int where){
+        return generate(pattern,where,1);
+    }
+    public TexturedModel generate(int[][] pattern, int where, float scale){
 
         Random r = new Random();
         int bound = maxFloors - minFloors;
@@ -103,13 +108,12 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
 
         ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];//fixme
         for (int f = 0; currentHeight < desiredHeight; f++) {
-            ProceduralBuildingFloor prevFloor = null;
-            if(f > 0){prevFloor = floorMap[f-1];}
+            ProceduralBuildingFloor prevFloor = f > 0 ? floorMap[f-1] : null;
             List<ProceduralBuildingFloor> possibleFloors = new ArrayList<>();
             for(ProceduralBuildingFloor act : allFloors){if(act.canBeBuilt(f,prevFloor)){possibleFloors.add(act);}}
-            float[] probabilites = new float[possibleFloors.size()];
-            for(int i = 0; i < possibleFloors.size(); i++){probabilites[i]=possibleFloors.get(i).bias;}
-            ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilites);
+            float[] probabilities = new float[possibleFloors.size()];
+            for(int i = 0; i < possibleFloors.size(); i++){probabilities[i]=possibleFloors.get(i).bias;}
+            ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilities);
             //the application can get stuck here, I really need to up the contratiction model
             floorModels.add(floorToBuild.generate(pattern,currentHeight,where,shouldConsiderMiddleBlocks));
             floorMap[f] = floorToBuild;
@@ -117,7 +121,14 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         }
         TexturedModel[] floorArray = new TexturedModel[floorModels.size()];
         floorArray = floorModels.toArray(floorArray);
-        return ModelUtils.mergeModels(floorArray, texture, shaderProgram);
+        TexturedModel finalModel = ModelUtils.mergeModels(floorArray, texture, null);
+        if(scale!=1F){
+            float[] verts = finalModel.getRelativeVertices();
+            for (int i = 0; i < verts.length; i+=4) {verts[i]*=scale; verts[i+1]*=scale;verts[i+2]*=scale;}
+            finalModel.setVertices(verts);
+        }
+        finalModel.setShader(shaderProgram);
+        return finalModel;
     }
 
     public ProceduralBuildingBlock getBlock(String name){

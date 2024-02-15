@@ -2,7 +2,6 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildingg
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 
 import java.util.ArrayList;
 
@@ -18,7 +17,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
 
     int[][] indices = new int[5][];
     boolean[] forceRender = new boolean[5];
-    boolean[] adjacencyExclusive = {false,false,false,false,false};//is that really the best way to do so?
+    boolean[] isAdjacencyExclusive = {false,false,false,false,false};//is that really the best way to do so?
     String[][] compartiblesForAdjacency = new String[5][];
 
     float bias = -1;
@@ -28,6 +27,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     public ProceduralBuildingBlock(String[] data, ProceduralBuilding context){
         this.context = context;
         int currentFace = -1;
+
         //fOr StAtEmEnT cAN Be rePlACeD wITh eNhAncEd 'fOr' 🤓 🤓 🤓
         for (int i = 0; i < data.length; i++) {
             switch (data[i]){
@@ -96,22 +96,23 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
                     }
             }
         }
+
     }
 
-    private ProceduralBuildingBlock(int simmetry, float[][] wallVertices, float[][] textureCoordinates, int[][] indices, boolean[] forceRender, boolean[] adjacencyExclusive, String[][] compartiblesForAdjacency, float bias, ProceduralBuilding context, String name) {
+    private ProceduralBuildingBlock(int simmetry, float[][] wallVertices, float[][] textureCoordinates, int[][] indices, boolean[] forceRender, boolean[] isAdjacencyExclusive, String[][] compartiblesForAdjacency, float bias, ProceduralBuilding context, String name) {
         this.simmetry = simmetry;
         this.wallVertices = wallVertices;
         this.textureCoordinates = textureCoordinates;
         this.indices = indices;
         this.forceRender = forceRender;
-        this.adjacencyExclusive = adjacencyExclusive;
+        this.isAdjacencyExclusive = isAdjacencyExclusive;
         this.compartiblesForAdjacency = compartiblesForAdjacency;
         this.bias = bias;
         this.context = context;
         this.name = name;
     }
 
-    public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ, ShaderProgram shader){
+    public TexturedModel generate(boolean genNorth, boolean genSouth, boolean genEast, boolean genWest, float correctionX, float correctionY, float correctionZ){
         ArrayList<TexturedModel> models = new ArrayList<>(4);
         if(genNorth){models.add(generateWall(NORTH));}
         if(genSouth){models.add(generateWall(SOUTH));}
@@ -120,7 +121,7 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         models.add(generateWall(RENDER_ALWAYS));
         TexturedModel[] modelArray = new TexturedModel[models.size()];
         for(int i = 0; i < modelArray.length;i++){modelArray[i]=models.get(i);}
-        TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture, shader);
+        TexturedModel finishedModel = ModelUtils.mergeModels(modelArray, context.texture, null);
         ModelUtils.translateModel(finishedModel,correctionX,correctionY,correctionZ);
         return finishedModel;
     }
@@ -141,9 +142,11 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     }
 
     private void setCompartibles(int side, String[] cmd){ // to avoid verbose code
-        if(cmd[1].substring(0,1).equalsIgnoreCase("!"))
-        {adjacencyExclusive[side] = true;cmd[1] = cmd[1].replace("!","");}
-        compartiblesForAdjacency[side] = cmd[1].split(",");
+        String arg = cmd[1];
+        if(arg.substring(0,1).equalsIgnoreCase("!")) {
+            isAdjacencyExclusive[side] = true;arg = arg.replace("!","");}
+        arg = !arg.contains(NOT_INSIDE_BUILDING) && context.implicitlyAssumeNoBuildOK ? arg + "," + NOT_INSIDE_BUILDING : arg;
+        compartiblesForAdjacency[side] = arg.split(",");
     }
 
     public static int mirrorDirection(int dir){
@@ -176,30 +179,40 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
         }
     }
 
-    public boolean isCompartible(int direction, ProceduralBuildingBlock block){
-        return isCompartible(direction,block,true);
+    public boolean isCompatible(int direction, ProceduralBuildingBlock block){
+        return isCompatible(direction,block,true);
     }
 
-    public boolean isCompartible(int direction, ProceduralBuildingBlock block, boolean checkForBoth){
-
+    public boolean isCompatible(int direction, ProceduralBuildingBlock block, boolean checkForBoth){
         if(block == null){
-            return true;//todo compartiblesForAdjacency[direction][0].equalsIgnoreCase("%any%");
+            return true;
         }
 
-        boolean compartForMe = isCompartible(direction,block.name);
+        checkForBoth = checkForBoth && !(block == OUT_OF_BITMAP_BOUNDS || block == OUT_OF_BITMAP_BUILD_PATH);
+
+        boolean compartForMe = isCompatible(direction,block.name);
         if(!checkForBoth){return compartForMe;}
-        boolean compartForThem = block.isCompartible(mirrorDirection(direction),this,false);
+        boolean compartForThem = block.isCompatible(mirrorDirection(direction),this,false);
         return compartForThem && compartForMe;
     }
 
-    public boolean isCompartible(int direction, String blockName){
-        if(compartiblesForAdjacency[direction][0].equalsIgnoreCase(ANY)){
-            return true;
-        }
+    public boolean isCompatible(int direction, String blockName){
+        if(compartiblesForAdjacency[direction][0].equalsIgnoreCase(ANY)){return true;}
         for(String act : compartiblesForAdjacency[direction]){
-            if(act.equals(blockName)){return !adjacencyExclusive[direction];}
+            if(act.equals(NOT_INSIDE_BUILDING)){
+                boolean b = blockName.equals(OUT_OF_BITMAP_NAME) || blockName.equals(OUT_OF_PATH_NAME);
+                if(isAdjacencyExclusive[direction]){b = !b;}
+                return b;
+            } else if (act.equals(OUT_OF_BOUNDS_SINTAX)){
+                boolean b = blockName.equals(OUT_OF_BITMAP_NAME);
+                if(isAdjacencyExclusive[direction]){b = !b;}
+                return b;
+            }
+            else if(act.equals(blockName)){
+                return !isAdjacencyExclusive[direction];
+            }
         }
-        return adjacencyExclusive[direction];
+        return isAdjacencyExclusive[direction];
     }
 
     @Override
@@ -216,4 +229,8 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
     public String toString(){
         return name;
     }
+
+    public static final ProceduralBuildingBlock OUT_OF_BITMAP_BUILD_PATH = new ProceduralBuildingBlock(0,null,null,null,null,null,null,0,null, OUT_OF_PATH_NAME);
+    public static final ProceduralBuildingBlock OUT_OF_BITMAP_BOUNDS = new ProceduralBuildingBlock(0,null,null,null,null,null,null,0,null, OUT_OF_BITMAP_NAME);
+
 }

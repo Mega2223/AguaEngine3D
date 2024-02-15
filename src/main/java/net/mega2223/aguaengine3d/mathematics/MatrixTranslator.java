@@ -612,6 +612,21 @@ public class MatrixTranslator {
         System.out.println("Comparison complete!");
     }
 
+    public static void debugMatrix(int[][] mat){
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < mat.length; i++) {
+            int[] act = mat[i];
+            out.append("[");
+            for (int j = 0; j < act.length; j++) {
+                out.append(mat[i][j]);
+                if(j != act.length - 1){
+                    out.append(",");}
+            }
+            out.append("]\n");
+        }
+        System.out.println(out);
+    }
+
     public static void debugMatrix(float[][] mat){
         StringBuilder out = new StringBuilder();
         for (int i = 0; i < mat.length; i++) {

@@ -4,8 +4,8 @@ bias=1
 
 compartibleNorth=YellowCrossX,YellowCrossCross
 compartibleSouth=YellowCrossX,YellowCrossCross
-compartibleWest=%any%
-compartibleEast=%any%
+compartibleWest=%nobuild%
+compartibleEast=%nobuild%
 
 all:
 forceRender=false

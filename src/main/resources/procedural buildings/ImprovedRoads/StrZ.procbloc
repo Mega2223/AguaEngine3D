@@ -1,0 +1,14 @@
+name=StrZ
+
+bias=1
+
+compartibleNorth=StrZ,Cross,%outofbounds%
+compartibleSouth=StrZ,Cross,%outofbounds%
+compartibleWest=%any%
+compartibleEast=%any%
+
+all:
+forceRender=false
+vertices=0,0,0,0 , 0,0,1,0 , 1,0,0,0 , 1,0,1,0
+textureCoords=.5,.5 , .5,0, 1,.5, 1,0
+indices=0,1,2,3,2,1

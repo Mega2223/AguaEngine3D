@@ -2,8 +2,8 @@ name=YellowCrossZ
 
 bias=1
 
-compartibleNorth=%any%
-compartibleSouth=%any%
+compartibleNorth=YellowCrossX,YellowCrossCross
+compartibleSouth=YellowCrossX,YellowCrossCross
 compartibleWest=YellowCrossZ,YellowCrossCross
 compartibleEast=YellowCrossZ,YellowCrossCross
 

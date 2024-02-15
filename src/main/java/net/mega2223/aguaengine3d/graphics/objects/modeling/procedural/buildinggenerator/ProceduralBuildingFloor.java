@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildingg
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.mathematics.MathUtils;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,13 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
         //map must be a matrix
         //perhaps check for that?
         ProceduralBuildingBlock[][] blockMap = new ProceduralBuildingBlock[map.length][map[0].length];
-
+        for (int i = 0; i < blockMap.length; i++) {
+            for (int j = 0; j < blockMap.length; j++) {
+                if(map[i][j]!=where){
+                    blockMap[i][j] = OUT_OF_BITMAP_BUILD_PATH;
+                }
+            }
+        }
         genIt(map,height,where,blockMap,0,0,models,shouldConsiderMiddleBlocks);
 
         TexturedModel[] ret = new TexturedModel[models.size()];
@@ -95,7 +102,11 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             ProceduralBuildingBlock toTry = (ProceduralBuildingBlock) MathUtils.doWeightedSelection(possibleBlocks,weights);
             couldPlace = tryToPlace(z,x,height,buildMap,whereToBuild,blockMap,toTry,whereToPlace);
             if(couldPlace){
-                try {genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace,shouldConsiderMiddleBlocks);return;} catch (ContradictionException ignored) {}
+                try {
+                    genIt(buildMap,height,whereToBuild,blockMap,z,x+1,whereToPlace,shouldConsiderMiddleBlocks);return;
+                } catch (ContradictionException ignored) {
+                    couldPlace = false; possibleBlocks.remove(toTry);
+                }
             } else {possibleBlocks.remove(toTry);
         }
         }
@@ -114,17 +125,17 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
     private boolean tryToPlace(int z, int x, int height, int[][] buildMap, int where, ProceduralBuildingBlock[][] blockMap, ProceduralBuildingBlock block, List<TexturedModel> whereToAdd){
         boolean canBuildNorth = z > 0, canBuildSouth = z < buildMap.length -1,
                 canBuildEast = x < buildMap[z].length -1, canBuildWest = x > 0;
-        ProceduralBuildingBlock north = null, south = null, east = null, west = null;
+        ProceduralBuildingBlock north, south, east, west;
 
-        if(canBuildNorth){north = blockMap[z-1][x];}
-        if(canBuildSouth){south = blockMap[z+1][x];}
-        if(canBuildEast){east = blockMap[z][x+1];}
-        if(canBuildWest){west = blockMap[z][x-1];}
+        north = canBuildNorth ? blockMap[z-1][x] : OUT_OF_BITMAP_BOUNDS;
+        south = canBuildSouth ? blockMap[z+1][x] : OUT_OF_BITMAP_BOUNDS;
+        east  = canBuildEast ? blockMap[z][x+1] : OUT_OF_BITMAP_BOUNDS;
+        west  = canBuildWest ? blockMap[z][x-1] : OUT_OF_BITMAP_BOUNDS;
 
-        canBuildNorth = block.isCompartible(ProceduralBuildingBlock.NORTH,north);
-        canBuildSouth = block.isCompartible(ProceduralBuildingBlock.SOUTH,south);
-        canBuildEast = block.isCompartible(ProceduralBuildingBlock.EAST,east);
-        canBuildWest = block.isCompartible(ProceduralBuildingBlock.WEST,west);
+        canBuildNorth = block.isCompatible(ProceduralBuildingBlock.NORTH,north);
+        canBuildSouth = block.isCompatible(ProceduralBuildingBlock.SOUTH,south);
+        canBuildEast = block.isCompatible(ProceduralBuildingBlock.EAST,east);
+        canBuildWest = block.isCompatible(ProceduralBuildingBlock.WEST,west);
 
         if(canBuildNorth && canBuildSouth && canBuildEast && canBuildWest){
             boolean genNorth = z <= 0, genSouth = z >= buildMap.length -1,
@@ -134,7 +145,7 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             if(!genEast){genEast = buildMap[z][x+1] != where;}
             if(!genWest){genWest = buildMap[z][x-1] != where;}
 
-            whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z,context.shaderProgram));
+            whereToAdd.add(block.generate(genNorth,genSouth,genEast,genWest,x,height,z));
             blockMap[z][x] = block;
             return true;
         }

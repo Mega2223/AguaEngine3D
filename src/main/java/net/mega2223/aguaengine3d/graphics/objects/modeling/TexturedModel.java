@@ -33,7 +33,6 @@ public class TexturedModel extends Model{
     protected void init(float[] textureData, int texture){
         this.texture = texture;
         this.setTextureShift(textureData);
-        textureSamplerUniformCoord = GL30.glGetUniformLocation(shader.getID(),"samplerTexture");
     }
 
     public void mirrorTexturesVertically(){
@@ -46,7 +45,7 @@ public class TexturedModel extends Model{
         super.initVBOS();
     }
 
-    int textureSamplerUniformCoord = -1;
+
 
     @Override
     public void draw() {

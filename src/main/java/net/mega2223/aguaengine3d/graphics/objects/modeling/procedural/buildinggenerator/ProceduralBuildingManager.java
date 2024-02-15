@@ -21,6 +21,31 @@ public class ProceduralBuildingManager {
         System.out.println(out);
     }
 
+    public static void debugMap(ProceduralBuildingBlock[][] map){
+        StringBuilder out = new StringBuilder();
+        StringBuilder buf = new StringBuilder();
+        int longestString = 0;
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                ProceduralBuildingBlock act = map[i][j];
+                int len = act == null ? 4 : act.getName().length();
+                longestString = Math.max(len, longestString);
+            }
+        }
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                ProceduralBuildingBlock act = map[y][x];
+                String name = act == null ? "NULL" :  act.getName();
+                buf.delete(0,Math.max(buf.length()-1,0));
+                for (int i = name.length(); i < longestString; i++) {buf.append(" ");}
+                out.append(name).append(buf);
+                if(x+1!=map[y].length){out.append("| ");}
+            }
+            out.append("\n");
+        }
+        System.out.println(out);
+    }
+
     public static int[][] pngToBitmap(String dir, int[][] expectedColors){
         try {
             BufferedImage img = ImageIO.read(new File(dir));

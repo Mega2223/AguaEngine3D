@@ -6,6 +6,7 @@ minFloors=20
 minSize=2,2
 bias=1
 shouldRenderMiddle=false
+assumeNoBuildOK=true
 
 floors=WindowFloor,StandardFloor,DoorFloor
 blocks=StandardBlock,WindowBlock,DoorBlock,DoubleHeightBlock

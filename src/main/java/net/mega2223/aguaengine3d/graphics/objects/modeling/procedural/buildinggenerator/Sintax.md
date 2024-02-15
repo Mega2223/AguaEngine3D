@@ -40,9 +40,13 @@ Lists are usually separated by comma, like:
 `var=val1,val2,val3`
 
 ## Built in variables:
-_%any%_ - valid in any file listing, means that it is indifferent towards other buildings, blocks or floors.
+_%any%_ - Valid in any file listing, means that it is indifferent towards other buildings, blocks or floors.
 
-_%none%_ - sidings where nothing happens
+_%none%_ - No sidings
+
+_%nobuild%_ Places where there's no build, either places that are out of the bounds of the bitmap or places that the bitmap explicitly instructs the constructor not to build on.
+
+_%outofbounds%_ To explicitly refer to sidings that are out of the bitmap. 
 
 ## Procedural Building (procb) configs:
 ### Required:
@@ -68,7 +72,9 @@ maxFloors - Maximum of floors
 
 minFloors - Minimum of floors
 
-minSize - Minimum grid size, two sized array of integers
+minSize - Minimum grid size, two sized array of integers  
+
+assumeNoBuildOK - Should the constructor assume that places where there are no buildings are acceptable sidings by default? If false then you need to explicitly put _%nobuild%_ in the outer sidings of your building.
 
 ## Procedural Building Floor (procf)
 

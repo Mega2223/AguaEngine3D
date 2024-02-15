@@ -90,6 +90,16 @@ public class ModelUtils {
         VectorTranslator.addToAllVectors(vertices,x,y,z);
         return vertices;
     }
+    public static void scaleModel(Model model, float factor){
+        scaleModel(model,factor,factor,factor);
+    }
+    public static void scaleModel(Model  model, float sX, float sY, float sZ){
+        float[] vertices = model.getRelativeVertices();
+        for (int i = 0; i < vertices.length; i+=4) {
+            vertices[i]*=sX; vertices[i+1]*=sY; vertices[i+2]*=sZ;
+        }
+        model.setVertices(vertices);
+    }
 
     /**Saves the object in wavefront format, does not consider normals*/
     public static void saveModel(TexturedModel model, String dir, String nameAndExtension) throws IOException {
