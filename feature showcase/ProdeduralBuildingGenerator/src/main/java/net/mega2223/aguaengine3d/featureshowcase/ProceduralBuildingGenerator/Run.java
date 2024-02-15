@@ -66,9 +66,9 @@ public class Run {
 
         //terrain setup
         int[][] map = {
-                {3,3,3,1,2,2,2,1,0,0,0,1,0,0,0},
-                {3,3,3,1,2,2,2,1,0,0,0,1,0,0,0},
-                {3,3,3,1,2,2,2,1,0,0,0,1,0,0,0},
+                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
+                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
+                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
                 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
                 {4,4,4,1,5,5,5,1,6,6,6,1,7,7,7},
                 {4,4,4,1,5,5,5,1,6,6,6,1,7,7,7},
@@ -87,7 +87,7 @@ public class Run {
         ProceduralBuilding brick = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
         gen.setCoords(-225,0,-225);
         context.addObject(gen);
-        for (int i = 2; i < 16; i++) {
+        for (int i = 2; i < 18; i++) {
             System.out.println(i);
             TexturedModel gen2 = brick.generate(map, i,10,30F);
             gen2.setCoords(-225,0,-225);

@@ -8,6 +8,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureU
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.RadialNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -95,10 +96,14 @@ public class ProceduralTerrainGenerator {
         perlin4.setTranslations(0,0,.5F,.5F);
         perlin4.setHeightScale(3F/4);
 
-        stackedNoises.add(perlin1);
-        stackedNoises.add(perlin2);
-        stackedNoises.add(perlin3);
-        stackedNoises.add(perlin4);
+//        stackedNoises.add(perlin1);
+//        stackedNoises.add(perlin2);
+//        stackedNoises.add(perlin3);
+//        stackedNoises.add(perlin4);
+        RadialNoise radial1 = new RadialNoise(0, 0, 0.4F, RadialNoise.LINEAR,true);
+        radial1.setTranslations(0,0,1,1);
+        radial1.setDislocation(.5F);
+        stackedNoises.add(radial1);
 
         ProceduralBuilding build = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1",new TextureShaderProgram());
         int[][] map = new int[16][16];
