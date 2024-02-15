@@ -96,7 +96,10 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
     public TexturedModel generate(int[][] pattern, int where){
         return generate(pattern,where,1);
     }
-    public TexturedModel generate(int[][] pattern, int where, float scale){
+    public TexturedModel generate(int[][] pattern, int where,float scale){
+        return generate(pattern,where,1,scale);
+    }
+    public TexturedModel generate(int[][] pattern, int where, int complexity,float scale){
 
         Random r = new Random();
         int bound = maxFloors - minFloors;
@@ -105,8 +108,8 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
         int currentHeight = 0;
 
         ArrayList<TexturedModel> floorModels = new ArrayList<>(desiredHeight);
+        ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];
 
-        ProceduralBuildingFloor[] floorMap = new ProceduralBuildingFloor[desiredHeight];//fixme
         for (int f = 0; currentHeight < desiredHeight; f++) {
             ProceduralBuildingFloor prevFloor = f > 0 ? floorMap[f-1] : null;
             List<ProceduralBuildingFloor> possibleFloors = new ArrayList<>();
@@ -114,14 +117,15 @@ public class ProceduralBuilding implements ProceduralBuildingObject {
             float[] probabilities = new float[possibleFloors.size()];
             for(int i = 0; i < possibleFloors.size(); i++){probabilities[i]=possibleFloors.get(i).bias;}
             ProceduralBuildingFloor floorToBuild = (ProceduralBuildingFloor) MathUtils.doWeightedSelection(possibleFloors,probabilities);
-            //the application can get stuck here, I really need to up the contratiction model
-            floorModels.add(floorToBuild.generate(pattern,currentHeight,where,shouldConsiderMiddleBlocks));
+            //FIXME: the application can get stuck here, I really need to up the contratiction model
+            floorModels.add(floorToBuild.generate(pattern,currentHeight,where,complexity,shouldConsiderMiddleBlocks));
             floorMap[f] = floorToBuild;
             currentHeight += floorToBuild.height;
         }
         TexturedModel[] floorArray = new TexturedModel[floorModels.size()];
         floorArray = floorModels.toArray(floorArray);
         TexturedModel finalModel = ModelUtils.mergeModels(floorArray, texture, null);
+        scale/=complexity;
         if(scale!=1F){
             float[] verts = finalModel.getRelativeVertices();
             for (int i = 0; i < verts.length; i+=4) {verts[i]*=scale; verts[i+1]*=scale;verts[i+2]*=scale;}

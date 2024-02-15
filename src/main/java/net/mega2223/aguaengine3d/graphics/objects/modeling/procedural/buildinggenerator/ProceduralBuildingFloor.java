@@ -51,8 +51,21 @@ public class ProceduralBuildingFloor implements ProceduralBuildingObject{
             }
         }
     }
+    public TexturedModel generate(int[][] map, int height, int where,int complexity,boolean shouldConsiderMiddleBlocks){
+        if (complexity == 1){
+            return generate(map,height,where,shouldConsiderMiddleBlocks);
+        }
+        int[][] newMap = new int[map.length*complexity][map[0].length*complexity];
+        //not going to bother with a total rewrite of the generate function to accomodate this
+        for (int i = 0; i < newMap.length; i++) {
+            for (int j = 0; j < newMap[i].length; j++) {
+                newMap[i][j] = map[i/complexity][j/complexity];
+            }
+        }
+        return generate(newMap,height,where,shouldConsiderMiddleBlocks);
+    }
 
-    public TexturedModel generate(int[][] map, int height, int where, boolean shouldConsiderMiddleBlocks){
+    public TexturedModel generate(int[][] map, int height, int where,boolean shouldConsiderMiddleBlocks){
         List<TexturedModel> models = new ArrayList<>();
         Random r = new Random();
 

@@ -84,8 +84,12 @@ public class Run {
         };
         ProceduralBuilding road = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\ImprovedRoads");
         TexturedModel gen = road.generate(map, 1, 30F);
+        ProceduralBuilding brick = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
         gen.setCoords(-225,0,-225);
+        TexturedModel gen2 = brick.generate(map, 0,4,30F);
+        gen2.setCoords(-225,0,-225);
         context.addObject(gen);
+        context.addObject(gen2);
 
         //Render Logic be like:
         long unrendered = 0;

@@ -143,9 +143,9 @@ public class ProceduralBuildingBlock implements ProceduralBuildingObject {
 
     private void setCompartibles(int side, String[] cmd){ // to avoid verbose code
         String arg = cmd[1];
-        if(arg.substring(0,1).equalsIgnoreCase("!")) {
-            isAdjacencyExclusive[side] = true;arg = arg.replace("!","");}
-        arg = !arg.contains(NOT_INSIDE_BUILDING) && context.implicitlyAssumeNoBuildOK ? arg + "," + NOT_INSIDE_BUILDING : arg;
+        boolean isNegative = arg.charAt(0) == '!';
+        if(isNegative) {isAdjacencyExclusive[side] = true;arg = arg.replace("!","");}
+        arg = !arg.contains(NOT_INSIDE_BUILDING) && context.implicitlyAssumeNoBuildOK &&  !isNegative ? arg + "," + NOT_INSIDE_BUILDING : arg;
         compartiblesForAdjacency[side] = arg.split(",");
     }
 
