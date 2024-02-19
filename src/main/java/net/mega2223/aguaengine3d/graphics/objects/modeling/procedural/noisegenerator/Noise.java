@@ -122,7 +122,6 @@ public interface Noise {
             }
         }
         float[] vertices = new float[verticeList.size()];
-        System.out.println("V: " + vertices.length / 4);
         for (int j = 0; j < vertices.length; j++) {vertices[j] = verticeList.get(j);}
         int[] indices = new int[indexList.size()];
         for (i = 0; i < indices.length; i++) {indices[i] = indexList.get(i);}

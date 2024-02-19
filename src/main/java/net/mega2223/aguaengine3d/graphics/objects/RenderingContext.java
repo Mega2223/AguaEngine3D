@@ -4,10 +4,7 @@ import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import org.lwjgl.opengl.GL30;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class RenderingContext implements Comparator<Renderable> {
 
@@ -25,7 +22,7 @@ public class RenderingContext implements Comparator<Renderable> {
 
     }
 
-    public RenderingContext addObjects(List<Renderable> toAdd){
+    public RenderingContext addObjects(Collection<Renderable> toAdd){
         for(Renderable ac : toAdd){addObject(ac);}
         return this;
     }
