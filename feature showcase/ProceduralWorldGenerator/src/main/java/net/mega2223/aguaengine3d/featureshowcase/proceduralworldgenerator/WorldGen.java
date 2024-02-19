@@ -71,15 +71,26 @@ public class WorldGen {
         modelAssembler.start();
 
         PerlinNoise perlinMajor = new PerlinNoise(37,37);
-        perlinMajor.setTranslations(0,0,256,256);
-        perlinMajor.setHeightScale(42);
-        perlinMajor.setDislocation(-.4F);
+        perlinMajor.setTranslations(0,0,512,512);
+        perlinMajor.setHeightScale(40);
+        perlinMajor.setDislocation(-6);
 
         PerlinNoise perlinMinor1 = new PerlinNoise(32, 32);
-        perlinMinor1.setTranslations(0,0,22,22);
-        perlinMinor1.setHeightScale(16);
+        perlinMinor1.setTranslations(0,0,256,256);
+        perlinMinor1.setHeightScale(30);
+
+        PerlinNoise perlinMinor2 = new PerlinNoise(33, 33);
+        perlinMinor2.setTranslations(0,0,128,128);
+        perlinMinor2.setHeightScale(15);
+
+        PerlinNoise perlinMinor3 = new PerlinNoise(34, 34);
+        perlinMinor3.setTranslations(0,0,64,64);
+        perlinMinor3.setHeightScale(7.5F);
+
 
         map.add(perlinMinor1);
+        map.add(perlinMinor2);
+        map.add(perlinMinor3);
         map.add(perlinMajor);
         context.addObject(new Model(
                 new float[]{-160,0,-160,0, 160,0,-160,0, 160,0,160,0, -160,0,160,0},
@@ -161,7 +172,7 @@ public class WorldGen {
     public static void genModelForReg(int x, int z){
         generatedLocations.add(x); generatedLocations.add(z);
         float xF = x*100F - 50F; float zF = z*100F - 50F;
-        Model model = Noise.NoiseToModel(map, xF, zF, xF + 100F, zF + 100F, 1F, 1F, 1F, null);
+        Model model = Noise.NoiseToModel(map, xF, zF, xF + 100.1F, zF + 100.1F, 1F, 1F, 1F, null);
         readyToUse.add(model);
     }
 }
