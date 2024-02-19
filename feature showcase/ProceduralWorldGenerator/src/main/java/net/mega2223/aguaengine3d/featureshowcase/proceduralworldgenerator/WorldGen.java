@@ -7,6 +7,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegener
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
@@ -71,14 +72,20 @@ public class WorldGen {
 
         PerlinNoise perlinMajor = new PerlinNoise(37,37);
         perlinMajor.setTranslations(0,0,256,256);
-        perlinMajor.setHeightScale(20);
+        perlinMajor.setHeightScale(42);
+        perlinMajor.setDislocation(-.4F);
 
         PerlinNoise perlinMinor1 = new PerlinNoise(32, 32);
         perlinMinor1.setTranslations(0,0,22,22);
         perlinMinor1.setHeightScale(16);
 
-        //map.add(perlinMinor1);
+        map.add(perlinMinor1);
         map.add(perlinMajor);
+        context.addObject(new Model(
+                new float[]{-160,0,-160,0, 160,0,-160,0, 160,0,160,0, -160,0,160,0},
+                new int[]{0,1,2,3,2,0},
+                new SolidColorShaderProgram(.2F,.2F,.4F)
+        ));
 
 
         GRASS_SHADER = new GrassShaderProgram();
