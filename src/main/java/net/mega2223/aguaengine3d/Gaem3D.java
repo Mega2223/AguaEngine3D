@@ -5,9 +5,11 @@ import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
@@ -19,6 +21,9 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 @SuppressWarnings({"unused"})
@@ -132,8 +137,16 @@ public class Gaem3D {
         Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj"),new SolidColorShaderProgram(0,1,0));
         context.addObject(grass);
 
-        float[] vertices = grass.getRelativeVertices();
-        float[] normals = grass.getNormals();
+        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
+        Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
+                new BufferedImage[]{cat,cat,cat,cat,cat,cat}
+        ));
+        context.addObject(sk);
+        context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
+
+
+ //       float[] vertices = grass.getRelativeVertices();
+//        float[] normals = grass.getNormals();
         //VectorTranslator.debugVector(normals);
 //        for (int i = 0; i < normals.length; i+=4) {
 //            Line toAdd = new Line(1, 0, 0);

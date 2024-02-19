@@ -5,9 +5,11 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class RenderingContext {
+public class RenderingContext implements Comparator<Renderable> {
 
     protected final List<Renderable> objects = new ArrayList<>();
     protected final List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
@@ -29,6 +31,7 @@ public class RenderingContext {
     }
     public RenderingContext addObject(Renderable toAdd){
         objects.add(toAdd);
+        objects.sort(this);
         this.synchronizeUniforms(toAdd.getShader());
         return this;
     }
@@ -188,5 +191,10 @@ public class RenderingContext {
     //for testing purposes
     public LightspaceRenderingManager getLightSpaceRenderingManager() {
         return lightSpaceRenderingManager;
+    }
+
+    @Override
+    public int compare(Renderable o1, Renderable o2) {
+        return o1.getRenderOrderPosition() - o2.getRenderOrderPosition();
     }
 }

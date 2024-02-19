@@ -28,13 +28,14 @@ const vec4 test = vec4(0,0,0,1);
 void main(){
     float greenBias = (objectiveCoords.y-1.5F)*.75F;
     greenBias = clamp(greenBias,0,1);
-    color = mix(yellow,green,greenBias);
+    color = mix(yellow,green,smoothstep(0,1,greenBias));
     float browBias = (-objectiveCoords.y-.85)*.5F;
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
 
     float dp = dot(perVertexNormal.xyz,normalize(vec3(2,.15,1)));
-    dp = clamp(dp*2F, 0.25, 1);
+    //float dpMUltiplier = dp
+    dp = clamp(dp*1.75F, 0, 1);
     dp = (3F - dp * 2F) * dp * dp;
     color = mix(color,vec4(0,0,0,1),dp);
 

@@ -10,4 +10,5 @@ public interface Renderable {
     void setUniforms(int itneration, float[] projectionMatrix);
     ShaderProgram getShader(); //ideally this would not be here but RenderingManager needs it
 
+    default int getRenderOrderPosition(){return 0;}
 }
