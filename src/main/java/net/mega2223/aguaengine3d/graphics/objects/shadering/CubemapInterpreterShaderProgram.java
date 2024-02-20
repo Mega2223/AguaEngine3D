@@ -76,8 +76,8 @@ public class CubemapInterpreterShaderProgram implements ShaderProgram{
             this.camera = camera;
         }
         @Override
-        protected void preLogic(int itneration, RenderingContext context) {
-            super.preLogic(itneration, context);
+        protected void preLogic(int iteration, RenderingContext context) {
+            super.preLogic(iteration, context);
             tX = camera[0]; tY = camera[1]; tZ = camera[2];
             rY = -camera[3];
             if(camera.length>4){rZ = camera[4];

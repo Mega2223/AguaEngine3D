@@ -12,12 +12,12 @@ public abstract class WorldspaceDataVisualizer implements Renderable {
     }
 
     @Override
-    public void doLogic(int itneration) {
-        object.doLogic(itneration);
+    public void doLogic(int iteration) {
+        object.doLogic(iteration);
     }
     @Override
-    public void setUniforms(int itneration, float[] projectionMatrix) {
-        object.setUniforms(itneration,projectionMatrix);
+    public void setUniforms(int iteration, float[] projectionMatrix) {
+        object.setUniforms(iteration,projectionMatrix);
     }
     @Override
     public ShaderProgram getShader() {
@@ -37,8 +37,8 @@ public abstract class WorldspaceDataVisualizer implements Renderable {
         line.setStart(x,y,z);
         WorldspaceDataVisualizer visualizer = new WorldspaceDataVisualizer(line) {
             @Override
-            public void doLogic(int itneration) {
-                super.doLogic(itneration);
+            public void doLogic(int iteration) {
+                super.doLogic(iteration);
                 line.setEnd(x + memoryAccess[0], y + memoryAccess[1], z + memoryAccess[2]);
             }
         };
@@ -50,8 +50,8 @@ public abstract class WorldspaceDataVisualizer implements Renderable {
         line.setStart(beginningMemoryAcess[0],beginningMemoryAcess[1],beginningMemoryAcess[2]);
         WorldspaceDataVisualizer visualizer = new WorldspaceDataVisualizer(line) {
             @Override
-            public void doLogic(int itneration) {
-                super.doLogic(itneration);
+            public void doLogic(int iteration) {
+                super.doLogic(iteration);
                 line.setStart(beginningMemoryAcess[0],beginningMemoryAcess[1],beginningMemoryAcess[2]);
                 line.setEnd(beginningMemoryAcess[0] + endMemoryAccess[0], beginningMemoryAcess[1] + endMemoryAccess[1], beginningMemoryAcess[2] + endMemoryAccess[2]);
             }

@@ -8,14 +8,14 @@ public class InterfaceComponent extends Model{
 
     float[] textureCoords;
 
-    public InterfaceComponent(float[] vertices, int[] indexes, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram shaderProgram) {
-        super(vertices, indexes, shaderProgram);
+    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram shaderProgram) {
+        super(vertices, indices, shaderProgram);
         this.shaderProgram = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public InterfaceComponent(float[] vertices, int[] indexes, float[] textureCoords, int texture,float aspectRatio) {
-        super(vertices, indexes, new DisplayComponentShaderProgram(texture, textureCoords,aspectRatio));
+    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio) {
+        super(vertices, indices, new DisplayComponentShaderProgram(texture, textureCoords,aspectRatio));
         shaderProgram = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }

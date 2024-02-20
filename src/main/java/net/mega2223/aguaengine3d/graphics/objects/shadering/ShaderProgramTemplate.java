@@ -26,7 +26,7 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
         rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
-        itnerationLocation = GL30.glGetUniformLocation(getID(),"itneration");
+        itnerationLocation = GL30.glGetUniformLocation(getID(),"iteration");
         GL30.glUseProgram(getID());
         //fixme this may be messing up the depth display shader somehow
         for (int i = 0; i < MAX_LIGHTS; i++) {

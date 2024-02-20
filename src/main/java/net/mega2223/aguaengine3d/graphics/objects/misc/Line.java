@@ -52,14 +52,14 @@ public class Line implements Renderable {
     }
 
     @Override
-    public void doLogic(int itneration) {
+    public void doLogic(int iteration) {
 
     }
 
     @Override
-    public void setUniforms(int itneration, float[] projectionMatrix) {
+    public void setUniforms(int iteration, float[] projectionMatrix) {
         MatrixTranslator.generateTranslationMatrix(transMatBuffer,coords[0],coords[1],coords[2]);
-        shaderProgram.setUniforms(itneration,transMatBuffer,projectionMatrix);
+        shaderProgram.setUniforms(iteration,transMatBuffer,projectionMatrix);
     }
 
     @Override

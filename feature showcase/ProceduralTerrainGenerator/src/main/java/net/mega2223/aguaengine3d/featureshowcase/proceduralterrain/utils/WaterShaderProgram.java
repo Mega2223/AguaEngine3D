@@ -19,7 +19,7 @@ public class WaterShaderProgram extends ShaderProgramTemplate implements ShaderP
     @Override
     public void initUniforms() {
         super.initUniforms();
-        itneration_uni_loc = GL30.glGetUniformLocation(id,"itneration");
+        itneration_uni_loc = GL30.glGetUniformLocation(id,"iteration");
     }
 
     @Override

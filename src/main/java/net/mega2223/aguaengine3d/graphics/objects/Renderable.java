@@ -6,8 +6,8 @@ public interface Renderable {
 
     void draw();
     void drawForceShader(ShaderProgram shader);
-    void doLogic(int itneration);
-    void setUniforms(int itneration, float[] projectionMatrix);
+    void doLogic(int iteration);
+    void setUniforms(int iteration, float[] projectionMatrix);
     ShaderProgram getShader(); //ideally this would not be here but RenderingManager needs it
 
     default int getRenderOrderPosition(){return 0;}

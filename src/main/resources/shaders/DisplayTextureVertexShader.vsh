@@ -6,7 +6,7 @@ layout(location = 1) in vec2 texturePos;
 uniform mat4 projection;
 uniform mat4 translation;
 uniform mat4 rotation = mat4(1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1);
-uniform int itneration;
+uniform int iteration;
 uniform vec4 bounds = vec4(0,0,1,1);
 
 out vec2 texturePosition;

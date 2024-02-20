@@ -9,7 +9,7 @@ in vec3 normalAligment;
 const int MAX_LIGHTS = 10;
 
 uniform sampler2D samplerTexture;
-uniform int itneration;
+uniform int iteration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);

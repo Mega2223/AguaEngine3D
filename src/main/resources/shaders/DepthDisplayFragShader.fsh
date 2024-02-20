@@ -8,7 +8,7 @@ in vec4 objectiveCoord;
 //--@maxLightsConstant
 
 uniform sampler2D displayTexture;
-uniform int itneration;
+uniform int iteration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);

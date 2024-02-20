@@ -90,17 +90,17 @@ public class RenderingManager {
     public static int[] genTextureFrameBufferObject(int tX, int tY) { //todo maybe move the texture logic to a method in the TextureManager class?
         int id = genFrameBufferObject();
         int texture = TextureManager.generateImageTexture(tX,tY);
-        int depthBuffer = GL30.glGenRenderbuffers();
+        int renderBuffer = GL30.glGenRenderbuffers();
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, texture);
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, id);
-        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER,depthBuffer);
+        GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER,renderBuffer);
         GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_TEXTURE_2D, texture, 0);
         GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER,GL30.GL_DEPTH_COMPONENT,tX,tY);
-        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER,GL30.GL_DEPTH_ATTACHMENT,GL30.GL_RENDERBUFFER,depthBuffer);
+        GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER,GL30.GL_DEPTH_ATTACHMENT,GL30.GL_RENDERBUFFER,renderBuffer);
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
         GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER,0);
-        return new int[]{id, texture, depthBuffer};
+        return new int[]{id, texture, renderBuffer};
     }
 
     public static int[] genDepthFrameBufferObject(int tX, int tY){

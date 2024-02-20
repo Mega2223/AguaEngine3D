@@ -10,7 +10,7 @@ in vec4[MAX_LIGHTS] lightSpacePos;
 in vec4 fragmentNormal;
 
 uniform sampler2D samplerTexture;
-uniform int itneration;
+uniform int iteration;
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);

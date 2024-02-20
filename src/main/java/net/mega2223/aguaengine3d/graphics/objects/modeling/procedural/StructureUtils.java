@@ -15,7 +15,7 @@ public class StructureUtils {
 
     public static TexturedModel generateWallModel(float sx, float sz, float ex, float ez, float top, float base, int texture){
         float[] coords = {sx,base,sz,0 , sx,top,sz,0 , ex,base,ez,0 , ex,top,ez,0};
-        int[] indexes = {0,1,2, 2,3,1};
+        int[] indices = {0,1,2, 2,3,1};
 
         float xD = ex - sx;
         float zD = ez - sz;
@@ -24,7 +24,7 @@ public class StructureUtils {
 
         float[] textureShift = {0,0 , 0,-dif , r,0 , r,-dif};
         return new TexturedModel(
-                coords,indexes,textureShift,texture
+                coords,indices,textureShift,texture
         );
     }
 

@@ -176,7 +176,7 @@ public class Model implements Renderable {
     }
 
     //for subclasses
-    public void doLogic(int itneration){
+    public void doLogic(int iteration){
 
     }
 
@@ -219,9 +219,9 @@ public class Model implements Renderable {
         this.textureCoordsVBO = textureCoordsVBO;
     }
 
-    public void setUniforms(int itneration, float[] projectionMatrix){
+    public void setUniforms(int iteration, float[] projectionMatrix){
         MatrixTranslator.generateTranslationMatrix(bufferTranslationMatrix,coords);
-        shader.setUniforms(itneration,bufferTranslationMatrix,projectionMatrix);
+        shader.setUniforms(iteration,bufferTranslationMatrix,projectionMatrix);
     }
 
 }

@@ -25,7 +25,7 @@ public class RigidBodySystem extends PhysicsSystem {
     private final float[] rw = new float[4]; //stores the rotation quaternion to be used in update operations
     private final float[] rotationMatrix = new float[16];//stores the translation matrix multiplied by the rotation matrix
     private final float[] rotationRadians = new float[3];//to be updated each object update, dependent on the quaternion rotation representation
-    private final float[] inverseInnertialTensorWorldspace = new float[9];//stores the inverse inertia tensor in worldspace coords, updates each itneration
+    private final float[] inverseInnertialTensorWorldspace = new float[9];//stores the inverse inertia tensor in worldspace coords, updates each iteration
     //static variables meant to be used for physics calculations
     private static final float[] bufferM4 = new float[16];
     private static final float[] bufferVec = new float[4];

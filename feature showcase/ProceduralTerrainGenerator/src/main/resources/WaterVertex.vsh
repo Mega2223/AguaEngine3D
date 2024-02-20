@@ -3,7 +3,7 @@ layout(location = 0) in vec4 vertexPosition_modelspace;
 
 layout(location = 2) in vec4 vertexNormal;
 
-uniform int itneration;
+uniform int iteration;
 uniform mat4 translation;
 uniform mat4 projection;
 uniform mat4 rotation = mat4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
@@ -15,7 +15,7 @@ out vec4 perVertexNormal;
 
 void main(){
     gl_Position.xyz = vertexPosition_modelspace.xyz;
-    float itfl = float(itneration);
+    float itfl = float(iteration);
     gl_Position.y += sin(itfl*.00025F)*.5F;
     float z = vertexPosition_modelspace.z; float x = vertexPosition_modelspace.x;
     gl_Position.y += sin(x + (itfl *.0125F)) * .2F;

@@ -38,7 +38,7 @@ public class Skybox implements Renderable {
     }
 
     @Override
-    public void doLogic(int itneration) {
+    public void doLogic(int iteration) {
 
     }
 
@@ -47,8 +47,8 @@ public class Skybox implements Renderable {
     };
 
     @Override
-    public void setUniforms(int itneration, float[] projectionMatrix) {
-        program.setUniforms(itneration,translationMatrix,projectionMatrix);
+    public void setUniforms(int iteration, float[] projectionMatrix) {
+        program.setUniforms(iteration,translationMatrix,projectionMatrix);
     }
 
     @Override

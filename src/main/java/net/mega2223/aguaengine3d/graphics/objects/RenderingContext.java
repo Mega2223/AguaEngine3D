@@ -11,7 +11,7 @@ public class RenderingContext implements Comparator<Renderable> {
     protected final List<Renderable> objects = new ArrayList<>();
     protected final List<ScriptedSequence> scripts = new ArrayList<>();//perhaps have 2 lists?
 
-    int itneration = 0;
+    int iteration = 0;
     float[] backGroundColor = {.5f,.5f,.6f,1};
     final float[] fogDetails = new float[2];
     protected boolean active = false;
@@ -36,13 +36,13 @@ public class RenderingContext implements Comparator<Renderable> {
     public void doLogic(){
         if(!active){return;}
         for(ScriptedSequence s : scripts){
-            s.preLogic(itneration,this);
+            s.preLogic(iteration,this);
         }
-        for(Renderable o : objects){o.doLogic(itneration);}
+        for(Renderable o : objects){o.doLogic(iteration);}
         for(ScriptedSequence s : scripts){
-            s.postLogic(itneration,this);
+            s.postLogic(iteration,this);
         }
-        itneration++;
+        iteration++;
     }
 
     private final float[] bufferTransMatrix = new float[16];
@@ -57,14 +57,14 @@ public class RenderingContext implements Comparator<Renderable> {
     /** Assumes that the rendering context is already in place */
     public void doCustomRender(float[] projectionMatrix){
         for(Renderable m : objects){
-            m.setUniforms(itneration,projectionMatrix);
+            m.setUniforms(iteration,projectionMatrix);
             m.draw();
         }
     }
 
     public void doCustomRenderForceShader(float[] projectionMatrix, ShaderProgram shaderProgram){
         for(Renderable m : objects){
-            m.setUniforms(itneration,projectionMatrix);
+            m.setUniforms(iteration,projectionMatrix);
             m.drawForceShader(shaderProgram);
         }
     }

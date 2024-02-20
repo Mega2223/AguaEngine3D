@@ -156,7 +156,7 @@ public class TexturedModel extends Model{
     public static void debugTexturedModel(TexturedModel model){
         float[] vertices = model.vertices;
         float[] textureData = model.getTextureShift();
-        int[] indexes = model.indices;
+        int[] indices = model.indices;
 
         StringBuilder debug = new StringBuilder("Debugging model with " + vertices.length + " vertices\n");
         debug.append("It is using the shaderProgram ").append(model.shader.getID());
@@ -168,10 +168,10 @@ public class TexturedModel extends Model{
         }
         debug.append("\nThis model is constructed to build in the order [");
 
-        for (int i = 0; i < indexes.length-1; i++) {
-            debug.append(indexes[i]).append(",");
+        for (int i = 0; i < indices.length-1; i++) {
+            debug.append(indices[i]).append(",");
         }
-        debug.append(indexes[indexes.length - 1]).append("]");
+        debug.append(indices[indices.length - 1]).append("]");
         System.out.println(debug);
     }
 
