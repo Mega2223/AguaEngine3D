@@ -429,7 +429,8 @@ public class MatrixTranslator {
     }
 
     public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio, float tX, float tY, float tZ, float sX, float sY, float sZ){
-        generateTranslationAndScaleMatrix(m4,tX,tY,tZ,sX,sY,sZ);//fixme
+        generateTranslationAndScaleMatrix(m4,tX,tY,tZ,sX/aspectRatio,sY,sZ);//fixme
+
     }
 
     public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){

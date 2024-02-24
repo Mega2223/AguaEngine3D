@@ -7,6 +7,7 @@ public class InterfaceComponent extends Model{
     final DisplayComponentShaderProgram shaderProgram;
 
     float[] textureCoords;
+    int renderOrderPosition = -1;
 
     public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram shaderProgram) {
         super(vertices, indices, shaderProgram);
@@ -30,6 +31,15 @@ public class InterfaceComponent extends Model{
 
     public void setAspectRatio(float ar){
         shaderProgram.setAspectRatio(ar);
+    }
+
+    public void setRenderOrderPosition(int pos){
+        this.renderOrderPosition = pos;
+    }
+
+    @Override
+    public int getRenderOrderPosition() {
+        return renderOrderPosition;
     }
 
     public float getAspectRatio(){

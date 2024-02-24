@@ -62,6 +62,15 @@ public class RenderingContext implements Comparator<Renderable> {
         }
     }
 
+    /** Only renders objects whose render order positions are >= minPriority and <= maxPriority*/
+    public void doCustomRender(float[] projectionMatrix, int minPriority, int maxPriority){
+        for(Renderable m : objects){
+            if(m.getRenderOrderPosition() < minPriority || m.getRenderOrderPosition() > maxPriority){continue;}
+            m.setUniforms(iteration,projectionMatrix);
+            m.draw();
+        }
+    }
+
     public void doCustomRenderForceShader(float[] projectionMatrix, ShaderProgram shaderProgram){
         for(Renderable m : objects){
             m.setUniforms(iteration,projectionMatrix);
