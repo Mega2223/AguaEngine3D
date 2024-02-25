@@ -28,8 +28,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class WorldGen {
 
     public static final String TITLE = "World Generator :o";
-    public static final float SPEED = .05F * 100;
+    public static final float SPEED = .05F;
     public static final int TARGET_FPS = 60;
+    public static final int RENDER_DIST = 3;
+    public static final float STEP = .6F;
     public static long framesElapsed = 0L;
 
     //MAPA
@@ -43,8 +45,9 @@ public class WorldGen {
     static RenderingContext context = new RenderingContext();
     static WindowManager manager = new WindowManager(300,300,TITLE);
     static float[] camera = new float[4];
-    static float mapHeight = 1000F;
-    public static final List<Integer> generatedLocations = new LinkedList<>();
+    static int[] currentChunk = {0XF,0};
+    static float mapHeight = 150F;
+    public static final List<int[]> generatedLocations = new LinkedList<>();
     public static MapComponent mapView;
 
     public static void main(String[] args) {
@@ -65,10 +68,11 @@ public class WorldGen {
         manager.addKeypressEvent((window,key,scancode,action,mods) -> {
             if(action != GLFW.GLFW_PRESS){return;}
             if(key == GLFW.GLFW_KEY_PAGE_UP){
-                mapHeight += 200;
+                mapHeight += 50;
             } else if (key == GLFW.GLFW_KEY_PAGE_DOWN){
-                mapHeight -= 200;
+                mapHeight -= 50;
             }
+            mapHeight = Math.max(50,mapHeight);
         });
 
         context = new RenderingContext();
@@ -81,9 +85,10 @@ public class WorldGen {
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //Map setup:
-        final int[] mapViewTexture = RenderingManager.genTextureFrameBufferObject(64,64);
+
         final float mapSize = .35F;
-        mapView = new MapComponent(mapSize,900,mapViewTexture);
+        int mapS = 256;
+        mapView = new MapComponent(mapSize, mapS, mapS);
 
         context.addScript(mapView.updateSequence);
         context.addObject(mapView);
@@ -91,7 +96,7 @@ public class WorldGen {
 
         modelAssembler.start();
 
-        PerlinNoise perlinMajor1 = new PerlinNoise(26,26);
+        /*PerlinNoise perlinMajor1 = new PerlinNoise(26,26);
         perlinMajor1.setTranslations(0,0,512,512);
         perlinMajor1.setHeightScale(-90);
         perlinMajor1.setDislocation(-6);
@@ -118,21 +123,36 @@ public class WorldGen {
         map.add(perlinMinor2);
         map.add(perlinMinor3);
         map.add(perlinMajor1);
-        map.add(perlinMajor2);
-        context.addObject(new Model(
-                new float[]{-160,0,-160,0, 160,0,-160,0, 160,0,160,0, -160,0,160,0},
-                new int[]{0,1,2,3,2,0},
-                new SolidColorShaderProgram(.2F,.2F,.4F)
-        ));
+        map.add(perlinMajor2);*/
 
-
-        GRASS_SHADER = new GrassShaderProgram();
-
-        for (int i = -100; i < 100; i++) {
-            for (int j = -100; j < 100; j++) {
-                requestRender(i,j);
-            }
+        for (int i = 0; i < 7; i++) {
+            int i1 = i + 1;
+            int s = 8 + i1 + i1 * 2 + i1 * 3;
+            PerlinNoise per = new PerlinNoise(s, s);
+            // intedersting float decay = (float) (Math.pow(i1,2.5F) * .025);
+            float decay = (float) (Math.pow(i1,1.75F) * .035);
+            per.setTranslations(0,0,6F / decay,6F / decay);
+            per.setHeightScale(1F / decay);
+            per.setDislocation(-126F * decay);
+            map.add(per);
         }
+        System.out.println(map.get(0,0));
+        map.setDislocation(-map.get(0,0));
+
+        Model water = new Model(
+                new float[]{-160, 0, -160, 0, 160, 0, -160, 0, 160, 0, 160, 0, -160, 0, 160, 0},
+                new int[]{0, 1, 2, 3, 2, 0},
+                new SolidColorShaderProgram(.2F, .2F, .4F)
+        );
+        context.addObject(water);
+        water.setCoords(0,0.0187446F,0);
+        context.addScript(new ScriptedSequence("water_pos") {
+            @Override
+            protected void preLogic(int iteration, RenderingContext context) {
+                water.setCoords(camera[0],0,camera[2]);
+            }
+        });
+        GRASS_SHADER = new GrassShaderProgram();
 
         //Render Logic:
         long unrendered = 0;
@@ -162,16 +182,28 @@ public class WorldGen {
     }
     static final ArrayList<Renderable> toRemove = new ArrayList<>();
     public static void doLogic(){
+        int curX = (int) Math.floor((camera[0]+50F)/100F), curZ = (int) Math.floor((camera[2]+50F)/100F);
+        if(curX != currentChunk[0] || curZ != currentChunk[1]){
+            int dist = RENDER_DIST;
+            for (int i = -dist; i < dist; i++) {
+                for (int j = -dist; j < dist; j++) {
+                    requestRender(curX+i,curZ+j);
+                }
+            }
+        }
+
         for (Renderable act : readyToUse){
             ((Model)act).setShader(GRASS_SHADER);
             context.addObject(act);
             toRemove.add(act);
         }
         readyToUse.removeAll(toRemove);
+        currentChunk[0] = curX; currentChunk[1] = curZ;
     }
     private static final float[] proj = new float[16];
 
     public static void doRenderLogic(){
+        camera[1] = map.get(camera[0], camera[2])+2F;
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
         context.doLogic();
@@ -196,12 +228,15 @@ public class WorldGen {
         }
     });
     public static void requestRender(int x, int z){
+        for (int[] act : generatedLocations){
+            if(act[0]==x&&act[1]==z){return;}
+        }
         toMake.add(new int[]{x,z});
     }
     public static void genModelForReg(int x, int z){
-        generatedLocations.add(x); generatedLocations.add(z);
+        generatedLocations.add(new int[]{x,z});
         float xF = x*100F - 50F; float zF = z*100F - 50F;
-        Model model = Noise.NoiseToModel(map, xF, zF, xF + 100.1F, zF + 100.1F, 1F, 1F, 1F, null);
+        Model model = Noise.NoiseToModel(map, xF - STEP/10, zF - STEP/10, xF + 100.1F + (STEP/10), zF + 100.1F + (STEP/10), STEP, 1F, 1F, null);
         while(readyToUse.size() >= 32 * 32){
             System.out.println("WAITING FOR THE MODEL QUEUE");
             try { Thread.sleep(10);
