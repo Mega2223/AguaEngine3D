@@ -38,7 +38,7 @@ void main(){
     //smoothstep(-1,1,clamp(dp*2,-1,1));
     dp = clamp(dp/**1.75F*/, 0, 1);
     //dp = (3F - dp * 2F) * dp * dp;
-    color = mix(color,vec4(0,0,0,1),dp);
+    color = mix(color,mix(fogColor,vec4(0,0,0,1),.7),dp);
 
     mixFog();
 }
