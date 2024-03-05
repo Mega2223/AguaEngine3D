@@ -32,11 +32,11 @@ public class MapComponent extends InterfaceComponent {
             float aspectRatio = manager.getAspectRatio();
             setAspectRatio(aspectRatio);
             setCoords(-aspectRatio + mapSize,1 - mapSize,0);
-            MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, mapHeight+100, (float) Math.toRadians(90), 1);
-            MatrixTranslator.applyLookTransformation(proj, camera[0],mapHeight,camera[2]+1, camera[0],0,camera[2]);
+            MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, mapHeight+150, (float) Math.toRadians(90), 1);
+            MatrixTranslator.applyLookTransformation(proj, (float) (camera[0]+Math.sin(camera[3])),mapHeight, (float) (camera[2]+Math.cos(camera[3])), camera[0],0,camera[2]);
             context.setFogDetails(100000,100);
             context.doCustomRender(proj,0,Integer.MAX_VALUE);
-            context.setFogDetails(200-160,160);
+            context.setFogDetails(40,160);
             GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER,0);
         }
     };

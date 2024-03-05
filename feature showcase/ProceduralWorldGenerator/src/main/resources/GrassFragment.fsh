@@ -10,6 +10,7 @@ uniform vec4 color2; // uniform color
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);
+uniform vec3 lightDir = normalize(vec3(2,.15,1));
 
 uniform int useAlphaForFog = 0;
 uniform int iteration;
@@ -32,10 +33,11 @@ void main(){
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
 
-    float dp = dot(perVertexNormal.xyz,normalize(vec3(2,.15,1)));
-    //float dpMUltiplier = dp
-    dp = clamp(dp*1.75F, 0, 1);
-    dp = (3F - dp * 2F) * dp * dp;
+    float dp = dot(perVertexNormal.xyz,lightDir);
+    dp = dp > 0 ? 1 : smoothstep(-1,1,dp * 2 + 1);
+    //smoothstep(-1,1,clamp(dp*2,-1,1));
+    dp = clamp(dp/**1.75F*/, 0, 1);
+    //dp = (3F - dp * 2F) * dp * dp;
     color = mix(color,vec4(0,0,0,1),dp);
 
     mixFog();

@@ -3,21 +3,23 @@ package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.ScriptedSequence;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.UniformNoise;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.interpolation.CubicInterpolator;
+import net.mega2223.aguaengine3d.mathematics.interpolation.DoubleCubicInterpolator;
+import net.mega2223.aguaengine3d.mathematics.interpolation.LinearInterpolator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +34,7 @@ public class WorldGen {
     public static final int TARGET_FPS = 60;
     public static final int RENDER_DIST = 3;
     public static final float STEP = .6F;
+    public static final Thread MAIN_THREAD = Thread.currentThread();
     public static long framesElapsed = 0L;
 
     //MAPA
@@ -87,7 +90,7 @@ public class WorldGen {
         //Map setup:
 
         final float mapSize = .35F;
-        int mapS = 256;
+        int mapS = 128;
         mapView = new MapComponent(mapSize, mapS, mapS);
 
         context.addScript(mapView.updateSequence);
@@ -96,54 +99,24 @@ public class WorldGen {
 
         modelAssembler.start();
 
-        /*PerlinNoise perlinMajor1 = new PerlinNoise(26,26);
-        perlinMajor1.setTranslations(0,0,512,512);
-        perlinMajor1.setHeightScale(-90);
-        perlinMajor1.setDislocation(-6);
-
-        PerlinNoise perlinMajor2 = new PerlinNoise(37,37);
-        perlinMajor2.setTranslations(0,0,512,512);
-        perlinMajor2.setHeightScale(-60);
-        perlinMajor2.setDislocation(-13);
-
-        PerlinNoise perlinMinor1 = new PerlinNoise(32, 32);
-        perlinMinor1.setTranslations(0,0,256,256);
-        perlinMinor1.setHeightScale(-30);
-
-        PerlinNoise perlinMinor2 = new PerlinNoise(33, 33);
-        perlinMinor2.setTranslations(0,0,128,128);
-        perlinMinor2.setHeightScale(-15);
-
-        PerlinNoise perlinMinor3 = new PerlinNoise(34, 34);
-        perlinMinor3.setTranslations(0,0,64,64);
-        perlinMinor3.setHeightScale(-7.5F);
-
-
-        map.add(perlinMinor1);
-        map.add(perlinMinor2);
-        map.add(perlinMinor3);
-        map.add(perlinMajor1);
-        map.add(perlinMajor2);*/
-
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             int i1 = i + 1;
             int s = 8 + i1 + i1 * 2 + i1 * 3;
-            PerlinNoise per = new PerlinNoise(s, s);
-            // intedersting float decay = (float) (Math.pow(i1,2.5F) * .025);
+            PerlinNoise per = new PerlinNoise(s, s, 1);
+            // interesting float decay = (float) (Math.pow(i1,2.5F) * .025);
             float decay = (float) (Math.pow(i1,1.75F) * .035);
-            per.setTranslations(0,0,6F / decay,6F / decay);
+            per.setTranslations(0,0,8 / decay,8 / decay);
             per.setHeightScale(1F / decay);
-            per.setDislocation(-126F * decay);
+            per.setDislocation(-126F / decay);
+            per.setInterpolationMethod(DoubleCubicInterpolator.INSTANCE);
             map.add(per);
         }
-        System.out.println(map.get(0,0));
         map.setDislocation(-map.get(0,0));
-
-        Model water = new Model(
-                new float[]{-160, 0, -160, 0, 160, 0, -160, 0, 160, 0, 160, 0, -160, 0, 160, 0},
-                new int[]{0, 1, 2, 3, 2, 0},
-                new SolidColorShaderProgram(.2F, .2F, .4F)
-        );
+//        try { ImageIO.write(Noise.NoiseToImage(map,2048,2048,0,0,.2F,true),"png", new File(Utils.USER_DIR+"\\feature showcase\\ProceduralWorldGenerator\\src\\main\\resources\\noises\\noise.png"));
+//        } catch (IOException e) { throw new RuntimeException(e); }
+        WATER_SHADER = new WaterShaderProgram();
+        Model water = Noise.NoiseToModel(new UniformNoise(0),-220,-220,220F,220F,1,1F,1F,WATER_SHADER);
+        ModelUtils.figureOutLargestTriangle(water);
         context.addObject(water);
         water.setCoords(0,0.0187446F,0);
         context.addScript(new ScriptedSequence("water_pos") {
@@ -199,7 +172,18 @@ public class WorldGen {
         }
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
+
+        float cycle = .05F * (framesElapsed / 60F);
+        GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) Math.sin(cycle), (float) (Math.cos(cycle)/2));
+        WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) Math.sin(cycle), (float) (Math.cos(cycle)/2));
+        for (int i = 0; i < 3; i++) {
+            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(BRIGHT_SKY[i], DARK_SKY[i], (float) Math.cos(cycle) * .5F + .5F);
+        }
+        context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
+    static final float[] skyColor = new float[4];
+    public static final float[] BRIGHT_SKY = {.5F,.5F,.6F};
+    public static final float[] DARK_SKY = {.01F,.01F,.05F};
     private static final float[] proj = new float[16];
 
     public static void doRenderLogic(){
@@ -213,11 +197,13 @@ public class WorldGen {
         manager.update();
     }
 
-    public static ShaderProgram GRASS_SHADER;
+    public static GrassShaderProgram GRASS_SHADER;
+    public static WaterShaderProgram WATER_SHADER;
     public static Collection<Renderable> readyToUse = new ArrayBlockingQueue<>(32*32);
     public static List<int[]> toMake = new ArrayList<>();
-    public static Thread modelAssembler = new Thread(() -> {
+    public final static Thread modelAssembler = new Thread(() -> {
         while (true) {
+            if(!MAIN_THREAD.isAlive()){System.exit(-1);}
             if(toMake.isEmpty()){
                 try{Thread.sleep(500);} catch (InterruptedException ignored){}
                 continue;

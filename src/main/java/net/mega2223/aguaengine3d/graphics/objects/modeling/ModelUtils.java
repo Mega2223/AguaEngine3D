@@ -235,9 +235,9 @@ public class ModelUtils {
         }
         System.out.println("LEN: " + largestDist);
         System.out.println("\n\n");
-        for (int i = 0; i < vertices.length; i+=4) {
-            System.out.println(i/4 + ": " + vertices[i] + ", " + vertices[i+1] + ", " + vertices[i+2]);
-        }
+        //for (int i = 0; i < vertices.length; i+=4) {
+        //    System.out.println(i/4 + ": " + vertices[i] + ", " + vertices[i+1] + ", " + vertices[i+2]);
+        //}
     }
 
     public static void debugIndices(Model model){
