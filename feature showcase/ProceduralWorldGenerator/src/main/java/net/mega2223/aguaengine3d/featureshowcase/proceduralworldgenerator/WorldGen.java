@@ -1,21 +1,19 @@
 package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.GrassShaderProgram;
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.ScriptedSequence;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.UniformNoise;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.interpolation.CubicInterpolator;
-import net.mega2223.aguaengine3d.mathematics.interpolation.DoubleCubicInterpolator;
 import net.mega2223.aguaengine3d.mathematics.interpolation.LinearInterpolator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -59,23 +57,45 @@ public class WorldGen {
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += SPEED*c;camera[0] += SPEED*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= SPEED*c;camera[0] -= SPEED*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += SPEED*c;camera[2]-= SPEED*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= SPEED*c;camera[2]+= SPEED*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += SPEED;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= SPEED;}
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
+                camera[2] += SPEED * c;
+                camera[0] += SPEED * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
+                camera[2] -= SPEED * c;
+                camera[0] -= SPEED * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
+                camera[0] += SPEED * c;
+                camera[2] -= SPEED * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
+                camera[0] -= SPEED * c;
+                camera[2] += SPEED * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) {
+                camera[3] += Math.PI / 90;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) {
+                camera[3] -= Math.PI / 90;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Z) == GLFW.GLFW_PRESS) {
+                camera[1] += SPEED;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_X) == GLFW.GLFW_PRESS) {
+                camera[1] -= SPEED;
+            }
         });
-        manager.addKeypressEvent((window,key,scancode,action,mods) -> {
-            if(action != GLFW.GLFW_PRESS){return;}
-            if(key == GLFW.GLFW_KEY_PAGE_UP){
+        manager.addKeypressEvent((window, key, scancode, action, mods) -> {
+            if (action != GLFW.GLFW_PRESS) {
+                return;
+            }
+            if (key == GLFW.GLFW_KEY_PAGE_UP) {
                 mapHeight += 50;
-            } else if (key == GLFW.GLFW_KEY_PAGE_DOWN){
+            } else if (key == GLFW.GLFW_KEY_PAGE_DOWN) {
                 mapHeight -= 50;
             }
-            mapHeight = Math.max(50,mapHeight);
+            mapHeight = Math.max(50, mapHeight);
         });
 
         context = new RenderingContext();
@@ -86,6 +106,9 @@ public class WorldGen {
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+
+        //Skybox setup
+        context.addObject(new Skybox());
 
         //Map setup:
 
@@ -104,19 +127,18 @@ public class WorldGen {
             int s = 8 + i1 + i1 * 2 + i1 * 3;
             PerlinNoise per = new PerlinNoise(s, s, 1);
             // interesting float decay = (float) (Math.pow(i1,2.5F) * .025);
-            float decay = (float) (Math.pow(i1,1.75F) * .035);
-            per.setTranslations(0,0,8 / decay,8 / decay);
+            float decay = (float) (Math.pow(i1, 1.75F) * .035);
+            per.setTranslations(0, 0, 8 / decay, 8 / decay);
             per.setHeightScale(1F / decay);
             per.setDislocation(-126F / decay);
-            per.setInterpolationMethod(DoubleCubicInterpolator.INSTANCE);
+            per.setInterpolationMethod(LinearInterpolator.INSTANCE);
             map.add(per);
         }
-        map.setDislocation(-map.get(0,0));
-//        try { ImageIO.write(Noise.NoiseToImage(map,2048,2048,0,0,.2F,true),"png", new File(Utils.USER_DIR+"\\feature showcase\\ProceduralWorldGenerator\\src\\main\\resources\\noises\\noise.png"));
-//        } catch (IOException e) { throw new RuntimeException(e); }
+        map.setDislocation(-map.get(0, 0));
+
         WATER_SHADER = new WaterShaderProgram();
-        Model water = Noise.NoiseToModel(new UniformNoise(0),-220,-220,220F,220F,1,1F,1F,WATER_SHADER);
-        ModelUtils.figureOutLargestTriangle(water);
+        Model water = Noise.NoiseToModel(new UniformNoise(0), -220, -220, 220F, 220F, 1, 1F, 1F, WATER_SHADER);
+
         context.addObject(water);
         water.setCoords(0,0.0187446F,0);
         context.addScript(new ScriptedSequence("water_pos") {
@@ -174,10 +196,10 @@ public class WorldGen {
         currentChunk[0] = curX; currentChunk[1] = curZ;
 
         float cycle = .05F * (framesElapsed / 60F);
-        GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) Math.sin(cycle), (float) (Math.cos(cycle)/2));
-        WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) Math.sin(cycle), (float) (Math.cos(cycle)/2));
+        GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
+        WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         for (int i = 0; i < 3; i++) {
-            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(BRIGHT_SKY[i], DARK_SKY[i]-.5F, (float) -Math.sin(cycle) * .5F + .5F);
+            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], (float) Math.sin(cycle) * .5F);
         }
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }

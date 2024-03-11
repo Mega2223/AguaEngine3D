@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders;
 
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;

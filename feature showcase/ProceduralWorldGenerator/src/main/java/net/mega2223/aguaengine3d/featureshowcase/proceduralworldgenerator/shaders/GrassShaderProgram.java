@@ -1,7 +1,6 @@
-package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders;
 
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgramTemplate;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
@@ -34,6 +33,7 @@ public class GrassShaderProgram extends DemoShader implements ShaderProgram {
     }
 
     public void setLightDirection(float x, float y, float z){
+        //System.out.println(x + "," + y + "," + z);
         float mag = (float) Math.sqrt(x*x + y*y + z*z);
         x/=mag; y/=mag; z/=mag;
         GL30.glUseProgram(id);

@@ -1,14 +1,12 @@
 package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.GrassShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.ScriptedSequence;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
-
-import java.util.Map;
 
 import static net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.WorldGen.camera;
 import static net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.WorldGen.manager;

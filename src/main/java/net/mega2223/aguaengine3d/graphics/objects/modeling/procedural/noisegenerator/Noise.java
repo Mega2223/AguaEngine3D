@@ -130,10 +130,6 @@ public interface Noise {
             }
         }
 
-//        System.out.println("x -> " + xC);
-//        System.out.println("predict: " + rowSize);
-        System.out.println(i);
-
         List<Integer> toClean = new ArrayList<>();
 
         for (int j = 0; j < indexList.size(); j+=3) {
