@@ -2,20 +2,22 @@ package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.SkyShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
+import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
 public class Skybox implements Renderable {
     float[] mesh;
     int[] indices;
-
     ShaderProgram program;
     int verticesVBO, indicesVBO;
+    RenderingContext context;
 
     public Skybox() {
         Model model = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),null);
@@ -23,6 +25,7 @@ public class Skybox implements Renderable {
         program = new SkyShaderProgram();
         this.verticesVBO = RenderingManager.genArrayBufferObject(mesh, GL30.GL_STATIC_DRAW);
         this.indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_STATIC_DRAW);
+        this.context = context;
     }
 
     @Override
@@ -42,6 +45,10 @@ public class Skybox implements Renderable {
     @Override
     public void doLogic(int iteration) {
 
+    }
+
+    public void setSkyboxTranslation(float x, float y, float z){
+        MatrixTranslator.generateTranslationMatrix(translationMatrix,x,y,z);
     }
 
     private static final float[] translationMatrix = {

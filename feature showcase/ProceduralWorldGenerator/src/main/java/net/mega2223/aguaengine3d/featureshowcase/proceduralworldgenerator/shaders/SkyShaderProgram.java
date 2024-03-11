@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shade
 
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
@@ -10,6 +11,8 @@ public class SkyShaderProgram implements ShaderProgram {
     private final int direction_vector_loc;
     private final int projection_matrix_loc;
     private final int rotation_matrix_loc;
+    private final int translation_matrix_loc;
+
     public SkyShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
                         Utils.USER_DIR+"\\feature showcase\\ProceduralWorldGenerator\\src\\main\\resources\\SkyboxFragment.fsh",
@@ -19,6 +22,8 @@ public class SkyShaderProgram implements ShaderProgram {
         direction_vector_loc = GL30.glGetUniformLocation(id,"direction");
         projection_matrix_loc = GL30.glGetUniformLocation(id,"projection");
         rotation_matrix_loc = GL30.glGetUniformLocation(id,"rotation");
+        translation_matrix_loc = GL30.glGetUniformLocation(id,"translation");
+        MatrixTranslator.generateRotationMatrix(rotationMatrix,0,0,0);
     }
 
     @Override
@@ -37,6 +42,8 @@ public class SkyShaderProgram implements ShaderProgram {
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(projection_matrix_loc,false,projectionMatrix);
         GL30.glUniformMatrix4fv(rotation_matrix_loc,false, rotationMatrix);
+        GL30.glUniformMatrix4fv(translation_matrix_loc,false, translationMatrix);
+
     }
 
     @Override

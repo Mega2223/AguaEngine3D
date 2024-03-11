@@ -33,6 +33,7 @@ public class WorldGen {
     public static final int RENDER_DIST = 3;
     public static final float STEP = .6F;
     public static final Thread MAIN_THREAD = Thread.currentThread();
+    public static Skybox skybox;
     public static long framesElapsed = 0L;
 
     //MAPA
@@ -108,7 +109,8 @@ public class WorldGen {
         globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //Skybox setup
-        context.addObject(new Skybox());
+        skybox = new Skybox();
+        context.addObject(skybox);
 
         //Map setup:
 
@@ -139,7 +141,7 @@ public class WorldGen {
         WATER_SHADER = new WaterShaderProgram();
         Model water = Noise.NoiseToModel(new UniformNoise(0), -220, -220, 220F, 220F, 1, 1F, 1F, WATER_SHADER);
 
-        context.addObject(water);
+        //context.addObject(water);
         water.setCoords(0,0.0187446F,0);
         context.addScript(new ScriptedSequence("water_pos") {
             @Override
@@ -189,13 +191,13 @@ public class WorldGen {
 
         for (Renderable act : readyToUse){
             ((Model)act).setShader(GRASS_SHADER);
-            context.addObject(act);
+            //context.addObject(act);
             toRemove.add(act);
         }
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
 
-        float cycle = .05F * (framesElapsed / 60F);
+        float cycle = (float) (.05F * (framesElapsed / 60F) + Math.PI/2);
         GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         for (int i = 0; i < 3; i++) {
@@ -209,7 +211,8 @@ public class WorldGen {
     private static final float[] proj = new float[16];
 
     public static void doRenderLogic(){
-        camera[1] = map.get(camera[0], camera[2])+2F;
+        skybox.setSkyboxTranslation(camera[0],camera[1],camera[2]);
+        //camera[1] = map.get(camera[0], camera[2])+2F;
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
         MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
         context.doLogic();
