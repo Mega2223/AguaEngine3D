@@ -80,7 +80,7 @@ public class CubemapInterpreterShaderProgram implements ShaderProgram{
             super.preLogic(iteration, context);
             tX = camera[0]; tY = camera[1]; tZ = camera[2];
             rY = -camera[3];
-            if(camera.length>4){rZ = camera[4];
+            if(camera.length>4){rZ = camera[4]; //TODO: what
                 if(camera.length>5){rX = camera[5];}
             }
         }

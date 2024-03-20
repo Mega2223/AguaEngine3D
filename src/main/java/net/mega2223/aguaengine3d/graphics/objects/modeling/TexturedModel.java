@@ -133,7 +133,7 @@ public class TexturedModel extends Model{
             String[] sp = existingVerticeCombinations.get(i).split("/");
             int[] combination = new int[sp.length];
             for (int j = 0; j < sp.length; j++) {
-                if(sp[j].equals("")){continue;}
+                if(sp[j].isEmpty()){continue;}
                 combination[j] = Integer.parseInt(sp[j]);
             }
             for (int j = 0; j < 3; j++) {

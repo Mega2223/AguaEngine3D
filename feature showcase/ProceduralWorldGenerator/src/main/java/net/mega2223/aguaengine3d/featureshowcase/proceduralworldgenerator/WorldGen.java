@@ -141,7 +141,7 @@ public class WorldGen {
         WATER_SHADER = new WaterShaderProgram();
         Model water = Noise.NoiseToModel(new UniformNoise(0), -220, -220, 220F, 220F, 1, 1F, 1F, WATER_SHADER);
 
-        //context.addObject(water);
+        context.addObject(water);
         water.setCoords(0,0.0187446F,0);
         context.addScript(new ScriptedSequence("water_pos") {
             @Override
@@ -191,7 +191,7 @@ public class WorldGen {
 
         for (Renderable act : readyToUse){
             ((Model)act).setShader(GRASS_SHADER);
-            //context.addObject(act);
+            context.addObject(act);
             toRemove.add(act);
         }
         readyToUse.removeAll(toRemove);
@@ -211,10 +211,12 @@ public class WorldGen {
     private static final float[] proj = new float[16];
 
     public static void doRenderLogic(){
-        skybox.setSkyboxTranslation(camera[0],camera[1],camera[2]);
-        //camera[1] = map.get(camera[0], camera[2])+2F;
+        camera[1] = map.get(camera[0], camera[2])+2F;
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
+        float rx = (float) (camera[0] + Math.sin(camera[3]));
+        float rz = (float) (camera[2] + Math.cos(camera[3]));
+        skybox.setSkyboxTranslation(camera[0],camera[1],camera[2],rx,0,rz);
+        MatrixTranslator.applyLookTransformation(proj, camera, rx, camera[1], rz, 0, 1, 0);
         context.doLogic();
         manager.fitViewport();
         context.doRender(proj);

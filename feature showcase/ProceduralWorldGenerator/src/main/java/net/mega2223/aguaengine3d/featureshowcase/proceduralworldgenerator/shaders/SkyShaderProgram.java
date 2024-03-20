@@ -12,6 +12,7 @@ public class SkyShaderProgram implements ShaderProgram {
     private final int projection_matrix_loc;
     private final int rotation_matrix_loc;
     private final int translation_matrix_loc;
+    private final int iteration_matrix_loc;
 
     public SkyShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
@@ -23,6 +24,7 @@ public class SkyShaderProgram implements ShaderProgram {
         projection_matrix_loc = GL30.glGetUniformLocation(id,"projection");
         rotation_matrix_loc = GL30.glGetUniformLocation(id,"rotation");
         translation_matrix_loc = GL30.glGetUniformLocation(id,"translation");
+        iteration_matrix_loc = GL30.glGetUniformLocation(id,"iteration");
         MatrixTranslator.generateRotationMatrix(rotationMatrix,0,0,0);
     }
 
@@ -38,12 +40,12 @@ public class SkyShaderProgram implements ShaderProgram {
 
     private final float[] rotationMatrix = new float[16];
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(projection_matrix_loc,false,projectionMatrix);
         GL30.glUniformMatrix4fv(rotation_matrix_loc,false, rotationMatrix);
         GL30.glUniformMatrix4fv(translation_matrix_loc,false, translationMatrix);
-
+        GL30.glUniform1i(iteration_matrix_loc,iteration);
     }
 
     @Override

@@ -4,8 +4,6 @@ import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shader
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
@@ -15,25 +13,25 @@ import org.lwjgl.opengl.GL30;
 public class Skybox implements Renderable {
     float[] mesh;
     int[] indices;
-    ShaderProgram program;
+    SkyShaderProgram shader;
     int verticesVBO, indicesVBO;
     RenderingContext context;
+
 
     public Skybox() {
         Model model = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),null);
         this.mesh = model.getRelativeVertices(); this.indices = model.getIndices();
-        program = new SkyShaderProgram();
+        shader = new SkyShaderProgram();
         this.verticesVBO = RenderingManager.genArrayBufferObject(mesh, GL30.GL_STATIC_DRAW);
         this.indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_STATIC_DRAW);
-        this.context = context;
     }
 
     @Override
     public void draw() {
         GL30.glDisable(GL30.GL_DEPTH_TEST);
-        program.preRenderLogic();
-        RenderingManager.drawnIndexBufferVBO(verticesVBO,GL30.GL_TRIANGLES,4,program,indicesVBO,indices.length);
-        program.postRenderLogic();
+        shader.preRenderLogic();
+        RenderingManager.drawnIndexBufferVBO(verticesVBO,GL30.GL_TRIANGLES,4, shader,indicesVBO,indices.length);
+        shader.postRenderLogic();
         GL30.glEnable(GL30.GL_DEPTH_TEST);
     }
 
@@ -47,8 +45,9 @@ public class Skybox implements Renderable {
 
     }
 
-    public void setSkyboxTranslation(float x, float y, float z){
+    public void setSkyboxTranslation(float x, float y, float z, float dx, float dy, float dz){
         MatrixTranslator.generateTranslationMatrix(translationMatrix,x,y,z);
+        shader.setDirection(dx,dy,dz);
     }
 
     private static final float[] translationMatrix = {
@@ -57,12 +56,12 @@ public class Skybox implements Renderable {
 
     @Override
     public void setUniforms(int iteration, float[] projectionMatrix) {
-        program.setUniforms(iteration,translationMatrix,projectionMatrix);
+        shader.setUniforms(iteration,translationMatrix,projectionMatrix);
     }
 
     @Override
     public ShaderProgram getShader() {
-        return program;
+        return shader;
     }
 
     @Override

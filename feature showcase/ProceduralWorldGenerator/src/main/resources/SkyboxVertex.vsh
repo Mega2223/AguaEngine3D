@@ -5,6 +5,7 @@ layout(location = 0) in vec4 vertexPosition_modelspace;
 uniform mat4 translation;
 uniform mat4 projection;
 uniform mat4 rotation = mat4(1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1);
+uniform vec3 direction;
 
 out vec3 dir;
 
@@ -14,5 +15,4 @@ void main(){
 
     gl_Position = projection * (rotation*gl_Position*translation);
     dir = vertexPosition_modelspace.xyz;
-
 }
