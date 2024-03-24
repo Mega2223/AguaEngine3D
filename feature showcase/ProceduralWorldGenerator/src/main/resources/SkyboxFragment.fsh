@@ -49,17 +49,24 @@ void main(){
 
     vec3 point = findPosAtPlane(dirN,25);
     vec3 point7 = findPosAtPlane(dirN,79);
-    vec3 point10 = findPosAtPlane(dirN,10);
+    vec3 point40 = findPosAtPlane(dirN,400);
 
     float itf = iteration / 60F;
 
     float s = 0;
     float l = 0;
-    for(int i = 0; i < 30; i++){
-        s+=perlin(point.xz/((1+i)*5),iteration * (.1F/(i+1)))*(11-i);
-        l+=11-i;
+    for(int i = 0; i < 16; i++){
+        vec3 pointTo = point40 + vec3(iteration/5.0 + 23400.0,0,24300.0 + iteration/7.0);
+        float weight = 1.0F/pow(i+1,1.1);
+        float scale = 3000*(1F/(pow(i,2.5)+1));
+        float speed = (0.00025F/(i+1));
+        s+=perlin(pointTo.xz / scale, iteration * speed) * weight;
+        l+=weight;
     }
-    s/=l;
+    s/=l; s*=1.6F;
+    s -= max(length(point)/16000.0,0);
+    s = clamp(s,0,1);
+    if(dirN.y <= 0){s = 0;}
 
     color = mix(fogColor,vec4(1,1,1,1),s);
 }
