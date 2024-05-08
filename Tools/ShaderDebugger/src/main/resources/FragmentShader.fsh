@@ -6,6 +6,8 @@ in vec4 fragmentNormal;
 
 //--@maxLightsConstant
 
+uniform vec4 color2; // uniform color
+
 uniform float fogStart = 10;
 uniform float fogDissolve = 10;
 uniform vec4 fogColor = vec4(.5,.5,.6,1);

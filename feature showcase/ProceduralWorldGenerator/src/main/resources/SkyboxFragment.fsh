@@ -63,9 +63,9 @@ void main(){
         s+=perlin(pointTo.xz / scale, iteration * speed) * weight;
         l+=weight;
     }
-    s/=l; s*=1.6F;
+    s/=l;
     s -= max(length(point)/16000.0,0);
-    s = clamp(s,0,1);
+    s = clamp(s,0,1.5);
     if(dirN.y <= 0){s = 0;}
 
     color = mix(fogColor,vec4(1,1,1,1),s);

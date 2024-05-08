@@ -11,7 +11,7 @@ public interface Collidiable {
 
     float getX(); float getY(); float getZ();
 
-    default float[] getCenter(){return new float[]{getX(),getY(),getZ(),0};}
+    default float[] getCenter(){return new float[]{getX(),getY(),getZ(),0};} //FIXME UNPERFORMANT >:(
     void doLogic(float time);
     void resolveForHitbox(Hitbox hitbox);
 }

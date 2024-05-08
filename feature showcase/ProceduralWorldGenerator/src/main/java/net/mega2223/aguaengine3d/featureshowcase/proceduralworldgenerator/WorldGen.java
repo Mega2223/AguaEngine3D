@@ -201,12 +201,13 @@ public class WorldGen {
         GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         for (int i = 0; i < 3; i++) {
-            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], (float) Math.sin(cycle) * .5F);
+            //(float) Math.sin(cycle) * .5F
+            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], 0);
         }
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
     static final float[] skyColor = new float[4];
-    public static final float[] BRIGHT_SKY = {.5F,.5F,.65F};
+    public static final float[] BRIGHT_SKY = {135F/255F, 206F/255F, 250F/255F};
     public static final float[] DARK_SKY = {.005F,.005F,.15F};
     private static final float[] proj = new float[16];
 

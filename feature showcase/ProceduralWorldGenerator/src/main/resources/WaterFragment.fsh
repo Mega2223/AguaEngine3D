@@ -24,7 +24,7 @@ out vec4 color;
 void main(){
     float dp = dot(vec3(0,1,0),lightDir);
     dp = clamp(dp, 0, 1);
-    color = mix(color,mix(vec4(0,0,0,1),fogColor,0.25F),1-dp);
+    color = mix(color,mix(vec4(0,0,0,1),vec4(63,97,97,255)/255F,1),1/*1-dp*/);
     color.a = 1;
 
     mixFog();
