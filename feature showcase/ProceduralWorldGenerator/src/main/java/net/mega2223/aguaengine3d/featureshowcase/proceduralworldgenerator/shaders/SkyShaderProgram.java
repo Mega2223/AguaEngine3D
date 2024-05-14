@@ -13,6 +13,7 @@ public class SkyShaderProgram implements ShaderProgram {
     private final int rotation_matrix_loc;
     private final int translation_matrix_loc;
     private final int iteration_matrix_loc;
+    private final int light_dir_loc;
 
     public SkyShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
@@ -25,6 +26,8 @@ public class SkyShaderProgram implements ShaderProgram {
         rotation_matrix_loc = GL30.glGetUniformLocation(id,"rotation");
         translation_matrix_loc = GL30.glGetUniformLocation(id,"translation");
         iteration_matrix_loc = GL30.glGetUniformLocation(id,"iteration");
+        light_dir_loc = GL30.glGetUniformLocation(id,"lightDir");
+
         MatrixTranslator.generateRotationMatrix(rotationMatrix,0,0,0);
     }
 
@@ -56,6 +59,12 @@ public class SkyShaderProgram implements ShaderProgram {
     @Override
     public void setRenderShadows(int index, boolean s) {
 
+    }
+    public void setLightDirection(float x, float y, float z){
+        float mag = (float) Math.sqrt(x*x + y*y + z*z);
+        x/=mag; y/=mag; z/=mag;
+        GL30.glUseProgram(id);
+        GL30.glUniform3f(light_dir_loc,x,y,z);
     }
     @Override
     public int[] getLightspaceTextureLocs() {

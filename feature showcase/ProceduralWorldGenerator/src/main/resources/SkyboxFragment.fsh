@@ -4,6 +4,7 @@ in vec3 dir;
 
 uniform int iteration;
 uniform vec4 fogColor;
+uniform vec3 lightDir;
 
 out vec4 color;
 
@@ -45,7 +46,18 @@ void main(){
 
     vec3 dirA = dir;
     vec3 dirN = normalize(dirA);
-    //vec3 sunCoord = vec3(cos(iteration/100.0F),sin(iteration/100.0F),0); // remove dps :)
+    color = fogColor;
+
+    //Sun
+    vec3 suncoord = lightDir;
+    float dif = length(suncoord - dirN);
+    float dotPr = dot(suncoord,dirN);
+    float sunInf = dotPr/5;
+    sunInf += max(0,1-dif*10);
+    sunInf = clamp(sunInf,0,1);
+    color = mix(color,vec4(1,1,1,1),sunInf);
+
+    // Cloud perlin noise calculations
 
     vec3 point = findPosAtPlane(dirN,25);
     vec3 point7 = findPosAtPlane(dirN,79);
@@ -68,5 +80,5 @@ void main(){
     s = clamp(s,0,1.5);
     if(dirN.y <= 0){s = 0;}
 
-    color = mix(fogColor,vec4(1,1,1,1),s);
+    color = mix(color,vec4(1,1,1,1),s);
 }

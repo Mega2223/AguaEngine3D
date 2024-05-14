@@ -19,7 +19,7 @@ out vec4 color;
 
 //--@mixFogFunction
 
-const vec4 green = vec4(104F/255F, 155F/255F, 77F/255F,1);
+const vec4 green = vec4(.15,.35,.15,1);
 const vec4 yellow = vec4(.7,.7,.4,1);
 const vec4 brown = vec4(.49,.41,.3,1);
 const vec4 test = vec4(0,0,0,1);
@@ -33,7 +33,7 @@ void main(){
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
 
-    float dp = dot(perVertexNormal.xyz,lightDir);
+    float dp = dot(perVertexNormal.xyz,-lightDir);
     //dp = dp > 0 ? 1 : smoothstep(-1,1,dp * 2 + 1);
     //smoothstep(-1,1,clamp(dp*2,-1,1));
     dp = clamp(dp, 0, 1);

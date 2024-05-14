@@ -24,6 +24,7 @@ public class Skybox implements Renderable {
         shader = new SkyShaderProgram();
         this.verticesVBO = RenderingManager.genArrayBufferObject(mesh, GL30.GL_STATIC_DRAW);
         this.indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_STATIC_DRAW);
+        WorldGen.SKY_SHADER = shader;
     }
 
     @Override

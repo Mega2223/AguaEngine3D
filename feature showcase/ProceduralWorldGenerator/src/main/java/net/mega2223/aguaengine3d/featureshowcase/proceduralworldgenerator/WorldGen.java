@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.GrassShaderProgram;
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.SkyShaderProgram;
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
@@ -36,6 +37,12 @@ public class WorldGen {
     public static Skybox skybox;
     public static long framesElapsed = 0L;
 
+    public static GrassShaderProgram GRASS_SHADER;
+    public static WaterShaderProgram WATER_SHADER;
+    public static SkyShaderProgram SKY_SHADER;
+    public static Collection<Renderable> readyToUse = new ArrayBlockingQueue<>(32*32);
+    public static List<int[]> toMake = new ArrayList<>();
+
     //MAPA
     //SKYBOX
     //ILHAS
@@ -59,33 +66,21 @@ public class WorldGen {
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
-                camera[2] += SPEED * c;
-                camera[0] += SPEED * s;
-            }
+                camera[2] += (float) (SPEED * c); camera[0] += (float) (SPEED * s); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
-                camera[2] -= SPEED * c;
-                camera[0] -= SPEED * s;
-            }
+                camera[2] -= (float) (SPEED * c); camera[0] -= (float) (SPEED * s); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
-                camera[0] += SPEED * c;
-                camera[2] -= SPEED * s;
-            }
+                camera[0] += (float) (SPEED * c); camera[2] -= (float) (SPEED * s); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
-                camera[0] -= SPEED * c;
-                camera[2] += SPEED * s;
-            }
+                camera[0] -= (float) (SPEED * c); camera[2] += (float) (SPEED * s); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) {
-                camera[3] += Math.PI / 90;
-            }
+                camera[3] += (float) (Math.PI / 90); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) {
-                camera[3] -= Math.PI / 90;
-            }
+                camera[3] -= (float) (Math.PI / 90); }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Z) == GLFW.GLFW_PRESS) {
-                camera[1] += SPEED;
-            }
+                camera[1] += SPEED; }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_X) == GLFW.GLFW_PRESS) {
-                camera[1] -= SPEED;
-            }
+                camera[1] -= SPEED; }
         });
         manager.addKeypressEvent((window, key, scancode, action, mods) -> {
             if (action != GLFW.GLFW_PRESS) {
@@ -196,13 +191,14 @@ public class WorldGen {
         }
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
+        float cycle = (.1F * (framesElapsed / 60F));
+        float cycleHeight = (float) -Math.cos(cycle * Math.PI);
+        GRASS_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
+        WATER_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
+        SKY_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
 
-        float cycle = (float) (.05F * (framesElapsed / 60F) + Math.PI/2);
-        GRASS_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
-        WATER_SHADER.setLightDirection((float) Math.cos(cycle), (float) -Math.sin(cycle),0);
         for (int i = 0; i < 3; i++) {
-            //(float) Math.sin(cycle) * .5F
-            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], 0);
+            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], cycleHeight * 0.5F + 0.5F);
         }
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
@@ -224,11 +220,6 @@ public class WorldGen {
         RenderingManager.printErrorQueue();
         manager.update();
     }
-
-    public static GrassShaderProgram GRASS_SHADER;
-    public static WaterShaderProgram WATER_SHADER;
-    public static Collection<Renderable> readyToUse = new ArrayBlockingQueue<>(32*32);
-    public static List<int[]> toMake = new ArrayList<>();
     public final static Thread modelAssembler = new Thread(() -> {
         while (true) {
             if(!MAIN_THREAD.isAlive()){System.exit(-1);}
