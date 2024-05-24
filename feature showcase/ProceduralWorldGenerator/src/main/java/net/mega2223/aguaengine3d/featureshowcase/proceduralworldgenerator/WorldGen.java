@@ -119,21 +119,27 @@ public class WorldGen {
 
         final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
         final float[] bluerSky = {115F/255F, 180F/255F, 250F/255F};
-        final float[] sunset = {.7F,.5F,.6F};
+        final float[] sunset = {130F/255F,40F/255F,105F/255F};
         final float[] darkBlue = {.05F,.05F,.2F};
         final float[] darkSky = {.005F,.005F,.1F};
 
         final float[] cloudColor = {1,1,1};
         final float[] fogData = {-1,-1};
 
-        TIMELINE.add(new CycleKeyframe(.5F,brightSky,cloudColor,fogData,0));
-        TIMELINE.add(new CycleKeyframe(.65F,bluerSky,cloudColor,fogData,0));
-        TIMELINE.add(new CycleKeyframe(.7F,sunset,cloudColor,fogData,0));
+        framesElapsed += 60 * 350;
 
-        TIMELINE.add(new CycleKeyframe(.775F,darkBlue,cloudColor,fogData,1));
-        TIMELINE.add(new CycleKeyframe(.85F,darkSky,cloudColor,fogData,1));
-        TIMELINE.add(new CycleKeyframe(0F,darkSky,cloudColor,fogData,1));
-        TIMELINE.add(new CycleKeyframe(.15F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(12/24F,brightSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(17.3F/24F,bluerSky,cloudColor,fogData,0));
+
+        TIMELINE.add(new CycleKeyframe(18F/24F,sunset,cloudColor,fogData,0));
+
+        TIMELINE.add(new CycleKeyframe(18.5F/24F,darkBlue,cloudColor,fogData,1));
+
+        TIMELINE.add(new CycleKeyframe(21/24F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(0F/24F,darkSky,cloudColor,fogData,1.2F));
+        TIMELINE.add(new CycleKeyframe(3F/24F,darkSky,cloudColor,fogData,1));
+
+        TIMELINE.setInterpolationMethod(CubicInterpolator.INSTANCE);
 
         //Map setup:
 
