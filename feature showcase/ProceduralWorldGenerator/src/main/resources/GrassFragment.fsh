@@ -36,6 +36,7 @@ void main(){
     float dp = dot(perVertexNormal.xyz,-lightDir);
     //dp = dp > 0 ? 1 : smoothstep(-1,1,dp * 2 + 1);
     //smoothstep(-1,1,clamp(dp*2,-1,1));
+    //dp += 0.0005F;
     dp = clamp(dp, 0, 1);
     //dp = (3F - dp * 2F) * dp * dp;
     color = mix(color,mix(vec4(0,0,0,1),fogColor,0.25F),1-dp);

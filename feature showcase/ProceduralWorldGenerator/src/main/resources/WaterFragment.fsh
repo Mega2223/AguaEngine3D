@@ -23,6 +23,7 @@ out vec4 color;
 
 void main(){
     float dp = dot(vec3(0,-1,0),-lightDir);
+    dp += 0.035F;
     dp = clamp(dp, 0, 1);
     color = mix(waterColor,mix(vec4(0,0,0,1),fogColor,0.25F),1-dp);
     color.a = 1;

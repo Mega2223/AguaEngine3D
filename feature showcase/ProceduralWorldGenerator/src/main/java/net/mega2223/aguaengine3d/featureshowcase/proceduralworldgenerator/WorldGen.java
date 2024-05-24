@@ -119,14 +119,14 @@ public class WorldGen {
 
         final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
         final float[] bluerSky = {115F/255F, 180F/255F, 250F/255F};
-        final float[] sunset = {130F/255F,40F/255F,105F/255F};
+        final float[] sunset = {120F/255F,60F/255F,95F/255F};
         final float[] darkBlue = {.05F,.05F,.2F};
         final float[] darkSky = {.005F,.005F,.1F};
 
         final float[] cloudColor = {1,1,1};
         final float[] fogData = {-1,-1};
 
-        framesElapsed += 60 * 350;
+        framesElapsed += 60 * 325;
 
         TIMELINE.add(new CycleKeyframe(12/24F,brightSky,cloudColor,fogData,0));
         TIMELINE.add(new CycleKeyframe(17.3F/24F,bluerSky,cloudColor,fogData,0));
@@ -148,7 +148,7 @@ public class WorldGen {
         mapView = new MapComponent(mapSize, mapS, mapS);
 
         context.addScript(mapView.updateSequence);
-        context.addObject(mapView);
+        //context.addObject(mapView);
         //Logic setup:
 
         modelAssembler.start();
