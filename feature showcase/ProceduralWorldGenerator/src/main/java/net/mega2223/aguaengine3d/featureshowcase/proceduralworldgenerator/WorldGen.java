@@ -38,7 +38,7 @@ public class WorldGen {
     public static final float STEP = .6F;
     public static final Thread MAIN_THREAD = Thread.currentThread();
     public static final CycleTimeline TIMELINE = new CycleTimeline();
-    public static final float CYCLE_SPEED = .01F;//0.01f
+    public static final float CYCLE_SPEED = .02F;//0.01f
     public static Skybox skybox;
     public static long framesElapsed = 0L;
 
@@ -114,16 +114,18 @@ public class WorldGen {
         context.addObject(skybox);
 
         final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
+        final float[] sunset = {.7F,.5F,.6F};
         final float[] darkSky = {.005F,.005F,.15F};
 
         final float[] cloudColor = {1,1,1};
         final float[] fogData = {-1,-1};
 
         TIMELINE.add(new CycleKeyframe(.5F,brightSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(.7F,sunset,cloudColor,fogData,0));
 
-        TIMELINE.add(new CycleKeyframe(.75F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(.85F,darkSky,cloudColor,fogData,1));
         TIMELINE.add(new CycleKeyframe(0F,darkSky,cloudColor,fogData,1));
-        TIMELINE.add(new CycleKeyframe(.25F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(.15F,darkSky,cloudColor,fogData,1));
 
         //Map setup:
 
@@ -169,21 +171,23 @@ public class WorldGen {
         long lastLoop = System.currentTimeMillis();
         int framesLastSecond = 0;
         int fps = 0;
-        long fLSLastUpdate = 0;
+        long fpsLastUpdate = 0;
         context.setActive(true);
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             unrendered += System.currentTimeMillis() - lastLoop;
             lastLoop = System.currentTimeMillis();
-            if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
-                fLSLastUpdate = System.currentTimeMillis();
+            if (System.currentTimeMillis() - fpsLastUpdate > 250) {
+                fpsLastUpdate = System.currentTimeMillis();
                 fps = framesLastSecond;
                 framesLastSecond = 0;
+                int timeHour = (int)(cycleTime * 24), timeMin = (int)(((cycleTime * 24)%1F)*60F);
+                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + fps +
+                        " (x: " + camera[0] + " y: " + camera[1] + " z: " + camera[2] + ") (T=" +
+                        ((timeHour < 10) ? "0" + timeHour : timeHour) + ":" +
+                        (timeMin < 10 ? "0" + timeMin : timeMin) + ")"
+                );
             }
-            int timeHour = (int)(cycleTime * 24), timeMin = (int)(((cycleTime * 24)%1F)*60F);
-            String title = TITLE + "    FPS: %d (x: %f y: %f z: %f) (T=%2d:2d)";
-            title = String.format(title,fps,camera[0],camera[1],camera[2],timeHour,timeMin);
-            System.out.println(title);
-            GLFW.glfwSetWindowTitle(manager.windowName, title);
+
             if (unrendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();
                 doLogic();
@@ -192,6 +196,7 @@ public class WorldGen {
                 framesElapsed++;
                 framesLastSecond++;
             }
+
         }
         System.exit(0);
     }
@@ -215,7 +220,7 @@ public class WorldGen {
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
         cycleTime = (CYCLE_SPEED * (framesElapsed / 60F));
-        float cycleHeight = (float) -Math.cos(cycleTime * Math.PI);
+        float cycleHeight = (float) -Math.cos(2 * cycleTime * Math.PI);
         GRASS_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
         WATER_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
         SKY_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
