@@ -38,7 +38,7 @@ public class WorldGen {
     public static final float STEP = .6F;
     public static final Thread MAIN_THREAD = Thread.currentThread();
     public static final CycleTimeline TIMELINE = new CycleTimeline();
-    public static final float CYCLE_SPEED = .02F;//0.01f
+    public static final float CYCLE_SPEED = .002F;//0.01f
     public static Skybox skybox;
     public static long framesElapsed = 0L;
 
@@ -58,7 +58,7 @@ public class WorldGen {
     static StackedNoises map = new StackedNoises();
     static RenderingContext context = new RenderingContext();
     static WindowManager manager = new WindowManager(300,300,TITLE);
-    static float[] camera = new float[4];
+    static float[] camera = new float[5];
     static int[] currentChunk = {0XF,0};
     static float mapHeight = 150F;
     public static final List<int[]> generatedLocations = new LinkedList<>();
@@ -87,6 +87,10 @@ public class WorldGen {
                 camera[1] += SPEED; }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_X) == GLFW.GLFW_PRESS) {
                 camera[1] -= SPEED; }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_M) == GLFW.GLFW_PRESS) {
+                camera[4] -= (float) (Math.PI / 90); }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_N) == GLFW.GLFW_PRESS) {
+                camera[4] += (float) (Math.PI / 90); }
         });
         manager.addKeypressEvent((window, key, scancode, action, mods) -> {
             if (action != GLFW.GLFW_PRESS) {
@@ -114,15 +118,19 @@ public class WorldGen {
         context.addObject(skybox);
 
         final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
+        final float[] bluerSky = {115F/255F, 180F/255F, 250F/255F};
         final float[] sunset = {.7F,.5F,.6F};
-        final float[] darkSky = {.005F,.005F,.15F};
+        final float[] darkBlue = {.05F,.05F,.2F};
+        final float[] darkSky = {.005F,.005F,.1F};
 
         final float[] cloudColor = {1,1,1};
         final float[] fogData = {-1,-1};
 
         TIMELINE.add(new CycleKeyframe(.5F,brightSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(.65F,bluerSky,cloudColor,fogData,0));
         TIMELINE.add(new CycleKeyframe(.7F,sunset,cloudColor,fogData,0));
 
+        TIMELINE.add(new CycleKeyframe(.775F,darkBlue,cloudColor,fogData,1));
         TIMELINE.add(new CycleKeyframe(.85F,darkSky,cloudColor,fogData,1));
         TIMELINE.add(new CycleKeyframe(0F,darkSky,cloudColor,fogData,1));
         TIMELINE.add(new CycleKeyframe(.15F,darkSky,cloudColor,fogData,1));
@@ -176,7 +184,7 @@ public class WorldGen {
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             unrendered += System.currentTimeMillis() - lastLoop;
             lastLoop = System.currentTimeMillis();
-            if (System.currentTimeMillis() - fpsLastUpdate > 250) {
+            if (System.currentTimeMillis() - fpsLastUpdate > 1000) {
                 fpsLastUpdate = System.currentTimeMillis();
                 fps = framesLastSecond;
                 framesLastSecond = 0;
@@ -221,23 +229,25 @@ public class WorldGen {
         currentChunk[0] = curX; currentChunk[1] = curZ;
         cycleTime = (CYCLE_SPEED * (framesElapsed / 60F));
         float cycleHeight = (float) -Math.cos(2 * cycleTime * Math.PI);
-        GRASS_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
-        WATER_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
-        SKY_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
+        GRASS_SHADER.setLightDirection((float) Math.sin(2 * cycleTime * Math.PI), cycleHeight,0);
+        WATER_SHADER.setLightDirection((float) Math.sin(2 * cycleTime  * Math.PI), cycleHeight,0);
+        SKY_SHADER.setLightDirection((float) Math.sin(2 * cycleTime * Math.PI), cycleHeight,0);
 
         TIMELINE.getSkyColor(cycleTime,skyColor);
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
     static final float[] skyColor = new float[4];
     private static final float[] proj = new float[16];
+    private static final float[] unitV = {0,0,1,0};
+    private static final float[] bufferVec = new float[4], bufferMat = new float[16];
 
     public static void doRenderLogic(){
         camera[1] = map.get(camera[0], camera[2])+2F;
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        float rx = (float) (camera[0] + Math.sin(camera[3]));
-        float rz = (float) (camera[2] + Math.cos(camera[3]));
-        skybox.setSkyboxTranslation(camera[0],camera[1],camera[2],rx,0,rz);
-        MatrixTranslator.applyLookTransformation(proj, camera, rx, camera[1], rz, 0, 1, 0);
+        MatrixTranslator.generateRotationMatrix(bufferMat,0,camera[3],camera[4]);
+        MatrixTranslator.multiplyVec4Mat4(unitV,bufferMat,bufferVec);
+        skybox.setSkyboxTranslation(camera[0],camera[1],camera[2],bufferVec[0], 0,bufferVec[2]);
+        MatrixTranslator.applyLookTransformation(proj, camera, camera[0]+bufferVec[0], camera[1]+bufferVec[1], camera[2]+bufferVec[2], 0, 1, 0);
         context.doLogic();
         manager.fitViewport();
         context.doRender(proj);
