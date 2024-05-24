@@ -52,8 +52,8 @@ void main(){
     vec3 suncoord = lightDir;
     float dif = length(suncoord - dirN);
     float dotPr = dot(suncoord,dirN);
-    float sunInf = dotPr/5;
-    sunInf += max(0,1-dif*10);
+    float sunInf = max(0,pow(dotPr,1200));
+    sunInf += max(0,1-dif*14)/3;
     sunInf = clamp(sunInf,0,1);
     color = mix(color,vec4(1,1,1,1),sunInf);
 

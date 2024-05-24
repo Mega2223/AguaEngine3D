@@ -1,5 +1,7 @@
 package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator;
 
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.daycycle.CycleKeyframe;
+import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.daycycle.CycleTimeline;
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.GrassShaderProgram;
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.SkyShaderProgram;
 import net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.shaders.WaterShaderProgram;
@@ -15,6 +17,7 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.interpolation.CubicInterpolator;
 import net.mega2223.aguaengine3d.mathematics.interpolation.LinearInterpolator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -34,6 +37,8 @@ public class WorldGen {
     public static final int RENDER_DIST = 3;
     public static final float STEP = .6F;
     public static final Thread MAIN_THREAD = Thread.currentThread();
+    public static final CycleTimeline TIMELINE = new CycleTimeline();
+    public static final float CYCLE_SPEED = .01F;//0.01f
     public static Skybox skybox;
     public static long framesElapsed = 0L;
 
@@ -58,6 +63,7 @@ public class WorldGen {
     static float mapHeight = 150F;
     public static final List<int[]> generatedLocations = new LinkedList<>();
     public static MapComponent mapView;
+    private static float cycleTime;
 
     public static void main(String[] args) {
         //GLFW, OPENGL & Context setup:
@@ -107,6 +113,18 @@ public class WorldGen {
         skybox = new Skybox();
         context.addObject(skybox);
 
+        final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
+        final float[] darkSky = {.005F,.005F,.15F};
+
+        final float[] cloudColor = {1,1,1};
+        final float[] fogData = {-1,-1};
+
+        TIMELINE.add(new CycleKeyframe(.5F,brightSky,cloudColor,fogData,0));
+
+        TIMELINE.add(new CycleKeyframe(.75F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(0F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(.25F,darkSky,cloudColor,fogData,1));
+
         //Map setup:
 
         final float mapSize = .35F;
@@ -150,6 +168,7 @@ public class WorldGen {
         long unrendered = 0;
         long lastLoop = System.currentTimeMillis();
         int framesLastSecond = 0;
+        int fps = 0;
         long fLSLastUpdate = 0;
         context.setActive(true);
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
@@ -157,10 +176,14 @@ public class WorldGen {
             lastLoop = System.currentTimeMillis();
             if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " y:" + camera[1] +  " z:" + camera[2] + ")");
+                fps = framesLastSecond;
                 framesLastSecond = 0;
-
             }
+            int timeHour = (int)(cycleTime * 24), timeMin = (int)(((cycleTime * 24)%1F)*60F);
+            String title = TITLE + "    FPS: %d (x: %f y: %f z: %f) (T=%2d:2d)";
+            title = String.format(title,fps,camera[0],camera[1],camera[2],timeHour,timeMin);
+            System.out.println(title);
+            GLFW.glfwSetWindowTitle(manager.windowName, title);
             if (unrendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();
                 doLogic();
@@ -191,20 +214,16 @@ public class WorldGen {
         }
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
-        float cycle = (.1F * (framesElapsed / 60F));
-        float cycleHeight = (float) -Math.cos(cycle * Math.PI);
-        GRASS_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
-        WATER_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
-        SKY_SHADER.setLightDirection((float) Math.sin(cycle * Math.PI), cycleHeight,0);
+        cycleTime = (CYCLE_SPEED * (framesElapsed / 60F));
+        float cycleHeight = (float) -Math.cos(cycleTime * Math.PI);
+        GRASS_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
+        WATER_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
+        SKY_SHADER.setLightDirection((float) Math.sin(cycleTime * Math.PI), cycleHeight,0);
 
-        for (int i = 0; i < 3; i++) {
-            skyColor[i] = LinearInterpolator.INSTANCE.interpolate(DARK_SKY[i], BRIGHT_SKY[i], cycleHeight * 0.5F + 0.5F);
-        }
+        TIMELINE.getSkyColor(cycleTime,skyColor);
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
     static final float[] skyColor = new float[4];
-    public static final float[] BRIGHT_SKY = {135F/255F, 206F/255F, 250F/255F};
-    public static final float[] DARK_SKY = {.005F,.005F,.15F};
     private static final float[] proj = new float[16];
 
     public static void doRenderLogic(){
@@ -221,10 +240,12 @@ public class WorldGen {
         manager.update();
     }
     public final static Thread modelAssembler = new Thread(() -> {
-        while (true) {
-            if(!MAIN_THREAD.isAlive()){System.exit(-1);}
-            if(toMake.isEmpty()){
-                try{Thread.sleep(500);} catch (InterruptedException ignored){}
+        while (MAIN_THREAD.isAlive()) {
+            if (toMake.isEmpty()) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {
+                }
                 continue;
             }
             int[] req = toMake.get(0);
