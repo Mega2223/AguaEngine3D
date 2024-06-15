@@ -2,9 +2,7 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
@@ -16,7 +14,6 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
@@ -41,8 +38,9 @@ import java.io.IOException;
 * Cubemap support (for lights and skyboxes) <- Done
 * Logo and Readme.md
 * Figure out why the FPS loop is weird
-* Improvements on procedural building generation (aka multi building and scaling support)
+* Improvements on procedural building generation (aka multi building and scaling support) (Done, kinda)
 * Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
+* We NEED VAOs
 * Model blueprint class <- Done
 * Coverage testing <- what
 * Sound stuff
@@ -60,10 +58,12 @@ import java.io.IOException;
 * Parallel contact is weird currently
 * Static function that creates objects with bound buffers
 * Shader recompile function
-* Render order priority variable/method?
-* Rewrite the normal handling code
+* Render order priority variable/method? (Done)
+* Rewrite the normal handling code (Done)
 * Model editor (maybe a inbuilt tools tools package)
-* Interpolation interface and objects
+* Interpolation interface and objects (Done)
+* FPS manager for windowmanagers
+* TAG para operações que criam objetos
 * */
 
 public class Gaem3D {
@@ -103,7 +103,7 @@ public class Gaem3D {
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
         context = new RenderingContext();
 
         //scenery setup

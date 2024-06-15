@@ -4,10 +4,10 @@ import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShad
 
 public class InterfaceComponent extends Model{
 
-    final DisplayComponentShaderProgram shaderProgram;
+    protected DisplayComponentShaderProgram shaderProgram;
 
-    float[] textureCoords;
-    int renderOrderPosition = -1;
+    protected float[] textureCoords;
+    protected int renderOrderPosition = -1;
 
     public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram shaderProgram) {
         super(vertices, indices, shaderProgram);
@@ -44,6 +44,15 @@ public class InterfaceComponent extends Model{
 
     public float getAspectRatio(){
         return shaderProgram.getAspectRatio();
+    }
+
+    public float[] getTextureCoords() {
+        return textureCoords.clone();
+    }
+
+    public void setTextureCoords(float[] textureCoords) {
+        this.textureCoords = textureCoords;
+        unloadVBOS();
     }
 
     public DisplayComponentShaderProgram getCastShader(){

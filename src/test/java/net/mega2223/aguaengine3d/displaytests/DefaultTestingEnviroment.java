@@ -55,7 +55,7 @@ public class DefaultTestingEnviroment {
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //scenery setup
 

@@ -9,7 +9,7 @@ public class ShaderDictionaryReplacerTest {
 
     public static void main(String[] args) {
         ShaderDictonary dict = new ShaderDictonary();
-        dict.add("fogFunction","fogfunction(){\n    equations();\n}");
+        dict.addAllValues("fogFunction","fogfunction(){\n    equations();\n}");
         System.out.println(dict.resolve(teste));
     }
 

@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
@@ -273,6 +274,22 @@ public class ModelUtils {
             }
             System.out.println();
         }
+    }
+
+    public static void rescaleModel(Model model, float scale){
+        float[] verts = model.getRelativeVertices();
+        for (int i = 0; i < verts.length; i++) {
+            verts[i] *= scale;
+        }
+        model.setVertices(verts);
+    }
+
+    public static void rescaleModel(InterfaceComponent model, float scale){
+        float[] verts = model.getRelativeVertices();
+        for (int i = 0; i < verts.length; i++) {
+            verts[i] *= scale;
+        }
+        model.setVertices(verts);
     }
 
 }

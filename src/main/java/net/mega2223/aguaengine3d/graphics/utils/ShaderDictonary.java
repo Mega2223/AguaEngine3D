@@ -18,12 +18,12 @@ public class ShaderDictonary {
 
     }
 
-    public ShaderDictonary add(String alias, String content){
+    public ShaderDictonary addAllValues(String alias, String content){
         entries.add(new ShaderDictionaryEntry(alias,content));
         return this;
     }
 
-    public ShaderDictonary add(ShaderDictonary content){
+    public ShaderDictonary addAllValues(ShaderDictonary content){
         entries.addAll(content.entries);
         return this;
     }
@@ -61,7 +61,7 @@ public class ShaderDictonary {
             if(lines[l].toCharArray()[0] == '#'){continue;}
             String[] split = lines[l].split(TITLE_DIV);
             if(split.length != 2){continue;}
-            ret.add(split[0],split[1]);
+            ret.addAllValues(split[0],split[1]);
         }
         return ret;
     }

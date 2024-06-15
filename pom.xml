@@ -7,6 +7,11 @@
     <groupId>net.Mega2223</groupId>
     <artifactId>AguaEngine3D</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>Tools</module>
+        <module>Tools/ShaderDebugger</module>
+        <module>Tools/ModelEditor</module>
+    </modules>
     <version>BETA-0.3-U</version>
 
     <properties>

@@ -433,6 +433,11 @@ public class MatrixTranslator {
 
     }
 
+    public static void generateIsometricProjectionMatrix(float[] m4, float scale){
+        Arrays.fill(m4,0);
+        m4[0] = scale; m4[5] = scale; m4[10] = scale; m4[15] = scale;
+    }
+
     public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){
         float ar = w / h;
         generatePerspectiveProjectionMatrix(m4,zNear,zFar,fov,ar);

@@ -1,6 +1,14 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling.ui;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
+import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
+import net.mega2223.aguaengine3d.misc.Utils;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 @SuppressWarnings("ALL")
 public class BitmapFont {
@@ -11,6 +19,7 @@ public class BitmapFont {
     final char[] dictionary;
 
     /**For image coordinates*/
+
     public BitmapFont(int texture, int imageWidth, int imageHeight, int cellWidth, int cellHeight, int textWidth, int[] baseWidths, char[] dictionary){
         this(texture,(float) cellWidth / imageWidth,(float) cellHeight / imageHeight,(float) textWidth / imageWidth,convertWidthsFromInts(baseWidths,imageWidth),dictionary);
     }
