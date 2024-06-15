@@ -30,13 +30,12 @@ public class ModelEditor {
         globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
         context.setLight(1,0,10,0,1000);
         context.setFogDetails(1000,1000);
-        //console = new Console(windowManager,Misc.loadConsolas());
+        console = new Console(windowManager,Misc.loadConsolas());
+        context.addObject(console);
 
-        InterfaceComponent teste = Misc.loadConsolas().genFromString("TESTE");
-        ModelUtils.rescaleModel(teste,5);
-        context.addObject(
-                teste
-        );
+        //InterfaceComponent teste = Misc.loadConsolas().genFromString("TESTE");
+        //ModelUtils.rescaleModel(teste,5);
+        //context.addObject(teste);
 
 //        context.addObject(new Model(
 //                new float[]{0,0,0,0, 0,1,0,0, 1,0,0,0, 1,1,0,0},
@@ -46,19 +45,22 @@ public class ModelEditor {
 
         GL30.glClearColor(.5F,.5F,.6F,1F);
 
-        for(long frames = 0, lastRender = 0, currentRender, unrendered; !GLFW.glfwWindowShouldClose(windowManager.getWindow()) ; frames++){
+        for(long frames = 0, lastRender = 0, currentRender, unrendered; !GLFW.glfwWindowShouldClose(windowManager.getWindow()) ;){
             currentRender = System.currentTimeMillis();
             unrendered = currentRender - lastRender;
             if(unrendered > 1000 / TARGET_FPS){
-                doLogic();
+                doLogic(frames);
                 doRender();
                 windowManager.update();
                 lastRender = currentRender;
+                frames++;
+                GLFW.glfwSetWindowTitle(windowManager.windowName,frames+"");
             }
         }
     }
 
-    public static void doLogic(){
+    public static void doLogic(long iteration){
+        console.text.setCoords(-1, (float) Math.sin(iteration/30F),0);
 
     }
     public static void doRender(){

@@ -45,23 +45,23 @@ public class BitmapFont {
         int[] indices = new int[text.length()*6];
         float[] textureCoords = getTextureCoords(text);
 
-        for (int v = 0; v < text.length()*16; v+=16) {
-            //makes sense in this context
-            //noinspection IntegerDivisionInFloatingPointContext
-            float x = v/16 * textW;// 6*1/4*4
-            int y = 0;
-            vertices[v] = x;
-            vertices[v+1] = y;
+        for (int t = 0, x = 0, y = 0; t < text.length(); t++) {
 
-            vertices[v+4] = x+textW;
-            vertices[v+5] = y;
+            if(text.charAt(t) == '\n'){y++; x=0; continue;} //FIXME quebra os indices eu acho
 
-            vertices[v+8] = x;
-            vertices[v+9] = y-cellH;
+            vertices[t*16] = x/2F;
+            vertices[t*16+1] = y;
 
-            vertices[v+12] = x+textW;
-            vertices[v+13] = y-cellH;
+            vertices[t*16+4] = (x+1)/2F;
+            vertices[t*16+5] = y;
 
+            vertices[t*16+8] = x/2F;
+            vertices[t*16+9] = y-1;
+
+            vertices[t*16+12] = (x+1)/2F;
+            vertices[t*16+13] = y-1;
+
+            x++;
         }
         for (int i = 0; i < indices.length; i+=6) {
             indices[i] = i*2/3 + 0;
@@ -80,13 +80,14 @@ public class BitmapFont {
             char l = text.charAt(i);
             float x = getX(l);
             float y = getY(l);
+            float w = getCharacterWidth(l);
             data[i*8] = x;
             data[i*8+1] = y;
-            data[i*8+2] = x + textW;
+            data[i*8+2] = x + w;
             data[i*8+3] = y;
             data[i*8+4] = x;
             data[i*8+5] = y + cellH;
-            data[i*8+6] = x + textW;
+            data[i*8+6] = x + w;
             data[i*8+7] = y + cellH;
         }
         return data;
@@ -98,7 +99,7 @@ public class BitmapFont {
                 return (i % (1 / cellW)) * cellW;
             }
         }
-        throw new RuntimeException();
+        return -1;
     }
     float getY(char character){
         for (int i = 0; i < dictionary.length; i++){
@@ -107,7 +108,7 @@ public class BitmapFont {
                 return v * cellH; //what?
             }
         }
-        throw new RuntimeException();
+        return -1;
     }
 
     public float[] getStartingPointFromChar(char character){

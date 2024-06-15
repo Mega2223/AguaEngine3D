@@ -64,6 +64,7 @@ import java.io.IOException;
 * Interpolation interface and objects (Done)
 * FPS manager for windowmanagers
 * TAG para operações que criam objetos
+* Filter functions? (functions that filter :p)
 * */
 
 public class Gaem3D {

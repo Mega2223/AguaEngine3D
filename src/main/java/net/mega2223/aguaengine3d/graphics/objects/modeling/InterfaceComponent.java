@@ -4,33 +4,34 @@ import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShad
 
 public class InterfaceComponent extends Model{
 
-    protected DisplayComponentShaderProgram shaderProgram;
+    protected DisplayComponentShaderProgram displayShader;
 
     protected float[] textureCoords;
     protected int renderOrderPosition = -1;
 
-    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram shaderProgram) {
-        super(vertices, indices, shaderProgram);
-        this.shaderProgram = (DisplayComponentShaderProgram) getShader();
+    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram displayShader) {
+        super(vertices, indices, displayShader);
+        this.displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
     public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio) {
         super(vertices, indices, new DisplayComponentShaderProgram(texture, textureCoords,aspectRatio));
-        shaderProgram = (DisplayComponentShaderProgram) getShader();
+        displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public InterfaceComponent(InterfaceComponent component, DisplayComponentShaderProgram shaderProgram){
-        this(component.vertices,component.indices,component.textureCoords,component.shaderProgram.getTexture(),component.getAspectRatio(), shaderProgram);
+    public InterfaceComponent(InterfaceComponent component, DisplayComponentShaderProgram displayShader){
+        this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio(), displayShader);
     }
 
     public InterfaceComponent(InterfaceComponent component){
-        this(component.vertices,component.indices,component.textureCoords,component.shaderProgram.getTexture(),component.getAspectRatio());
+        this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio());
+        this.renderOrderPosition = component.renderOrderPosition;
     }
 
     public void setAspectRatio(float ar){
-        shaderProgram.setAspectRatio(ar);
+        displayShader.setAspectRatio(ar);
     }
 
     public void setRenderOrderPosition(int pos){
@@ -43,7 +44,7 @@ public class InterfaceComponent extends Model{
     }
 
     public float getAspectRatio(){
-        return shaderProgram.getAspectRatio();
+        return displayShader.getAspectRatio();
     }
 
     public float[] getTextureCoords() {
@@ -56,6 +57,6 @@ public class InterfaceComponent extends Model{
     }
 
     public DisplayComponentShaderProgram getCastShader(){
-        return shaderProgram;
+        return displayShader;
     }
 }
