@@ -27,16 +27,17 @@ import java.io.IOException;
 
 /*
 * The official AguaEngine3D TODO list:
-* Remove shadow acnes somehow (I hate normals so much it's unreal)
-* Font rendering <- unfinished
+* Remove shadow acnes somehow (I hate normals so much it's unreal) <- At least i did make the normal calculator lol
+* Font rendering <- unfinished <- almost finished
 * Rewrite texture loading function
 * Convert light objects to structs in shaders
 * The floor is slightly transparent somehow <- FIXED
-* Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade)
+* Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade) <- Done
 * Move aero to another module? (also finish it lol) <- DONE
 * Move shadow calculation algorithm to the default shader dictionary
+* Reform the shader dictionary lol
 * Cubemap support (for lights and skyboxes) <- Done
-* Logo and Readme.md
+* Logo (kindadone) and Readme.md
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support) (Done, kinda)
 * Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
@@ -52,11 +53,11 @@ import java.io.IOException;
 * Denote static buffers explicitly as static? <- DONE afaik
 * Interaction radius detection interface <- Done
 * Object declaration instantiation generation annotation?
-* Standardize array arguments
+* Standardize array arguments (especially for the phyisics module)
 * Calculate the restitution variable lol <- Done?
 * Also the physics module needs the friction force
 * Parallel contact is weird currently
-* Static function that creates objects with bound buffers
+* Static functions that creates objects with bound buffers
 * Shader recompile function
 * Render order priority variable/method? (Done)
 * Rewrite the normal handling code (Done)
@@ -65,6 +66,7 @@ import java.io.IOException;
 * FPS manager for windowmanagers
 * TAG para operações que criam objetos
 * Filter functions? (functions that filter :p)
+* Dinamically alocated text object
 * */
 
 public class Gaem3D {

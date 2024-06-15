@@ -1,8 +1,9 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 
-public class InterfaceComponent extends Model{
+public class TexturedInterfaceComponent extends Model implements InterfaceComponent {
 
     protected DisplayComponentShaderProgram displayShader;
 
@@ -11,29 +12,25 @@ public class InterfaceComponent extends Model{
     protected float scale = 1F;
     protected int aligment = 0;
 
-    public static final int CENTER_ALIGMENT = 0,
-            BOTTOM_LEFT_ALIGMENT = 1,
-            BOTTOM_RIGHT_ALIGMENT = 2,
-            TOP_LEFT_ALIGMENT = 3,
-            TOP_RIGHT_ALIGMENT = 4;
 
-    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram displayShader) {
+
+    public TexturedInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio, DisplayComponentShaderProgram displayShader) {
         super(vertices, indices, displayShader);
         this.displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio) {
+    public TexturedInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio) {
         super(vertices, indices, new DisplayComponentShaderProgram(texture, textureCoords,aspectRatio));
         displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public InterfaceComponent(InterfaceComponent component, DisplayComponentShaderProgram displayShader){
+    public TexturedInterfaceComponent(TexturedInterfaceComponent component, DisplayComponentShaderProgram displayShader){
         this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio(), displayShader);
     }
 
-    public InterfaceComponent(InterfaceComponent component){
+    public TexturedInterfaceComponent(TexturedInterfaceComponent component){
         this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio());
         this.renderOrderPosition = component.renderOrderPosition;
     }
@@ -70,7 +67,7 @@ public class InterfaceComponent extends Model{
     }
 
     @Override
-    public void setCoords(float x, float y, float z) { //FIXME displacement entre getCoords e setCoords >:(
+    public void setCoords(float x, float y, float z) {
         super.setCoords(x,y,z);
     }
 

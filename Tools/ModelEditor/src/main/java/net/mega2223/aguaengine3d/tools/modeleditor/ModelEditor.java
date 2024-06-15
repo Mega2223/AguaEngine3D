@@ -1,11 +1,6 @@
 package net.mega2223.aguaengine3d.tools.modeleditor;
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.TextManipulator;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;

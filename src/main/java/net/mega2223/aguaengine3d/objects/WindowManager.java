@@ -1,9 +1,6 @@
 package net.mega2223.aguaengine3d.objects;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
@@ -52,6 +49,7 @@ public class WindowManager {
                 doKeyCallbackEvents(window,key,scancode,action,mods);
             }
         });
+        GLFW.glfwSetCharCallback(windowName, this::doCharCallbackEvents);
         GLFW.glfwSetWindowSizeCallback(windowName, (l, w, h) -> {
             viewportSize[0] = w;
             viewportSize[1] = h;
@@ -92,10 +90,16 @@ public class WindowManager {
 
     List<GLFWKeyCallbackI> keyCallbacksList = new ArrayList<>();
     List<Runnable> updateEventList = new ArrayList<>();
+    List<GLFWCharCallbackI> charCallbacksList = new ArrayList<>();
 
     private void doKeyCallbackEvents(long window, int key, int scancode, int action, int mods){
         for(GLFWKeyCallbackI act : keyCallbacksList){
             act.invoke(window,key,scancode,action,mods);
+        }
+    }
+    private void doCharCallbackEvents(long window, int code){
+        for (GLFWCharCallbackI act : charCallbacksList){
+            act.invoke(window,code);
         }
     }
 
@@ -108,5 +112,8 @@ public class WindowManager {
     }
     public void addKeypressEvent(GLFWKeyCallbackI keyCallback){
         keyCallbacksList.add(keyCallback);
+    }
+    public void addKeyCharEvent(GLFWCharCallbackI charCallbackI){
+        charCallbacksList.add(charCallbackI);
     }
 }

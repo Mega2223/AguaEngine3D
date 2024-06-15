@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.Mega2223</groupId>
         <artifactId>AguaEngine3D</artifactId>
-        <version>BETA-0.3-U</version>
+        <version>BETA-0.4-U</version>
     </parent>
 
     <groupId>net.mega2223.aguaengine3d</groupId>

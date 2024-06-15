@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedInterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
@@ -121,9 +121,9 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         GL30.glUniform1i(aligmentIntLoc,aligment);
     }
 
-    public static final int CENTER_ALIGMENT = InterfaceComponent.CENTER_ALIGMENT,
-            BOTTOM_LEFT_ALIGMENT = InterfaceComponent.BOTTOM_LEFT_ALIGMENT,
-            BOTTOM_RIGHT_ALIGMENT = InterfaceComponent.BOTTOM_RIGHT_ALIGMENT,
-            TOP_LEFT_ALIGMENT = InterfaceComponent.TOP_LEFT_ALIGMENT,
-            TOP_RIGHT_ALIGMENT = InterfaceComponent.TOP_RIGHT_ALIGMENT;
+    public static final int CENTER_ALIGMENT = TexturedInterfaceComponent.CENTER_ALIGMENT,
+            BOTTOM_LEFT_ALIGMENT = TexturedInterfaceComponent.BOTTOM_LEFT_ALIGMENT,
+            BOTTOM_RIGHT_ALIGMENT = TexturedInterfaceComponent.BOTTOM_RIGHT_ALIGMENT,
+            TOP_LEFT_ALIGMENT = TexturedInterfaceComponent.TOP_LEFT_ALIGMENT,
+            TOP_RIGHT_ALIGMENT = TexturedInterfaceComponent.TOP_RIGHT_ALIGMENT;
 }
