@@ -17,11 +17,11 @@ public class Console implements Renderable {
     public InterfaceComponent text = null;
     public Console(WindowManager context, BitmapFont font) {
         this.font = font;
-        add("teste\nAMONG US");
+        add("teste\nAMONG US\nIN real life");
 
-        context.addUpdateEvent(() -> {
-            text.setAspectRatio(context.getAspectRatio());
-        });
+        context.addUpdateEvent(() -> text.setAspectRatio(context.getAspectRatio()));
+        text.setScale(.2F,.3F,.3F);
+        text.setAligment(InterfaceComponent.TOP_LEFT_ALIGMENT);
     }
 
     public void add(String what){

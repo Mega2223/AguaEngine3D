@@ -48,7 +48,7 @@ public class ModelEditor {
         for(long frames = 0, lastRender = 0, currentRender, unrendered; !GLFW.glfwWindowShouldClose(windowManager.getWindow()) ;){
             currentRender = System.currentTimeMillis();
             unrendered = currentRender - lastRender;
-            if(unrendered > 1000 / TARGET_FPS){
+            if(unrendered*TARGET_FPS > 1000){
                 doLogic(frames);
                 doRender();
                 windowManager.update();
@@ -60,7 +60,6 @@ public class ModelEditor {
     }
 
     public static void doLogic(long iteration){
-        console.text.setCoords(-1, (float) Math.sin(iteration/30F),0);
 
     }
     public static void doRender(){

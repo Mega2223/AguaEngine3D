@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
+import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
@@ -19,6 +20,10 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     int rotationMatrixLoc = -1;
     int translationMatrixLoc = -1;
     int projectionMatrixLoc = -1;
+    int scaleMatrixLoc = -1;
+    int aligmentIntLoc = -1;
+
+    private static final float[] bufferMat4 = new float[16];
 
     public DisplayComponentShaderProgram(int texture,float[] textureCoords, float aspectRatio){
         id = ShaderManager.loadShaderFromFiles(
@@ -48,6 +53,8 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         translationMatrixLoc = GL30.glGetUniformLocation(id,"translation");
         rotationMatrixLoc = GL30.glGetUniformLocation(id,"translation");
         projectionMatrixLoc = GL30.glGetUniformLocation(id,"projection");
+        scaleMatrixLoc = GL30.glGetUniformLocation(id,"scale");
+        aligmentIntLoc =GL30.glGetUniformLocation(id,"aligment");
     }
     /**This shader does not support projection matrices*/
     @Override
@@ -98,4 +105,25 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     public float getAspectRatio() {
         return aspectRatio;
     }
+
+    public void setScale(float f){
+        setScale(f,f,f);
+    }
+
+    public void setScale(float x, float y, float z){
+        MatrixTranslator.generateTranslationAndScaleMatrix(bufferMat4,0,0,0,x,y,z);
+        GL30.glUseProgram(id);
+        GL30.glUniformMatrix4fv(scaleMatrixLoc,false,bufferMat4);
+    }
+
+    public void setAligment(int aligment){
+        GL30.glUseProgram(id);
+        GL30.glUniform1i(aligmentIntLoc,aligment);
+    }
+
+    public static final int CENTER_ALIGMENT = InterfaceComponent.CENTER_ALIGMENT,
+            BOTTOM_LEFT_ALIGMENT = InterfaceComponent.BOTTOM_LEFT_ALIGMENT,
+            BOTTOM_RIGHT_ALIGMENT = InterfaceComponent.BOTTOM_RIGHT_ALIGMENT,
+            TOP_LEFT_ALIGMENT = InterfaceComponent.TOP_LEFT_ALIGMENT,
+            TOP_RIGHT_ALIGMENT = InterfaceComponent.TOP_RIGHT_ALIGMENT;
 }

@@ -47,8 +47,6 @@ public class BitmapFont {
 
         for (int t = 0, x = 0, y = 0; t < text.length(); t++) {
 
-            if(text.charAt(t) == '\n'){y++; x=0; continue;} //FIXME quebra os indices eu acho
-
             vertices[t*16] = x/2F;
             vertices[t*16+1] = y;
 
@@ -56,12 +54,13 @@ public class BitmapFont {
             vertices[t*16+5] = y;
 
             vertices[t*16+8] = x/2F;
-            vertices[t*16+9] = y-1;
+            vertices[t*16+9] = (y)-1;
 
             vertices[t*16+12] = (x+1)/2F;
-            vertices[t*16+13] = y-1;
+            vertices[t*16+13] = (y)-1;
 
             x++;
+            if(text.charAt(t) == '\n'){y--; x=0;}
         }
         for (int i = 0; i < indices.length; i+=6) {
             indices[i] = i*2/3 + 0;

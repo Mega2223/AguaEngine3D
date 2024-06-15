@@ -8,6 +8,14 @@ public class InterfaceComponent extends Model{
 
     protected float[] textureCoords;
     protected int renderOrderPosition = -1;
+    protected float scale = 1F;
+    protected int aligment = 0;
+
+    public static final int CENTER_ALIGMENT = 0,
+            BOTTOM_LEFT_ALIGMENT = 1,
+            BOTTOM_RIGHT_ALIGMENT = 2,
+            TOP_LEFT_ALIGMENT = 3,
+            TOP_RIGHT_ALIGMENT = 4;
 
     public InterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture,float aspectRatio, DisplayComponentShaderProgram displayShader) {
         super(vertices, indices, displayShader);
@@ -56,7 +64,34 @@ public class InterfaceComponent extends Model{
         unloadVBOS();
     }
 
+    @Override
+    public void setCoords(float[] coords) {
+        setCoords(coords[0],coords[1],coords[2]);
+    }
+
+    @Override
+    public void setCoords(float x, float y, float z) { //FIXME displacement entre getCoords e setCoords >:(
+        super.setCoords(x,y,z);
+    }
+
+    public void setScale(float f){
+        setScale(f,f,f);
+    }
+
+    public void setScale(float x,float y,float z){
+        displayShader.setScale(x,y,z);
+    }
+
     public DisplayComponentShaderProgram getCastShader(){
         return displayShader;
+    }
+
+    public int getAligment() {
+        return aligment;
+    }
+
+    public void setAligment(int aligment) {
+        this.aligment = aligment;
+        displayShader.setAligment(aligment);
     }
 }
