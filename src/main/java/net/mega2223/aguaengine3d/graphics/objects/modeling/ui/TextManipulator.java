@@ -11,7 +11,7 @@ import java.io.IOException;
 public class TextManipulator {
     private TextManipulator(){}
 
-    public static final int DEFAULT_START_LOCATION = 32;
+    public static final int DEFAULT_START_LOCATION = 32; //TODO: essa informação aparece no CSV
 
     public static BitmapFont decompileCSV(String csvFile, String bitmapFile) {
         try {

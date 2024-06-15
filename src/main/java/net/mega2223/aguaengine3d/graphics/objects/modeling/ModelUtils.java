@@ -47,7 +47,7 @@ public class ModelUtils {
         return new TexturedModel(vertices,indices,textureCoords,program,texture);
     }
 
-    public static TexturedInterfaceComponent mergeComponents(TexturedInterfaceComponent[] components, int texture){
+    public static TextureInterfaceComponent mergeComponents(TextureInterfaceComponent[] components, int texture){
         List<Float> verticeList = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
         List<Float> textureCoordList = new ArrayList<>();
@@ -73,7 +73,7 @@ public class ModelUtils {
         for(int i = 0; i < textureCoords.length;i++){textureCoords[i]=textureCoordList.get(i);}
         //should I make an Interface that abranges InterfaceComponent AND TexturedModel?
 
-        return new TexturedInterfaceComponent(vertices,indices,textureCoords,texture,components[0].getAspectRatio());
+        return new TextureInterfaceComponent(vertices,indices,textureCoords,texture,components[0].getAspectRatio());
     }
 
     public static void translateModel(Model model, float x, float y, float z){
@@ -257,7 +257,7 @@ public class ModelUtils {
         }
     }
 
-    public static void debugIndices(TexturedInterfaceComponent model){
+    public static void debugIndices(TextureInterfaceComponent model){
         debugIndices(model.indices,model.vertices,model.textureCoords);
     }
 
@@ -283,7 +283,7 @@ public class ModelUtils {
         model.setVertices(verts);
     }
 
-    public static void rescaleModel(TexturedInterfaceComponent model, float scale){
+    public static void rescaleModel(TextureInterfaceComponent model, float scale){
         float[] verts = model.getRelativeVertices();
         for (int i = 0; i < verts.length; i++) {
             verts[i] *= scale;

@@ -3,7 +3,7 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.InterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
 
-public class TexturedInterfaceComponent extends Model implements InterfaceComponent {
+public class TextureInterfaceComponent extends Model implements InterfaceComponent {
 
     protected DisplayComponentShaderProgram displayShader;
 
@@ -14,23 +14,23 @@ public class TexturedInterfaceComponent extends Model implements InterfaceCompon
 
 
 
-    public TexturedInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio, DisplayComponentShaderProgram displayShader) {
+    public TextureInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio, DisplayComponentShaderProgram displayShader) {
         super(vertices, indices, displayShader);
         this.displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public TexturedInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio) {
+    public TextureInterfaceComponent(float[] vertices, int[] indices, float[] textureCoords, int texture, float aspectRatio) {
         super(vertices, indices, new DisplayComponentShaderProgram(texture, textureCoords,aspectRatio));
         displayShader = (DisplayComponentShaderProgram) getShader();
         this.textureCoords = textureCoords;
     }
 
-    public TexturedInterfaceComponent(TexturedInterfaceComponent component, DisplayComponentShaderProgram displayShader){
+    public TextureInterfaceComponent(TextureInterfaceComponent component, DisplayComponentShaderProgram displayShader){
         this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio(), displayShader);
     }
 
-    public TexturedInterfaceComponent(TexturedInterfaceComponent component){
+    public TextureInterfaceComponent(TextureInterfaceComponent component){
         this(component.vertices,component.indices,component.textureCoords,component.displayShader.getTexture(),component.getAspectRatio());
         this.renderOrderPosition = component.renderOrderPosition;
     }

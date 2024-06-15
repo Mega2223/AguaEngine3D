@@ -2,7 +2,7 @@ package net.mega2223.aguaengine3d.tools.modeleditor;
 
 import net.mega2223.aguaengine3d.AguaEngine;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedInterfaceComponent;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.TextureInterfaceComponent;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.BitmapFont;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.objects.WindowManager;
@@ -18,7 +18,7 @@ public class Console implements Renderable {
 
     public boolean isVisible = false;
     public StackedTexts text = new StackedTexts();
-    public TexturedInterfaceComponent prompt;
+    public TextureInterfaceComponent prompt;
     public ArrayList<ConsoleCommand> commands  = new ArrayList<>(10);
 
     public Console(WindowManager context, BitmapFont font) {
@@ -44,9 +44,9 @@ public class Console implements Renderable {
             }
         });
         text.setScale(.1F,.15F,.15F);
-        text.setAligment(TexturedInterfaceComponent.BOTTOM_LEFT_ALIGMENT);
+        text.setAligment(TextureInterfaceComponent.BOTTOM_LEFT_ALIGMENT);
         text.setCoords(0,2,0);
-        prompt.setAligment(TexturedInterfaceComponent.BOTTOM_LEFT_ALIGMENT);
+        prompt.setAligment(TextureInterfaceComponent.BOTTOM_LEFT_ALIGMENT);
         prompt.setCoords(0,1,0);
         refresh();
     }
@@ -63,7 +63,7 @@ public class Console implements Renderable {
     public void refresh(){
         this.prompt = font.genFromString(cmd);
         prompt.setScale(.1F,.15F,.15F);
-        prompt.setAligment(TexturedInterfaceComponent.TOP_LEFT_ALIGMENT);
+        prompt.setAligment(TextureInterfaceComponent.TOP_LEFT_ALIGMENT);
         prompt.setCoords(0,1,0);
     }
 

@@ -67,6 +67,7 @@ import java.io.IOException;
 * TAG para operações que criam objetos
 * Filter functions? (functions that filter :p)
 * Dinamically alocated text object
+* Texturable interface?
 * */
 
 public class Gaem3D {
