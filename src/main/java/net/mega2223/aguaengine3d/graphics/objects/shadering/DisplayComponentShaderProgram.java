@@ -13,7 +13,7 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     float aspectRatio;
     protected final float[] nativeProjectionMatrix = new float[16];
-    protected final float[] textureCoords;
+    protected float[] textureCoords;
 
     int textureCoordsVBO;
 
@@ -25,7 +25,7 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
 
     private static final float[] bufferMat4 = new float[16];
 
-    public DisplayComponentShaderProgram(int texture,float[] textureCoords, float aspectRatio){
+    protected DisplayComponentShaderProgram(int texture,float[] textureCoords, float aspectRatio, int textureCoordsVBO){
         id = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR+"\\InterfaceComponentFragmentShader.fsh",
@@ -36,7 +36,10 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         initUniforms();
         this.aspectRatio = aspectRatio;
         this.textureCoords = textureCoords;
-        textureCoordsVBO = RenderingManager.genArrayBufferObject(textureCoords,GL30.GL_STATIC_DRAW);
+        this.textureCoordsVBO = textureCoordsVBO;
+    }
+    public DisplayComponentShaderProgram(int texture,float[] textureCoords, float aspectRatio) {
+        this(texture,textureCoords,aspectRatio,RenderingManager.genArrayBufferObject(textureCoords,GL30.GL_STATIC_DRAW));
     }
 
     public DisplayComponentShaderProgram(DisplayComponentShaderProgram shaderProgram){
@@ -116,6 +119,10 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         GL30.glUniformMatrix4fv(scaleMatrixLoc,false,bufferMat4);
     }
 
+    public void setTextureCoords(float[] textureCoords) {
+        this.textureCoords = textureCoords.clone();
+    }
+
     public void setAligment(int aligment){
         GL30.glUseProgram(id);
         GL30.glUniform1i(aligmentIntLoc,aligment);
@@ -126,4 +133,5 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
             BOTTOM_RIGHT_ALIGMENT = TextureInterfaceComponent.BOTTOM_RIGHT_ALIGMENT,
             TOP_LEFT_ALIGMENT = TextureInterfaceComponent.TOP_LEFT_ALIGMENT,
             TOP_RIGHT_ALIGMENT = TextureInterfaceComponent.TOP_RIGHT_ALIGMENT;
+
 }

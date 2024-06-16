@@ -1,14 +1,7 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling.ui;
 
-import net.mega2223.aguaengine3d.graphics.objects.modeling.InterfaceComponent;
-import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
-import net.mega2223.aguaengine3d.misc.Utils;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.TextureInterfaceComponent;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 @SuppressWarnings("ALL")
 public class BitmapFont {
@@ -40,7 +33,7 @@ public class BitmapFont {
         return textW;
     }
 
-    public InterfaceComponent genFromString(CharSequence text){
+    public TextureInterfaceComponent genFromString(CharSequence text){
         float[] vertices = new float[text.length()*16];
         int[] indices = new int[text.length()*6];
         float[] textureCoords = getTextureCoords(text);
@@ -70,7 +63,46 @@ public class BitmapFont {
             indices[i+4] = i*2/3 + 1;
             indices[i+5] = i*2/3 + 3;
         }
-        return new InterfaceComponent(vertices,indices,textureCoords,texture,1);
+        return new TextureInterfaceComponent(vertices,indices,textureCoords,texture,1);
+    }
+
+    public DinAllocTextComponent genFromString(CharSequence text, DinAllocTextComponent component){
+        float[] vertices = new float[text.length()*16];
+        int[] indices = new int[text.length()*6];
+        float[] textureCoords = getTextureCoords(text);
+
+        for (int t = 0, x = 0, y = 0; t < text.length(); t++) {
+
+            vertices[t*16] = x/2F;
+            vertices[t*16+1] = y;
+
+            vertices[t*16+4] = (x+1)/2F;
+            vertices[t*16+5] = y;
+
+            vertices[t*16+8] = x/2F;
+            vertices[t*16+9] = (y)-1;
+
+            vertices[t*16+12] = (x+1)/2F;
+            vertices[t*16+13] = (y)-1;
+
+            x++;
+            if(text.charAt(t) == '\n'){y--; x=0;}
+        }
+        for (int i = 0; i < indices.length; i+=6) {
+            indices[i] = i*2/3 + 0;
+            indices[i+1] = i*2/3 + 1;
+            indices[i+2] = i*2/3 + 2;
+            indices[i+3] = i*2/3 + 2;
+            indices[i+4] = i*2/3 + 1;
+            indices[i+5] = i*2/3 + 3;
+        }
+        if(component != null){
+            component.vertices = vertices;
+            component.indices = indices;
+            component.textureCoords = textureCoords;
+            return component;
+        }
+        return new DinAllocTextComponent(vertices,indices,textureCoords,texture);
     }
 
     public float[] getTextureCoords(CharSequence text){
