@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL30;
 
 public class ModelEditor {
     public static final int TARGET_FPS = 60;
-    static RenderingContext context = new RenderingContext();
+    public static RenderingContext context = new RenderingContext();
     static WindowManager windowManager = new WindowManager(400,400,"Janela :D");
     static Console console;
 

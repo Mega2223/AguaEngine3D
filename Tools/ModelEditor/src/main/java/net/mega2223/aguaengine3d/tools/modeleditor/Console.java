@@ -7,8 +7,8 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.BitmapFont;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ui.DinAllocTextComponent;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.objects.WindowManager;
-import net.mega2223.aguaengine3d.tools.modeleditor.commands.AddModelCommand;
 import net.mega2223.aguaengine3d.tools.modeleditor.commands.Help;
+import net.mega2223.aguaengine3d.tools.modeleditor.commands.modeling.ModelingCommands;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class Console implements Renderable {
         });
 
         commands.add(new Help(this));
-        commands.add(new AddModelCommand(this));
+        commands.addAll(ModelingCommands.getCommands(this));
 
         textDisplay.setScale(.05F,.075F,.075F);
         textDisplay.setAligment(TextureInterfaceComponent.BOTTOM_LEFT_ALIGMENT);
