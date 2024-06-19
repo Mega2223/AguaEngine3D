@@ -15,7 +15,7 @@ public class ModelEditor {
     static WindowManager windowManager = new WindowManager(400,400,"Janela :D");
     static Console console;
 
-    static float[] projectionMatrix = new float[16];
+    private static final float[] projectionMatrix = new float[16];
 
     public static void main(String[] args) {
         windowManager.init();
@@ -27,16 +27,6 @@ public class ModelEditor {
         context.setFogDetails(1000,1000);
         console = new Console(windowManager,Misc.loadConsolas());
         context.addObject(console);
-
-        //InterfaceComponent teste = Misc.loadConsolas().genFromString("TESTE");
-        //ModelUtils.rescaleModel(teste,5);
-        //context.addObject(teste);
-
-//        context.addObject(new Model(
-//                new float[]{0,0,0,0, 0,1,0,0, 1,0,0,0, 1,1,0,0},
-//                new int[]{0,1,2,3,2,1},
-//                new SolidColorShaderProgram(1,0,0,1)
-//        ));
 
         GL30.glClearColor(.5F,.5F,.6F,1F);
 
