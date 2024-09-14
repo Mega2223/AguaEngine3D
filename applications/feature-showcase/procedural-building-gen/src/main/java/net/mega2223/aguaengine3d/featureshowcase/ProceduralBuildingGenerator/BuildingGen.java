@@ -4,7 +4,7 @@ import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -41,8 +41,8 @@ public class BuildingGen {
 
         //shader dict setup
         ShaderManager.setIsGlobalShaderDictEnabled(true);
-        ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        ShaderDictionary globalDict = ShaderManager.getGlobalShaderDictionary();
+        globalDict.addAllValues(ShaderDictionary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
         context = new RenderingContext();
 
         //scenery setup

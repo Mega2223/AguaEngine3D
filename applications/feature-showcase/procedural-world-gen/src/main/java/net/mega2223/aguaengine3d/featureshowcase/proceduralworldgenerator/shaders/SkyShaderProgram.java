@@ -18,8 +18,8 @@ public class SkyShaderProgram implements ShaderProgram {
 
     public SkyShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                        Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\SkyboxFragment.fsh",
-                        Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\SkyboxVertex.vsh"
+                        Utils.USER_DIR+"SkyboxFragment.fsh",
+                        Utils.USER_DIR+"SkyboxVertex.vsh"
                 }
         );
         direction_vector_loc = GL30.glGetUniformLocation(id,"direction");

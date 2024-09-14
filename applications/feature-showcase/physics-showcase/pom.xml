@@ -9,6 +9,14 @@
     <version>0.1-U</version>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>net.mega2223</groupId>
+            <artifactId>aguaengine3d</artifactId>
+            <version>BETA-0.4-U</version>
+        </dependency>
+    </dependencies>
+
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

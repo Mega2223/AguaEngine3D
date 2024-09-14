@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ALL")
-public class ShaderDictonary {
+public class ShaderDictionary {
 
     List<ShaderDictionaryEntry> entries =  new ArrayList<>();
 
@@ -14,21 +14,26 @@ public class ShaderDictonary {
     public static final String TITLE_DIV = "--:";
     public static final String REPLACE_SIGN = "//--@";
 
-    public ShaderDictonary(){
+    public ShaderDictionary(){
 
     }
 
-    public ShaderDictonary addAllValues(String alias, String content){
+    public ShaderDictionary addAllValues(String alias, String content){
         entries.add(new ShaderDictionaryEntry(alias,content));
         return this;
     }
 
-    public ShaderDictonary addAllValues(ShaderDictonary content){
+    public ShaderDictionary addAllValues(ShaderDictionary content){
         entries.addAll(content.entries);
         return this;
     }
 
-    public ShaderDictonary remove(String alias){
+    public ShaderDictionary add(ShaderDictionaryEntry content){
+        entries.add(content);
+        return this;
+    }
+
+    public ShaderDictionary remove(String alias){
         ArrayList<ShaderDictionaryEntry> toRemove = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
             if(entries.get(i).name.equals(alias)){toRemove.add(entries.get(i));}
@@ -54,9 +59,9 @@ public class ShaderDictonary {
         public String getContent() {return content;}
     }
 
-    public static ShaderDictonary fromContent(String sdcText){
+    public static ShaderDictionary fromContent(String sdcText){
         String[] lines = sdcText.split(ENTRY_DIV);
-        ShaderDictonary ret = new ShaderDictonary();
+        ShaderDictionary ret = new ShaderDictionary();
         for (int l = 0; l < lines.length; l++) {
             if(lines[l].toCharArray()[0] == '#'){continue;}
             String[] split = lines[l].split(TITLE_DIV);
@@ -66,7 +71,7 @@ public class ShaderDictonary {
         return ret;
     }
 
-    public static ShaderDictonary fromFile(String path){
+    public static ShaderDictionary fromFile(String path){
         String content = Utils.readFile(path);
         return fromContent(content);
     }

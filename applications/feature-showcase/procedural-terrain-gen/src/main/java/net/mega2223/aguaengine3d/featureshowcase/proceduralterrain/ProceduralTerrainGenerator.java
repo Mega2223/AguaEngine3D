@@ -4,16 +4,13 @@ import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.GrassSh
 import net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.utils.WaterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.StructureUtils;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.buildinggenerator.ProceduralBuilding;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.RadialNoise;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.TextureShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -63,8 +60,8 @@ public class ProceduralTerrainGenerator {
         //shader dict setup
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
-        ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.add(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        ShaderDictionary globalDict = ShaderManager.getGlobalShaderDictionary();
+        globalDict.addAllValues(ShaderDictionary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //scene setup
 
@@ -116,14 +113,18 @@ public class ProceduralTerrainGenerator {
         //Model grass = Noise.NoiseToModel(noise,64,64,4F/32F,400F/64F,grassShaderProgram);
         int siz = 5;
         List<Noise> noises = stackedNoises.getNoises();
+
+        File out = new File(System.getProperty("user.dir")+"\\src\\main\\resources\\noises");
+        out.mkdirs();
+
         for (int i = 0; i < noises.size(); i++) {
             ImageIO.write(
                     Noise.NoiseToImage(noises.get(i),1024,1024,-siz,-siz,(2*siz)/1024F,new float[]{0,1,0},new float[]{0,0,1},false),
-                    "png",new File(Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\noises\\noise_"+(i+1)+".png"));
+                    "png",new File(out.getAbsolutePath()+"\\noise_"+(i+1)+".png"));
         }
         ImageIO.write(
                 Noise.NoiseToImage(stackedNoises,1024,1024,-siz,-siz,(2*siz)/1024F,new float[]{0,1,0},new float[]{0,0,1},false),
-                "png",new File(Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\noises\\all.png"));
+                "png",new File(out.getAbsolutePath()+"\\all.png"));
 
         Model grass = Noise.NoiseToModel(stackedNoises,-siz,-siz, siz, siz,.1F,200F/ siz,10F,grassShaderProgram);
 

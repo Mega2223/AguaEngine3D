@@ -14,7 +14,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegener
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.StackedNoises;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.UniformNoise;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.interpolation.CubicInterpolator;
@@ -110,8 +110,8 @@ public class WorldGen {
                 .setActive(true)
                 .setFogDetails(1000, 100);
         ShaderManager.setIsGlobalShaderDictEnabled(true);
-        ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        ShaderDictionary globalDict = ShaderManager.getGlobalShaderDictionary();
+        globalDict.addAllValues(ShaderDictionary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
 
         //Skybox setup
         skybox = new Skybox();

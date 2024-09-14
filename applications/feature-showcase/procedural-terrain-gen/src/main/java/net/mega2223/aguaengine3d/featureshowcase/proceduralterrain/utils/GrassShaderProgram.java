@@ -12,9 +12,9 @@ public class GrassShaderProgram extends ShaderProgramTemplate implements ShaderP
     int itneration_uni_loc = -1;
     public GrassShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\GrassFragment.fsh",
-                Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\Vertex.vsh",
-                Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\NormalCalculator.geom"
+                Utils.USER_DIR+"GrassFragment.fsh",
+                Utils.USER_DIR+"Vertex.vsh",
+                Utils.USER_DIR+"NormalCalculator.geom"
         }
         );
         initUniforms();

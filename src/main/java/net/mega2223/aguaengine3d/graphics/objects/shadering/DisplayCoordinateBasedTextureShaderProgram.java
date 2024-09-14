@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
@@ -15,7 +15,7 @@ public class DisplayCoordinateBasedTextureShaderProgram extends ShaderProgramTem
         this(texture,null);
     }
 
-    public DisplayCoordinateBasedTextureShaderProgram(int texture, ShaderDictonary dict){
+    public DisplayCoordinateBasedTextureShaderProgram(int texture, ShaderDictionary dict){
         programID = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR + "\\DisplayBasedFragShader.fsh",

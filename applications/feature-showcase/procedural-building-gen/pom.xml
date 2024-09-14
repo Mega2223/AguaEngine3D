@@ -15,4 +15,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>net.mega2223</groupId>
+            <artifactId>aguaengine3d</artifactId>
+            <version>BETA-0.4-U</version>
+        </dependency>
+    </dependencies>
+
 </project>

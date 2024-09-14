@@ -9,8 +9,8 @@ public class WaterShaderProgram extends ShaderProgramTemplate implements ShaderP
     int itneration_uni_loc = -1;
     public WaterShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                        Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\WaterFragment.fsh",
-                        Utils.USER_DIR+"\\feature showcase\\procedural-terrain-gen\\src\\main\\resources\\WaterVertex.vsh"
+                        Utils.USER_DIR+"WaterFragment.fsh",
+                        Utils.USER_DIR+"WaterVertex.vsh"
                 }
         );
         initUniforms();

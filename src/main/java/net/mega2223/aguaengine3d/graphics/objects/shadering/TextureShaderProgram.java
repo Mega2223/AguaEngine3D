@@ -1,13 +1,13 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.misc.Utils;
 
 public class TextureShaderProgram extends ShaderProgramTemplate implements ShaderProgram{
 
     public TextureShaderProgram(){this(null);}
-    public TextureShaderProgram(ShaderDictonary dict){
+    public TextureShaderProgram(ShaderDictionary dict){
         id = ShaderManager.loadShaderFromFiles(
                 new String[]{
                         Utils.SHADERS_DIR + "\\TextureFragShader.fsh",

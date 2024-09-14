@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.generictests;
 
-import net.mega2223.aguaengine3d.graphics.utils.ShaderDictonary;
+import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 
 public class ShaderDictionaryReplacerTest {
 
@@ -8,7 +8,7 @@ public class ShaderDictionaryReplacerTest {
 
 
     public static void main(String[] args) {
-        ShaderDictonary dict = new ShaderDictonary();
+        ShaderDictionary dict = new ShaderDictionary();
         dict.addAllValues("fogFunction","fogfunction(){\n    equations();\n}");
         System.out.println(dict.resolve(teste));
     }

@@ -11,8 +11,8 @@ public class WaterShaderProgram extends DemoShader implements ShaderProgram {
 
     public WaterShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                        Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\WaterVertex.vsh",
-                        Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\WaterFragment.fsh"
+                        Utils.USER_DIR+"WaterVertex.vsh",
+                        Utils.USER_DIR+"WaterFragment.fsh"
                 }
         );
         initUniforms();

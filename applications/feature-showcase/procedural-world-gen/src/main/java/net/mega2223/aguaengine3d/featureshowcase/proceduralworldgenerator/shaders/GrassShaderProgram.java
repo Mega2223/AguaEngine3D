@@ -12,8 +12,8 @@ public class GrassShaderProgram extends DemoShader implements ShaderProgram {
     int light_dir_loc = -1;
     public GrassShaderProgram(){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\GrassFragment.fsh",
-                Utils.USER_DIR+"\\feature showcase\\procedural-world-gen\\src\\main\\resources\\GrassVertex.vsh"
+                Utils.USER_DIR+"GrassFragment.fsh",
+                Utils.USER_DIR+"GrassVertex.vsh"
         }
         );
         initUniforms();
