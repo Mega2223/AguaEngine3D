@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.mega2223</groupId>
-    <artifactId>FeatureShowcase</artifactId>
+    <artifactId>feature-showcase</artifactId>
     <version>0.1</version>
     <packaging>pom</packaging>
     <modules>
-        <module>ProceduralTerrainGenerator</module>
-        <module>ProdeduralBuildingGenerator</module>
-        <module>ProceduralWorldGenerator</module>
+        <module>procedural-terrain-gen</module>
+        <module>procedural-building-gen</module>
+        <module>procedural-world-gen</module>
     </modules>
 
     <properties>
@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>net.Mega2223</groupId>
-            <artifactId>AguaEngine3D</artifactId>
+            <artifactId>aguaengine3d</artifactId>
             <version>BETA-0.2-U</version>
             <scope>compile</scope>
         </dependency>
@@ -36,7 +36,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.ProceduralTerrainGenerator</mainClass>
+                            <mainClass>net.mega2223.aguaengine3d.featureshowcase.proceduralterrain.procedural-terrain-gen</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.Mega2223</groupId>
-        <artifactId>AguaEngine3D</artifactId>
+        <groupId>net.mega2223</groupId>
+        <artifactId>aguaengine3d</artifactId>
         <version>BETA-0.3-U</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>net.mega2223.aguaengine3d.tools</groupId>
-    <artifactId>ShaderDebbuger</artifactId>
+    <artifactId>shader-debugger</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

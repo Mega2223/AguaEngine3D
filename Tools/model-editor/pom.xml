@@ -7,15 +7,24 @@
         <groupId>net.mega2223</groupId>
         <artifactId>aguaengine3d</artifactId>
         <version>BETA-0.4-U</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <groupId>net.mega2223.aguaengine3d</groupId>
-    <artifactId>tools</artifactId>
+    <groupId>net.mega2223.aguaengine3d.tools</groupId>
+    <artifactId>model-editor</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>net.mega2223</groupId>
+            <artifactId>aguaengine3d</artifactId>
+            <version>BETA-0.4-U</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>
