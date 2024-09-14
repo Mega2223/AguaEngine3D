@@ -107,7 +107,7 @@ public class Gaem3D {
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
         ShaderDictonary globalDict = ShaderManager.getGlobalShaderDictionary();
-        globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "\\DefaultShaderDictionary.sdc"));
+        globalDict.addAllValues(ShaderDictonary.fromFile(Utils.SHADERS_DIR + "/DefaultShaderDictionary.sdc"));
         context = new RenderingContext();
 
         //scenery setup
@@ -140,8 +140,7 @@ public class Gaem3D {
         //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
         Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj"),new SolidColorShaderProgram(0,1,0));
         context.addObject(grass);
-
-        BufferedImage cat = ImageIO.read(new File(Utils.TEXTURES_DIR + "\\img.png"));
+        BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "\\img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat,cat,cat,cat,cat,cat}
         ));

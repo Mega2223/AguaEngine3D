@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.utils;
 
+import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,7 @@ public class TextureManager {
         int width, height;
         int[] pixels;
         try {
+            path = Utils.resolvePath(path);
             BufferedImage image = ImageIO.read(new FileInputStream(path));
             width = image.getWidth();
             height = image.getHeight();
