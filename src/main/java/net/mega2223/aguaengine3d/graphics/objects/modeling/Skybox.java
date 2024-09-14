@@ -11,13 +11,13 @@ public class Skybox implements Renderable {
     float[] mesh;
     int[] indices;
 
-    ShaderProgram program;
+    ShaderProgram shader;
     int texture, verticesVBO, indicesVBO;
 
     public Skybox(int texture) {
         Model model = TexturedModel.loadTexturedModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj").split("\n"),null,texture);
         this.mesh = model.vertices.clone(); this.indices = model.indices.clone();
-        program = new CubemapInterpreterShaderProgram(texture);
+        shader = new CubemapInterpreterShaderProgram(texture);
         this.texture = texture;
         this.verticesVBO = RenderingManager.genArrayBufferObject(mesh, GL30.GL_STATIC_DRAW);
         this.indicesVBO = RenderingManager.genIndexBufferObject(indices, GL30.GL_STATIC_DRAW);
@@ -26,9 +26,9 @@ public class Skybox implements Renderable {
     @Override
     public void draw() {
         GL30.glDisable(GL30.GL_DEPTH_TEST);
-        program.preRenderLogic();
-        RenderingManager.drawnIndexBufferVBO(verticesVBO,GL30.GL_TRIANGLES,4,program,indicesVBO,indices.length);
-        program.postRenderLogic();
+        shader.preRenderLogic();
+        RenderingManager.drawnIndexBufferVBO(verticesVBO,GL30.GL_TRIANGLES,4, shader,indicesVBO,indices.length);
+        shader.postRenderLogic();
         GL30.glEnable(GL30.GL_DEPTH_TEST);
     }
 
@@ -48,16 +48,18 @@ public class Skybox implements Renderable {
 
     @Override
     public void setUniforms(int iteration, float[] projectionMatrix) {
-        program.setUniforms(iteration,translationMatrix,projectionMatrix);
+        shader.setUniforms(iteration,translationMatrix,projectionMatrix);
     }
 
     @Override
     public ShaderProgram getShader() {
-        return program;
+        return shader;
     }
 
     @Override
     public int getRenderOrderPosition() {
         return -2;
     }
+
+
 }

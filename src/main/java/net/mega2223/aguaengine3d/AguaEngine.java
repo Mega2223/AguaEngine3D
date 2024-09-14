@@ -4,4 +4,5 @@ public class AguaEngine {
     private AguaEngine(){}
 
     public static final String VERSION = "BETA-0.4-U";
+    public static final boolean STABLE = false;
 }

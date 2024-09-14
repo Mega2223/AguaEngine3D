@@ -99,6 +99,11 @@ public class CubemapInterpreterShaderProgram implements ShaderProgram{
         GL30.glUseProgram(id);
         GL30.glBindTexture(GL30.GL_TEXTURE_CUBE_MAP,texture);
         GL30.glActiveTexture(GL30.GL_TEXTURE0);
+        GL30.glDisable(GL30.GL_DEPTH_TEST);
+    }
 
+    @Override
+    public void postRenderLogic() {
+        GL30.glEnable(GL30.GL_DEPTH_TEST);
     }
 }
