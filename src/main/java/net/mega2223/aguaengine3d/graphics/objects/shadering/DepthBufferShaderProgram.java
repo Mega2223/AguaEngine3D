@@ -28,8 +28,8 @@ public class DepthBufferShaderProgram implements ShaderProgram{
     }
     public DepthBufferShaderProgram(int[] FBO){
         id = ShaderManager.loadShaderFromFiles(new String[]{
-                Utils.SHADERS_DIR + "\\DepthAlgVertShader.vsh",
-                Utils.SHADERS_DIR + "\\DepthAlgFragShader.fsh"}
+                Utils.SHADERS_DIR + "/DepthAlgVertShader.vsh",
+                Utils.SHADERS_DIR + "/DepthAlgFragShader.fsh"}
         );
         this.FBO = FBO;
         initUniforms();

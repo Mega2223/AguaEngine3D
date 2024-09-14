@@ -17,17 +17,11 @@ public class TextureManager {
     public static int loadTexture(String path) {
         int width, height;
         int[] pixels;
-        try {
-            path = Utils.resolvePath(path);
-            BufferedImage image = ImageIO.read(new FileInputStream(path));
-            width = image.getWidth();
-            height = image.getHeight();
-            pixels = new int[width * height];
-            image.getRGB(0, 0, width, height, pixels, 0, width);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return -1;
-        }
+        BufferedImage image = Utils.readImage(path);
+        width = image.getWidth();
+        height = image.getHeight();
+        pixels = new int[width * height];
+        image.getRGB(0, 0, width, height, pixels, 0, width);
 
         int[] data = new int[width * height];
         for (int i = 0; i < width * height; i++) {

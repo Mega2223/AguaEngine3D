@@ -6,12 +6,12 @@
 
     <groupId>net.mega2223</groupId>
     <artifactId>aguaengine3d</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>Tools</module>
-        <module>Tools/ShaderDebugger</module>
-        <module>Tools/model-editor</module>
-    </modules>
+    <packaging>jar</packaging>
+<!--    <modules>-->
+<!--        <module>Tools</module>-->
+<!--        <module>Tools/ShaderDebugger</module>-->
+<!--        <module>Tools/model-editor</module>-->
+<!--    </modules>-->
     <version>BETA-0.4-U</version>
 
     <properties>
@@ -20,6 +20,15 @@
         <lwjgl.version>3.2.3</lwjgl.version>
         <lwjgl.natives>natives-windows</lwjgl.natives>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Mega2223 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Mega2223/AguaEngine3D</url>
+        </repository>
+    </distributionManagement>
+
 
     <dependencyManagement>
         <dependencies>
@@ -360,9 +369,11 @@
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
+                        <descriptorRef>bin</descriptorRef>
                     </descriptorRefs>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>

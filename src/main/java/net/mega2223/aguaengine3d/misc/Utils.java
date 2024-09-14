@@ -5,11 +5,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Objects;
 
 public class Utils {
+    private Utils(){}
+
     public static final String USER_DIR = "";
     public static final String RESOURCES_DIR = "";
     public static final String SHADERS_DIR = RESOURCES_DIR + "shaders";
@@ -18,59 +17,67 @@ public class Utils {
     public static final String PROCEDURAL_BUILDINGS_DIR = RESOURCES_DIR + "procedural buildings";
     public static final String FONTS_DIR = RESOURCES_DIR + "fonts";
 
-    public static String resolvePath(String path){
-        if(Files.exists(Paths.get(path))){
-            return path;
+    public static Reader getFileStream(String path){
+        if(new File(path).exists()){
+            try {
+                return new FileReader(path);}
+            catch (FileNotFoundException ignored) {}
+        } else {
+            InputStream stream = Utils.class.getClassLoader().getResourceAsStream(path);
+            if(stream != null){return new InputStreamReader(stream);}
         }
-        return findResource(path);
+        return null;
     }
 
-    public static String findResource(String path){
-        path = Utils.class.getClassLoader().getResource(path).getFile();
-        try {
-            path = URLDecoder.decode(path,"UTF-8");
-            return path;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String readResource(String path) {
-        return readFile(findResource(path),false);
-    }
-
-    public static String readFile(String path){
-        return readFile(path, true);
-    }
-
-    public static String readFile (String path, boolean checkResources){
-        if(checkResources){
-            return readResource(path);
-        }
+    public static String readFile (String path){
+        File f = new File(path);
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));
-            StringBuilder ret = new StringBuilder();
-            String line = reader.readLine();
-            while(line != null){
-                ret.append(line).append("\n");
-                line = reader.readLine();
-            }
-            return ret.toString();
-        } catch (IOException e) {
+            InputStream stream = Utils.class.getClassLoader().getResourceAsStream(path);
+            stream = stream != null ? stream :  Utils.class.getClassLoader().getResourceAsStream(path.replace("\\","/"));
+            BufferedReader reader = f.exists() ?
+                    new BufferedReader(new FileReader(f)):
+                    new BufferedReader(new InputStreamReader(stream));
+            return readStreamReader(reader);
+        } catch (IOException | NullPointerException e) {
             RuntimeException runtimeException = new RuntimeException("There is no directory such as " + path);
             e.printStackTrace();
             throw runtimeException;
         }
     }
 
-    public static BufferedImage readImage(String path){
-        path = resolvePath(path);
-        try {
-            return ImageIO.read(new File(path));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    protected static String readStreamReader(BufferedReader reader) throws IOException {
+        StringBuilder ret = new StringBuilder();
+        String line = reader.readLine();
+        while(line != null){
+            ret.append(line).append("\n");
+            line = reader.readLine();
         }
+        return ret.toString();
+    }
+
+    public static String resolvePath(String path) {
+        File f = new File(path);
+        try {
+            return f.exists() ? path : URLDecoder.decode(Utils.class.getClassLoader().getResource(path).getPath(),"UTF-8");
+        } catch (UnsupportedEncodingException ignored) { return null; }
+    }
+
+    public static BufferedImage readImage(String path) {
+        try {
+            File f = new File(path);
+            if (f.exists()) {
+                return ImageIO.read(f);
+            } else {
+                InputStream stream = Utils.class.getClassLoader().getResourceAsStream(path);
+                stream = stream != null ? stream :  Utils.class.getClassLoader().getResourceAsStream(path.replace("\\","/"));
+                if (stream != null) {
+                    return ImageIO.read(stream);
+                }
+            }
+        } catch (IOException ignored){}
+        System.out.println("WARNING: Could not find file \""+ path + "\"");
+        return null;
     }
 
     public static void writeToFile(String path, String content){

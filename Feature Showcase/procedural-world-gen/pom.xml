@@ -20,12 +20,6 @@
         <dependency>
             <groupId>net.mega2223</groupId>
             <artifactId>aguaengine3d</artifactId>
-            <version>BETA-0.3-U</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.mega2223</groupId>
-            <artifactId>aguaengine3d</artifactId>
             <version>BETA-0.4-U</version>
             <scope>compile</scope>
         </dependency>

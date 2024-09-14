@@ -121,7 +121,7 @@ public class Gaem3D {
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
                 new int[]{0, 1, 2, 2, 1, 3},
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\xadrez.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png")
         );
 
         Model water = new Model(
@@ -138,16 +138,16 @@ public class Gaem3D {
 
         //context.addObject(chessFloor);
         //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
-        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"\\cube.obj"),new SolidColorShaderProgram(0,1,0));
+        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0));
         context.addObject(grass);
-        BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "\\img.png");
+        BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat,cat,cat,cat,cat,cat}
         ));
         context.addObject(sk);
         context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
 
-
+        new SolidColorShaderProgram(1,1,1);
  //       float[] vertices = grass.getRelativeVertices();
 //        float[] normals = grass.getNormals();
         //VectorTranslator.debugVector(normals);

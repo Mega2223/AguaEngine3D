@@ -22,9 +22,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.Mega2223</groupId>
+            <groupId>net.mega2223</groupId>
             <artifactId>aguaengine3d</artifactId>
-            <version>BETA-0.2-U</version>
+            <version>BETA-0.4-U</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
