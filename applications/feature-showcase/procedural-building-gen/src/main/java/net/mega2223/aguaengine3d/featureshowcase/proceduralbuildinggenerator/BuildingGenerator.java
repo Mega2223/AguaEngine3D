@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.featureshowcase.ProceduralBuildingGenerator;
+package net.mega2223.aguaengine3d.featureshowcase.proceduralbuildinggenerator;
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -11,7 +11,7 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
-public class BuildingGen {
+public class BuildingGenerator {
     static RenderingContext context;
     static WindowManager manager;
     static String TITLE = "Procedural Buildings :D";

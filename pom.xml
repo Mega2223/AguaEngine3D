@@ -112,6 +112,9 @@
     </dependencies>
 
     <build>
+        <defaultGoal>
+            clean validate compile test package assembly:single verify install
+        </defaultGoal>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
