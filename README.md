@@ -9,6 +9,13 @@
         AguaEngine3D
     </div>
     </h1>
-    <strong>OpenGL based rendering engine made as a personal hobby-project :) </strong>
+    <strong>OpenGL based rendering engine made as a personal hobby-project :)  </strong>
 </div>
 
+
+   
+<div class = "g">
+    <p style="color: red">AguaEngine3D is a Java engine which uses LWJGL's OpenGL binder as it's rendering framework</p>
+</div>
+
+among us
