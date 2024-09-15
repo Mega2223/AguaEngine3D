@@ -58,7 +58,7 @@ public class Line implements Renderable {
 
     @Override
     public void setUniforms(int iteration, float[] projectionMatrix) {
-        MatrixTranslator.generateTranslationMatrix(transMatBuffer,coords[0],coords[1],coords[2]);
+        MatrixTranslator.generateTranslationMatrix(coords[0], coords[1], coords[2], transMatBuffer);
         shaderProgram.setUniforms(iteration,transMatBuffer,projectionMatrix);
     }
 

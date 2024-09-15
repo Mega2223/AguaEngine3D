@@ -38,7 +38,7 @@ public class Model implements Renderable {
 
     public Model(float[] vertices, int[] indices, ShaderProgram shader){
         this(vertices,indices,null,shader);
-        this.normals = ModelUtils.generateNormals(this,true);
+        this.normals = ModelUtils.generateNormals(this);
     }
 
     public static Model loadModel(String objData, ShaderProgram shader){
@@ -90,7 +90,7 @@ public class Model implements Renderable {
             String[] sp = existingVerticeCombinations.get(i).split("/");
             int[] combination = new int[sp.length];
             for (int j = 0; j < sp.length; j++) {
-                if(sp[j].equals("")){continue;}
+                if(sp[j].isEmpty()){continue;}
                 combination[j] = Integer.parseInt(sp[j]);
             }
             for (int j = 0; j < 3; j++) {
@@ -220,7 +220,7 @@ public class Model implements Renderable {
     }
 
     public void setUniforms(int iteration, float[] projectionMatrix){
-        MatrixTranslator.generateTranslationMatrix(bufferTranslationMatrix,coords);
+        MatrixTranslator.generateTranslationMatrix(coords, bufferTranslationMatrix);
         shader.setUniforms(iteration,bufferTranslationMatrix,projectionMatrix);
     }
 

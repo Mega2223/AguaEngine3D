@@ -24,18 +24,18 @@ public class CollisionSolver {
     // The template for collision the resolution vector is:
     // [0,1,2] = contact transformation, [3,4,5] = contact rotation
 
-    public static void resolveConflict(float totalInvMass, float localInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float tX, float tY, float tZ, float[] dest){
+    public static void resolveConflict(float totalInvMass, float localInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float confDepth,float tX, float tY, float tZ, float[] result){
         //BASE METHOD FOR RESOLVING PARTICLE COLLISIONS
         if(confDepth <= 0){return;}
         if(totalInvMass <= 0){return;}
         bufferVec1[0] = cnX; bufferVec1[1] = cnY; bufferVec1[2] = cnZ;
-        VectorTranslator.scaleVec3(bufferVec1, -confDepth/totalInvMass);
-        VectorTranslator.scaleVec3(bufferVec1,totalInvMass);
+        VectorTranslator.scaleVector(bufferVec1, -confDepth/totalInvMass);
+        VectorTranslator.scaleVector(bufferVec1,totalInvMass);
         VectorTranslator.flipVector(bufferVec1);
-        dest[0] += bufferVec1[0]*localInvMass; dest[1] += bufferVec1[1]*localInvMass; dest[2] += bufferVec1[2]*localInvMass;
+        result[0] += bufferVec1[0]*localInvMass; result[1] += bufferVec1[1]*localInvMass; result[2] += bufferVec1[2]*localInvMass;
     }
     // transformations > position
-    public static void resolveConflict(float totalInvMass, float localInvMass, float[] localInverseInertiaTensor, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth, float tX, float tY, float tZ, float[] rotationMatrix, float[] dest){
+    public static void resolveConflict(float totalInvMass, float localInvMass, float[] localInverseInertiaTensor, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth, float tX, float tY, float tZ, float[] rotationMatrix, float[] result){
         //BASE METHOD FOR RESOLVING RIGIDBODY COLLISIONS
 
         //do not ask me how the code below works
@@ -50,21 +50,21 @@ public class CollisionSolver {
         VectorTranslator.getCrossProduct(bufferVec1,bufferVec2);
         VectorTranslator.flipVector(bufferVec1);
         bufferVec2[0] = cnX; bufferVec2[1] = cnY; bufferVec2[2] = cnZ;
-        float angularInertia = VectorTranslator.getScalarProduct(bufferVec1,bufferVec2);
+        float angularInertia = VectorTranslator.getDotProduct(bufferVec1,bufferVec2);
         float totalInertia = angularInertia + linearInertia;
         float linearTransform = (depth * linearInertia)/totalInertia;
         float angularTransform = (depth * angularInertia)/totalInertia;
-        VectorTranslator.scaleVec3(bufferVec2,linearTransform);
-        dest[0] += bufferVec2[0]; dest[1] += bufferVec2[1]; dest[2] += bufferVec2[2];
+        VectorTranslator.scaleVector(bufferVec2,linearTransform);
+        result[0] += bufferVec2[0]; result[1] += bufferVec2[1]; result[2] += bufferVec2[2];
         bufferVec2[0] = pX + tX; bufferVec2[1] = pY + tY; bufferVec2[2] = pZ + tZ;
         //VectorTranslator.getCrossProduct();
         System.out.println(angularInertia);
     }
 
-    public static void resolveConflict(RigidBodySystem obj, float totalInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] dest){
+    public static void resolveConflict(RigidBodySystem obj, float totalInvMass, float pX, float pY, float pZ, float cnX, float cnY, float cnZ, float depth, float[] result){
         obj.getRotationMatrix(bufferMatrix4);
         obj.getInverseInertiaTensor(bufferMatrix3);
-        resolveConflict(totalInvMass, obj.getInverseMass(), bufferMatrix3, pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix4, dest);
+        resolveConflict(totalInvMass, obj.getInverseMass(), bufferMatrix3, pX, pY, pZ, cnX, cnY, cnZ, depth, obj.getCoordX(), obj.getCoordY(), obj.getCoordZ(), bufferMatrix4, result);
     }
 
     public static void resolveConflict(PhysicsSystem obj, float totalInvMass,float pX, float pY, float pZ, float cnX, float cnY, float cnZ, final float depth) {
@@ -118,8 +118,8 @@ public class CollisionSolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,px,py,pz, bufferVec1);
-        VectorTranslator.scaleVec3(bufferVec1,impulse);
-        VectorTranslator.scaleVec3(bufferVec1,obj1.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec1,impulse);
+        VectorTranslator.scaleVector(bufferVec1,obj1.getInverseMass());
         obj1.applyImpulse(bufferVec1);
     }
 
@@ -141,13 +141,13 @@ public class CollisionSolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,cx2,cy2,cz2, bufferVec1);
-        VectorTranslator.scaleVec3(bufferVec1,impulse);
+        VectorTranslator.scaleVector(bufferVec1,impulse);
         System.arraycopy(bufferVec1,0, bufferVec2,0,3);
-        VectorTranslator.scaleVec3(bufferVec2,obj1.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec2,obj1.getInverseMass());
         obj1.applyImpulse(bufferVec2);
         VectorTranslator.flipVector(bufferVec1);
         System.arraycopy(bufferVec1,0, bufferVec2,0,3);
-        VectorTranslator.scaleVec3(bufferVec2,obj2.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec2,obj2.getInverseMass());
         obj2.applyImpulse(bufferVec2);
     }
 
@@ -165,13 +165,13 @@ public class CollisionSolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,cx2,cy2,cz2, bufferVec1);
-        VectorTranslator.scaleVec3(bufferVec1,impulse);
+        VectorTranslator.scaleVector(bufferVec1,impulse);
         System.arraycopy(bufferVec1,0, bufferVec2,0,3);
-        VectorTranslator.scaleVec3(bufferVec2,obj1.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec2,obj1.getInverseMass());
         obj1.applyImpulse(bufferVec2[0], bufferVec2[1], bufferVec2[2],cx1,cy1,cz1);
         VectorTranslator.flipVector(bufferVec1);
         System.arraycopy(bufferVec1,0, bufferVec2,0,3);
-        VectorTranslator.scaleVec3(bufferVec2,obj2.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec2,obj2.getInverseMass());
         obj2.applyImpulse(bufferVec2[0], bufferVec2[1], bufferVec2[2],cx2,cy2,cz2);
     }
 
@@ -187,8 +187,8 @@ public class CollisionSolver {
         if(inverseMass <= 0){return;}
         float impulse = deltaV/inverseMass;
         PhysicsManager.getContactNormal(cx1,cy1,cz1,px,py,pz, bufferVec1);
-        VectorTranslator.scaleVec3(bufferVec1,impulse);
-        VectorTranslator.scaleVec3(bufferVec1,obj.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec1,impulse);
+        VectorTranslator.scaleVector(bufferVec1,obj.getInverseMass());
         obj.applyImpulse(bufferVec1[0], bufferVec1[1], bufferVec1[2], px,py,pz);
     }
 
@@ -213,8 +213,8 @@ public class CollisionSolver {
         bufferVec1[0] = cnX;
         bufferVec1[1] = cnY;
         bufferVec1[2] = cnZ;
-        VectorTranslator.scaleVec3(bufferVec1,impulse);
-        VectorTranslator.scaleVec3(bufferVec1,obj.getInverseMass());
+        VectorTranslator.scaleVector(bufferVec1,impulse);
+        VectorTranslator.scaleVector(bufferVec1,obj.getInverseMass());
         obj.applyImpulse(bufferVec1[0], bufferVec1[1], bufferVec1[2],px,py,pz);
     }
 

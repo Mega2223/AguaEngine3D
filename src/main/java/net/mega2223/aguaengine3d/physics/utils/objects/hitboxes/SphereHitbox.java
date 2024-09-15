@@ -45,7 +45,7 @@ public class SphereHitbox extends Hitbox {
     }
 
     @Override
-    public void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ) {
+    public void getAxisDepthRelative(float[] result, float locX, float locY, float locZ) {
 
     }
 

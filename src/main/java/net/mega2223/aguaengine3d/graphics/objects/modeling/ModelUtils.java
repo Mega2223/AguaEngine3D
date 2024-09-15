@@ -144,11 +144,11 @@ public class ModelUtils {
         }
     }
 
-    public static float[] generateNormals(Model model,boolean clockwise){
-        return generateNormals(model.getRelativeVertices(),model.getIndices(),clockwise);
+    public static float[] generateNormals(Model model){
+        return generateNormals(model.getRelativeVertices(),model.getIndices());
     }
 
-    public static float[] generateNormals(float[] vertices, int[] indices, boolean clockwise){
+    public static float[] generateNormals(float[] vertices, int[] indices){
         float[] ret =  new float[vertices.length];
         //int[] connectedPrimitives = new int[vertices.length/4];
         float[][] primitiveNormals = new float[indices.length/3][3];
@@ -164,9 +164,9 @@ public class ModelUtils {
             float vAx = v1x - v0x; float vAy = v1y - v0y; float vAz = v1z - v0z;
             float vBx = v2x - v0x; float vBy = v2y - v0y; float vBz = v2z - v0z;
 
-            VectorTranslator.getCrossProduct(bufferVec4,vAx,vAy,vAz,vBx,vBy,vBz);
+            VectorTranslator.getCrossProduct(vAx, vAy, vAz, vBx, vBy, vBz, bufferVec4);
             VectorTranslator.normalize(bufferVec4);
-            if(clockwise){VectorTranslator.flipVector(bufferVec4);}
+
             primitiveNormals[i/3][0] = bufferVec4[0];
             primitiveNormals[i/3][1] = bufferVec4[1];
             primitiveNormals[i/3][2] = bufferVec4[2];

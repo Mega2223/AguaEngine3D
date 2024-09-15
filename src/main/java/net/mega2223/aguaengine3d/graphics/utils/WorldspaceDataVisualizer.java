@@ -32,7 +32,7 @@ public abstract class WorldspaceDataVisualizer implements Renderable {
         object.drawForceShader(shader);
     }
 
-    public static void visualize3DVector(RenderingContext context, float[] memoryAccess, float x, float y, float z, float magnitudeScalar){
+    public static void visualize3DVector(RenderingContext context, float[] memoryAccess, float x, float y, float z, float magnitudeDot){
         Line line = new Line(1,0,0);
         line.setStart(x,y,z);
         WorldspaceDataVisualizer visualizer = new WorldspaceDataVisualizer(line) {
@@ -44,7 +44,7 @@ public abstract class WorldspaceDataVisualizer implements Renderable {
         };
         context.addObject(visualizer);
     }
-    public static void visualize3DVector(RenderingContext context, float[] beginningMemoryAcess,float[] endMemoryAccess, float magnitudeScalar){
+    public static void visualize3DVector(RenderingContext context, float[] beginningMemoryAcess,float[] endMemoryAccess, float magnitudeDot){
         Line line = new Line(1,0,0);
 
         line.setStart(beginningMemoryAcess[0],beginningMemoryAcess[1],beginningMemoryAcess[2]);

@@ -76,7 +76,7 @@ public class RigidBodySystem extends PhysicsSystem {
     //therefore there's no need to override the original superclass method
 
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
-        VectorTranslator.getCrossProduct(bufferVec,fx,fy,fz,px,py,pz);
+        VectorTranslator.getCrossProduct(fx, fy, fz, px, py, pz, bufferVec);
         applyTorque(bufferVec[0], bufferVec[1], bufferVec[2]);
         applyForce(Math.max(fx-px,0),Math.max(fy-py,0),Math.max(fz-pz,0));
     }
@@ -91,7 +91,7 @@ public class RigidBodySystem extends PhysicsSystem {
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         bufferVec[0] = px; bufferVec[1] = py; bufferVec[2] = pz;
         applyImpulse(ix- bufferVec[0],iy- bufferVec[1],iz- bufferVec[2]);
-        VectorTranslator.getCrossProduct(bufferVec,ix,iy,iz,px,py,pz);
+        VectorTranslator.getCrossProduct(ix, iy, iz, px, py, pz, bufferVec);
         //No idea why it's not I x T but it works so
         applySpin(bufferVec);
     }
@@ -120,8 +120,8 @@ public class RigidBodySystem extends PhysicsSystem {
         applySpin(spin[0],spin[1],spin[2]);
     }
 
-    void getInverseInertiaTensorTranslated(float[] dest){
-        PhysicsUtils.rotateInertiaTensor(inverseInertialTensor,rotationMatrix,dest);
+    void getInverseInertiaTensorTranslated(float[] result){
+        PhysicsUtils.rotateInertiaTensor(inverseInertialTensor,rotationMatrix,result);
     }
 
     public float orienX(){
@@ -162,12 +162,12 @@ public class RigidBodySystem extends PhysicsSystem {
         return boundHitbox == null ? 0 : boundHitbox.getEffectiveInteractionRadius();
     }
 
-    public void getRotationMatrix(float[] dest){
-        System.arraycopy(rotationMatrix,0,dest,0,16);
+    public void getRotationMatrix(float[] result){
+        System.arraycopy(rotationMatrix,0,result,0,16);
     }
 
-    public void getInverseInertiaTensor(float[] dest){
-        System.arraycopy(inverseInertialTensor,0,dest,0,dest.length);
+    public void getInverseInertiaTensor(float[] result){
+        System.arraycopy(inverseInertialTensor,0,result,0,result.length);
     }
 
     public void toLocalRotation(float[] vec){
@@ -178,12 +178,12 @@ public class RigidBodySystem extends PhysicsSystem {
         MatrixTranslator.multiplyVec4Mat4(vec,rotationMatrix);
     }
 
-    public void getWorldspacePointVelocity(float px, float py, float pz, float[] dest){
-        dest[0] = px; dest[1] = py; dest[2] = pz;
-        MatrixTranslator.multiplyVec4Mat4(dest,rotationMatrix);
-        VectorTranslator.getCrossProduct(dest,spin,dest);
+    public void getWorldspacePointVelocity(float px, float py, float pz, float[] result){
+        result[0] = px; result[1] = py; result[2] = pz;
+        MatrixTranslator.multiplyVec4Mat4(result,rotationMatrix);
+        VectorTranslator.getCrossProduct(result,spin,result);
         for (int i = 0; i < 3; i++) {
-            dest[i] += velocity[i];
+            result[i] += velocity[i];
         }
     }
 

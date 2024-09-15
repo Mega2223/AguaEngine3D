@@ -2,13 +2,10 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling.ui;
 
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayComponentShaderProgram;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.DisplayShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
-
-import static net.mega2223.aguaengine3d.graphics.utils.RenderingManager.drawnIndexBufferVBO;
 
 public class DinAllocTextComponent implements Renderable, InterfaceComponent {
 
@@ -93,7 +90,7 @@ public class DinAllocTextComponent implements Renderable, InterfaceComponent {
 
     @Override
     public void setUniforms(int iteration, float[] projectionMatrix) {
-        MatrixTranslator.generateTranslationMatrix(translationMatrix,coords);
+        MatrixTranslator.generateTranslationMatrix(coords, translationMatrix);
         displayShaderProgram.setUniforms(iteration,translationMatrix,projectionMatrix);
     }
 

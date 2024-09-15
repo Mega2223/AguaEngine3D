@@ -56,10 +56,10 @@ public class CubemapInterpreterShaderProgram implements ShaderProgram{
          * Since the shader interface is made to work without requiring a context getting variables like the
          * FOV right is currently impossible, this current solution is also barely a solution tho. So much for OOP.*/
         GL30.glUseProgram(id);
-        MatrixTranslator.generateRotationMatrix(rot,rX,rY,rZ);
+        MatrixTranslator.generateRotationMatrix(rX, rY, rZ, rot);
         //GL30.glUniformMatrix4fv(rotation_matrix_loc,false,rot);
         GL30.glUniformMatrix4fv(projection_matrix_loc,false,projectionMatrix);
-        MatrixTranslator.generateTranslationMatrix(translationMatrix,tX,tY,tZ);
+        MatrixTranslator.generateTranslationMatrix(tX, tY, tZ, translationMatrix);
         GL30.glUniformMatrix4fv(translation_matrix_loc,false,translationMatrix);
     }
     /** Generates an object of the ScriptedSequence type intended to be put into a RenderingContext

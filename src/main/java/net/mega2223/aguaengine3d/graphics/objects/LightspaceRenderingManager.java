@@ -55,13 +55,13 @@ public class LightspaceRenderingManager {
 
     public void genTranslationMatrixForLight(float[] m4, int index){
         float[] pos = associatedRenderingContext.lights[index];
-        MatrixTranslator.generateTranslationMatrix(m4,pos[0],pos[1],pos[2]);
+        MatrixTranslator.generateTranslationMatrix(pos[0], pos[1], pos[2], m4);
     }
 
     public void genProjectionMatrixForLight(float[] m4,int index){
         float[] pos = associatedRenderingContext.lights[index];
         MatrixTranslator.generatePerspectiveProjectionMatrix(m4,0.1f,80f, (float) Math.toRadians(45),1);
-        MatrixTranslator.applyLookTransformation(m4,pos[0],pos[1],pos[2],0,0,0); //fixme
+        MatrixTranslator.applyLookTransformation(pos[0], pos[1], pos[2], 0, 0, 0, m4); //fixme
     }
 
     void setLightspaceProjMatricesUniforms(int index,float[] projection, float[] translation){
