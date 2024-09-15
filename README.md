@@ -14,7 +14,22 @@
 
 ## Showcase:
 
-I tend to upload feature showcases in [my youtube development playlist](https://www.youtube.com/playlist?list=PL2CjNrK_Cb0otRoxs5VSQrdccLCmlGvOX), but i also have some cool screenshots for you.
+I usually to upload feature showcases in [my youtube development playlist](https://www.youtube.com/playlist?list=PL2CjNrK_Cb0qEX2Y7PIwy2z6IGoHwQ9Cr), but i also have some cool screenshots for you.
+
+![image](https://github.com/user-attachments/assets/973aacf5-7c37-41ab-abab-8b3197042bee)
+![image](https://github.com/user-attachments/assets/586dcaed-b2d2-4295-9c50-25e5ad37398e)
+![image](https://github.com/user-attachments/assets/59bc9947-8ff7-4196-a4eb-04ed2c8bb851)
+
+<img 
+    height=200
+    width=350
+    src="https://github.com/user-attachments/assets/89bf2bdb-ed00-48dd-909a-59c336e98950"
+    >
+<img 
+    height=200
+    width=350
+    src="https://github.com/user-attachments/assets/90b5ec0f-40e1-4f5e-893e-40fe4802ce68"
+    >
 
 ## Features:  
 
@@ -82,4 +97,10 @@ cd AguaEngine3D
 mvn clean validate compile test package assembly:single verify install
 ```
 
-the resulting `.jar` file will be at the bin directory.
+the resulting `.jar` file will be at the `target` directory.
+
+If you want to import the project as a maven dependecy without having to go login via maven you can run 
+```bat
+mvn clean deploy -o
+```
+in the repo directory, this will return an error message, however the repository will be saved in your machine's internal `.m2` directory, thus making it usable as a dependecy in other projects.
