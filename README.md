@@ -97,4 +97,4 @@ cd AguaEngine3D
 mvn clean validate compile test package assembly:single verify install
 ```
 
-the resulting `.jar` file will be at the bin directory.
+the resulting `.jar` file will be at the `target` directory.
