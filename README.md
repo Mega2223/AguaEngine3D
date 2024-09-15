@@ -1,4 +1,4 @@
-<div class="title"; style="align-items: center ;background-color: red">
+<div class="title"; style="align-items: center ;">
     <h1><img 
     height=100
     width=100
@@ -11,3 +11,4 @@
     </h1>
     <strong>OpenGL based rendering engine made as a personal hobby-project :) </strong>
 </div>
+
