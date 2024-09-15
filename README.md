@@ -9,7 +9,7 @@
         AguaEngine3D
     </div>
     </h1>
-    <strong>OpenGL based rendering engine made as a personal hobby-project :) </strong>
+    <strong>OpenGL based rendering engine made as a personal hobby-project :)  </strong>
 </div>
 
 ## Showcase:
