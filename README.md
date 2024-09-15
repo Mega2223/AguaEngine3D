@@ -98,3 +98,9 @@ mvn clean validate compile test package assembly:single verify install
 ```
 
 the resulting `.jar` file will be at the `target` directory.
+
+If you want to import the project as a maven dependecy without having to go login via maven you can run 
+```bat
+mvn clean deploy -o
+```
+in the repo directory, this will return an error message, however the repository will be saved in your machine's internal `.m2` directory, thus making it usable as a dependecy in other projects.
