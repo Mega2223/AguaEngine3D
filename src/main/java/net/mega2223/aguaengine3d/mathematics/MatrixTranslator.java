@@ -1,5 +1,7 @@
 package net.mega2223.aguaengine3d.mathematics;
 
+import net.mega2223.aguaengine3d.misc.Modified;
+
 import java.util.Arrays;
 
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
@@ -62,88 +64,80 @@ public class MatrixTranslator {
         }
     }
 
-    public static void translateVector(float[] vector, float[][] matrix) {
-        if (matrix.length != 4 || vector.length != 4) {
+    public static void multiplyVectorMatrix(@Modified float[] vector, float[][] mat4) {
+        if (mat4.length != 4 || vector.length != 4) {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
         for (int i = 0; i < 4; i++) {
-            vector[i] = (matrix[i][0] * vector[0]) + (matrix[i][1] * vector[1]) + (matrix[i][2] * vector[2]) + (matrix[i][3] * vector[3]);
+            vector[i] = (mat4[i][0] * vector[0]) + (mat4[i][1] * vector[1]) + (mat4[i][2] * vector[2]) + (mat4[i][3] * vector[3]);
         }
     }
 
-    public static void translateVector(float[] vector, float[] matrix) {
-        if (matrix.length != 16) {
+    public static void multiplyVectorMatrix(@Modified float[] vector, float[] mat4) {
+        if (mat4.length != 16) {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
         for (int i = 0; i < 4; i++) {
             int i1 = i * 4;
-            vector[i] = (matrix[i1] * vector[0]) + (matrix[i1 + 1] * vector[1]) + (matrix[i1 + 2] * vector[2]) + (matrix[i1 + 3] * vector[3]);
+            vector[i] = (mat4[i1] * vector[0]) + (mat4[i1 + 1] * vector[1]) + (mat4[i1 + 2] * vector[2]) + (mat4[i1 + 3] * vector[3]);
         }
     }
 
-    public static void translateVectors(float[] vectors, float[] matrix) {
-        if (matrix.length != 16) {
-            throw new UnsupportedOperationException();
+    public static void translateAllVectors(@Modified float[] vectors, float[] mat4) {
+        if (mat4.length < 16) {
+            throw new UnsupportedOperationException("Provided argument is not a matrix object.");
         }
-
         for (int g = 0; g < vectors.length; g += 4) {
             for (int i = 0; i < 4; i++) {
                 int i1 = i * 4;
-                vectors[i + g] = (matrix[i1] * vectors[g]) + (matrix[i1 + 1] * vectors[g + 1]) + (matrix[i1 + 2] * vectors[g + 2]) + (matrix[i1 + 3] * vectors[g + 3]);
+                vectors[i + g] = (mat4[i1] * vectors[g]) + (mat4[i1 + 1] * vectors[g + 1]) + (mat4[i1 + 2] * vectors[g + 2]) + (mat4[i1 + 3] * vectors[g + 3]);
             }
         }
     }
 
-    public void rotatePolygons(float[][] polygons, float[] rotationRadians) {
-        for (float[] polygon : polygons) {
-            rotatePolygon(polygon, rotationRadians);
+    public void rotateAllVectors(@Modified float[][] vectors, float[] rotationRadians) {
+        for (float[] polygon : vectors) {
+            rotateAllVectors(polygon, rotationRadians);
         }
     }
 
-    public void rotatePolygon(float[] polygon, float[] rotationRadians) {
-        for (int j = 0; j < polygon.length; j += 4) {
-            float[] rot = polygon.clone();
-            MatrixTranslator.rotateVector3(polygon, rotationRadians[0], rotationRadians[1], rotationRadians[2], j);
+    public void rotateAllVectors(@Modified float[] vectors, float[] rotationRadians) {
+        for (int j = 0; j < vectors.length; j += 4) {
+            float[] rot = vectors.clone();
+            MatrixTranslator.rotateVector(rotationRadians[0], rotationRadians[1], rotationRadians[2], j, vectors);
         }
     }
 
-    public static void rotateVector3(float[] vec3, double rX, double rY, double rZ) {
-        rotateVector3(vec3, rX, rY, rZ, 0, 0, 0);
+    public static void rotateVector(double rX, double rY, double rZ, @Modified float[] result) {
+        rotateVector(rX, rY, rZ, 0, 0, 0, result);
     }
 
-    public static void rotateVector3(float[] vec3, double rX, double rY, double rZ, int startIndex) {
-        rotateVector3(vec3, rX, rY, rZ, 0, 0, 0, startIndex);
+    public static void rotateVector(double rX, double rY, double rZ, int startIndex, @Modified float[] result) {
+        rotateVector(rX, rY, rZ, 0, 0, 0, startIndex, result);
     }
 
-    public static void rotateVector3(float[] vec3, double rX, double rY, double rZ, float aX, float aY, float aZ) {
-        rotateVector3(vec3, rX, rY, rZ, aX, aY, aZ, 0);
+    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, @Modified float[] result) {
+        rotateVector(rX, rY, rZ, aX, aY, aZ, 0, result);
     }
 
-    public static void rotateVector3(float[] vec3, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex) {
-        float x = vec3[startIndex];
-        float y = vec3[startIndex + 1];
-        float z = vec3[startIndex + 2];
-        rotateVector3(vec3, x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex);
-        //System.out.println("("+x+","+y+","+z+") -> ("+vec3[0]+","+vec3[1]+","+vec3[2]+")");
+    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
+        float x = result[startIndex];
+        float y = result[startIndex + 1];
+        float z = result[startIndex + 2];
+        rotateVector(x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex, result);
     }
 
-    public static void rotateVector3(float[] vec3, float x, float y, float z, double rX, double rY, double rZ) {
-        rotateVector3(vec3, x, y, z, rX, rY, rZ, 0, 0, 0, 0);
+    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, @Modified float[] result) {
+        rotateVector(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
     }
 
-    public static void rotateVector3(float[] vec3, float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex) {
+    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
 
-        if (rX == Float.POSITIVE_INFINITY || rX == Float.NEGATIVE_INFINITY) {
-            rX = 0;
-        }
-        if (rY == Float.POSITIVE_INFINITY || rY == Float.NEGATIVE_INFINITY) {
-            rY = 0;
-        }
-        if (rZ == Float.POSITIVE_INFINITY || rZ == Float.NEGATIVE_INFINITY) {
-            rZ = 0;
-        }
+        if (!Double.isFinite(rX)) {rX = 0;}
+        if (!Double.isFinite(rY)) {rY = 0;}
+        if (!Double.isFinite(rZ)) {rZ = 0;}
 
         //pain
         while (rX < 0) {
@@ -188,30 +182,29 @@ public class MatrixTranslator {
         float nY = y - aY;
         float nZ = z - aZ;
 
-        vec3[startIndex] = (float) (Axx * nX + Axy * nY + Axz * nZ);
-        vec3[startIndex + 1] = (float) (Ayx * nX + Ayy * nY + Ayz * nZ);
-        vec3[startIndex + 2] = (float) (Azx * nX + Azy * nY + Azz * nZ);
+        result[startIndex] = (float) (Axx * nX + Axy * nY + Axz * nZ);
+        result[startIndex + 1] = (float) (Ayx * nX + Ayy * nY + Ayz * nZ);
+        result[startIndex + 2] = (float) (Azx * nX + Azy * nY + Azz * nZ);
     }
 
-    public static void rotateVector2(float[] vec2, float[] anchorVec, double rotationRadians) {
-        rotateVector2(vec2, vec2[0], vec2[1], anchorVec[0], anchorVec[1], rotationRadians);
+    public static void rotateVector2(@Modified float[] vec2, float[] anchorVec, double rotationRadians) {
+        rotateVector2(vec2[0], vec2[1], anchorVec[0], anchorVec[1], rotationRadians, vec2);
     }
 
-    public static void rotateVector2(float[] vec2, float cX, float cY, double rotationRadians) {
-        rotateVector2(vec2, cX, cY, 0, 0, rotationRadians);
+    public static void rotateVector2(float cX, float cY, double rotationRadians, @Modified float[] result) {
+        rotateVector2(cX, cY, 0, 0, rotationRadians, result);
     }
 
-    public static void rotateVector2(float[] vec2, final float cX, final float cY, float anchorX, float anchorY, double rotationRadians) {
+    public static void rotateVector2(final float cX, final float cY, float anchorX, float anchorY, double rotationRadians, @Modified float[] result) {
         final double sin = Math.sin(rotationRadians);
         final double cos = Math.cos(rotationRadians);
         final double nCX = (float) ((cX * cos) - (cY * sin));
         final double nCY = (float) ((cX * sin) + (cY * cos));
-        vec2[0] = (float) (nCX) + anchorX;
-        vec2[1] = (float) (nCY) + anchorY;
-        //System.out.println("("+cX + ","+cY+") -> " + rotationRadians + " -> (" + ret[0] + "," + ret[1] + ")");
+        result[0] = (float) (nCX) + anchorX;
+        result[1] = (float) (nCY) + anchorY;
     }
 
-    public static void scaleVector(float[] vector, float factor) {
+    public static void scaleVector(@Modified float[] vector, float factor) {
         for (int i = 0; i < vector.length; i += 4) {
             vector[i] *= factor;
             vector[i + 1] *= factor;
@@ -219,7 +212,7 @@ public class MatrixTranslator {
         }
     }
 
-    public static void scaleVectors(float[][] vectors, float factor) {
+    public static void scaleVectors(@Modified float[][] vectors, float factor) {
         for (float[] vector : vectors) {
             scaleVector(vector, factor);
         }
@@ -233,7 +226,7 @@ public class MatrixTranslator {
         }
         return ret;
     }
-
+    /** Multiplies each element of matrix with their respective counterpart on matrix2, this is NOT a matrix multiplication. */
     public static float[] translateMatrix(float[] matrix, float[] matrix2) {
         if (matrix.length != matrix2.length) {
             throw new UnsupportedOperationException();
@@ -251,7 +244,7 @@ public class MatrixTranslator {
         }
     }
 
-    public static void addArrays(float[] arr, float[] arr2) {
+    public static void addArrays(@Modified float[] arr, float[] arr2) {
         for (int i = 0; i < arr.length; i++) {
             arr[i] += arr2[i];
         }
@@ -274,8 +267,13 @@ public class MatrixTranslator {
         }
         return ret;
     }
+
+    public static void multiply4x4Matrices(@Modified float[] m1, float[] m2){
+        multiply4x4Matrices(m1,m2,m1);
+    }
+
     //very proud of that one
-    public static void multiply4x4Matrices(float[] m1, float[] m2){//todo make this a 3 argument function
+    public static void multiply4x4Matrices(float[] m1, float[] m2, @Modified float[] result){
         Arrays.fill(bufferMatrix4,0);
         for (int c = 0; c < 4; c++) {
             for (int r = 0; r <4; r++) {
@@ -286,115 +284,115 @@ public class MatrixTranslator {
                 }
             }
         }
-        System.arraycopy(bufferMatrix4, 0, m1, 0, m1.length);
+        System.arraycopy(bufferMatrix4, 0, result, 0, 16);
     }
 
-    public static void multiply3x3Matrices(float[] m1, float[] m2, float[] dest){
-        Arrays.fill(dest,0);
+    public static void multiply3x3Matrices(float[] m1, float[] m2, @Modified float[] result){
+        Arrays.fill(result,0);
         for (int c = 0; c < 3; c++) {
             for (int r = 0; r < 3; r++) {
                 for (int i = 0; i < 3; i++) {
-                    dest[c + r*3] += m1[r*3+i]*m2[c+i*3];
+                    result[c + r*3] += m1[r*3+i]*m2[c+i*3];
                 }
             }
         }
-        System.arraycopy(dest, 0, m1, 0, dest.length);
+        System.arraycopy(result, 0, m1, 0, result.length);
     }
 
-    public static void multiplyVec4Mat4(float[] vec4, float[] mat4){
+    public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){
         float[] stolenVector = VectorTranslator.bufferVector;
         multiplyVec4Mat4(vec4,mat4,stolenVector);
         System.arraycopy(stolenVector,0,vec4,0,4);
     }
 
-    public static void multiplyVec4Mat4(float[] vec4, float[] mat4, float[] dest){
-        Arrays.fill(dest,0);
+    public static void multiplyVec4Mat4(float[] vec4, float[] mat4,@Modified float[] result){
+        Arrays.fill(result,0);
         for (int i = 0; i < 16; i++) {
             int c = i%4, r = i/4;
-            dest[r]+=vec4[c]*mat4[r*4+c];
+            result[r]+=vec4[c]*mat4[r*4+c];
         }
     }
 
-    public static void multiplyVec3Mat3(float[] vec3, float[] mat3){
+    public static void multiplyVec3Mat3(@Modified float[] vec3, float[] mat3){
         multiplyVec3Mat3(vec3,mat3,VectorTranslator.bufferVector);
         System.arraycopy(VectorTranslator.bufferVector,0,vec3,0,3);
     }
 
-    public static void multiplyVec3Mat3(float[] vec3, float[] mat3, float[] dest){
-        Arrays.fill(dest,0);
+    public static void multiplyVec3Mat3(float[] vec3, float[] mat3,@Modified float[] resultMat3){
+        Arrays.fill(resultMat3,0);
         for (int i = 0; i < 9; i++) {
             int c = i%3, r = i/3;
-            dest[r]+=vec3[c]*mat3[r*3+c];
+            resultMat3[r]+=vec3[c]*mat3[r*3+c];
         }
     }
 
     /**
      * resets the current matrix and sets it to a translation
      */
-    public static void generateTranslationMatrix(float[][] mat, float[] vec) {
-        generateTranslationMatrix(mat, vec[0], vec[1], vec[2]);
+    public static void generateTranslationMatrix(float[] vec, @Modified float[][] resultMat4) {
+        generateTranslationMatrix(vec[0], vec[1], vec[2], resultMat4);
     }
 
     /**
      * resets the current matrix and sets it to a translation
      */
-    public static void generateTranslationMatrix(float[][] mat, float x, float y, float z) {
-        if (mat.length != 4) {
+    public static void generateTranslationMatrix(float x, float y, float z, @Modified float[][] resultMat4) {
+        if (resultMat4.length != 4) {
             return;
         }
-        for (int i = 0; i < mat.length; i++) {
-            for (int j = 0; j < mat.length; j++) {
-                mat[i][j] = 0;
+        for (int i = 0; i < resultMat4.length; i++) {
+            for (int j = 0; j < resultMat4.length; j++) {
+                resultMat4[i][j] = 0;
             }
         }
         for (int i = 0; i < 4; i++) {
-            mat[i][i] = 1;
+            resultMat4[i][i] = 1;
         }
-        mat[0][3] = x;
-        mat[1][3] = y;
-        mat[2][3] = z;
+        resultMat4[0][3] = x;
+        resultMat4[1][3] = y;
+        resultMat4[2][3] = z;
 
     }
-
-    public static void generateTranslationMatrix(float[] mat4, float[] vec) {
-        generateTranslationMatrix(mat4, vec[0], vec[1], vec[2]);
+    
+    public static void generateTranslationMatrix(float[] vec, @Modified float[] resultMat4) {
+        generateTranslationMatrix(vec[0], vec[1], vec[2], resultMat4);
     }
 
-    public static void generateTranslationMatrix(float[] mat4, float x, float y, float z) {
+    public static void generateTranslationMatrix(float x, float y, float z, @Modified float[] resultMat4) {
 
-        Arrays.fill(mat4, 0);
-        for (int i = 0; i < mat4.length; i += 5) {
-            mat4[i] = 1;
+        Arrays.fill(resultMat4, 0);
+        for (int i = 0; i < resultMat4.length; i += 5) {
+            resultMat4[i] = 1;
         }
 
-        mat4[3] = x;
-        mat4[7] = y;
-        mat4[11] = z;
+        resultMat4[3] = x;
+        resultMat4[7] = y;
+        resultMat4[11] = z;
 
     }
 
-    public static void generateIdentity(float[] m4){
-        generateTranslationMatrix(m4,0,0,0);
+    public static void generateIdentity(float[] resultMat4){
+        generateTranslationMatrix(0, 0, 0, resultMat4);
     }
 
-    public static void generateTranslationAndScaleMatrix(float[] m4, float tx, float ty, float tz, float sx, float sy, float sz){
-        m4[0] = sx;
-        m4[5] = sy;
-        m4[10] = sz;
-
-        m4[3] = tx;
-        m4[7] = ty;
-        m4[11] = tz;
-        m4[15] = 1;
+    public static void generateTranslationAndScaleMatrix(float tx, float ty, float tz, float sx, float sy, float sz, @Modified float[] resultMat4){
+        Arrays.fill(resultMat4,0);
+        resultMat4[0] = sx;
+        resultMat4[5] = sy;
+        resultMat4[10] = sz;
+        resultMat4[3] = tx;
+        resultMat4[7] = ty;
+        resultMat4[11] = tz;
+        resultMat4[15] = 1;
     }
 
     public static float[] createTranslationMatrix(float x, float y, float z) {
         float[] ret = new float[16];
-        generateTranslationMatrix(ret, x, y, z);
+        generateTranslationMatrix(x, y, z, ret);
         return ret;
     }
 
-    public static void generateRotationMatrix(float[] m4, float rX, float rY, float rZ) {
+    public static void generateRotationMatrix(float rX, float rY, float rZ, @Modified float[] resultMat4) {
         float sX = (float) Math.sin(rX);
         float sY = (float) Math.sin(rY);
         float sZ = (float) Math.sin(rZ);
@@ -402,69 +400,69 @@ public class MatrixTranslator {
         float cY = (float) Math.cos(rY);
         float cZ = (float) Math.cos(rZ);
 
-        Arrays.fill(m4, 0);
+        Arrays.fill(resultMat4, 0);
 
-        m4[0] = cZ * cY;
-        m4[1] = cZ * sY * sX - sZ * cX;
-        m4[2] = cZ * sY * cX + sZ * sX;
+        resultMat4[0] = cZ * cY;
+        resultMat4[1] = cZ * sY * sX - sZ * cX;
+        resultMat4[2] = cZ * sY * cX + sZ * sX;
 
-        m4[4] = sZ * cY;
-        m4[5] = sZ * sY * sX + cZ * cX;
-        m4[6] = sZ * sY * cX - cZ * sX;
+        resultMat4[4] = sZ * cY;
+        resultMat4[5] = sZ * sY * sX + cZ * cX;
+        resultMat4[6] = sZ * sY * cX - cZ * sX;
 
-        m4[8] = -sY;
-        m4[9] = cY * sX;
-        m4[10] = cY * cX;
+        resultMat4[8] = -sY;
+        resultMat4[9] = cY * sX;
+        resultMat4[10] = cY * cX;
 
-        m4[15] = 1;
-
-    }
-
-    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio){
-        generateStaticInterfaceProjectionMatrix(m4,aspectRatio,0,0,0);
-    }
-
-    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio, float tX, float tY, float tZ){
-        generateStaticInterfaceProjectionMatrix(m4,aspectRatio,tX,tY,tZ,1,1,1);
-    }
-
-    public static void generateStaticInterfaceProjectionMatrix(float[] m4, float aspectRatio, float tX, float tY, float tZ, float sX, float sY, float sZ){
-        generateTranslationAndScaleMatrix(m4,tX,tY,tZ,sX/aspectRatio,sY,sZ);//fixme
+        resultMat4[15] = 1;
 
     }
 
-    public static void generateIsometricProjectionMatrix(float[] m4, float scale){
-        Arrays.fill(m4,0);
-        m4[0] = scale; m4[5] = scale; m4[10] = scale; m4[15] = scale;
+    public static void generateStaticInterfaceProjectionMatrix(@Modified float[] resultMat4, float aspectRatio){
+        generateStaticInterfaceProjectionMatrix(resultMat4,aspectRatio,0,0,0);
     }
 
-    public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float w, float h){
+    public static void generateStaticInterfaceProjectionMatrix(@Modified float[] resultMat4, float aspectRatio, float tX, float tY, float tZ){
+        generateStaticInterfaceProjectionMatrix(resultMat4,aspectRatio,tX,tY,tZ,1,1,1);
+    }
+
+    public static void generateStaticInterfaceProjectionMatrix(@Modified float[] resultMat4, float aspectRatio, float tX, float tY, float tZ, float sX, float sY, float sZ){
+        generateTranslationAndScaleMatrix(tX, tY, tZ, sX/aspectRatio, sY, sZ, resultMat4);//fixme
+
+    }
+
+    public static void generateIsometricProjectionMatrix(@Modified float[] resultMat4, float scale){
+        Arrays.fill(resultMat4,0);
+        resultMat4[0] = scale; resultMat4[5] = scale; resultMat4[10] = scale; resultMat4[15] = scale;
+    }
+
+    public static void generatePerspectiveProjectionMatrix(@Modified float[] resultMat4, float zNear, float zFar, float fov, float w, float h){
         float ar = w / h;
-        generatePerspectiveProjectionMatrix(m4,zNear,zFar,fov,ar);
+        generatePerspectiveProjectionMatrix(resultMat4,zNear,zFar,fov,ar);
     }
-    public static void generatePerspectiveProjectionMatrix(float[] m4, float zNear, float zFar, float fov, float aspR){
-        Arrays.fill(m4,0);
+    public static void generatePerspectiveProjectionMatrix(@Modified float[] resultMat4, float zNear, float zFar, float fov, float aspR){
+        Arrays.fill(resultMat4,0);
         float hh = (float) Math.tan(fov*.5f);
-        m4[0] = 1/(hh*aspR);
-        m4[5] = 1/hh;
-        m4[10] = (zFar + zNear) / (zNear - zFar);
-        m4[11] = -1f;
-        m4[14] = (zFar + zFar)*zNear/(zNear-zFar);
+        resultMat4[0] = 1/(hh*aspR);
+        resultMat4[5] = 1/hh;
+        resultMat4[10] = (zFar + zNear) / (zNear - zFar);
+        resultMat4[11] = -1f;
+        resultMat4[14] = (zFar + zFar)*zNear/(zNear-zFar);
     }
 
-    public static void applyLookTransformation(float[] m4, float cX, float cY, float cZ, float x, float y, float z) {
-        applyLookTransformation(m4,cX,cY,cZ,x,y,z,0,1,0);
+    public static void applyLookTransformation(float cX, float cY, float cZ, float x, float y, float z, @Modified float[] resultMat4) {
+        applyLookTransformation(cX, cY, cZ, x, y, z, 0, 1, 0, resultMat4);
     }
 
-    public static void applyLookTransformation(float[] m4, float[] camera, float x, float y, float z) {
-        applyLookTransformation(m4,camera[0],camera[1],camera[2],x,y,z);
+    public static void applyLookTransformation(float[] camera, float x, float y, float z, @Modified float[] resultMat4) {
+        applyLookTransformation(camera[0], camera[1], camera[2], x, y, z, resultMat4);
     }
 
-    public static void applyLookTransformation(float[] m4, float[] camera, float x, float y, float z, float upX, float upY, float upZ) {
-        applyLookTransformation(m4,camera[0],camera[1],camera[2],x,y,z,upX,upY,upZ);
+    public static void applyLookTransformation(float[] camera, float x, float y, float z, float upX, float upY, float upZ, @Modified float[] resultMat4) {
+        applyLookTransformation(camera[0], camera[1], camera[2], x, y, z, upX, upY, upZ, resultMat4);
     }
 
-    public static void applyLookTransformation(float[] m4, float cX, float cY, float cZ, float x, float y, float z, float upX, float upY, float upZ){
+    public static void applyLookTransformation(float cX, float cY, float cZ, float x, float y, float z, float upX, float upY, float upZ, @Modified float[] resultMat4){
         float dX, dY, dZ;
         dX = cX - x;
         dY = cY - y;
@@ -492,43 +490,43 @@ public class MatrixTranslator {
         m31 = -(uX * cX + uY * cY + uZ * cZ);
         m32 = -(dX * cX + dY * cY + dZ * cZ);
 
-        bufferMatrix4[0] = m4[0] * m00;
-        bufferMatrix4[4] = m4[0] * m10;
-        bufferMatrix4[8] = m4[0] * m20;
-        bufferMatrix4[12] = m4[0] * m30;
+        bufferMatrix4[0] = resultMat4[0] * m00;
+        bufferMatrix4[4] = resultMat4[0] * m10;
+        bufferMatrix4[8] = resultMat4[0] * m20;
+        bufferMatrix4[12] = resultMat4[0] * m30;
 
-        bufferMatrix4[1] = m4[5] * m01;
-        bufferMatrix4[5] = m4[5] * m11;
-        bufferMatrix4[9] = m4[5] * m21;
-        bufferMatrix4[13] = m4[5] * m31;
+        bufferMatrix4[1] = resultMat4[5] * m01;
+        bufferMatrix4[5] = resultMat4[5] * m11;
+        bufferMatrix4[9] = resultMat4[5] * m21;
+        bufferMatrix4[13] = resultMat4[5] * m31;
 
-        bufferMatrix4[2] = m4[10] * m02;
-        bufferMatrix4[6] = m4[10] * m12;
-        bufferMatrix4[10] = m4[10] * m22;
-        bufferMatrix4[14] = m4[10] * m32 + m4[14];
+        bufferMatrix4[2] = resultMat4[10] * m02;
+        bufferMatrix4[6] = resultMat4[10] * m12;
+        bufferMatrix4[10] = resultMat4[10] * m22;
+        bufferMatrix4[14] = resultMat4[10] * m32 + resultMat4[14];
 
-        bufferMatrix4[3] = m4[11] * m02;
-        bufferMatrix4[7] = m4[11] * m12;
-        bufferMatrix4[11] = m4[11] * m22;
-        bufferMatrix4[15] = m4[11] * m32;
+        bufferMatrix4[3] = resultMat4[11] * m02;
+        bufferMatrix4[7] = resultMat4[11] * m12;
+        bufferMatrix4[11] = resultMat4[11] * m22;
+        bufferMatrix4[15] = resultMat4[11] * m32;
 
-        System.arraycopy(bufferMatrix4, 0, m4, 0, bufferMatrix4.length);
+        System.arraycopy(bufferMatrix4, 0, resultMat4, 0, bufferMatrix4.length);
     }
 
-    public static void getTransposeMatrix4(float[] m4){
-        getTransposeMatrix4(m4,bufferMatrix4);
-        System.arraycopy(bufferMatrix4,0,m4,0,16);
+    public static void getTransposeMatrix4(@Modified float[] resultMat4){
+        getTransposeMatrix4(resultMat4,bufferMatrix4);
+        System.arraycopy(bufferMatrix4,0,resultMat4,0,16);
     }
 
-    public static void getTransposeMatrix4(float[] m4, float[] dest){
+    public static void getTransposeMatrix4(float[] m4,@Modified float[] resultMat4){
         for (int i = 0; i < 16; i++) {
             int r = i/4;
             int c = i%4;
-            dest[r+c*4] = m4[r*4+c];
+            resultMat4[r+c*4] = m4[r*4+c];
         }
     }
 
-    public static void getInverseMatrix3(float[] m3, float[] dest){
+    public static void getInverseMatrix3(float[] m3,@Modified float[] resultMat3){
         float determinantMatrix3 = getDeterminantMatrix3(m3);
         if(determinantMatrix3 == 0){throw new UnsupportedOperationException("Matrix does not have a determinant.");}
         float v1 = m3[0]*m3[4];
@@ -538,22 +536,22 @@ public class MatrixTranslator {
         float v5 = m3[1]*m3[6];
         float v6 = m3[2]*m3[6];
         float inv = 1/determinantMatrix3;
-        dest[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
-        dest[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
-        dest[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
-        dest[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
-        dest[4] = (m3[0]*m3[8]-v6)*inv;
-        dest[5] = -(v2-v4)*inv;
-        dest[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
-        dest[7] = -(m3[0]*m3[7]-v5)*inv;
-        dest[8] = (v1-v3)*inv;
+        resultMat3[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
+        resultMat3[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
+        resultMat3[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
+        resultMat3[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
+        resultMat3[4] = (m3[0]*m3[8]-v6)*inv;
+        resultMat3[5] = -(v2-v4)*inv;
+        resultMat3[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
+        resultMat3[7] = -(m3[0]*m3[7]-v5)*inv;
+        resultMat3[8] = (v1-v3)*inv;
     }
 
-    public static void getTransposeMatrix3(float m3[], float dest[]){
+    public static void getTransposeMatrix3(float[] m3, @Modified float[] resultMat3){
         for (int i = 0; i < 9; i++) {
             int r = i/3;
             int c = i%3;
-            dest[r+c*3] = m3[r*3+c];
+            resultMat3[r+c*3] = m3[r*3+c];
         }
     }
 
@@ -562,22 +560,22 @@ public class MatrixTranslator {
                 (mat3[6]*mat3[4]*mat3[2] + mat3[7]*mat3[5]*mat3[0] + mat3[8]*mat3[3]*mat3[1]);
     }
 
-    public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] dest){
-        Arrays.fill(dest,0);
+    public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] resultMat4){
+        Arrays.fill(resultMat4,0);
         float[] stolenVector = VectorTranslator.bufferVector;
         VectorTranslator.getRotationRadians(w,x,y,z, stolenVector);
-        MatrixTranslator.generateRotationMatrix(dest,stolenVector[0],stolenVector[1],stolenVector[2]);
+        MatrixTranslator.generateRotationMatrix(stolenVector[0], stolenVector[1], stolenVector[2], resultMat4);
         /*This doesn't work lol
-        dest[0] = 1-(2*y*y+2*z*z);
-        dest[1] = 2*x*y + 2*z*w;
-        dest[2] = 2*x*z - 2*y*w;
-        dest[4] = 2*x*y - 2*z*w;
-        dest[5] = 1-(2*x*x+2*z*z);
-        dest[6] = 2*y*z + 2*x*w;
-        dest[8] = 2*x*z + 2*y*w;
-        dest[9] = 2*y*z - 2*x*w;
-        dest[10] = 1-(2*x*x+2*y*y);
-        dest[15] = 1;*/
+        resultMat4[0] = 1-(2*y*y+2*z*z);
+        resultMat4[1] = 2*x*y + 2*z*w;
+        resultMat4[2] = 2*x*z - 2*y*w;
+        resultMat4[4] = 2*x*y - 2*z*w;
+        resultMat4[5] = 1-(2*x*x+2*z*z);
+        resultMat4[6] = 2*y*z + 2*x*w;
+        resultMat4[8] = 2*x*z + 2*y*w;
+        resultMat4[9] = 2*y*z - 2*x*w;
+        resultMat4[10] = 1-(2*x*x+2*y*y);
+        resultMat4[15] = 1;*/
     }
 
 

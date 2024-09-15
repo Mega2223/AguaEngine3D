@@ -91,7 +91,7 @@ public class ShaderDebugger {
 
     protected static void doRenderLogic() {
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(proj, camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0);
+        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, proj);
         context.doLogic();
         manager.fitViewport();
         context.doRender(proj);

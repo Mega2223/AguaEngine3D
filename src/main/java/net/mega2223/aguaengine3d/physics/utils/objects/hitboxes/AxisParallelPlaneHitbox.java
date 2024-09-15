@@ -40,10 +40,10 @@ public class AxisParallelPlaneHitbox extends Hitbox {
     }
 
     @Override
-    public void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ) {
-        dest[0] = 0;
-        dest[1] = Math.max(0,locY-this.coordY);
-        dest[2] = 0;
+    public void getAxisDepthRelative(float[] result, float locX, float locY, float locZ) {
+        result[0] = 0;
+        result[1] = Math.max(0,locY-this.coordY);
+        result[2] = 0;
     }
 
     @Override
@@ -57,9 +57,9 @@ public class AxisParallelPlaneHitbox extends Hitbox {
     }
 
     @Override
-    public void getContactNormal(float x, float y, float z, float[] dest) {
-        dest[0] = 0;
-        dest[1] = getDepth(x,y,z);
-        dest[2] = 0;
+    public void getContactNormal(float x, float y, float z, float[] result) {
+        result[0] = 0;
+        result[1] = getDepth(x,y,z);
+        result[2] = 0;
     }
 }

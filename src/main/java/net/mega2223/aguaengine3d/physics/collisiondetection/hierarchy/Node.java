@@ -26,7 +26,7 @@ public class Node implements Collidiable {
         float[] n1c = n1.getCenter();
         float[] n2c = n2.getCenter();
         VectorTranslator.subtractFromVector(coords, n1c);
-        VectorTranslator.scaleVec3(coords,0.5F);
+        VectorTranslator.scaleVector(coords,0.5F);
         VectorTranslator.addToVector(coords, n1c);
         this.radius = Math.max(
                 VectorTranslator.getDistance(coords,n1c) + n1.getEffectiveInteractionRadius(),
@@ -67,9 +67,9 @@ public class Node implements Collidiable {
     public float getY(){return coords[1];}
     public float getZ(){return coords[2];}
 
-    void getTranslatedVector(float[] worldVector, float[] dest, float radius, Collidiable n1, Collidiable n2){
+    void getTranslatedVector(float[] worldVector, float[] result, float radius, Collidiable n1, Collidiable n2){
         for (int i = 0; i < 3; i++) {
-            dest[i] = worldVector[i] - coords[i];
+            result[i] = worldVector[i] - coords[i];
         }
     }
 

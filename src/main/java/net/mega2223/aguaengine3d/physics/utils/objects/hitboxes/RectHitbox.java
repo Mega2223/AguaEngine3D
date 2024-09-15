@@ -33,10 +33,10 @@ public class RectHitbox extends Hitbox {
     }
 
     @Override
-    public void getAxisDepthRelative(float[] dest, float locX, float locY, float locZ) {
-        dest[0] = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
-        dest[1] = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
-        dest[2] = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
+    public void getAxisDepthRelative(float[] result, float locX, float locY, float locZ) {
+        result[0] = locX < 0 ? Math.max(0,locX - minX) : Math.min(locX - maxX,0);
+        result[1] = locY < 0 ? Math.max(0,locY - minY) : Math.min(locY - maxY,0);
+        result[2] = locZ < 0 ? Math.max(0,locZ - minZ) : Math.min(locZ - maxZ,0);
     }
 
     @Override
@@ -148,23 +148,23 @@ public class RectHitbox extends Hitbox {
         pointBuffer[24] = maxX; pointBuffer[25] = maxY; pointBuffer[26] = maxZ; pointBuffer[27] = 0;
     }
 
-    public void getAllPoints(float[] dest){
-        System.arraycopy(pointBuffer,0,dest,0,dest.length);
+    public void getAllPoints(float[] result){
+        System.arraycopy(pointBuffer,0,result,0,result.length);
     }
 
     @Override
-    public void getContactNormal(float x, float y, float z, float[] dest) {
+    public void getContactNormal(float x, float y, float z, float[] result) {
         getTranslatedVector(x,y,z, bufferVec);
         float rX = maxX - minX, rY = maxY - minY, rZ = maxZ - minZ;
         float absX = Math.abs(bufferVec[0]);
         float abxY = Math.abs(bufferVec[1]);
         float absZ = Math.abs(bufferVec[2]);
         if(absX > abxY && absX > absZ){
-            dest[0] = 0;
+            result[0] = 0;
         } else if (abxY > absX && abxY > absZ){
-            dest[1] = 0;
+            result[1] = 0;
         } else {
-            dest[2] = 0;
+            result[2] = 0;
         }
     }
 }

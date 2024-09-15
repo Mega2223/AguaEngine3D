@@ -21,11 +21,11 @@ public class RopeForce implements PhysicsForce {
         buffer[0] = coord[0] - system.getCoordX();
         buffer[1] = coord[1] - system.getCoordY();
         buffer[2] = coord[2] - system.getCoordZ();
-        float f = -stiffness * (VectorTranslator.getMagnitudeVec3(buffer) - len);
+        float f = -stiffness * (VectorTranslator.getMagnitude(buffer) - len);
         if(f >= 0){return;}
-        VectorTranslator.normalizeVec3(buffer);
-        VectorTranslator.scaleVec3(buffer,f);
-        VectorTranslator.scaleVec3(buffer,time);
+        VectorTranslator.normalize(buffer);
+        VectorTranslator.scaleVector(buffer,f);
+        VectorTranslator.scaleVector(buffer,time);
         VectorTranslator.flipVector(buffer);
         system.applyAcceleration(buffer);
     }

@@ -114,7 +114,7 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     }
 
     public void setScale(float x, float y, float z){
-        MatrixTranslator.generateTranslationAndScaleMatrix(bufferMat4,0,0,0,x,y,z);
+        MatrixTranslator.generateTranslationAndScaleMatrix(0, 0, 0, x, y, z, bufferMat4);
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(scaleMatrixLoc,false,bufferMat4);
     }

@@ -8,15 +8,15 @@ public class PhysicsUtils {
 
     public static float[] generatePredictionVector(float speed, float rX, float rY, float rZ){
         float[] transVec = {0,0,1};
-        MatrixTranslator.rotateVector3(transVec,rX,rY,rZ);
-        VectorTranslator.scaleVec3(transVec,speed,0);
+        MatrixTranslator.rotateVector(rX, rY, rZ, transVec);
+        VectorTranslator.scaleVector(transVec,speed,0);
         return transVec;
     }
 
     public static void predictNextStep(float[] vector, float speed, float rX, float rY, float rZ){
         float[] transVec = {0,1,0};
-        MatrixTranslator.rotateVector3(transVec,rX,rY,rZ);
-        VectorTranslator.scaleVec3(transVec,speed,0);
+        MatrixTranslator.rotateVector(rX, rY, rZ, transVec);
+        VectorTranslator.scaleVector(transVec,speed,0);
         for (int i = 0; i < vector.length; i++) {
             vector[i] += transVec[i];
         }

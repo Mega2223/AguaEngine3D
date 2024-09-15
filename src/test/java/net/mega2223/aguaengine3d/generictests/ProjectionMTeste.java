@@ -8,7 +8,7 @@ public class ProjectionMTeste {
         float[] testVec4 = {10,10,10,1};
         float[][] testMat = new float[4][4];
 
-        MatrixTranslator.generateTranslationMatrix(testMat,testVec4);
+        MatrixTranslator.generateTranslationMatrix(testVec4, testMat);
 
         MatrixTranslator.debugMatrix(testMat);
 
