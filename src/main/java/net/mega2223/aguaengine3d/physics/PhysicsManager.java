@@ -34,13 +34,13 @@ public class PhysicsManager {
         VectorTranslator.subtractFromVector(v1,v2,buffer1);
         VectorTranslator.subtractFromVector(p1,p2,buffer2);
         VectorTranslator.normalize(buffer2);
-        return VectorTranslator.getDotProduct(buffer1,buffer2);
+        return VectorTranslator.dotProduct(buffer1,buffer2);
     }
     public static float getClosingVelocity(float x1, float y1, float z1, float vx1, float vy1, float vz1, float x2, float y2, float z2, float vx2, float vy2, float vz2){
         VectorTranslator.subtractFromVector(vx1,vy1,vz1,vx2,vy2,vz2, buffer1);
         VectorTranslator.subtractFromVector(x1,y1,z1,x2,y2,z2, buffer2);
         VectorTranslator.normalize(buffer2);
-        return VectorTranslator.getDotProduct(buffer1,buffer2);
+        return VectorTranslator.dotProduct(buffer1,buffer2);
     }
 
     public static void getContactNormal(float x1, float y1, float z1, float x2, float y2, float z2, float[] result){

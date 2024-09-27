@@ -219,6 +219,10 @@ public class Model implements Renderable {
         this.textureCoordsVBO = textureCoordsVBO;
     }
 
+    public void setNormals(float[] normals) {
+        this.normals = normals.clone();
+    }
+
     public void setUniforms(int iteration, float[] projectionMatrix){
         MatrixTranslator.generateTranslationMatrix(coords, bufferTranslationMatrix);
         shader.setUniforms(iteration,bufferTranslationMatrix,projectionMatrix);

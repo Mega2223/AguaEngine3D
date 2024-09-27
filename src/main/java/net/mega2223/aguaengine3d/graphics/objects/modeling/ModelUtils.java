@@ -145,7 +145,12 @@ public class ModelUtils {
     }
 
     public static float[] generateNormals(Model model){
-        return generateNormals(model.getRelativeVertices(),model.getIndices());
+        float[] vertices = model.getRelativeVertices(); //TODO normals should have 4 elements
+        float[] normals = generateNormals(vertices, model.getIndices());
+        if(VectorTranslator.dotProduct(normals[0],normals[1],normals[2], vertices[0],vertices[1],vertices[2]) < 0){
+            VectorTranslator.flipAllVectors(normals);
+        }
+        return normals;
     }
 
     public static float[] generateNormals(float[] vertices, int[] indices){

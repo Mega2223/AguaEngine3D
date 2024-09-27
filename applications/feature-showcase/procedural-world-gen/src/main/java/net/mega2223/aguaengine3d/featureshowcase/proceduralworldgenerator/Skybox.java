@@ -47,7 +47,7 @@ public class Skybox implements Renderable {
     }
 
     public void setSkyboxTranslation(float x, float y, float z, float dx, float dy, float dz){
-        MatrixTranslator.generateTranslationMatrix(translationMatrix,x,y,z);
+        MatrixTranslator.generateTranslationMatrix(x,y,z,translationMatrix);
         shader.setDirection(dx,dy,dz);
     }
 

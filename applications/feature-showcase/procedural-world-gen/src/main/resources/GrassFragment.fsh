@@ -33,7 +33,7 @@ void main(){
     browBias = clamp(browBias,0,1);
     color = mix(color,brown,browBias);
 
-    float dp = dot(perVertexNormal.xyz,-lightDir);
+    float dp = dot(perVertexNormal.xyz,lightDir);
     //dp = dp > 0 ? 1 : smoothstep(-1,1,dp * 2 + 1);
     //smoothstep(-1,1,clamp(dp*2,-1,1));
     //dp += 0.0005F;

@@ -11,6 +11,8 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Random;
+
 public class BuildingGenerator {
     static RenderingContext context;
     static WindowManager manager;
@@ -29,14 +31,34 @@ public class BuildingGenerator {
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
             float speed = .075F;
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += speed*c;camera[0] += speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= speed*c;camera[0] -= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += speed*c;camera[2]-= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= speed*c;camera[2]+= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
+                camera[2] += speed * c;
+                camera[0] += speed * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
+                camera[2] -= speed * c;
+                camera[0] -= speed * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
+                camera[0] += speed * c;
+                camera[2] -= speed * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
+                camera[0] -= speed * c;
+                camera[2] += speed * s;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Q) == GLFW.GLFW_PRESS) {
+                camera[3] += Math.PI / 90;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_E) == GLFW.GLFW_PRESS) {
+                camera[3] -= Math.PI / 90;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Z) == GLFW.GLFW_PRESS) {
+                camera[1] += speed;
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_X) == GLFW.GLFW_PRESS) {
+                camera[1] -= speed;
+            }
         });
 
         //shader dict setup
@@ -61,31 +83,37 @@ public class BuildingGenerator {
 
         //terrain setup
         int[][] map = {
-                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
-                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
-                {3,3,3,1,2,2,2,1,16,16,16,1,17,17,17},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-                {4,4,4,1,5,5,5,1,6,6,6,1,7,7,7},
-                {4,4,4,1,5,5,5,1,6,6,6,1,7,7,7},
-                {4,4,4,1,5,5,5,1,6,6,6,1,7,7,7},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-                {9,9,9,1,10,10,10,1,11,11,11,1,12,12,12},
-                {9,9,9,1,10,10,10,1,11,11,11,1,12,12,12},
-                {9,9,9,1,10,10,10,1,11,11,11,1,12,12,12},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-                {13,13,13,1,14,14,14,1,15,15,15,1,8,8,8},
-                {13,13,13,1,14,14,14,1,15,15,15,1,8,8,8},
-                {13,13,13,1,14,14,14,1,15,15,15,1,8,8,8}
+                {3, 3, 3, 1, 2, 2, 2, 1, 16, 16, 16, 1, 17, 17, 17},
+                {3, 3, 3, 1, 2, 2, 2, 1, 16, 16, 16, 1, 17, 17, 17},
+                {3, 3, 3, 1, 2, 2, 2, 1, 16, 16, 16, 1, 17, 17, 17},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {4, 4, 4, 1, 5, 5, 5, 1, 6, 6, 6, 1, 7, 7, 7},
+                {4, 4, 4, 1, 5, 5, 5, 1, 6, 6, 6, 1, 7, 7, 7},
+                {4, 4, 4, 1, 5, 5, 5, 1, 6, 6, 6, 1, 7, 7, 7},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {9, 9, 9, 1, 10, 10, 10, 1, 11, 11, 11, 1, 12, 12, 12},
+                {9, 9, 9, 1, 10, 10, 10, 1, 11, 11, 11, 1, 12, 12, 12},
+                {9, 9, 9, 1, 10, 10, 10, 1, 11, 11, 11, 1, 12, 12, 12},
+                {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+                {13, 13, 13, 1, 14, 14, 14, 1, 15, 15, 15, 1, 8, 8, 8},
+                {13, 13, 13, 1, 14, 14, 14, 1, 15, 15, 15, 1, 8, 8, 8},
+                {13, 13, 13, 1, 14, 14, 14, 1, 15, 15, 15, 1, 8, 8, 8}
         };
-        ProceduralBuilding road = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\ImprovedRoads");
-        TexturedModel gen = road.generate(map, 1, 30F);
-        ProceduralBuilding brick = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle1");
-        gen.setCoords(-225,0,-225);
-        context.addObject(gen);
+        ProceduralBuilding road = new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR + "\\ImprovedRoads");
+        float scale = 18;
+        TexturedModel roads = road.generate(map, 1, scale);
+        ProceduralBuilding[] bricks = {
+                new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR + "\\BrickStyle2"),
+                new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle3"),
+                new ProceduralBuilding(Utils.PROCEDURAL_BUILDINGS_DIR+"\\BrickStyle4")
+        };
+        Random r = new Random();
+        roads.setCoords(-15 * scale * 0.5F, 0, -15 * scale * 0.5F);
+        context.addObject(roads);
         for (int i = 2; i < 18; i++) {
             System.out.println(i);
-            TexturedModel gen2 = brick.generate(map, i,10,30F);
-            gen2.setCoords(-225,0,-225);
+            TexturedModel gen2 = bricks[r.nextInt(bricks.length)].generate(map, i, 10, scale);
+            gen2.setCoords(-15 * scale * 0.5F, 0, -15 * scale * 0.5F);
             context.addObject(gen2);
         }
 

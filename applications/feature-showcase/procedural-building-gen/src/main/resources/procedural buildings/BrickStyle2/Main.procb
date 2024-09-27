@@ -1,0 +1,12 @@
+name=BrickStyle2
+
+validSidings=%any%
+maxFloors=25
+minFloors=15
+minSize=2,2
+bias=1
+shouldRenderMiddle=false
+assumeNoBuildOK=true
+
+floors=WindowFloor,StandardFloor,DoorFloor
+blocks=StandardBlock,WindowBlock,DoorBlock,DoubleHeightBlock

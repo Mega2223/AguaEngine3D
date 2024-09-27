@@ -38,7 +38,7 @@ public class WorldGen {
     public static final float STEP = .6F;
     public static final Thread MAIN_THREAD = Thread.currentThread();
     public static final CycleTimeline TIMELINE = new CycleTimeline();
-    public static final float CYCLE_SPEED = .002F;//0.01f
+    public static final float CYCLE_SPEED = .005F * .5F;//0.01f
     public static Skybox skybox;
     public static long framesElapsed = 0L;
 
@@ -47,6 +47,11 @@ public class WorldGen {
     public static SkyShaderProgram SKY_SHADER;
     public static Collection<Renderable> readyToUse = new ArrayBlockingQueue<>(32*32);
     public static List<int[]> toMake = new ArrayList<>();
+
+    static final float[] skyColor = new float[4];
+    private static final float[] proj = new float[16];
+    private static final float[] unitV = {0,0,1,0};
+    private static final float[] bufferVec = new float[4], bufferMat = new float[16];
 
     //MAPA
     //SKYBOX
@@ -62,6 +67,7 @@ public class WorldGen {
     static int[] currentChunk = {0XF,0};
     static float mapHeight = 150F;
     public static final List<int[]> generatedLocations = new LinkedList<>();
+    static final ArrayList<Renderable> toRemove = new ArrayList<>();
     public static MapComponent mapView;
     private static float cycleTime;
 
@@ -118,6 +124,7 @@ public class WorldGen {
         context.addObject(skybox);
 
         final float[] brightSky = {135F/255F, 206F/255F, 250F/255F};
+        final float[] morningSky = {120F/255F, 180F/255F, 240F/255F};
         final float[] bluerSky = {115F/255F, 180F/255F, 250F/255F};
         final float[] sunset = {120F/255F,60F/255F,95F/255F};
         final float[] darkBlue = {.05F,.05F,.2F};
@@ -126,18 +133,15 @@ public class WorldGen {
         final float[] cloudColor = {1,1,1};
         final float[] fogData = {-1,-1};
 
-        framesElapsed += 60 * 325;
-
-        TIMELINE.add(new CycleKeyframe(12/24F,brightSky,cloudColor,fogData,0));
-        TIMELINE.add(new CycleKeyframe(17.3F/24F,bluerSky,cloudColor,fogData,0));
-
-        TIMELINE.add(new CycleKeyframe(18F/24F,sunset,cloudColor,fogData,0));
-
-        TIMELINE.add(new CycleKeyframe(18.5F/24F,darkBlue,cloudColor,fogData,1));
-
-        TIMELINE.add(new CycleKeyframe(21/24F,darkSky,cloudColor,fogData,1));
         TIMELINE.add(new CycleKeyframe(0F/24F,darkSky,cloudColor,fogData,1.2F));
         TIMELINE.add(new CycleKeyframe(3F/24F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(5.6F/24F,darkSky,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(7/24F,morningSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(12/24F,brightSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(17.3F/24F,bluerSky,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(18F/24F,sunset,cloudColor,fogData,0));
+        TIMELINE.add(new CycleKeyframe(18.5F/24F,darkBlue,cloudColor,fogData,1));
+        TIMELINE.add(new CycleKeyframe(21/24F,darkSky,cloudColor,fogData,1));
 
         TIMELINE.setInterpolationMethod(CubicInterpolator.INSTANCE);
 
@@ -194,7 +198,7 @@ public class WorldGen {
                 fpsLastUpdate = System.currentTimeMillis();
                 fps = framesLastSecond;
                 framesLastSecond = 0;
-                int timeHour = (int)(cycleTime * 24), timeMin = (int)(((cycleTime * 24)%1F)*60F);
+                int timeHour = (int)(cycleTime * 24) % 24, timeMin = (int)(((cycleTime * 24)%1F)*60F) % 60;
                 GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + fps +
                         " (x: " + camera[0] + " y: " + camera[1] + " z: " + camera[2] + ") (T=" +
                         ((timeHour < 10) ? "0" + timeHour : timeHour) + ":" +
@@ -214,7 +218,7 @@ public class WorldGen {
         }
         System.exit(0);
     }
-    static final ArrayList<Renderable> toRemove = new ArrayList<>();
+
     public static void doLogic(){
         int curX = (int) Math.floor((camera[0]+50F)/100F), curZ = (int) Math.floor((camera[2]+50F)/100F);
         if(curX != currentChunk[0] || curZ != currentChunk[1]){
@@ -233,7 +237,7 @@ public class WorldGen {
         }
         readyToUse.removeAll(toRemove);
         currentChunk[0] = curX; currentChunk[1] = curZ;
-        cycleTime = (CYCLE_SPEED * (framesElapsed / 60F));
+        cycleTime = (CYCLE_SPEED * ((framesElapsed) / 60F)) + .25F;
         float cycleHeight = (float) -Math.cos(2 * cycleTime * Math.PI);
         GRASS_SHADER.setLightDirection((float) Math.sin(2 * cycleTime * Math.PI), cycleHeight,0);
         WATER_SHADER.setLightDirection((float) Math.sin(2 * cycleTime  * Math.PI), cycleHeight,0);
@@ -242,24 +246,21 @@ public class WorldGen {
         TIMELINE.getSkyColor(cycleTime,skyColor);
         context.setBackGroundColor(skyColor[0],skyColor[1],skyColor[2]);
     }
-    static final float[] skyColor = new float[4];
-    private static final float[] proj = new float[16];
-    private static final float[] unitV = {0,0,1,0};
-    private static final float[] bufferVec = new float[4], bufferMat = new float[16];
 
     public static void doRenderLogic(){
         camera[1] = map.get(camera[0], camera[2])+2F;
         MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.generateRotationMatrix(bufferMat,0,camera[3],camera[4]);
+        MatrixTranslator.generateRotationMatrix(0,camera[3],camera[4],bufferMat);
         MatrixTranslator.multiplyVec4Mat4(unitV,bufferMat,bufferVec);
         skybox.setSkyboxTranslation(camera[0],camera[1],camera[2],bufferVec[0], 0,bufferVec[2]);
-        MatrixTranslator.applyLookTransformation(proj, camera, camera[0]+bufferVec[0], camera[1]+bufferVec[1], camera[2]+bufferVec[2], 0, 1, 0);
+        MatrixTranslator.applyLookTransformation(camera, camera[0]+bufferVec[0], camera[1]+bufferVec[1], camera[2]+bufferVec[2], 0, 1, 0, proj);
         context.doLogic();
         manager.fitViewport();
         context.doRender(proj);
         RenderingManager.printErrorQueue();
         manager.update();
     }
+
     public final static Thread modelAssembler = new Thread(() -> {
         while (MAIN_THREAD.isAlive()) {
             if (toMake.isEmpty()) {
@@ -274,12 +275,14 @@ public class WorldGen {
             toMake.remove(req);
         }
     });
+
     public static void requestRender(int x, int z){
         for (int[] act : generatedLocations){
             if(act[0]==x&&act[1]==z){return;}
         }
         toMake.add(new int[]{x,z});
     }
+
     public static void genModelForReg(int x, int z){
         generatedLocations.add(new int[]{x,z});
         float xF = x*100F - 50F; float zF = z*100F - 50F;

@@ -29,7 +29,7 @@ public class SkyShaderProgram implements ShaderProgram {
         iteration_matrix_loc = GL30.glGetUniformLocation(id,"iteration");
         light_dir_loc = GL30.glGetUniformLocation(id,"lightDir");
 
-        MatrixTranslator.generateRotationMatrix(rotationMatrix,0,0,0);
+        MatrixTranslator.generateRotationMatrix(0,0,0,rotationMatrix);
     }
 
     @Override

@@ -1,0 +1,32 @@
+name=DoorBlock
+
+bias=.1
+
+compartibleNorth=!DoorBlock
+compartibleSouth=!DoorBlock
+compartibleWest=!DoorBlock
+compartibleEast=!DoorBlock
+
+wallNorth:
+forceRender=false
+vertices=0,0,0,0 , 0,2,0,0 , 1,0,0,0 , 1,2,0,0
+textureCoords= .5,1 , .5,0 , 1,1 , 1,0
+indices=0,1,2,3,2,1
+
+wallSouth:
+forceRender=false
+vertices= 0,0,1,0 , 0,2,1,0 , 1,0,1,0 , 1,2,1,0
+textureCoords= .5,1 , .5,0 , 1,1 , 1,0
+indices=0,1,2,3,2,1
+
+wallEast:
+forceRender=false
+vertices=1,0,0,0 , 1,2,0,0 , 1,0,1,0 , 1,2,1,0
+textureCoords= .5,1 , .5,0 , 1,1 , 1,0
+indices=0,1,2,3,2,1
+
+wallWest:
+forceRender=false
+vertices=0,0,0,0 , 0,2,0,0 , 0,0,1,0 , 0,2,1,0
+textureCoords= .5,1 , .5,0 , 1,1 , 1,0
+indices=0,1,2,3,2,1

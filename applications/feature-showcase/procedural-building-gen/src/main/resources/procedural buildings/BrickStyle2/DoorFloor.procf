@@ -1,0 +1,6 @@
+name=DoorFloor
+validAbove=%any%
+height=2
+bias=1
+blocks=DoubleHeightBlock,DoorBlock
+compartibleHeights=0

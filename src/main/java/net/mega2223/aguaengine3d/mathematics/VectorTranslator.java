@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.mathematics;
 
-import net.mega2223.aguaengine3d.misc.Modified;
+import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 public class VectorTranslator {
 
@@ -95,11 +95,11 @@ public class VectorTranslator {
         return vec[0]*vec2[0] + vec[1]*vec2[1];
     }
     
-    public static float getDotProduct(float[] vec3, float[] vec32){
+    public static float dotProduct(float[] vec3, float[] vec32){
         return vec3[0]*vec32[0]+vec3[1]*vec32[1]+vec3[2]*vec32[2];
     }
     
-    public static float getDotProduct(float x1,float y1,float z1,float x2,float y2,float z2){
+    public static float dotProduct(float x1, float y1, float z1, float x2, float y2, float z2){
         return x1*x2+y1*y2+z1*z2;
     }
 
@@ -114,7 +114,7 @@ public class VectorTranslator {
         float m1 = getMagnitude(vec), m2 = getMagnitude(vec2);
         float x1 = vec[0]/m1, y1 = vec[1]/m1, z1 = vec[2]/m1;
         float x2 = vec2[0]/m2, y2 = vec2[1]/m2, z2 = vec2[2]/m2;
-        float dot = getDotProduct(x1,y1,z1,x2,y2,z2);
+        float dot = dotProduct(x1,y1,z1,x2,y2,z2);
         return (float) Math.acos(dot);
     }
 
@@ -186,6 +186,12 @@ public class VectorTranslator {
             vectors[i]=-vectors[i];
             vectors[i+1]=-vectors[i+1];
             vectors[i+2]=-vectors[i+2];
+        }
+    }
+
+    public static void flipArray(@Modified float[] array){
+        for (int i = 0; i < array.length; i++) {
+            array[i]=-array[i];
         }
     }
 

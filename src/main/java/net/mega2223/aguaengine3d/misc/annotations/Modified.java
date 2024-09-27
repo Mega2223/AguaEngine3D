@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.misc;
+package net.mega2223.aguaengine3d.misc.annotations;
 
 /**
  * The modified annotation type implies that the object being provided is very likely to be modified in some way.

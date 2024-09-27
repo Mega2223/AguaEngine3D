@@ -151,6 +151,11 @@ public interface Noise {
         for (int j = 0; j < indices.length; j++) {
             if(indices[j]>=vertices.length / 4){throw new RuntimeException(j + ": " + indices[j]);}
         }
+        float[] normals = model.getNormals();
+        if(VectorTranslator.dotProduct(normals[0],normals[1],normals[2],0,1,0) < 0){
+            VectorTranslator.flipArray(normals);
+            model.setNormals(normals);
+        }
         return model;
     }
 }

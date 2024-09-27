@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.mathematics;
 
-import net.mega2223.aguaengine3d.misc.Modified;
+import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.util.Arrays;
 

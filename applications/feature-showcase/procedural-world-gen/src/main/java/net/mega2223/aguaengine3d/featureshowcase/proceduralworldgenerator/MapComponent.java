@@ -31,7 +31,7 @@ public class MapComponent extends TextureInterfaceComponent {
             setAspectRatio(aspectRatio);
             setCoords(-aspectRatio + mapSize,1 - mapSize,0);
             MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, mapHeight+150, (float) Math.toRadians(90), 1);
-            MatrixTranslator.applyLookTransformation(proj, (float) (camera[0]+Math.sin(camera[3])),mapHeight, (float) (camera[2]+Math.cos(camera[3])), camera[0],0,camera[2]);
+            MatrixTranslator.applyLookTransformation((float) (camera[0]+Math.sin(camera[3])),mapHeight, (float) (camera[2]+Math.cos(camera[3])), camera[0],0,camera[2],proj);
             context.setFogDetails(100000,100);
             context.doCustomRender(proj,0,Integer.MAX_VALUE);
             context.setFogDetails(40,160);

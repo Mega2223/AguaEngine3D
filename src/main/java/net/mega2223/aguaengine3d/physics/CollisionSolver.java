@@ -50,7 +50,7 @@ public class CollisionSolver {
         VectorTranslator.getCrossProduct(bufferVec1,bufferVec2);
         VectorTranslator.flipVector(bufferVec1);
         bufferVec2[0] = cnX; bufferVec2[1] = cnY; bufferVec2[2] = cnZ;
-        float angularInertia = VectorTranslator.getDotProduct(bufferVec1,bufferVec2);
+        float angularInertia = VectorTranslator.dotProduct(bufferVec1,bufferVec2);
         float totalInertia = angularInertia + linearInertia;
         float linearTransform = (depth * linearInertia)/totalInertia;
         float angularTransform = (depth * angularInertia)/totalInertia;
