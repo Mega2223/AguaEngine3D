@@ -16,7 +16,8 @@
 
 I usually to upload feature showcases in [my youtube development playlist](https://www.youtube.com/playlist?list=PL2CjNrK_Cb0qEX2Y7PIwy2z6IGoHwQ9Cr), but i also have some cool captures
 
-<div>
+<div style="align-items: center; display: flex; justify-content: center; "
+    >
     <img 
     height=325
     width=295
