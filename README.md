@@ -14,22 +14,32 @@
 
 ## Showcase:
 
-I usually to upload feature showcases in [my youtube development playlist](https://www.youtube.com/playlist?list=PL2CjNrK_Cb0qEX2Y7PIwy2z6IGoHwQ9Cr), but i also have some cool screenshots for you.
+I usually to upload feature showcases in [my youtube development playlist](https://www.youtube.com/playlist?list=PL2CjNrK_Cb0qEX2Y7PIwy2z6IGoHwQ9Cr), but i also have some cool captures
 
-![image](https://github.com/user-attachments/assets/973aacf5-7c37-41ab-abab-8b3197042bee)
-![image](https://github.com/user-attachments/assets/586dcaed-b2d2-4295-9c50-25e5ad37398e)
-![image](https://github.com/user-attachments/assets/59bc9947-8ff7-4196-a4eb-04ed2c8bb851)
-
-<img 
-    height=200
-    width=350
-    src="https://github.com/user-attachments/assets/89bf2bdb-ed00-48dd-909a-59c336e98950"
+<div style="align-items: center; display: flex; justify-content: center; "
     >
-<img 
-    height=200
-    width=350
-    src="https://github.com/user-attachments/assets/90b5ec0f-40e1-4f5e-893e-40fe4802ce68"
+    <img 
+    height=325
+    width=295
+    src="https://github.com/Mega2223/Mega2223.github.io/blob/main/media/WorldGenDemo.gif?raw=true"
     >
+    <img 
+    height=325
+    width=295
+    src="https://github.com/Mega2223/Mega2223.github.io/blob/main/media/Screenshot_1860.png?raw=true"
+    >
+    <img 
+    height=325
+    width=295
+    src="https://github.com/Mega2223/Mega2223.github.io/blob/main/media/ShadowDemo.gif?raw=true"
+    >
+    <img 
+    height=325
+    width=295
+    src="https://github.com/Mega2223/Mega2223.github.io/blob/main/media/FloorDemo.gif?raw=true"
+    >
+    
+</div>
 
 ## Features:  
 
