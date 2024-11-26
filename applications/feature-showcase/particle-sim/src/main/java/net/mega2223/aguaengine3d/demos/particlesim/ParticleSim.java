@@ -46,13 +46,13 @@ public class ParticleSim {
         long fLSLastUpdate = 0;
         context.setActive(true);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 69; i++) {
             Particle p = new Particle();
             context.addObject(p);
             p.x = 60 * (float) (Math.random() - 0.5F);
             p.y = 60 * (float) (Math.random() - 0.5F);
-            p.sX = 20 * (float) (Math.random() - 0.5F);
-            p.sY = 20 * (float) (Math.random() - 0.5F);
+            p.sX = 60 * (float) (Math.random() - 0.5F);
+            p.sY = 60 * (float) (Math.random() - 0.5F);
         }
 
         Force gravity = (context, p) -> {
@@ -63,8 +63,8 @@ public class ParticleSim {
                         (p2.x - p.x)*(p2.x - p.x)+
                         (p2.y - p.y)*(p2.y - p.y)
                 );
-                p.sX -= (float) (p.x - p2.x)/600.0F;
-                p.sY -= (float) (p.y - p2.y)/600.0F;
+                p.sX -= (float) (p.x - p2.x)/1600.0F;
+                p.sY -= (float) (p.y - p2.y)/1600.0F;
             }
         };
         Force rep = (context, p) -> {
@@ -78,8 +78,8 @@ public class ParticleSim {
             }
         };
         Force drag = (context, p) -> {
-            p.sX -= p.sX * .01F;
-            p.sY -= p.sY * .01F;
+            p.sX -= p.sX * .1F;
+            p.sY -= p.sY * .1F;
         };
         forces.add(gravity);
         forces.add(drag);
