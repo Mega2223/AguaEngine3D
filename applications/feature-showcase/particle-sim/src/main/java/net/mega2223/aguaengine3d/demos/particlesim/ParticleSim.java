@@ -54,7 +54,7 @@ public class ParticleSim {
                     context.addObject(p);
                 }
                 if(key == GLFW.GLFW_KEY_1 && action == GLFW.GLFW_PRESS){
-                    Particle p = new Particle(.1F,-.25F);
+                    Particle p = new Particle(.1F,-1F);
                     p.x = -cam[0]; p.y = -cam[1];
                     context.addObject(p);
                 }
@@ -77,49 +77,49 @@ public class ParticleSim {
             }
         });
 //
-//        for (int i = 0; i < 100; i++) {
-//            boolean n = Math.random() >= 0.5;
-//            boolean e = Math.random() >= 0.5 && !n;
-//            Particle p = new Particle(1,0);
-//            context.addObject(p);
-//            p.x = 1000 * (float) (Math.random() - 0.5F);
-//            p.y = 1000 * (float) (Math.random() - 0.5F);
-////            p.vX = 0.1F * (float) (Math.random() - 0.5F);
-////            p.vY = 0.1F * (float) (Math.random() - 0.5F);
-//        }
+        for (int i = 0; i < 100; i++) {
+            boolean n = Math.random() >= 0.5;
+            boolean e = Math.random() >= 0.5 && !n;
+            Particle p = new Particle(1,0);
+            context.addObject(p);
+            p.x = 1000 * (float) (Math.random() - 0.5F);
+            p.y = 1000 * (float) (Math.random() - 0.5F);
+//            p.vX = 0.1F * (float) (Math.random() - 0.5F);
+//            p.vY = 0.1F * (float) (Math.random() - 0.5F);
+        }
 
-//        for (int i = 0; i < 30; i++) {
-//            Particle p = new Particle(.1F,-1);
-//            context.addObject(p);
-//            p.x = 80 * (float) (Math.random() - 0.5F) + 500;
-//            p.y = 80 * (float) (Math.random() - 0.5F);
-//        }
-//
-//        for (int i = 0; i < 30; i++) {
-//            Particle p = new Particle(1,1);
-//            context.addObject(p);
-//            p.x = 80 * (float) (Math.random() - 0.5F) - 500;
-//            p.y = 80 * (float) (Math.random() - 0.5F);
-//        }
-//
-//        for (int i = 0; i < 25; i++) {
-//            Particle p = new Particle(1,0);
-//            context.addObject(p);
-//            p.x = 80 * (float) (Math.random() - 0.5F);
-//            p.y = 80 * (float) (Math.random() - 0.5F) + 500;
-//        }
-//
-//        for (int i = 0; i < 500; i++) {
-//            Particle p = new Particle(1,0);
-//            context.addObject(p);
-//            p.x = i*16 - 4000;
-//        }
+        for (int i = 0; i < 30; i++) {
+            Particle p = new Particle(.1F,-1);
+            context.addObject(p);
+            p.x = 80 * (float) (Math.random() - 0.5F) + 500;
+            p.y = 80 * (float) (Math.random() - 0.5F);
+        }
+
+        for (int i = 0; i < 30; i++) {
+            Particle p = new Particle(1,1);
+            context.addObject(p);
+            p.x = 80 * (float) (Math.random() - 0.5F) - 500;
+            p.y = 80 * (float) (Math.random() - 0.5F);
+        }
+
+        for (int i = 0; i < 25; i++) {
+            Particle p = new Particle(1,0);
+            context.addObject(p);
+            p.x = 80 * (float) (Math.random() - 0.5F);
+            p.y = 80 * (float) (Math.random() - 0.5F) + 500;
+        }
+
+        for (int i = 0; i < 500; i++) {
+            Particle p = new Particle(1,0);
+            context.addObject(p);
+            p.x = i*16 - 4000;
+        }
 
         forces.add(new Force.Gravity(1,.01F));
         forces.add(new Force.Drag(.005F,.01F));
         forces.add(new Force.Repulsion(15,.1F));
         forces.add(new Force.Electromag(4,.01F));
-        forces.add(new Force.Strong(.14F,100,10,0.01F));
+        forces.add(new Force.Strong(.14F,2.5F,2.5F,0.05F));
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             notRendered += System.currentTimeMillis() - lastLoop;

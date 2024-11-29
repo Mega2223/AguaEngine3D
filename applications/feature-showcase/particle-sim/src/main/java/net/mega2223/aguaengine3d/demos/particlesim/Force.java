@@ -118,11 +118,12 @@ public interface Force {
                if(!Float.isFinite(dist)){continue;}
                dX /= dist; dY /= dist;
                dist = -(dist - ringDist);
-               if(Math.abs(dist) <= ringRange){
-                   dist = Math.signum(dist) * Math.min(Math.abs(dist*scale),maxForce);
-                   p.applyForce(dX*dist,dY*dist);
+               if(Math.abs(dist) <= ringRange && Math.abs(p.mass / p2.mass) >= .9F && Math.abs(p.mass / p2.mass) <= 1.1F){
+                   float mag = Math.signum(dist) * Math.min(Math.abs(dist*scale),maxForce);
+                   mag *= Math.abs(p.mass * p2.mass);
+                   p.applyForce(dX*mag,dY*mag);
                    apply.apply(context,p);
-                   System.out.println("yes" + dist + "   " + dX);
+//                   System.out.println("yes" + dist + "   " + dX);
                }
            }
        }
