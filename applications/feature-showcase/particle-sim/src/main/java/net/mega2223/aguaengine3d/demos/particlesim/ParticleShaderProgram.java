@@ -20,6 +20,7 @@ public class ParticleShaderProgram implements ShaderProgram {
         return id;
     }
 
+    public float[] color = {1,1,1,1};
     public void initUniforms() {
         translation_loc = GL30.glGetUniformLocation(id,"translation");
         rotation_loc = GL30.glGetUniformLocation(id,"rotation");
@@ -27,16 +28,12 @@ public class ParticleShaderProgram implements ShaderProgram {
         color_loc = GL30.glGetUniformLocation(id,"color2");
         radius_loc = GL30.glGetUniformLocation(id,"radius");
         GL30.glUseProgram(id);
-        GL30.glUniform4f(color_loc,
-                (float) Math.random(),
-                (float) Math.random(),
-                (float) Math.random(),
-                1);
     }
     public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(id);
         GL30.glUniformMatrix4fv(translation_loc,false,translationMatrix);
         GL30.glUniformMatrix4fv(projection_loc,false,projectionMatrix);
+        GL30.glUniform4f(color_loc, color[0], color[1], color[2], color[3]);
     }
 
     public int[] getLightspaceTextureLocs() {return null;}

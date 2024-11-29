@@ -5,60 +5,128 @@ import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import java.util.List;
 
 public interface Force {
-    Force GRAVITY = (context, p) -> {
-        for (Renderable act : context) {
-            if (!(act instanceof Particle) || act == p) {
-                continue;
-            }
-            Particle p2 = (Particle) act;
-            float dX = p.x - p2.x, dY = p.y - p2.y, dist = (float) Math.sqrt(dX * dX + dY * dY);
-            if(!Float.isFinite(dist)){continue;}
-            dist = Math.max(dist,1);
-            dX /= dist; dY /= dist;
-            float fMag = -(p.mass * p2.mass) / (dist * dist);
-//            System.out.println("fGrav="+fMag);
-            p.applyForce(dX * fMag, dY * fMag);
-        }
-    };
-    Force REPULSION = (context, p) -> {
-        float rK = 8F;
-        for (Renderable act : context) {
-            if (!(act instanceof Particle) || act == p) {
-                continue;
-            }
-            Particle p2 = (Particle) act;
-            float dX = p.x - p2.x, dY = p.y - p2.y, dist = (float) Math.sqrt(dX * dX + dY * dY);
-            if(!Float.isFinite(dist)){continue;}
-            dist = Math.max(dist,.7F);
-            dX /= dist; dY /= dist;
-            float fMag = (rK * p.mass * p2.mass) / (dist * dist * dist);
-//            System.out.println("fRep="+fMag);
-            p.applyForce(dX * fMag, dY * fMag);
-        }
-    };
-    float k1 = .03F, k2 = .0F;
-//float k1 = .001F, k2 = .001F;
-    Force DRAG = (context, p) -> {
-        float vX = p.vX, vY = p.vY, speed = (float) Math.sqrt(vX * vX + vY * vY);
-        if(speed <= 0){return;}
-        if(Float.isInfinite(speed)){speed = 10;}
-        vX /= speed; vY /= speed;
-        p.applyForce(-vX * speed * k1, -vY * speed *k1);
-    p.applyForce(-vX * speed * speed * k2, -vY * speed * speed * k2);
-    };
+    float MAX_F = 1E-1F;
 
-    Force STR = (context, p) -> {
-        for (Renderable act : context) {
-            if (!(act instanceof Particle)) {
-                continue;
-            }
-            Particle p2 = (Particle) act;
-            float x = p.x - p2.x, y = p.y - p2.y, r = (float) Math.sqrt(x*x + y*y);
-            if(r <= 0){continue;} x /= r; y /= r;
-            float mag = - 36 / (100*r*r*r*r+1);
-            p.applyForce(x * mag,y * mag);
+    class Gravity implements Force{
+        final float forceFactor, maxForce;
+        public Gravity(float forceFactor, float maxForce){
+            this.forceFactor = forceFactor; this.maxForce = maxForce;
         }
-    };
+        @Override
+        public void apply(List<Renderable> context, Particle p) {
+            for (Renderable act : context) {
+                if (!(act instanceof Particle) || act == p) {
+                    continue;
+                }
+                Particle p2 = (Particle) act;
+                float dX = p.x - p2.x, dY = p.y - p2.y, dist = (float) Math.sqrt(dX * dX + dY * dY);
+                if(!Float.isFinite(dist)){continue;}
+                dX /= dist; dY /= dist;
+                float fMag = -(p.mass * p2.mass) / (dist * dist);
+                fMag = Math.signum(fMag) * Math.min(Math.abs(fMag),maxForce);
+                p.applyForce(dX * fMag, dY * fMag);
+            }
+        }
+    }
+
+    class Electromag implements Force{
+        final float forceFactor, maxForce;
+        public Electromag(float forceFactor, float maxForce){
+            this.forceFactor = forceFactor; this.maxForce = maxForce;
+        }
+        @Override
+        public void apply(List<Renderable> context, Particle p) {
+            for (Renderable act : context) {
+                if (!(act instanceof Particle) || act == p) {
+                    continue;
+                }
+                Particle p2 = (Particle) act;
+                float dX = (p.x - p2.x) + .15F*(p.y - p2.y), dY = p.y - p2.y - .15F*(p.x- p2.x), dist = (float) Math.sqrt(dX * dX + dY * dY);
+                if(!Float.isFinite(dist)){continue;}
+                dX /= dist; dY /= dist;
+                float fMag = (p2.e * p.e) / (dist * dist);
+                fMag = Math.signum(fMag) * Math.min(Math.abs(fMag),maxForce);
+                p.applyForce(dX * fMag, dY * fMag);
+            }
+        }
+    }
+
+    class Repulsion implements Force{
+        final float forceFactor, maxForce;
+        public Repulsion(float forceFactor, float maxForce){
+            this.forceFactor = forceFactor; this.maxForce = maxForce;
+        }
+        @Override
+        public void apply(List<Renderable> context, Particle p) {
+            for (Renderable act : context) {
+                if (!(act instanceof Particle) || act == p) {
+                    continue;
+                }
+                Particle p2 = (Particle) act;
+                float dX = p.x - p2.x, dY = p.y - p2.y, dist = (float) Math.sqrt(dX * dX + dY * dY);
+                if(!Float.isFinite(dist)){continue;}
+                dist = Math.max(dist,4F);
+                dX /= dist; dY /= dist;
+                float fMag = (forceFactor * p.mass * p2.mass) / (dist * dist * dist);
+                fMag = Math.signum(fMag) * Math.min(Math.abs(fMag),maxForce);
+                p.applyForce(dX * fMag, dY * fMag);
+            }
+        }
+    }
+
+    class Drag implements Force {
+        final float k1 , k2;
+        public Drag(){
+            this(.008F, .0001F);
+        }
+        public Drag(float k1, float k2){
+            this.k1 = k1; this.k2 = k2;
+        }
+
+        @Override
+        public void apply(List<Renderable> context, Particle p) {
+            {
+                float vX = p.vX, vY = p.vY, speed = (float) Math.sqrt(vX * vX + vY * vY);
+                if(speed <= 0){return;}
+                if(Float.isInfinite(speed)){speed = 10;}
+                vX /= speed; vY /= speed;
+                float mag1 = speed * k1 * p.mass, mag2 = speed * speed * k2 * p.mass;
+                p.applyForce(-vX * mag1, -vY * mag1);
+                p.applyForce(-vX * mag2, -vY * mag2);
+            }
+        }
+    }
+
+    class Strong implements Force{
+        final float maxForce, ringDist, ringRange, scale;
+
+       public Strong(float maxForce, float ringDist, float ringRange, float scale) {
+           this.maxForce = maxForce;
+           this.ringDist = ringDist;
+           this.ringRange = ringRange;
+           this.scale = scale;
+       }
+       Drag apply = new Drag(0.1F,0.05F);
+       @Override
+       public void apply(List<Renderable> context, Particle p) {
+           for (Renderable act : context) {
+               if (!(act instanceof Particle) || act == p) {
+                   continue;
+               }
+               Particle p2 = (Particle) act;
+               float dX = (p.x - p2.x), dY = p.y - p2.y, dist = (float) Math.sqrt(dX * dX + dY * dY);
+               if(!Float.isFinite(dist)){continue;}
+               dX /= dist; dY /= dist;
+               dist = -(dist - ringDist);
+               if(Math.abs(dist) <= ringRange){
+                   dist = Math.signum(dist) * Math.min(Math.abs(dist*scale),maxForce);
+                   p.applyForce(dX*dist,dY*dist);
+                   apply.apply(context,p);
+                   System.out.println("yes" + dist + "   " + dX);
+               }
+           }
+       }
+   }
 
     void apply(List<Renderable> context, Particle p);
 }

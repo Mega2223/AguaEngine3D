@@ -52,53 +52,74 @@ public class ParticleSim {
                     Particle p = new Particle(1);
                     p.x = -cam[0]; p.y = -cam[1];
                     context.addObject(p);
-                } else if (key == GLFW.GLFW_KEY_UP&& action == GLFW.GLFW_PRESS){
-                    cam[1]-=30;
                 }
-                else if (key == GLFW.GLFW_KEY_DOWN&& action == GLFW.GLFW_PRESS){
-                    cam[1]+=30;
+                if(key == GLFW.GLFW_KEY_1 && action == GLFW.GLFW_PRESS){
+                    Particle p = new Particle(.1F,-.25F);
+                    p.x = -cam[0]; p.y = -cam[1];
+                    context.addObject(p);
                 }
-                else if (key == GLFW.GLFW_KEY_LEFT&& action == GLFW.GLFW_PRESS){
-                    cam[0]+=30;
+                if(key == GLFW.GLFW_KEY_2 && action == GLFW.GLFW_PRESS){
+                    Particle p = new Particle(1,0);
+                    p.x = -cam[0]; p.y = -cam[1];
+                    context.addObject(p);
                 }
-                else if (key == GLFW.GLFW_KEY_RIGHT&& action == GLFW.GLFW_PRESS){
-                    cam[0]-=30;
+                if(key == GLFW.GLFW_KEY_3 && action == GLFW.GLFW_PRESS){
+                    Particle p = new Particle(1,1);
+                    p.x = -cam[0]; p.y = -cam[1];
+                    context.addObject(p);
                 }
-                else if (key == GLFW.GLFW_KEY_PAGE_UP&& action == GLFW.GLFW_PRESS){
-                    cam[2]-=10;
-                }
-                else if (key == GLFW.GLFW_KEY_PAGE_DOWN&& action == GLFW.GLFW_PRESS){
-                    cam[2]+=10;
-                }
+                else if (key == GLFW.GLFW_KEY_UP&& action == GLFW.GLFW_PRESS){cam[1]-=.1F *cam[2];}
+                else if (key == GLFW.GLFW_KEY_DOWN&& action == GLFW.GLFW_PRESS){cam[1]+=.1F *cam[2];}
+                else if (key == GLFW.GLFW_KEY_LEFT&& action == GLFW.GLFW_PRESS){cam[0]+=.1F *cam[2];}
+                else if (key == GLFW.GLFW_KEY_RIGHT&& action == GLFW.GLFW_PRESS){cam[0]-=.1F *cam[2];}
+                else if (key == GLFW.GLFW_KEY_PAGE_UP&& action == GLFW.GLFW_PRESS){cam[2]-=50;}
+                else if (key == GLFW.GLFW_KEY_PAGE_DOWN&& action == GLFW.GLFW_PRESS){cam[2]+=50;}
             }
         });
+//
+//        for (int i = 0; i < 100; i++) {
+//            boolean n = Math.random() >= 0.5;
+//            boolean e = Math.random() >= 0.5 && !n;
+//            Particle p = new Particle(1,0);
+//            context.addObject(p);
+//            p.x = 1000 * (float) (Math.random() - 0.5F);
+//            p.y = 1000 * (float) (Math.random() - 0.5F);
+////            p.vX = 0.1F * (float) (Math.random() - 0.5F);
+////            p.vY = 0.1F * (float) (Math.random() - 0.5F);
+//        }
 
-        Particle p1 = new Particle(1);
-//        context.addObject(p1);
-        Particle p2 = new Particle(1);
-//        context.addObject(p2);
-        p1.x = 1;
-        p2.x = -1;
+//        for (int i = 0; i < 30; i++) {
+//            Particle p = new Particle(.1F,-1);
+//            context.addObject(p);
+//            p.x = 80 * (float) (Math.random() - 0.5F) + 500;
+//            p.y = 80 * (float) (Math.random() - 0.5F);
+//        }
+//
+//        for (int i = 0; i < 30; i++) {
+//            Particle p = new Particle(1,1);
+//            context.addObject(p);
+//            p.x = 80 * (float) (Math.random() - 0.5F) - 500;
+//            p.y = 80 * (float) (Math.random() - 0.5F);
+//        }
+//
+//        for (int i = 0; i < 25; i++) {
+//            Particle p = new Particle(1,0);
+//            context.addObject(p);
+//            p.x = 80 * (float) (Math.random() - 0.5F);
+//            p.y = 80 * (float) (Math.random() - 0.5F) + 500;
+//        }
+//
+//        for (int i = 0; i < 500; i++) {
+//            Particle p = new Particle(1,0);
+//            context.addObject(p);
+//            p.x = i*16 - 4000;
+//        }
 
-        for (int i = 0; i < 0; i++) {
-            boolean n = Math.random() >= 0.5;
-            boolean e = Math.random() >= 0.5 && !n;
-            Particle p = new Particle(
-//                    e ? 0.1F : 1F
-                    1
-            );
-            p.e = e ? -1 : n ? 0 : 1;
-            context.addObject(p);
-            p.x = 1000 * (float) (Math.random() - 0.5F);
-            p.y = 1000 * (float) (Math.random() - 0.5F);
-//            p.vX = 0.1F * (float) (Math.random() - 0.5F);
-//            p.vY = 0.1F * (float) (Math.random() - 0.5F);
-        }
-
-        forces.add(Force.GRAVITY);
-        forces.add(Force.DRAG);
-        forces.add(Force.REPULSION);
-        forces.add(Force.STR);
+        forces.add(new Force.Gravity(1,.01F));
+        forces.add(new Force.Drag(.005F,.01F));
+        forces.add(new Force.Repulsion(15,.1F));
+        forces.add(new Force.Electromag(4,.01F));
+        forces.add(new Force.Strong(.14F,100,10,0.01F));
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             notRendered += System.currentTimeMillis() - lastLoop;
