@@ -41,7 +41,7 @@ public interface Force {
                     continue;
                 }
                 Particle p2 = (Particle) act;
-                float dX = (p.x - p2.x) + .15F*(p.y - p2.y), dY = p.y - p2.y - .15F*(p.x- p2.x), dist = (float) Math.sqrt(dX * dX + dY * dY);
+                float dX = (p.x - p2.x) + 0*.15F*(p.y - p2.y), dY = p.y - p2.y - 0*.15F*(p.x- p2.x), dist = (float) Math.sqrt(dX * dX + dY * dY);
                 if(!Float.isFinite(dist)){continue;}
                 dX /= dist; dY /= dist;
                 float fMag = (p2.e * p.e) / (dist * dist);
@@ -118,7 +118,9 @@ public interface Force {
                if(!Float.isFinite(dist)){continue;}
                dX /= dist; dY /= dist;
                dist = -(dist - ringDist);
-               if(Math.abs(dist) <= ringRange && Math.abs(p.mass / p2.mass) >= .9F && Math.abs(p.mass / p2.mass) <= 1.1F){
+               boolean charge = p.e >= 0 && p2.e >= 0;
+               charge = true;
+               if(charge && Math.abs(dist) <= ringRange && Math.abs(p.mass / p2.mass) >= .9F && Math.abs(p.mass / p2.mass) <= 1.1F){
                    float mag = Math.signum(dist) * Math.min(Math.abs(dist*scale),maxForce);
                    mag *= Math.abs(p.mass * p2.mass);
                    p.applyForce(dX*mag,dY*mag);

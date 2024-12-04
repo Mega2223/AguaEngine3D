@@ -26,6 +26,7 @@ public class ParticleSim {
     static float[] cam = {0,0,100};
 
     static final List<Force> forces = new ArrayList<>();
+    static boolean pause = false;
 
     public static void main(String[] args) {
         manager = new WindowManager(720,720, TITLE);
@@ -54,7 +55,7 @@ public class ParticleSim {
                     context.addObject(p);
                 }
                 if(key == GLFW.GLFW_KEY_1 && action == GLFW.GLFW_PRESS){
-                    Particle p = new Particle(.1F,-1F);
+                    Particle p = new Particle(.025F,-1F);
                     p.x = -cam[0]; p.y = -cam[1];
                     context.addObject(p);
                 }
@@ -72,54 +73,17 @@ public class ParticleSim {
                 else if (key == GLFW.GLFW_KEY_DOWN&& action == GLFW.GLFW_PRESS){cam[1]+=.1F *cam[2];}
                 else if (key == GLFW.GLFW_KEY_LEFT&& action == GLFW.GLFW_PRESS){cam[0]+=.1F *cam[2];}
                 else if (key == GLFW.GLFW_KEY_RIGHT&& action == GLFW.GLFW_PRESS){cam[0]-=.1F *cam[2];}
-                else if (key == GLFW.GLFW_KEY_PAGE_UP&& action == GLFW.GLFW_PRESS){cam[2]-=50;}
-                else if (key == GLFW.GLFW_KEY_PAGE_DOWN&& action == GLFW.GLFW_PRESS){cam[2]+=50;}
+                else if (key == GLFW.GLFW_KEY_PAGE_UP&& action == GLFW.GLFW_PRESS){cam[2]-=25;}
+                else if (key == GLFW.GLFW_KEY_PAGE_DOWN&& action == GLFW.GLFW_PRESS){cam[2]+=25;}
+                if(key == GLFW.GLFW_KEY_P && action == GLFW.GLFW_PRESS){pause = !pause;}
             }
         });
-//
-        for (int i = 0; i < 100; i++) {
-            boolean n = Math.random() >= 0.5;
-            boolean e = Math.random() >= 0.5 && !n;
-            Particle p = new Particle(1,0);
-            context.addObject(p);
-            p.x = 1000 * (float) (Math.random() - 0.5F);
-            p.y = 1000 * (float) (Math.random() - 0.5F);
-//            p.vX = 0.1F * (float) (Math.random() - 0.5F);
-//            p.vY = 0.1F * (float) (Math.random() - 0.5F);
-        }
-
-        for (int i = 0; i < 30; i++) {
-            Particle p = new Particle(.1F,-1);
-            context.addObject(p);
-            p.x = 80 * (float) (Math.random() - 0.5F) + 500;
-            p.y = 80 * (float) (Math.random() - 0.5F);
-        }
-
-        for (int i = 0; i < 30; i++) {
-            Particle p = new Particle(1,1);
-            context.addObject(p);
-            p.x = 80 * (float) (Math.random() - 0.5F) - 500;
-            p.y = 80 * (float) (Math.random() - 0.5F);
-        }
-
-        for (int i = 0; i < 25; i++) {
-            Particle p = new Particle(1,0);
-            context.addObject(p);
-            p.x = 80 * (float) (Math.random() - 0.5F);
-            p.y = 80 * (float) (Math.random() - 0.5F) + 500;
-        }
-
-        for (int i = 0; i < 500; i++) {
-            Particle p = new Particle(1,0);
-            context.addObject(p);
-            p.x = i*16 - 4000;
-        }
 
         forces.add(new Force.Gravity(1,.01F));
         forces.add(new Force.Drag(.005F,.01F));
         forces.add(new Force.Repulsion(15,.1F));
         forces.add(new Force.Electromag(4,.01F));
-        forces.add(new Force.Strong(.14F,2.5F,2.5F,0.05F));
+        forces.add(new Force.Strong(.28F,2.5F,2.5F,0.05F));
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             notRendered += System.currentTimeMillis() - lastLoop;
@@ -140,7 +104,10 @@ public class ParticleSim {
     }
 
     public static void doLogic(){
-
+        MatrixTranslator.generateTranslationMatrix(cam[0],cam[1],0,projection);
+        MatrixTranslator.getTransposeMatrix4(projection);
+        projection[15] = cam[2];
+        if(pause){return;}
         float avgX = 0, avgY = 0, c = 0;
         for(Renderable act : context.getObjects()){
             if(!(act instanceof Particle)){continue;}
@@ -149,14 +116,11 @@ public class ParticleSim {
             avgX+=p.x; avgY = p.y;c+=1;
         }
         avgX /= c; avgY /=c;
-        MatrixTranslator.generateTranslationMatrix(cam[0],cam[1],0,projection);
-        MatrixTranslator.getTransposeMatrix4(projection);
 //        for(Renderable act : context.getObjects()){
 //            if(!(act instanceof Particle)){continue;}
 //            Particle p = (Particle) act;
 //            p.x-=avgX; p.y-= avgY;
 //        }
-        projection[15] = cam[2];
     }
 
     public static void doRenderLogic(){
