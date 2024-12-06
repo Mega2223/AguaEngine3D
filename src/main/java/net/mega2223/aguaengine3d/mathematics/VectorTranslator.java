@@ -2,6 +2,8 @@ package net.mega2223.aguaengine3d.mathematics;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
+import java.util.Locale;
+
 public class VectorTranslator {
 
     static final float[] bufferVector = new float[4];
@@ -205,10 +207,11 @@ public class VectorTranslator {
 
     public static void debugVector (float... vec){
         System.out.print("v: [");
-        for (int i = 0; i < vec.length - 1; i++) {
-            System.out.print(vec[i] + ",");
+        for (int i = 0; i < vec.length; i++) {
+            System.out.printf(Locale.US,"%2.2f ",vec[i]);
+            if(i + 1 >= vec.length){System.out.println(",");}
         }
-        System.out.print(vec[vec.length-1]+"]\n");
+        System.out.print("]\n");
     }
 
     public static void debugVector (int... vec){

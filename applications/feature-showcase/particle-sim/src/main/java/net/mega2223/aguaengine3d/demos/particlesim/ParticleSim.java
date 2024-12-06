@@ -80,7 +80,7 @@ public class ParticleSim {
         });
 
         forces.add(new Force.Gravity(1,.01F));
-        forces.add(new Force.Drag(.005F,.01F));
+        forces.add(new Force.Drag(.00F,.00F));
         forces.add(new Force.Repulsion(15,.1F));
         forces.add(new Force.Electromag(4,.01F));
         forces.add(new Force.Strong(.28F,2.5F,2.5F,0.05F));
@@ -92,7 +92,6 @@ public class ParticleSim {
                 fLSLastUpdate = System.currentTimeMillis();
                 GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond));
                 framesLastSecond = 0;
-
             }
             if (notRendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();

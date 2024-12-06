@@ -47,6 +47,33 @@ public class ModelUtils {
         return new TexturedModel(vertices,indices,textureCoords,program,texture);
     }
 
+    public static Model mergeModels(Model[] models){
+        return mergeModels(models,models[0].shader);
+    }
+
+    public static Model mergeModels(Model[] models, ShaderProgram program){
+        if(models.length == 0){return null;}
+        List<Float> verticeList = new ArrayList<>();
+        List<Integer> indexList = new ArrayList<>();
+
+        for (int m = 0; m < models.length; m++) {
+            float[] modelVertices = models[m].vertices;
+            int[] modelIndexes = models[m].indices;
+            int indexStartingPoint = verticeList.size()/4;
+            translateVertices(modelVertices,models[m].coords);
+
+            for (float modelVertex : modelVertices) {verticeList.add(modelVertex);}
+            for (int modelIndex : modelIndexes){indexList.add(modelIndex+indexStartingPoint);}
+        }
+        float[] vertices = new float[verticeList.size()];
+        int[] indices = new int[indexList.size()];
+
+        for(int i = 0; i < vertices.length;i++){vertices[i]=verticeList.get(i);}
+        for(int i = 0; i < indices.length;i++){indices[i]=indexList.get(i);}
+
+        return new Model(vertices,indices,program);
+    }
+
     public static TextureInterfaceComponent mergeComponents(TextureInterfaceComponent[] components, int texture){
         List<Float> verticeList = new ArrayList<>();
         List<Integer> indexList = new ArrayList<>();
@@ -296,4 +323,37 @@ public class ModelUtils {
         model.setVertices(verts);
     }
 
+    private static final float[] cubeV = {
+            -1F, 1F, 1F, 0F, -1F, -1F, 1F, 0F,
+            -1F, 1F, -1F,0F, -1F, -1F, -1F, 0F,
+            1F, 1F, 1F, 0F, 1F, -1F, 1F, 0F,
+            1F, 1F, -1F, 0F, 1F, -1F, -1F, 0F
+    };
+    private static final int[] cubeI = {
+            5, 3, 1, 3, 8, 4, 7, 6, 8, 2, 8, 6, 1, 4, 2, 5, 2, 6, 5, 7, 3, 3, 7, 8, 7, 5, 6, 2, 4, 8, 1, 3, 4, 5, 1, 2
+    };
+
+    public static Model plotPoints(float[] vertices, float radius){
+        final int n = vertices.length / 4;
+        float[] nVertices = new float[n * 8 * 4];
+        int[] nIndices = new int[n * 12 * 3];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < 32; j++) {
+                nVertices[i * 32 + j] = cubeV[j] * radius + vertices[i * 4 + (j % 4)];
+            }
+        }
+        for (int i = 0; i < nIndices.length ; i++) {
+            nIndices[i] = cubeI[i%cubeI.length] + (cubeV.length / 4) * (i / cubeI.length);
+        }
+        VectorTranslator.debugVector(nVertices);
+        VectorTranslator.debugVector(nIndices);
+        Model model = new Model(nVertices, nIndices, null);
+        ModelUtils.debugIndices(model);
+        return model;
+    }
+
+    static {
+        for (int i = 0; i < cubeI.length; i++) {cubeI[i]--;}
+    }
 }

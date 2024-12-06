@@ -1,17 +1,17 @@
-import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
 public class Civ {
 
@@ -20,17 +20,16 @@ public class Civ {
 
     static RenderingContext context = null;
     static WindowManager manager = null;
+    static Random r = new Random();
     static long framesElapsed = 0;
     static float[] projection = new float[16];
     public static final float[] cam = {0, 0, -4, 0};
 
+    private static final float[] mat4 = new float[16];
+
     public static void main(String[] args) {
         setup();
-        Model teste = Geometry.genPolygon(6,1);
-        teste = new Model(
-                teste.getRelativeVertices(), teste.getIndices(), new SolidColorShaderProgram(1,1,1)
-        );
-        context.addObject(teste);
+        context.addObject(Geometry.genPolyhedron(5,0));
         begin();
     }
 
@@ -46,6 +45,23 @@ public class Civ {
                 .setActive(true)
                 .setFogDetails(7, 20);
         context.setActive(true);
+        manager.addUpdateEvent(() -> { //walk events
+            double s = Math.sin(cam[3]);
+            double c = Math.cos(cam[3]);
+            float speed = .075F;
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){cam[2] += speed*c;cam[0] += speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){cam[2] -= speed*c;cam[0] -= speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){cam[0] += speed*c;cam[2]-= speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){cam[0] -= speed*c;cam[2]+= speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){cam[3] += Math.PI/90;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){cam[3] -= Math.PI/90;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){cam[1] += speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){cam[1] -= speed;}
+        });
+        Model m = ModelUtils.plotPoints(
+                new float[]{0,1,0,0, 1,0,0,0, -1,0,0,0}, 0.1F);
+        m.setShader(new SolidColorShaderProgram(1,1,1,1));
+        context.addObject(m);
     }
 
     protected static void begin(){
@@ -72,7 +88,6 @@ public class Civ {
     }
 
     protected static void doLogic() {
-
     }
 
     protected static void doRenderLogic() {

@@ -3,8 +3,12 @@ package net.mega2223.aguaengine3d.mathematics;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
+
+//FIXME tem equações matriciais que mudam vetores os quais iterações seguintes ainda dependem
+//ex translateAllVertices, dá uma olhada depois e verifica a translação de cada matriz
 
 public class MatrixTranslator {
 
@@ -85,14 +89,15 @@ public class MatrixTranslator {
         }
     }
 
-    public static void translateAllVectors(@Modified float[] vectors, float[] mat4) {
+    public static void transformVectorArray(@Modified float[] vectors, float[] mat4) {
         if (mat4.length < 16) {
-            throw new UnsupportedOperationException("Provided argument is not a matrix object.");
+            throw new UnsupportedOperationException("Provided argument is not a valid matrix object.");
         }
+        float[] c = vectors.clone();
         for (int g = 0; g < vectors.length; g += 4) {
             for (int i = 0; i < 4; i++) {
                 int i1 = i * 4;
-                vectors[i + g] = (mat4[i1] * vectors[g]) + (mat4[i1 + 1] * vectors[g + 1]) + (mat4[i1 + 2] * vectors[g + 2]) + (mat4[i1 + 3] * vectors[g + 3]);
+                vectors[i + g] = (mat4[i1] * c[g]) + (mat4[i1 + 1] * c[g + 1]) + (mat4[i1 + 2] * c[g + 2]) + (mat4[i1 + 3] * c[g + 3]);
             }
         }
     }
@@ -583,7 +588,7 @@ public class MatrixTranslator {
         StringBuilder debug = new StringBuilder("[ ");
         for (int i = 0; i < matrix4.length; i += 4) {
             for (int j = 0; j < 4; j++) {
-                debug.append(matrix4[i + j]).append(" ");
+                debug.append(String.format(Locale.US,"%.2f",matrix4[i + j])).append(" ");
             }
             debug.append("]\n");
             if (i + 4 < matrix4.length) {

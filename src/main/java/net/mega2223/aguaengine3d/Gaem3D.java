@@ -35,7 +35,7 @@ import java.io.IOException;
 * Move shadow calculation algorithm to the default shader dictionary
 * Reform the shader dictionary lol
 * Cubemap support (for lights and skyboxes) <- Done
-* Logo (kindadone) and Readme.md
+* Logo (kindadone) and Readme.md (done)
 * Figure out why the FPS loop is weird
 * Improvements on procedural building generation (aka multi building and scaling support) (Done, kinda)
 * Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
@@ -66,6 +66,7 @@ import java.io.IOException;
 * Filter functions? (functions that filter :p)
 * Dinamically alocated text object
 * Texturable interface?
+* Modular uniform sync
 * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
