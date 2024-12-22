@@ -214,6 +214,19 @@ public class VectorTranslator {
         System.out.print("]\n");
     }
 
+    public static void debugV4(float... vec){
+        System.out.print("[");
+        for (int i = 0; i < vec.length; i+=4) {
+            System.out.print("[");
+            for (int j = 0; j < 4; j++) {
+                System.out.printf(Locale.US,"%2.2f ",vec[i+j]);
+            }
+            System.out.print("] ");
+            if(i + 1 >= vec.length){System.out.println(",");}
+        }
+        System.out.print("]\n");
+    }
+
     public static void debugVector (int... vec){
         System.out.print("v: [");
         for (int i = 0; i < vec.length - 1; i++) {

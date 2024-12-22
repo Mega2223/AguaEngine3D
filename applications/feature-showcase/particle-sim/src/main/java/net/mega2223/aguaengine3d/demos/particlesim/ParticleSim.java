@@ -14,10 +14,17 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ParticleSim {
     public static final int TARGET_FPS = 60;
     public static final String TITLE = "Particulas :)";
+
+    public static final Force.Gravity GRAVITY = new Force.Gravity(1, .1F);
+    public static final Force.Drag DRAG = new Force.Drag(.1F, 1F);
+    public static final Force.Repulsion REPULSION = new Force.Repulsion(15, .5F);
+    public static final Force.Electromag ELECTROMAG = new Force.Electromag(1, .1F);
+    public static final Force.Strong STRONG = new Force.Strong(1,1,1,.1F);
 
     static RenderingContext context;
     static WindowManager manager;
@@ -55,7 +62,7 @@ public class ParticleSim {
                     context.addObject(p);
                 }
                 if(key == GLFW.GLFW_KEY_1 && action == GLFW.GLFW_PRESS){
-                    Particle p = new Particle(.025F,-1F);
+                    Particle p = new Particle(.25F,-1F);
                     p.x = -cam[0]; p.y = -cam[1];
                     context.addObject(p);
                 }
@@ -69,6 +76,18 @@ public class ParticleSim {
                     p.x = -cam[0]; p.y = -cam[1];
                     context.addObject(p);
                 }
+                if(key == GLFW.GLFW_KEY_G && action == GLFW.GLFW_PRESS){
+                    Force f = GRAVITY;
+                    if(forces.contains(f)){forces.remove(f);} else {
+                        forces.add(f);
+                    }
+                }
+                if(key == GLFW.GLFW_KEY_H && action == GLFW.GLFW_PRESS){
+                    Force f = STRONG;
+                    if(forces.contains(f)){forces.remove(f);} else {
+                        forces.add(f);
+                    }
+                }
                 else if (key == GLFW.GLFW_KEY_UP&& action == GLFW.GLFW_PRESS){cam[1]-=.1F *cam[2];}
                 else if (key == GLFW.GLFW_KEY_DOWN&& action == GLFW.GLFW_PRESS){cam[1]+=.1F *cam[2];}
                 else if (key == GLFW.GLFW_KEY_LEFT&& action == GLFW.GLFW_PRESS){cam[0]+=.1F *cam[2];}
@@ -79,11 +98,25 @@ public class ParticleSim {
             }
         });
 
-        forces.add(new Force.Gravity(1,.01F));
-        forces.add(new Force.Drag(.00F,.00F));
-        forces.add(new Force.Repulsion(15,.1F));
-        forces.add(new Force.Electromag(4,.01F));
-        forces.add(new Force.Strong(.28F,2.5F,2.5F,0.05F));
+        forces.add(GRAVITY);
+        forces.add(DRAG);
+        forces.add(REPULSION);
+        forces.add(ELECTROMAG);
+        forces.add(STRONG);
+
+        for (int i = 0; i < 256; i++) {
+            float x = (float) Math.random(); float y = (float) Math.random();
+            x *= 700; y *= 700;
+            boolean e = new Random().nextBoolean();
+            Particle p;
+            if (e){
+                p = new Particle(.1F,-1);
+            } else {
+                p = new Particle(1,1);
+            }
+            context.addObject(p);
+            p.x = x; p.y = y;
+        }
 
         while (!GLFW.glfwWindowShouldClose(manager.windowName)) {
             notRendered += System.currentTimeMillis() - lastLoop;

@@ -1,10 +1,13 @@
 package net.mega2223.aguaengine3d.misc;
 
+import javafx.print.Collation;
+
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.List;
 
 public class Utils {
     private Utils(){}
@@ -93,4 +96,15 @@ public class Utils {
         } catch (IOException ignored) {}
     }
 
+    public static int[] toPrimitiveIndexArray(List<Integer> i){
+        int[] ret = new int[i.size()];
+        for (int j = 0; j < ret.length; j++) { ret[j] = i.get(j);}
+        return ret;
+    }
+
+    public static float[] toPrimitiveArray(List<Float> i){
+        float[] ret = new float[i.size()];
+        for (int j = 0; j < ret.length; j++) { ret[j] = i.get(j);}
+        return ret;
+    }
 }

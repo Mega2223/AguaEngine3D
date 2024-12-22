@@ -1,6 +1,7 @@
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
@@ -29,7 +30,12 @@ public class Civ {
 
     public static void main(String[] args) {
         setup();
-        context.addObject(Geometry.genPolyhedron(5,0));
+        Model polyhedron = Geometry.genPolyhedron(5, 0);
+        context.addObject(polyhedron);
+
+        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
+        m.setShader(new SolidColorShaderProgram(1,1,1,1));
+        context.addObject(m);
         begin();
     }
 
@@ -58,10 +64,6 @@ public class Civ {
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){cam[1] += speed;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){cam[1] -= speed;}
         });
-        Model m = ModelUtils.plotPoints(
-                new float[]{0,1,0,0, 1,0,0,0, -1,0,0,0}, 0.1F);
-        m.setShader(new SolidColorShaderProgram(1,1,1,1));
-        context.addObject(m);
     }
 
     protected static void begin(){
@@ -76,7 +78,6 @@ public class Civ {
                 fLSLastUpdate = System.currentTimeMillis();
                 GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond));
                 framesLastSecond = 0;
-
             }
             if (notRendered > (1000 / TARGET_FPS)) {
                 long cycleStart = System.currentTimeMillis();

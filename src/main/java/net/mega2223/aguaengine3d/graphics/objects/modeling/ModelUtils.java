@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
@@ -112,7 +113,7 @@ public class ModelUtils {
     @SuppressWarnings("UnusedReturnValue") //why??????
     public static float[] translateVertices (float[] vertices, float[] vector){
         return translateVertices(vertices,vector[0],vector[1], vector[2]);
-    }
+    }//todo precisa anotar e padronizar isso daq
     public static float[] translateVertices (float[] vertices, float x, float y, float z){
         vertices = vertices.clone();
         //it was all A MERE FACADE
@@ -338,19 +339,30 @@ public class ModelUtils {
         float[] nVertices = new float[n * 8 * 4];
         int[] nIndices = new int[n * 12 * 3];
 
+//        for (int i = 0; i < n; i++) {
+//            for (int j = 0; j < 32; j++) {
+//                nVertices[i * 32 + j] = cubeV[j] * radius + vertices[i * 4 + (j % 4)];
+//            }
+//        }
+//        for (int i = 0; i < nIndices.length ; i++) {
+//            nIndices[i] = cubeI[i%cubeI.length] + (cubeV.length / 4) * (i / cubeI.length);
+//        }
+        Model[] m = new Model[n];
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < 32; j++) {
-                nVertices[i * 32 + j] = cubeV[j] * radius + vertices[i * 4 + (j % 4)];
+            Model model = Mesh.CUBE.toModel(null);
+//            model.setCoords(vertices[i*4],vertices[i*4+1],vertices[i*4+2]);
+            float[] v = model.getRelativeVertices();
+            for(int j = 0; j < v.length; j+=4){
+                for (int k = 0; k < 4; k++) {
+                    v[j+k] *= radius;
+                    v[j+k] += vertices[i*4+k];
+                }
             }
+            model.setVertices(v);
+            m[i] = model;
         }
-        for (int i = 0; i < nIndices.length ; i++) {
-            nIndices[i] = cubeI[i%cubeI.length] + (cubeV.length / 4) * (i / cubeI.length);
-        }
-        VectorTranslator.debugVector(nVertices);
-        VectorTranslator.debugVector(nIndices);
-        Model model = new Model(nVertices, nIndices, null);
-        ModelUtils.debugIndices(model);
-        return model;
+        return ModelUtils.mergeModels(m);
+        //return new Model(nVertices, nIndices, null);
     }
 
     static {
