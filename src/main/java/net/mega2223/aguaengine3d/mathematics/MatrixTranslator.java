@@ -255,9 +255,12 @@ public class MatrixTranslator {
         }
     }
 
-    /**
-     * took me way too long
-     */
+    public static void addMatrices(float[] mat4a, float[] mat4b, @Modified float[] dest){
+        for (int i = 0; i < 16; i++) {
+            dest[i] = mat4a[i] + mat4b[i];
+        }
+    }
+
     public static float[][] multiplyMatrices(float[][] m1, float[][] m2) {
         if (m1[0].length != m2.length) {
             throw new UnsupportedOperationException("Incompartible matrices");
@@ -274,7 +277,8 @@ public class MatrixTranslator {
     }
 
     public static void multiply4x4Matrices(@Modified float[] m1, float[] m2){
-        multiply4x4Matrices(m1,m2,m1);
+        multiply4x4Matrices(m1,m2,bufferMatrix4);
+        System.arraycopy(bufferMatrix4,0,m1,0,16);
     }
 
     //very proud of that one
@@ -305,9 +309,8 @@ public class MatrixTranslator {
     }
 
     public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){
-        float[] stolenVector = VectorTranslator.bufferVector;
-        multiplyVec4Mat4(vec4,mat4,stolenVector);
-        System.arraycopy(stolenVector,0,vec4,0,4);
+        multiplyVec4Mat4(vec4,mat4,VectorTranslator.bufferVector);
+        System.arraycopy(VectorTranslator.bufferVector,0,vec4,0,4);
     }
 
     public static void multiplyVec4Mat4(float[] vec4, float[] mat4,@Modified float[] result){
@@ -329,6 +332,18 @@ public class MatrixTranslator {
             int c = i%3, r = i/3;
             resultMat3[r]+=vec3[c]*mat3[r*3+c];
         }
+    }
+
+    public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
+        Arrays.fill(dest,0);
+        float ang = VectorTranslator.getMagnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
+        float c = (float) Math.cos(ang), s = (float) Math.sin(ang),  C = 1F - c;
+        float x = axisAngle[0] / ang, y = axisAngle[1] / ang, z = axisAngle[2] / ang;
+        dest[0] = x * x * C + c; dest[1] = x * y * C - (z * s); dest[2] = x * z * C + (y * s);
+        dest[4] = y * x * C + (z * s); dest[5] = y * y * C + c; dest[6] = y * z * C - (x * s);
+        dest[8] = z * x * C - (y * s); dest[9] = z * y * C + (x * s); dest[10] = z * z * C + c;
+
+        dest[15] = 1;
     }
 
     /**

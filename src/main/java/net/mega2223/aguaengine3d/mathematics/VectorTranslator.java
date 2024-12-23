@@ -209,7 +209,7 @@ public class VectorTranslator {
         System.out.print("v: [");
         for (int i = 0; i < vec.length; i++) {
             System.out.printf(Locale.US,"%2.2f ",vec[i]);
-            if(i + 1 >= vec.length){System.out.println(",");}
+//            if(i + 1 >= vec.length){System.out.println(",");}
         }
         System.out.print("]\n");
     }
