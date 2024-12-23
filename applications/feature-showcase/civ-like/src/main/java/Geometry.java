@@ -91,7 +91,7 @@ public class Geometry {
                 boolean odd = (r % 4) / 2 == 1;
                 float x = c * SQRT_3 + (odd ? 0 : SQRT_3 / 2);
                 if(x > maxX - minX){break;}
-                System.out.printf(Locale.US,"(%.3f, %.3f),", x,y);
+//                System.out.printf(Locale.US,"(%.3f, %.3f),", x,y);
                 ret.add(x); ret.add(y); ret.add(0F); ret.add(0F);
             }
         }

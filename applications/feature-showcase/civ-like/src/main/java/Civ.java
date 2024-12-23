@@ -1,17 +1,18 @@
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.*;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
+import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Civ {
@@ -33,9 +34,30 @@ public class Civ {
         Model polyhedron = Geometry.genPolyhedron(5, 0);
         context.addObject(polyhedron);
 
-        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
-        m.setShader(new SolidColorShaderProgram(1,1,1,1));
-        context.addObject(m);
+//        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
+//        m.setShader(new SolidColorShaderProgram(1,1,1,1));
+//        context.addObject(m);
+
+        List<Float> f = new ArrayList<>();
+
+        Model model = ModelUtils.plotPoints(
+                Mesh.ICOSAHEDRON.getVertices()
+                , .1F
+        );
+        model.setShader(new SolidColorShaderProgram(1,1,1,1));
+        context.addObject(
+                model
+        );
+        TexturedModel icosa = Mesh.ICOSAHEDRON.toTexturedModel(
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "\\img.png")
+        );
+        float[] textureShift = new float[24];
+        for (int i = 0; i < textureShift.length; i++) {textureShift[i] = r.nextFloat();}
+        icosa.setTextureShift(
+                textureShift
+        );
+        context.addObject(icosa);
+
         begin();
     }
 

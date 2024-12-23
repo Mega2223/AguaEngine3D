@@ -3,11 +3,13 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling;
 import com.sun.org.apache.xpath.internal.operations.Mod;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.misc.Utils;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ModelUtils {
 
@@ -363,6 +365,26 @@ public class ModelUtils {
         }
         return ModelUtils.mergeModels(m);
         //return new Model(nVertices, nIndices, null);
+    }
+
+    public static boolean alreadyHasTriangle(List<Integer> triangles, int v1, int v2, int v3){
+        return alreadyHasTriangle(Utils.toPrimitiveIndexArray(triangles),v1,v2,v3);
+    }
+
+    public static boolean alreadyHasTriangle(int[] triangles, int v1, int v2, int v3) {
+        int a = Math.min(v2, Math.min(v1, v3));
+        int c = Math.max(v2, Math.max(v1, v3));
+        int b = v1 == a ? v2 == c ? v3 : v2 : v1 == c ? a == v2 ? v3 : v2 : v1; // :_)
+        for (int i = 0; i < triangles.length; i+=3) {
+            int t1 = triangles[i], t2 = triangles[i+1], t3 = triangles[i+2];
+            int ai = Math.min(t2, Math.min(t1, t3));
+            int ci = Math.max(t2, Math.max(t1, t3));
+            int bi = t1 == ai ? t2 == ci ? t3 : t2 : t1 == ci ? ai == t2 ? t3 : t2 : t1; // :_)
+            if(ai == a && bi == b && ci == c){
+                return true;
+            }
+        }
+        return false;
     }
 
     static {
