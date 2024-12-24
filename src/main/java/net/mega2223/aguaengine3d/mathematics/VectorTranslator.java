@@ -115,12 +115,18 @@ public class VectorTranslator {
         divideVector(vector,magnitude);
     }
 
-    public static float getAngleBetweenVectors(float[] vec, float[] vec2){
-        float m1 = getMagnitude(vec), m2 = getMagnitude(vec2);
-        float x1 = vec[0]/m1, y1 = vec[1]/m1, z1 = vec[2]/m1;
-        float x2 = vec2[0]/m2, y2 = vec2[1]/m2, z2 = vec2[2]/m2;
+    public static float getAngleBetweenVectors(float[] vecA, float[] vecB){
+        float m1 = getMagnitude(vecA), m2 = getMagnitude(vecB);
+        float x1 = vecA[0], y1 = vecA[1], z1 = vecA[2];
+        float x2 = vecB[0], y2 = vecB[1], z2 = vecB[2];
         float dot = dotProduct(x1,y1,z1,x2,y2,z2);
-        return (float) Math.acos(dot);
+
+        double angle = Math.acos(dot / (m1 * m2));
+        System.out.printf(Locale.US,
+                "ANGLE BETWEEN (%.2f,%.2f,%.2f) AND (%.2f,%.2f,%.2f): %.2f\n",
+                vecA[0],vecA[1],vecA[2],vecB[0],vecB[1],vecB[2],Math.toDegrees(angle));
+
+        return (float) angle;
     }
 
     /**Gets the axis angle rotation which represents the angle difference between these vectors
@@ -131,7 +137,8 @@ public class VectorTranslator {
         float ang = getAngleBetweenVectors(v3a,v3b);
         getCrossProduct(v3a,v3b,dest);
         normalize(dest);
-        scaleVector(dest, (float) Math.sin(ang));
+        scaleVector(dest, ang);
+        VectorTranslator.debugVector("AXIS ",dest);
     }
 
     //**Rotates a vector given an axis-angle*/

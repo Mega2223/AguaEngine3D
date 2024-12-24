@@ -75,6 +75,7 @@ public class Geometry {
         // é bem possível que alguma fórmula no meio desse processo esteja errada
         // e se não for isso então dá uma olhada em aumentar a precisão
         // pq a tradução só funciona pra 1/4 dos triângulos
+        // TESTA O PRODUTO VETORIAL !!!!
 
         int[] indices = icosahedron.getIndices();
         float[] vertices = icosahedron.getVertices();
@@ -108,6 +109,7 @@ public class Geometry {
             //TODO era pra ser um ponto equidistante dos outros, mas
             // os triângulos são equiláteros então eu acho que não tem problema???
             // enfim, teste :)
+            // me parece ser ok mas teste mesmo assim, tipo literalmente só mede a distância bobalhão
             center[0] = (aX + bX + cX)/3; center[1] = (aY + bY + cY)/3; center[2] = (aZ + bZ + cZ)/3;
 
             VectorTranslator.getCrossProduct(aX-cX,aY-cY,aZ-cZ,bX-cX,bY-cY,bZ-cZ,normal);
