@@ -34,9 +34,9 @@ public class Civ {
         Model polyhedron = Geometry.genPolyhedron(5, 0);
         context.addObject(polyhedron);
 
-        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
-        m.setShader(new SolidColorShaderProgram(1,1,1,1));
-        context.addObject(m);
+//        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
+//        m.setShader(new SolidColorShaderProgram(1,1,1,1));
+//        context.addObject(m);
 
 //        List<Float> f = new ArrayList<>();
 

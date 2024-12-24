@@ -58,10 +58,24 @@ public class Geometry {
         int r = 2;
         List<Float> planeSample = sampleHexagonPlane(-r, -r, r, r);
         planeSample.removeAll(planeSample);
-        planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);
+
+        for (int i = 0; i < 10; i++) {
+            planeSample.add(i/10F - .5F);planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);
+        }
+        for (int i = 0; i < 10; i++) {
+            planeSample.add(0f);planeSample.add(i/10F - .5F);planeSample.add(0F);planeSample.add(0F);
+        }
+
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
         Mesh icosahedron = Mesh.ICOSAHEDRON;
+        icosahedron = Mesh.CUBE;
+        //fixme a questão do ângulo tá ridiculamente imprecisa
+        // em um CUBO ele não pega o theta correto
+        // é bem possível que alguma fórmula no meio desse processo esteja errada
+        // e se não for isso então dá uma olhada em aumentar a precisão
+        // pq a tradução só funciona pra 1/4 dos triângulos
+
         int[] indices = icosahedron.getIndices();
         float[] vertices = icosahedron.getVertices();
         int t = indices.length; final float s = 1F;
@@ -75,14 +89,15 @@ public class Geometry {
         Model icosaModel = icosahedron.toModel(shader);
         models.add(icosaModel);
         ModelUtils.debugIndices(icosaModel);
-        float maxDist = 0;
-        for (int v = 0; v < planeSample.size(); v+=4) {
-            float x = planeSample.get(v), y = planeSample.get(v+1), z = planeSample.get(v+2);
-            maxDist = Math.max(maxDist,VectorTranslator.getMagnitude(x,y,z));
-        }
-        for (int v = 0; v < planeSample.size(); v++) {
-            planeSample.set(v,planeSample.get(v) / maxDist);
-        }
+
+//        float maxDist = 0;
+//        for (int v = 0; v < planeSample.size(); v+=4) {
+//            float x = planeSample.get(v), y = planeSample.get(v+1), z = planeSample.get(v+2);
+//            maxDist = Math.max(maxDist,VectorTranslator.getMagnitude(x,y,z));
+//        }
+//        for (int v = 0; v < planeSample.size(); v++) {
+//            planeSample.set(v,planeSample.get(v) / maxDist);
+//        }
 
         for (int i = 0; i < t; i+=3) {
             int a = indices[i], b = indices[i+1], c = indices[i+2];
@@ -109,11 +124,12 @@ public class Geometry {
 //            if(i > 4){break;};
         }
 
+        Model points = ModelUtils.plotPoints(
+                Utils.toPrimitiveArray(finalSample)
+                , .025F
+        );
         models.add(new Model(
-                ModelUtils.plotPoints(
-                        Utils.toPrimitiveArray(finalSample)
-                ,.025F
-                ).getRelativeVertices(), new int[0], shader
+                points.getRelativeVertices(), points.getIndices(), shader
         ));
 
 

@@ -67,6 +67,7 @@ import java.io.IOException;
 * Dinamically alocated text object
 * Texturable interface?
 * Modular uniform sync
+* Subdividing triangles of a model for debugging purposes
 * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
