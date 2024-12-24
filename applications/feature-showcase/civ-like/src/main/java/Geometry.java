@@ -1,13 +1,10 @@
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Vector;
 
 public class Geometry {
 

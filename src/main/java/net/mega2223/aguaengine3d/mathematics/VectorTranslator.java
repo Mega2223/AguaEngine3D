@@ -2,11 +2,14 @@ package net.mega2223.aguaengine3d.mathematics;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public class VectorTranslator {
 
-    static final float[] bufferVector = new float[4];
+    static final float[] buffer1 = new float[4];
+    static final float[] buffer2 = new float[4];
+    static final float[] buffer3 = new float[4];
 
     public static void scaleVector(@Modified float[] vector, float factor, int start){
         for (int i = 0; i < 3; i++) {
@@ -71,8 +74,8 @@ public class VectorTranslator {
     }
 
     public static void getCrossProduct(@Modified float[] vector, float[] vector2){
-        getCrossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], bufferVector);
-        System.arraycopy(bufferVector,0,vector,0,3);
+        getCrossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], buffer1);
+        System.arraycopy(buffer1,0,vector,0,3);
     }
 
     public static void getCrossProduct(float[] vector, float[] vector2, @Modified float[] result){
@@ -118,6 +121,32 @@ public class VectorTranslator {
         float x2 = vec2[0]/m2, y2 = vec2[1]/m2, z2 = vec2[2]/m2;
         float dot = dotProduct(x1,y1,z1,x2,y2,z2);
         return (float) Math.acos(dot);
+    }
+
+    public static void getAxisAngle(float[] v3a, float[] v3b, @Modified float[] dest){
+        Arrays.fill(dest,0);
+        float magA = VectorTranslator.getMagnitude(v3a), magB = VectorTranslator.getMagnitude(v3b);
+        float ang = getAngleBetweenVectors(v3a,v3b);
+        getCrossProduct(v3a,v3b,dest);
+        normalize(dest);
+        scaleVector(dest, (float) Math.sin(ang));
+    }
+
+    public static void rotateWithinAxis(float[] vec3, float[] axis, @Modified float[] dest){
+        Arrays.fill(dest,0);
+        float ang = getMagnitude(axis);
+        float s = (float) Math.sin(ang), C = 1F - (float) Math.cos(ang);
+
+        buffer1[0] = axis[0] / ang; buffer1[1] = axis[1] / ang;buffer1[2] = axis[2] / ang; buffer1[3] = 0;
+        //b1 = e    vec3 = v
+        getCrossProduct(buffer1,vec3,buffer2); // b2 = (e X v)
+        getCrossProduct(buffer1,buffer2,buffer3); // b3 = e X (e X v)
+        scaleVector(buffer3,C); // b3 = ( 1 - cos(T) ) (e X (e X v))
+        scaleVector(buffer2,s); // b2 = sin(T) (e X v)
+
+        System.arraycopy(vec3,0,dest,0,3);
+        addToVector(dest,buffer2);
+        addToVector(dest,buffer3);
     }
 
     public static void getRotationRadians(float[] quaternion, @Modified float[] result){

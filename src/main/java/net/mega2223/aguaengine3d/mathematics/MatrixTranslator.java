@@ -309,8 +309,8 @@ public class MatrixTranslator {
     }
 
     public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){
-        multiplyVec4Mat4(vec4,mat4,VectorTranslator.bufferVector);
-        System.arraycopy(VectorTranslator.bufferVector,0,vec4,0,4);
+        multiplyVec4Mat4(vec4,mat4,VectorTranslator.buffer1);
+        System.arraycopy(VectorTranslator.buffer1,0,vec4,0,4);
     }
 
     public static void multiplyVec4Mat4(float[] vec4, float[] mat4,@Modified float[] result){
@@ -322,8 +322,8 @@ public class MatrixTranslator {
     }
 
     public static void multiplyVec3Mat3(@Modified float[] vec3, float[] mat3){
-        multiplyVec3Mat3(vec3,mat3,VectorTranslator.bufferVector);
-        System.arraycopy(VectorTranslator.bufferVector,0,vec3,0,3);
+        multiplyVec3Mat3(vec3,mat3,VectorTranslator.buffer1);
+        System.arraycopy(VectorTranslator.buffer1,0,vec3,0,3);
     }
 
     public static void multiplyVec3Mat3(float[] vec3, float[] mat3,@Modified float[] resultMat3){
@@ -334,6 +334,7 @@ public class MatrixTranslator {
         }
     }
 
+    /**Generates a rotation angle given an axis angle, pretty inaccurate*/
     public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
         Arrays.fill(dest,0);
         float ang = VectorTranslator.getMagnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
@@ -342,7 +343,6 @@ public class MatrixTranslator {
         dest[0] = x * x * C + c; dest[1] = x * y * C - (z * s); dest[2] = x * z * C + (y * s);
         dest[4] = y * x * C + (z * s); dest[5] = y * y * C + c; dest[6] = y * z * C - (x * s);
         dest[8] = z * x * C - (y * s); dest[9] = z * y * C + (x * s); dest[10] = z * z * C + c;
-
         dest[15] = 1;
     }
 
@@ -582,7 +582,7 @@ public class MatrixTranslator {
 
     public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] resultMat4){
         Arrays.fill(resultMat4,0);
-        float[] stolenVector = VectorTranslator.bufferVector;
+        float[] stolenVector = VectorTranslator.buffer1;
         VectorTranslator.getRotationRadians(w,x,y,z, stolenVector);
         MatrixTranslator.generateRotationMatrix(stolenVector[0], stolenVector[1], stolenVector[2], resultMat4);
         /*This doesn't work lol
