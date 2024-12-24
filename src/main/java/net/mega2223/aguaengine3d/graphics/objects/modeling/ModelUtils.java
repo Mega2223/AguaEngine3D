@@ -1,6 +1,5 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -14,7 +13,7 @@ import java.util.Locale;
 public class ModelUtils {
 
     private ModelUtils(){}
-    private static final float[] bufferVec4 = new float[4];
+    private static final float[] bufferVec = new float[4];
 
     public static TexturedModel mergeModels(TexturedModel[] models, int texture){
         if(models.length == 0){return null;}
@@ -199,12 +198,12 @@ public class ModelUtils {
             float vAx = v1x - v0x; float vAy = v1y - v0y; float vAz = v1z - v0z;
             float vBx = v2x - v0x; float vBy = v2y - v0y; float vBz = v2z - v0z;
 
-            VectorTranslator.getCrossProduct(vAx, vAy, vAz, vBx, vBy, vBz, bufferVec4);
-            VectorTranslator.normalize(bufferVec4);
+            VectorTranslator.getCrossProduct(vAx, vAy, vAz, vBx, vBy, vBz, bufferVec);
+            VectorTranslator.normalize(bufferVec);
 
-            primitiveNormals[i/3][0] = bufferVec4[0];
-            primitiveNormals[i/3][1] = bufferVec4[1];
-            primitiveNormals[i/3][2] = bufferVec4[2];
+            primitiveNormals[i/3][0] = bufferVec[0];
+            primitiveNormals[i/3][1] = bufferVec[1];
+            primitiveNormals[i/3][2] = bufferVec[2];
 
             /*connectedPrimitives[indices[i]]++;
             connectedPrimitives[indices[i+1]]++;
@@ -280,15 +279,29 @@ public class ModelUtils {
         float[] vertices = model.vertices;
         debugIndices(indices,vertices);
     }
+
     public static void debugIndices(int[] indices, float[] vertices){
         for (int i = 0; i < indices.length; i+=3) {
             System.out.println("Triangle " + i/3 + ": ");
             for (int j = 0; j < 3; j++) {
                 int ind = indices[i + j]*4;
-                System.out.print("Vertice " + ind/4 + ": ");
-                System.out.println("x: " + vertices[ind] + " y: " + vertices[ind+1] + " z: " + vertices[ind + 2]);
+                System.out.print("Vertex " + ind/4 + ": ");
+                //" + vertices[ind] + " y: " + vertices[ind+1] + " z: " + vertices[ind + 2]
+                System.out.printf(Locale.US,"x: %.3f y:%.3f z:%.3f\n",vertices[ind],vertices[ind+1],vertices[ind+2]);
             }
-            System.out.println();
+            VectorTranslator.getCrossProduct(
+                    vertices[indices[i]*4]-vertices[indices[i+2]*4],
+                    vertices[indices[i]*4+1]-vertices[indices[i+2]*4+1],
+                    vertices[indices[i]*4+2]-vertices[indices[i+2]*4+2],
+                    vertices[indices[i+1]*4]-vertices[indices[i+2]*4+1],
+                    vertices[indices[i+1]*4+1]-vertices[indices[i+2]*4+1],
+                    vertices[indices[i+1]*4+2]-vertices[indices[i+2]*4+2],
+                    bufferVec
+                    );
+            VectorTranslator.normalize(bufferVec);
+            System.out.printf(Locale.US,"Normal: x: %.3f y:%.3f z:%.3f", bufferVec[0], bufferVec[1], bufferVec[2]);
+
+            System.out.println('\n');
         }
     }
 

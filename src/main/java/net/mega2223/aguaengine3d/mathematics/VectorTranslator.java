@@ -10,6 +10,7 @@ public class VectorTranslator {
     static final float[] buffer1 = new float[4];
     static final float[] buffer2 = new float[4];
     static final float[] buffer3 = new float[4];
+    private static final float PI2 = (float) (2 * Math.PI);
 
     public static void scaleVector(@Modified float[] vector, float factor, int start){
         for (int i = 0; i < 3; i++) {
@@ -115,7 +116,6 @@ public class VectorTranslator {
     }
 
     public static float getAngleBetweenVectors(float[] vec, float[] vec2){
-        //TODO: test this lol
         float m1 = getMagnitude(vec), m2 = getMagnitude(vec2);
         float x1 = vec[0]/m1, y1 = vec[1]/m1, z1 = vec[2]/m1;
         float x2 = vec2[0]/m2, y2 = vec2[1]/m2, z2 = vec2[2]/m2;
@@ -123,18 +123,22 @@ public class VectorTranslator {
         return (float) Math.acos(dot);
     }
 
+    /**Gets the axis angle rotation which represents the angle difference between these vectors
+     * FIXME: incrivelmente impreciso*/
     public static void getAxisAngle(float[] v3a, float[] v3b, @Modified float[] dest){
         Arrays.fill(dest,0);
-        float magA = VectorTranslator.getMagnitude(v3a), magB = VectorTranslator.getMagnitude(v3b);
+//        float magA = VectorTranslator.getMagnitude(v3a), magB = VectorTranslator.getMagnitude(v3b);
         float ang = getAngleBetweenVectors(v3a,v3b);
         getCrossProduct(v3a,v3b,dest);
         normalize(dest);
         scaleVector(dest, (float) Math.sin(ang));
     }
 
-    public static void rotateWithinAxis(float[] vec3, float[] axis, @Modified float[] dest){
+    //**Rotates a vector given an axis-angle*/
+    public static void rotateAlongAxis(float[] vec3, float[] axis, @Modified float[] dest){
         Arrays.fill(dest,0);
-        float ang = getMagnitude(axis);
+        float ang = getMagnitude(axis) % PI2;
+        if(ang == 0){ System.arraycopy(vec3,0,dest,0,3); return;}
         float s = (float) Math.sin(ang), C = 1F - (float) Math.cos(ang);
 
         buffer1[0] = axis[0] / ang; buffer1[1] = axis[1] / ang;buffer1[2] = axis[2] / ang; buffer1[3] = 0;
@@ -150,6 +154,7 @@ public class VectorTranslator {
     }
 
     public static void getRotationRadians(float[] quaternion, @Modified float[] result){
+        // FIXME eu não sei qual o sistema que essa rotação usa
         double sinr_cosp = 2 * (quaternion[0] * quaternion[1] + quaternion[2] * quaternion[3]);
         double cosr_cosp = 1 - 2 * (quaternion[1] * quaternion[1] + quaternion[2] * quaternion[2]);
         result[0] = (float) Math.atan2(sinr_cosp, cosr_cosp);
@@ -164,6 +169,7 @@ public class VectorTranslator {
     }
 
     public static void getRotationRadians(float w, float x, float y , float z, @Modified float[] ret){
+        // FIXME eu não sei qual o sistema que essa rotação usa
         double sinr_cosp = 2 * (w * x + y * z);
         double cosr_cosp = 1 - 2 * (x * x + y * y);
         ret[0] = (float) Math.atan2(sinr_cosp, cosr_cosp);

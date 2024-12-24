@@ -1,6 +1,8 @@
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 
 import java.util.ArrayList;
@@ -34,30 +36,86 @@ public class Geometry {
     }
 
     public static Model genPolyhedron(int m, int n){
-        List<Model> models = new ArrayList<>();
-        Model pentagon = genPolygon(5, 1);
-        Model hexagon = genPolygon(6, 1);
-        float[] pentaV = pentagon.getRelativeVertices(); int[] pentaI = pentagon.getIndices();
-        float[] hexaV = hexagon.getRelativeVertices(); int[] hexaI = hexagon.getIndices();
+        SolidColorShaderProgram shader = new SolidColorShaderProgram(.5F, 1F, .6F,1F);
 
-        float pentaLen = (float) Math.sqrt(
+        List<Model> models = new ArrayList<>();
+//        Model pentagon = genPolygon(5, 1);
+//        Model hexagon = genPolygon(6, 1);
+//        float[] pentaV = pentagon.getRelativeVertices(); int[] pentaI = pentagon.getIndices();
+//        float[] hexaV = hexagon.getRelativeVertices(); int[] hexaI = hexagon.getIndices();
+
+//        float pentaLen = (float) Math.sqrt(
                 //length of pentagon sides
-                (pentaV[0] - pentaV[4]) * (pentaV[0] - pentaV[4]) +
-                (pentaV[1] - pentaV[5]) * (pentaV[1] - pentaV[5]) +
-                (pentaV[2] - pentaV[6]) * (pentaV[2] - pentaV[6])
-        );
-        for (int i = 0; i < pentaV.length; i++) {
-            pentaV[i] /= pentaLen;
-        }
+//                (pentaV[0] - pentaV[4]) * (pentaV[0] - pentaV[4]) +
+//                (pentaV[1] - pentaV[5]) * (pentaV[1] - pentaV[5]) +
+//                (pentaV[2] - pentaV[6]) * (pentaV[2] - pentaV[6])
+//        );
+//        for (int i = 0; i < pentaV.length; i++) {
+//            pentaV[i] /= pentaLen;
+//        }
 
 //        models.add(new Model(pentaV,pentaI,new SolidColorShaderProgram(.5f,.7f,.5f)));
+        int r = 2;
+        List<Float> planeSample = sampleHexagonPlane(-r, -r, r, r);
+        planeSample.removeAll(planeSample);
+        planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);
+        List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
+
+        Mesh icosahedron = Mesh.ICOSAHEDRON;
+        int[] indices = icosahedron.getIndices();
+        float[] vertices = icosahedron.getVertices();
+        int t = indices.length; final float s = 1F;
+        float[] normal = new float[4];
+        float[] grid = {0,0,1,0};
+        float[] rotAxis = new float[4];
+        float[] currentSample = new float[4];
+        float[] rotated = new float[4];
+        float[] center = new float[4];
+
+        Model icosaModel = icosahedron.toModel(shader);
+        models.add(icosaModel);
+        ModelUtils.debugIndices(icosaModel);
+        float maxDist = 0;
+        for (int v = 0; v < planeSample.size(); v+=4) {
+            float x = planeSample.get(v), y = planeSample.get(v+1), z = planeSample.get(v+2);
+            maxDist = Math.max(maxDist,VectorTranslator.getMagnitude(x,y,z));
+        }
+        for (int v = 0; v < planeSample.size(); v++) {
+            planeSample.set(v,planeSample.get(v) / maxDist);
+        }
+
+        for (int i = 0; i < t; i+=3) {
+            int a = indices[i], b = indices[i+1], c = indices[i+2];
+            float aX = vertices[a*4], aY = vertices[a*4+1], aZ = vertices[a*4+2];
+            float bX = vertices[b*4], bY = vertices[b*4+1], bZ = vertices[b*4+2];
+            float cX = vertices[c*4], cY = vertices[c*4+1], cZ = vertices[c*4+2];
+
+            //TODO era pra ser um ponto equidistante dos outros, mas
+            // os triângulos são equiláteros então eu acho que não tem problema???
+            // enfim, teste :)
+            center[0] = (aX + bX + cX)/3; center[1] = (aY + bY + cY)/3; center[2] = (aZ + bZ + cZ)/3;
+
+            VectorTranslator.getCrossProduct(aX-cX,aY-cY,aZ-cZ,bX-cX,bY-cY,bZ-cZ,normal);
+            VectorTranslator.normalize(normal);
+            VectorTranslator.getAxisAngle(normal,grid,rotAxis);
+
+            for (int j = 0; j < planeSample.size(); j+=4) {
+                currentSample[0] = planeSample.get(j); currentSample[1] = planeSample.get(j+1);
+                currentSample[2] = planeSample.get(j+2); currentSample[3] = planeSample.get(j+3);
+                VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
+                for (int k = 0; k < 4; k++) { finalSample.add(rotated[k] + center[k]); }
+            }
+//            System.out.println(i/3);
+//            if(i > 4){break;};
+        }
 
         models.add(new Model(
                 ModelUtils.plotPoints(
-                        Utils.toPrimitiveArray(sampleHexagonPlane(-6,-6,6,6))
+                        Utils.toPrimitiveArray(finalSample)
                 ,.025F
-                ).getRelativeVertices(), new int[0],new SolidColorShaderProgram(.5F,.5F,.6F)
+                ).getRelativeVertices(), new int[0], shader
         ));
+
 
         Model[] ret = new Model[models.size()];
         ret = models.toArray(ret);

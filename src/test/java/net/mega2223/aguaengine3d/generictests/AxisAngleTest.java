@@ -38,7 +38,7 @@ public class AxisAngleTest {
                 res[0],res[1],res[2],b[0],b[1],b[2]
         );
 
-        VectorTranslator.rotateWithinAxis(a,axis,res);
+        VectorTranslator.rotateAlongAxis(a,axis,res);
         System.out.printf(Locale.US,"a * vr = (%.3f,%.3f,%.3f)\nb=(%.3f,%.3f,%.3f)\n",
                 res[0],res[1],res[2],b[0],b[1],b[2]
         );
