@@ -59,25 +59,22 @@ public class Geometry {
         List<Float> planeSample = sampleHexagonPlane(-r, -r, r, r);
         planeSample.removeAll(planeSample);
 
-        for (int i = 0; i < 10; i++) {
-            planeSample.add(i/10F - .5F);planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);
-        }
-        for (int i = 0; i < 10; i++) {
-            planeSample.add(0f);planeSample.add(i/10F - .5F);planeSample.add(0F);planeSample.add(0F);
+//        for (int i = 0; i < 10; i++) {
+//            planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);planeSample.add(i*.05f);
+//        }
+        float rad = .5F;
+        for (double i = - Math.PI; i < Math.PI; i+= Math.PI / 50) {
+            planeSample.add((float) Math.cos(i)*rad); planeSample.add((float) Math.sin(i)*rad);
+            planeSample.add(0f); planeSample.add(0f);
         }
 
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
-        Mesh icosahedron = Mesh.ICOSAHEDRON;
-        icosahedron = Mesh.CUBE;
-        //fixme a questão do ângulo tá ridiculamente imprecisa
-        // em um CUBO ele não pega o theta correto
-        // é bem possível que alguma fórmula no meio desse processo esteja errada
-        // e se não for isso então dá uma olhada em aumentar a precisão
-        // pq a tradução só funciona pra 1/4 dos triângulos
-        // TESTA O PRODUTO VETORIAL !!!!
+        Mesh icosahedron = Mesh.ICOSAHEDRON; //fixme deus não existe e o ângulo ainda está errado
+//        icosahedron = Mesh.CUBE;
 
         int[] indices = icosahedron.getIndices();
+//        indices[0] = 0; indices[1] = 0; indices[2] = 0;
         float[] vertices = icosahedron.getVertices();
         int t = indices.length; final float s = 1F;
         float[] normal = new float[4];
@@ -88,9 +85,10 @@ public class Geometry {
         float[] center = new float[4];
 
         Model icosaModel = icosahedron.toModel(shader);
+//        icosaModel.setIndices(indices);
         models.add(icosaModel);
-        ModelUtils.debugIndices(icosaModel);
-
+//        ModelUtils.debugIndices(icosaModel);
+//
 //        float maxDist = 0;
 //        for (int v = 0; v < planeSample.size(); v+=4) {
 //            float x = planeSample.get(v), y = planeSample.get(v+1), z = planeSample.get(v+2);
@@ -115,12 +113,14 @@ public class Geometry {
             VectorTranslator.getCrossProduct(aX-cX,aY-cY,aZ-cZ,bX-cX,bY-cY,bZ-cZ,normal);
             VectorTranslator.normalize(normal);
             VectorTranslator.getAxisAngle(normal,grid,rotAxis);
+            VectorTranslator.flipVector(rotAxis);
 
             for (int j = 0; j < planeSample.size(); j+=4) {
                 currentSample[0] = planeSample.get(j); currentSample[1] = planeSample.get(j+1);
-                currentSample[2] = planeSample.get(j+2); currentSample[3] = planeSample.get(j+3);
+                currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
+//
                 VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
-                for (int k = 0; k < 4; k++) { finalSample.add(rotated[k] + center[k]); }
+                for (int k = 0; k < 3; k++) { finalSample.add(rotated[k] + center[k]); }
             }
 //            System.out.println(i/3);
 //            if(i > 4){break;};

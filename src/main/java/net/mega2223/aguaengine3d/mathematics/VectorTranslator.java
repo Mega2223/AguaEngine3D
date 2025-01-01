@@ -122,10 +122,9 @@ public class VectorTranslator {
         float dot = dotProduct(x1,y1,z1,x2,y2,z2);
 
         double angle = Math.acos(dot / (m1 * m2));
-        System.out.printf(Locale.US,
-                "ANGLE BETWEEN (%.2f,%.2f,%.2f) AND (%.2f,%.2f,%.2f): %.2f\n",
-                vecA[0],vecA[1],vecA[2],vecB[0],vecB[1],vecB[2],Math.toDegrees(angle));
-
+//        System.out.printf(Locale.US,
+//                "ANGLE BETWEEN (%.2f,%.2f,%.2f) AND (%.2f,%.2f,%.2f): %.2f\n",
+//                vecA[0],vecA[1],vecA[2],vecB[0],vecB[1],vecB[2],Math.toDegrees(angle));
         return (float) angle;
     }
 
@@ -138,7 +137,7 @@ public class VectorTranslator {
         getCrossProduct(v3a,v3b,dest);
         normalize(dest);
         scaleVector(dest, ang);
-        VectorTranslator.debugVector("AXIS ",dest);
+//        VectorTranslator.debugVector("AXIS ",dest); AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
     //**Rotates a vector given an axis-angle*/
