@@ -32,7 +32,7 @@ import java.io.IOException;
 * The floor is slightly transparent somehow <- FIXED
 * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade) <- Done
 * Move aero to another module? (also finish it lol) <- DONE
-* Move shadow calculation algorithm to the default shader dictionary
+* Move shadow calculation algorithm to the default shader dictionary <- goes along with standardizing uniforms i guess
 * Reform the shader dictionary lol
 * Cubemap support (for lights and skyboxes) <- Done
 * Logo (kindadone) and Readme.md (done)
@@ -63,7 +63,7 @@ import java.io.IOException;
 * Interpolation interface and objects (Done)
 * FPS manager for windowmanagers
 * TAG para operações que criam objetos
-* Filter functions? (functions that filter :p)
+* Filter functions? (functions that filter :p) <- what was bro yapping about
 * Dinamically alocated text object
 * Texturable interface?
 * Modular uniform sync

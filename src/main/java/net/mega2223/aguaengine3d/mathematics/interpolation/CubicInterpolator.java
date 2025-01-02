@@ -1,6 +1,8 @@
 package net.mega2223.aguaengine3d.mathematics.interpolation;
 
-public class CubicInterpolator implements Interpolator{
+import net.mega2223.aguaengine3d.mathematics.Interpolator;
+
+public class CubicInterpolator implements Interpolator {
 
     @Override
     public float interpolate(float v1, float v2, float p) {

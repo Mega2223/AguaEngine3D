@@ -32,7 +32,7 @@ public class Civ {
 
     public static void main(String[] args) {
         setup();
-        Model polyhedron = Geometry.genPolyhedron(4, 2);
+        Model polyhedron = Geometry.genPolyhedron(4, 0);
         context.addObject(polyhedron);
         begin();
     }

@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d.featureshowcase.proceduralworldgenerator.daycycle;
 
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.mathematics.interpolation.Interpolator;
+import net.mega2223.aguaengine3d.mathematics.Interpolator;
 import net.mega2223.aguaengine3d.mathematics.interpolation.LinearInterpolator;
 
 import java.util.ArrayList;

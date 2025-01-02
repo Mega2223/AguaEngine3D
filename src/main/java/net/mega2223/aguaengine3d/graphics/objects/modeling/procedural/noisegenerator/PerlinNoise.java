@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator;
 
 import net.mega2223.aguaengine3d.mathematics.interpolation.CubicInterpolator;
-import net.mega2223.aguaengine3d.mathematics.interpolation.Interpolator;
+import net.mega2223.aguaengine3d.mathematics.Interpolator;
 
 import java.util.Random;
 

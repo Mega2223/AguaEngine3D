@@ -1,8 +1,11 @@
 package net.mega2223.aguaengine3d.mathematics.interpolation;
+
+import net.mega2223.aguaengine3d.mathematics.Interpolator;
+
 /**
  * Cubic interpolation with an additional inflection point at the medium point between v1 and v2
  * */
-public class DoubleCubicInterpolator implements Interpolator{
+public class DoubleCubicInterpolator implements Interpolator {
     public static final DoubleCubicInterpolator INSTANCE = new DoubleCubicInterpolator();
     @Override
     public float interpolate(float v1, float v2, float p) {

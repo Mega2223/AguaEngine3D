@@ -76,10 +76,10 @@ public class Geometry {
 //            planeSample.add(0F); planeSample.add(k); planeSample.add(0F); planeSample.add(0F);
 //            planeSample.add(0F); planeSample.add(0F); planeSample.add(k); planeSample.add(0F);
         }
-        for (float t = 0; t <= Math.PI * 2; t+=Math.PI/10F){
-            planeSample.add((float) Math.sin(t)); planeSample.add((float) Math.cos(t));
-            planeSample.add(0F); planeSample.add(0F);
-        }
+//        for (float t = 0; t <= Math.PI * 2; t+=Math.PI/10F){
+//            planeSample.add((float) Math.sin(t)); planeSample.add((float) Math.cos(t));
+//            planeSample.add(0F); planeSample.add(0F);
+//        }
 
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
@@ -123,8 +123,10 @@ public class Geometry {
                 currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
                 VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
                 for (int k = 0; k < 3; k++) {
-                    finalSample.add(rotated[k] + center[k]);
+//                    finalSample.add(rotated[k] + center[k]);
+                    finalSample.add(rotated[k]+center[k]);
                 }
+                finalSample.add(0F);
             }
         }
 
