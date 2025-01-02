@@ -56,6 +56,12 @@ public class Geometry {
         float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
         float mag = VectorTranslator.getMagnitude(p2);
 
+        float[] triangleCenter = {-p2[1],p2[0],0,0};
+        VectorTranslator.scaleVector(triangleCenter,SQRT_3/2F);
+        VectorTranslator.addToVector(p2[0]/2F,p2[1]/2F,0,triangleCenter);
+        VectorTranslator.addToVector(triangleCenter,p2);
+        VectorTranslator.scaleVector(triangleCenter,1F/3F);
+
         float[] right = {1,0,0,0};
         float[] axis = new float[4];
         VectorTranslator.getAxisAngle(p2,right,axis);
@@ -64,6 +70,7 @@ public class Geometry {
 
         for (int i = 0; i < planeSample.size(); i+=4) {
             float[] current = {planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2),0};
+            VectorTranslator.subtractFromVector(current,triangleCenter);
             VectorTranslator.rotateAlongAxis(current,axis,buffer);
             System.arraycopy(buffer,0,current,0,3);
             for (int j = 0; j < 3; j++) {planeSample.set(i+j,current[j]/mag);}
@@ -88,7 +95,7 @@ public class Geometry {
 
         int[] indices = icosahedron.getIndices();
         float[] vertices = icosahedron.getVertices();
-        int tr = indices.length; final float s = 1F;
+        int trC = indices.length; final float s = 1F;
         float[] normal = new float[4];
         float[] zPositive = {0,0,1,0};
         float[] rotAxis = new float[4];
@@ -99,7 +106,7 @@ public class Geometry {
         Model icosaModel = icosahedron.toModel(shader);
         models.add(icosaModel);
 
-        for (int i = 0; i < tr; i+=3) {
+        for (int i = 0; i < trC; i+=3) {
             int a = indices[i], b = indices[i+1], c = indices[i+2];
             float aX = vertices[a*4], aY = vertices[a*4+1], aZ = vertices[a*4+2];
             float bX = vertices[b*4], bY = vertices[b*4+1], bZ = vertices[b*4+2];

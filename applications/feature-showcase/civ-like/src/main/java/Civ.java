@@ -1,18 +1,13 @@
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.*;
-import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
-import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -21,14 +16,12 @@ public class Civ {
     public static final int TARGET_FPS = 60;
     public static final String TITLE = "Sid Meyer nao me processa :)";
 
-    static RenderingContext context = null;
-    static WindowManager manager = null;
+    public static RenderingContext context = null;
+    public static WindowManager manager = null;
     static Random r = new Random();
     static long framesElapsed = 0;
     static float[] projection = new float[16];
-    public static final float[] cam = {0, 0, 4, (float) Math.PI};
-
-    private static final float[] mat4 = new float[16];
+    static final float[] cam = {0, 0, 4, (float) Math.PI};
 
     public static void main(String[] args) {
         setup();
