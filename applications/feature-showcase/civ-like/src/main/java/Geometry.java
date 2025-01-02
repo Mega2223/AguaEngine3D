@@ -41,63 +41,45 @@ public class Geometry {
     private static final float COS_60 = (float) Math.cos(Math.toRadians(60));
     private static final float SIN_60 = (float) Math.sin(Math.toRadians(60));
 
-    static List<Float> filter (List<Float> vertices, float m, float n){
-        List<Float> ret = new ArrayList<>();
-        Arrays.fill(bufferPoints[0],0);
-        VectorTranslator.addToVector(m,0,0,bufferPoints[0]);
-        VectorTranslator.addToVector(COS_60*n,SIN_60*n,0,bufferPoints[0]);
-
-        float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
-        float sideLen = VectorTranslator.getMagnitude(p2);
-
-        float[] p3 = {-p2[1],p2[0],0,0};
-        VectorTranslator.scaleVector(p3,SQRT_3/2F);
-        VectorTranslator.addToVector(p2[0]/2F,p2[1]/2F,0,p3);
-
-        float[] vN = p3.clone();
-        VectorTranslator.subtractFromVector(vN,p2);
-
-        for (int i = 0; i < vertices.size(); i+=4) {
-            float x = vertices.get(i), y = vertices.get(i+1), z = vertices.get(i+2);
-            float ratio = y / x;
-            // eu sou o maior matemático de todos os tempos
-            boolean a = ratio <= p3[1] / p3[0];
-            boolean b = ratio >= p2[1] / p2[0];
-            boolean c = (y - p2[1]) / (x - p2[0]) >= vN[1] / vN[0];
-            boolean d = x <= p2[0];
-            boolean valid = a && b && c && d && x >= 0 && y >= 0;
-//            valid = x >= 0 && y >= 0 && a && b;
-            if(!valid){continue;}
-            ret.add(x); ret.add(y);ret.add(z);ret.add(0f);
-        }
-        return ret;
-    }
-
     public static Model genPolyhedron(int m, int n){
         SolidColorShaderProgram shader = new SolidColorShaderProgram(.5F, 1F, .6F,1F);
 
         List<Model> models = new ArrayList<>();
-        float r = Math.max(m,n), scale = 1F/r;
-        float bound = (m + n) * SQRT_3;
+        float radius = Math.max(m,n), scale = 1F/radius, bound = (m + n) * SQRT_3;
+
         List<Float> planeSample = sampleHexagonPlane(bound, bound);
         for (int i = 0; i < planeSample.size(); i++) { planeSample.set(i,planeSample.get(i)/SQRT_3);}
         planeSample = filter(planeSample,m,n);
 
-        for (int i = 0; i < planeSample.size(); i++) {
-            planeSample.set(i,planeSample.get(i)*scale);
+        float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
+        float mag = VectorTranslator.getMagnitude(p2);
+
+        float[] right = {1,0,0,0};
+        float[] axis = new float[4];
+        VectorTranslator.getAxisAngle(p2,right,axis);
+
+        float[] buffer = new float[4];
+
+        for (int i = 0; i < planeSample.size(); i+=4) {
+            float[] current = {planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2),0};
+            VectorTranslator.rotateAlongAxis(current,axis,buffer);
+            System.arraycopy(buffer,0,current,0,3);
+//            for (int j = 0; j < 3; j++) {planeSample.set(i+j,current[j]/mag);}
         }
 
-//        planeSample.removeAll(planeSample);
 
-//        float rad = .5F;
-//        for (double i = - Math.PI; i < Math.PI; i+= Math.PI / 50) {
-//            planeSample.add((float) Math.cos(i)*rad); planeSample.add((float) Math.sin(i)*rad);
-//            planeSample.add(0f); planeSample.add(0f);
-//        }
-//
-//        for (float i = 0; i < 15; i+=.05F) {
-//            planeSample.add(0f); planeSample.add(0f); planeSample.add(i); planeSample.add(0f);
-//        }
+        planeSample.removeAll(planeSample);
+        float rad = .5F;
+
+        for (float k = -.25F; k <= .25F; k+=.025F) {
+            planeSample.add(k); planeSample.add(0F); planeSample.add(0F); planeSample.add(0F);
+//            planeSample.add(0F); planeSample.add(k); planeSample.add(0F); planeSample.add(0F);
+//            planeSample.add(0F); planeSample.add(0F); planeSample.add(k); planeSample.add(0F);
+        }
+        for (float t = 0; t <= Math.PI * 2; t+=Math.PI/10F){
+            planeSample.add((float) Math.sin(t)); planeSample.add((float) Math.cos(t));
+            planeSample.add(0F); planeSample.add(0F);
+        }
 
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
@@ -113,8 +95,8 @@ public class Geometry {
         float[] rotated = new float[4];
         float[] center = new float[4];
 
-//        Model icosaModel = icosahedron.toModel(shader);
-//        models.add(icosaModel);
+        Model icosaModel = icosahedron.toModel(shader);
+        models.add(icosaModel);
 
         for (int i = 0; i < tr; i+=3) {
             int a = indices[i], b = indices[i+1], c = indices[i+2];
@@ -139,15 +121,11 @@ public class Geometry {
             for (int j = 0; j < planeSample.size(); j+=4) {
                 currentSample[0] = planeSample.get(j); currentSample[1] = planeSample.get(j+1);
                 currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
-//
                 VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
                 for (int k = 0; k < 3; k++) {
-//                    finalSample.add(rotated[k] + center[k]);
-//                    finalSample.add(planeSample.get(j+k));
+                    finalSample.add(rotated[k] + center[k]);
                 }
             }
-//            System.out.println(i/3);
-//            if(i > 4){break;};
         }
 
         for (int i = 0; i < planeSample.size(); i+=4) {
@@ -167,11 +145,46 @@ public class Geometry {
         models.add(new Model(
                 points.getRelativeVertices(), points.getIndices(), shader
         ));
-        VectorTranslator.debugVector(Utils.toPrimitiveArray(finalSample));
 
         Model[] ret = new Model[models.size()];
         ret = models.toArray(ret);
         return ModelUtils.mergeModels(ret);
+    }
+
+    static List<Float> filter (List<Float> vertices, float m, float n){
+        List<Float> ret = new ArrayList<>();
+        Arrays.fill(bufferPoints[0],0);
+        VectorTranslator.addToVector(m,0,0,bufferPoints[0]);
+        VectorTranslator.addToVector(COS_60*n,SIN_60*n,0,bufferPoints[0]);
+
+        float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
+        float sideLen = VectorTranslator.getMagnitude(p2);
+
+        float[] p3 = {-p2[1],p2[0],0,0};
+        VectorTranslator.scaleVector(p3,SQRT_3/2F);
+        VectorTranslator.addToVector(p2[0]/2F,p2[1]/2F,0,p3);
+
+        float[] vN = p3.clone();
+        VectorTranslator.subtractFromVector(vN,p2);
+
+        for (int i = 0; i < vertices.size(); i+=4) {
+            float x = vertices.get(i), y = vertices.get(i+1), z = vertices.get(i+2);
+            float ratio = y / x;
+            // eu sou o maior matemático de todos os tempos
+            boolean a = ratio <= p3[1] / p3[0];
+            boolean b = ratio >= p2[1] / p2[0];
+            boolean c = (y - p2[1]) / (x - p2[0]) >= vN[1] / vN[0];
+            boolean d = x < p2[0];
+            boolean valid = a && b && c && d && x >= 0 && y >= 0;
+            if(!valid){continue;}
+            ret.add(x); ret.add(y); ret.add(z); ret.add(0f);
+        }
+//
+//        for (int i = 0; i < ret.size(); i+=4) {
+//            System.out.printf(Locale.US,"(%.3f,%.3f),",ret.get(i),ret.get(i+1));
+//        }
+        System.out.println();
+        return ret;
     }
 
     static List<Float> sampleHexagonPlane(float maxX, float maxY){
@@ -182,31 +195,11 @@ public class Geometry {
             if(y > maxY){break;}
             for (int c = 0;; c++){
                 boolean odd = (r % 4) / 2 == 1;
-                float x = c * SQRT_3 + (odd ? 0 : SQRT_3 / 2);
+                float x = c * SQRT_3 + (odd ? 0 : SQRT_3 / 2F);
                 if(x > maxX){break;}
-//                System.out.printf(Locale.US,"(%.3f, %.3f),", x,y);
                 ret.add(x); ret.add(y); ret.add(0F); ret.add(0F);
             }
         }
-//        float tX = ret.get(0), tY = ret.get(1), cld = Float.MAX_VALUE;
-//        final float mx = maxX/2, my = maxY/2;
-//        for (int i = 0; i < ret.size(); i+=4) {
-//            float x = ret.get(i), y = ret.get(i + 1);
-//            float dx = x - mx, dy = y - my;
-//            float dist = (float) Math.sqrt(dx*dx + dy*dy);
-//            if(dist < cld){
-//                cld = dist; tX = x; tY = y;
-//            }
-//        }
-//        for (int i = 0; i < ret.size(); i+=4) {
-//            ret.set(i,ret.get(i)-tX);
-//            ret.set(i+1,ret.get(i+1)-tY);
-//        }
-
-        for (int i = 0; i < ret.size(); i+=4) {
-            System.out.printf(Locale.US,"(%.3f,%.3f),",ret.get(i),ret.get(i+1));
-        }
-        System.out.println();
         return ret;
     }
 }
