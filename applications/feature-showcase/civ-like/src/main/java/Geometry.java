@@ -6,7 +6,9 @@ import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class Geometry {
 
@@ -35,70 +37,86 @@ public class Geometry {
         return new Model(vertices,indices,null);
     }
 
+    private static final float[][] bufferPoints = new float[2][4];
+    private static final float COS_60 = (float) Math.cos(Math.toRadians(60));
+    private static final float SIN_60 = (float) Math.sin(Math.toRadians(60));
+
+    static List<Float> filter (List<Float> vertices, float m, float n){
+        List<Float> ret = new ArrayList<>();
+        Arrays.fill(bufferPoints[0],0);
+        VectorTranslator.addToVector(m,0,0,bufferPoints[0]);
+        VectorTranslator.addToVector(COS_60*n,SIN_60*n,0,bufferPoints[0]);
+
+        float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
+        float sideLen = VectorTranslator.getMagnitude(p2);
+
+        float[] p3 = {-p2[1],p2[0],0,0};
+        VectorTranslator.scaleVector(p3,SQRT_3/2F);
+        VectorTranslator.addToVector(p2[0]/2F,p2[1]/2F,0,p3);
+
+        float[] vN = p3.clone();
+        VectorTranslator.subtractFromVector(vN,p2);
+
+        for (int i = 0; i < vertices.size(); i+=4) {
+            float x = vertices.get(i), y = vertices.get(i+1), z = vertices.get(i+2);
+            float ratio = y / x;
+            // eu sou o maior matemático de todos os tempos
+            boolean a = ratio <= p3[1] / p3[0];
+            boolean b = ratio >= p2[1] / p2[0];
+            boolean c = (y - p2[1]) / (x - p2[0]) >= vN[1] / vN[0];
+            boolean d = x <= p2[0];
+            boolean valid = a && b && c && d && x >= 0 && y >= 0;
+//            valid = x >= 0 && y >= 0 && a && b;
+            if(!valid){continue;}
+            ret.add(x); ret.add(y);ret.add(z);ret.add(0f);
+        }
+        return ret;
+    }
+
     public static Model genPolyhedron(int m, int n){
         SolidColorShaderProgram shader = new SolidColorShaderProgram(.5F, 1F, .6F,1F);
 
         List<Model> models = new ArrayList<>();
-//        Model pentagon = genPolygon(5, 1);
-//        Model hexagon = genPolygon(6, 1);
-//        float[] pentaV = pentagon.getRelativeVertices(); int[] pentaI = pentagon.getIndices();
-//        float[] hexaV = hexagon.getRelativeVertices(); int[] hexaI = hexagon.getIndices();
+        float r = Math.max(m,n), scale = 1F/r;
+        float bound = (m + n) * SQRT_3;
+        List<Float> planeSample = sampleHexagonPlane(bound, bound);
+        for (int i = 0; i < planeSample.size(); i++) { planeSample.set(i,planeSample.get(i)/SQRT_3);}
+        planeSample = filter(planeSample,m,n);
 
-//        float pentaLen = (float) Math.sqrt(
-                //length of pentagon sides
-//                (pentaV[0] - pentaV[4]) * (pentaV[0] - pentaV[4]) +
-//                (pentaV[1] - pentaV[5]) * (pentaV[1] - pentaV[5]) +
-//                (pentaV[2] - pentaV[6]) * (pentaV[2] - pentaV[6])
-//        );
-//        for (int i = 0; i < pentaV.length; i++) {
-//            pentaV[i] /= pentaLen;
-//        }
-
-//        models.add(new Model(pentaV,pentaI,new SolidColorShaderProgram(.5f,.7f,.5f)));
-        int r = 2;
-        List<Float> planeSample = sampleHexagonPlane(-r, -r, r, r);
-        planeSample.removeAll(planeSample);
-
-//        for (int i = 0; i < 10; i++) {
-//            planeSample.add(0F);planeSample.add(0F);planeSample.add(0F);planeSample.add(i*.05f);
-//        }
-        float rad = .5F;
-        for (double i = - Math.PI; i < Math.PI; i+= Math.PI / 50) {
-            planeSample.add((float) Math.cos(i)*rad); planeSample.add((float) Math.sin(i)*rad);
-            planeSample.add(0f); planeSample.add(0f);
+        for (int i = 0; i < planeSample.size(); i++) {
+            planeSample.set(i,planeSample.get(i)*scale);
         }
+
+//        planeSample.removeAll(planeSample);
+
+//        float rad = .5F;
+//        for (double i = - Math.PI; i < Math.PI; i+= Math.PI / 50) {
+//            planeSample.add((float) Math.cos(i)*rad); planeSample.add((float) Math.sin(i)*rad);
+//            planeSample.add(0f); planeSample.add(0f);
+//        }
+//
+//        for (float i = 0; i < 15; i+=.05F) {
+//            planeSample.add(0f); planeSample.add(0f); planeSample.add(i); planeSample.add(0f);
+//        }
 
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
         Mesh icosahedron = Mesh.ICOSAHEDRON; //fixme deus não existe e o ângulo ainda está errado
-//        icosahedron = Mesh.CUBE;
 
         int[] indices = icosahedron.getIndices();
-//        indices[0] = 0; indices[1] = 0; indices[2] = 0;
         float[] vertices = icosahedron.getVertices();
-        int t = indices.length; final float s = 1F;
+        int tr = indices.length; final float s = 1F;
         float[] normal = new float[4];
-        float[] grid = {0,0,1,0};
+        float[] zPositive = {0,0,1,0};
         float[] rotAxis = new float[4];
         float[] currentSample = new float[4];
         float[] rotated = new float[4];
         float[] center = new float[4];
 
-        Model icosaModel = icosahedron.toModel(shader);
-//        icosaModel.setIndices(indices);
-        models.add(icosaModel);
-//        ModelUtils.debugIndices(icosaModel);
-//
-//        float maxDist = 0;
-//        for (int v = 0; v < planeSample.size(); v+=4) {
-//            float x = planeSample.get(v), y = planeSample.get(v+1), z = planeSample.get(v+2);
-//            maxDist = Math.max(maxDist,VectorTranslator.getMagnitude(x,y,z));
-//        }
-//        for (int v = 0; v < planeSample.size(); v++) {
-//            planeSample.set(v,planeSample.get(v) / maxDist);
-//        }
+//        Model icosaModel = icosahedron.toModel(shader);
+//        models.add(icosaModel);
 
-        for (int i = 0; i < t; i+=3) {
+        for (int i = 0; i < tr; i+=3) {
             int a = indices[i], b = indices[i+1], c = indices[i+2];
             float aX = vertices[a*4], aY = vertices[a*4+1], aZ = vertices[a*4+2];
             float bX = vertices[b*4], bY = vertices[b*4+1], bZ = vertices[b*4+2];
@@ -112,7 +130,10 @@ public class Geometry {
 
             VectorTranslator.getCrossProduct(aX-cX,aY-cY,aZ-cZ,bX-cX,bY-cY,bZ-cZ,normal);
             VectorTranslator.normalize(normal);
-            VectorTranslator.getAxisAngle(normal,grid,rotAxis);
+            if(VectorTranslator.getAngleBetweenVectors(normal,center) > Math.PI){
+                VectorTranslator.flipVector(normal);
+            }
+            VectorTranslator.getAxisAngle(normal,zPositive,rotAxis);
             VectorTranslator.flipVector(rotAxis);
 
             for (int j = 0; j < planeSample.size(); j+=4) {
@@ -120,10 +141,23 @@ public class Geometry {
                 currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
 //
                 VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
-                for (int k = 0; k < 3; k++) { finalSample.add(rotated[k] + center[k]); }
+                for (int k = 0; k < 3; k++) {
+//                    finalSample.add(rotated[k] + center[k]);
+//                    finalSample.add(planeSample.get(j+k));
+                }
             }
 //            System.out.println(i/3);
 //            if(i > 4){break;};
+        }
+
+        for (int i = 0; i < planeSample.size(); i+=4) {
+            for (int j = 0; j < 3; j++) {
+                finalSample.add(planeSample.get(i+j));
+            }
+            finalSample.add(0f);
+//            System.out.printf(Locale.US,"%.3f,%.3f,%.3f\n",
+//                    planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2)
+//                    );
         }
 
         Model points = ModelUtils.plotPoints(
@@ -133,55 +167,46 @@ public class Geometry {
         models.add(new Model(
                 points.getRelativeVertices(), points.getIndices(), shader
         ));
-
+        VectorTranslator.debugVector(Utils.toPrimitiveArray(finalSample));
 
         Model[] ret = new Model[models.size()];
         ret = models.toArray(ret);
         return ModelUtils.mergeModels(ret);
     }
 
-    static List<Float> sampleHexagonPlane(float minX, float minY, float maxX, float maxY){
+    static List<Float> sampleHexagonPlane(float maxX, float maxY){
         List<Float> ret = new ArrayList<>();
         boolean even = true;
-//        for (float y = 0; y < maxY-minY; y+= 3F/2F) {
-//            float start = even ? 0 : SQRT_3 * 0.5F;
-//            for (float x = 0; x < maxX-minX; x+= SQRT_3) {
-//                System.out.printf("P = (%.3f %.3f)", x,y);
-//                float sAX = start + x - SQRT_3 * 0.5F, sAY = y - .5F,
-//                        sBX = start + x, sBY = y - 1F,
-//                        sCX = start + x - SQRT_3 * 0.5F, sCY = y + .5F;;
-//                ret.add(sAX); ret.add(sAY); ret.add(0F); ret.add(0F);
-//                ret.add(sBX); ret.add(sBY); ret.add(0F); ret.add(0F);
-//                ret.add(sCX); ret.add(sCY); ret.add(0F);ret.add(0F);
-//                System.out.printf(" -> (%.3f %.3f) (%.3f %.3f) (%.3f %.3f)\n",sAX, sAY, sBX, sBY, sCX,sCY);
-//            }
-//            even = !even;
-//        }
         for (int r = 0;; r++){
             float y = r * .5F + ((r + 1) >> 1) *.5F - .5F;
-            if(y > maxY - minY){break;}
+            if(y > maxY){break;}
             for (int c = 0;; c++){
                 boolean odd = (r % 4) / 2 == 1;
                 float x = c * SQRT_3 + (odd ? 0 : SQRT_3 / 2);
-                if(x > maxX - minX){break;}
+                if(x > maxX){break;}
 //                System.out.printf(Locale.US,"(%.3f, %.3f),", x,y);
                 ret.add(x); ret.add(y); ret.add(0F); ret.add(0F);
             }
         }
-        float tX = ret.get(0), tY = ret.get(1), cld = Float.MAX_VALUE;
-        final float mx = (maxX-minX)/2, my = (maxY-minY)/2;
+//        float tX = ret.get(0), tY = ret.get(1), cld = Float.MAX_VALUE;
+//        final float mx = maxX/2, my = maxY/2;
+//        for (int i = 0; i < ret.size(); i+=4) {
+//            float x = ret.get(i), y = ret.get(i + 1);
+//            float dx = x - mx, dy = y - my;
+//            float dist = (float) Math.sqrt(dx*dx + dy*dy);
+//            if(dist < cld){
+//                cld = dist; tX = x; tY = y;
+//            }
+//        }
+//        for (int i = 0; i < ret.size(); i+=4) {
+//            ret.set(i,ret.get(i)-tX);
+//            ret.set(i+1,ret.get(i+1)-tY);
+//        }
+
         for (int i = 0; i < ret.size(); i+=4) {
-            float x = ret.get(i), y = ret.get(i + 1);
-            float dx = x - mx, dy = y - my;
-            float dist = (float) Math.sqrt(dx*dx + dy*dy);
-            if(dist < cld){
-                cld = dist; tX = x; tY = y;
-            }
+            System.out.printf(Locale.US,"(%.3f,%.3f),",ret.get(i),ret.get(i+1));
         }
-        for (int i = 0; i < ret.size(); i+=4) {
-            ret.set(i,ret.get(i)-tX);
-            ret.set(i+1,ret.get(i+1)-tY);
-        }
+        System.out.println();
         return ret;
     }
 }

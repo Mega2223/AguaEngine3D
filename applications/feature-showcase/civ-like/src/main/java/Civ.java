@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class Civ {
@@ -25,13 +26,13 @@ public class Civ {
     static Random r = new Random();
     static long framesElapsed = 0;
     static float[] projection = new float[16];
-    public static final float[] cam = {0, 0, -4, 0};
+    public static final float[] cam = {0, 0, 4, (float) Math.PI};
 
     private static final float[] mat4 = new float[16];
 
     public static void main(String[] args) {
         setup();
-        Model polyhedron = Geometry.genPolyhedron(5, 0);
+        Model polyhedron = Geometry.genPolyhedron(4, 2);
         context.addObject(polyhedron);
 
 //        Model m = ModelUtils.plotPoints(polyhedron.getRelativeVertices(), 0.1F);
@@ -99,7 +100,8 @@ public class Civ {
             lastLoop = System.currentTimeMillis();
             if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond));
+                String title = TITLE + String.format(Locale.US,"    FPS: %2d,   CAM: %.3f %.3f %.3f", framesLastSecond,cam[0],cam[1],cam[2]);
+                GLFW.glfwSetWindowTitle(manager.windowName, title);
                 framesLastSecond = 0;
             }
             if (notRendered > (1000 / TARGET_FPS)) {
