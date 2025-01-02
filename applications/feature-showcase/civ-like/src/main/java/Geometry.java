@@ -113,6 +113,12 @@ public class Geometry {
             final float v2x = bX - cX, v2y = bY - cY, v2z = bZ - cZ;
             final float v3x = aX - bX, v3y = aY - bY, v3z = aZ - bZ;
 
+            float[][] directions = {
+                    {-center[0]+aX,-center[1]+aY,-center[2]+aZ,0},
+                    {-center[0]+bX,-center[1]+bY,-center[2]+bZ,0},
+                    {-center[0]+cX,-center[1]+cY,-center[2]+cZ,0}
+            };
+
             VectorTranslator.getCrossProduct(v1x, v1y, v1z, v2x, v2y, v2z,normal);
             VectorTranslator.normalize(normal);
             if(VectorTranslator.getAngleBetweenVectors(normal,center) > Math.PI){
@@ -147,33 +153,31 @@ public class Geometry {
                 VectorTranslator.addToVector(current,rotated);
                 VectorTranslator.addToVector(current,center);
 
-//                VectorTranslator.addToVector(currentZ,rotated);
-//                VectorTranslator.addToVector(currentZ,center);
 
                 float[] triangleAxis = new float[4];
                 float p2x = p2Trans[0] - p1Trans[0], p2y = p2Trans[1] - p1Trans[1], p2z = p2Trans[2] - p1Trans[2];
                 VectorTranslator.getAxisAngle(p2x, p2y, p2z,v3x,v3y,v3z,triangleAxis);
 
+                VectorTranslator.rotateAlongAxis(currentY.clone(),triangleAxis,currentY);
+
+                boolean isRightAngle = true;
+                for (int d = 0; d < directions.length; d++) {
+                    Line obj = new Line(0,1,0);
+                    obj.setStart(center);
+                    obj.setDirection(directions[d]);
+                    Civ.context.addObject(obj);
+                    isRightAngle &= VectorTranslator.isColinear(directions[d],currentY,0.01F);
+                    System.out.println(isRightAngle);
+                }
+                if(!isRightAngle){
+                    VectorTranslator.flipVector(triangleAxis);
+                }
                 VectorTranslator.rotateAlongAxis(current.clone(),triangleAxis,current);
 
-                VectorTranslator.rotateAlongAxis(currentY.clone(),triangleAxis,currentY);
                 Line up = new Line(0, 0, 1);
                 up.setStart(center);
                 up.setDirection(currentY);
                 Civ.context.addObject(up);
-
-                Line obj = new Line(0,1,1);
-                obj.setStart(center);
-                obj.setEnd(aX,aY,aZ);
-                Civ.context.addObject(obj);
-                obj = new Line(0,1,1);
-                obj.setStart(center);
-                obj.setEnd(bX,bY,bZ);
-                Civ.context.addObject(obj);
-                obj = new Line(0,1,1);
-                obj.setStart(center);
-                obj.setEnd(cX,cY,cZ);
-                Civ.context.addObject(obj);
 
                 for (int k = 0; k < 4; k++) {
                     finalSample.add(current[k]);

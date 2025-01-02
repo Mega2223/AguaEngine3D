@@ -240,6 +240,10 @@ public class VectorTranslator {
         }
     }
 
+    public static boolean isColinear(float[] vec, float[] vec2, float tolerance){
+        return getAngleBetweenVectors(vec,vec2) > tolerance;
+    }
+
     public static void debugVector (String prefix, float... vec){
         System.out.print(prefix + ": [");
         for (int i = 0; i < vec.length - 1; i++) {
