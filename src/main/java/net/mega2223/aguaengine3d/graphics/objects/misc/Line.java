@@ -39,6 +39,14 @@ public class Line implements Renderable {
         updateVerticesVBO();
     }
 
+    public void setDirection(float[] vec3){
+        setDirection(vec3[0],vec3[1],vec3[2]);
+    }
+
+    public void setDirection(float x,float y,float z){
+        setEnd(vertices[0] + x, vertices[1] + y, vertices[2] + z);
+    }
+
     void updateVerticesVBO(){
         if(verticesVBO == -1){
             verticesVBO = GL30.glGenBuffers();

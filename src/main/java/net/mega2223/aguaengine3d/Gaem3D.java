@@ -68,6 +68,7 @@ import java.io.IOException;
 * Texturable interface?
 * Modular uniform sync
 * Subdividing triangles of a model for debugging purposes
+* Classe que representa uma série de transformações?
 * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
