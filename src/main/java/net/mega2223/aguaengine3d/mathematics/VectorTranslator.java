@@ -128,16 +128,18 @@ public class VectorTranslator {
         return (float) angle;
     }
 
-    /**Gets the axis angle rotation which represents the angle difference between these vectors
-     * FIXME: incrivelmente impreciso*/
+    /**Gets the axis angle rotation which represents the angle difference between these vectors*/
     public static void getAxisAngle(float[] v3a, float[] v3b, @Modified float[] dest){
-        Arrays.fill(dest,0);
-//        float magA = VectorTranslator.getMagnitude(v3a), magB = VectorTranslator.getMagnitude(v3b);
+        dest[3] = 0; dest[2] = 0; dest[1] = 0; dest[0] = 0;
         float ang = getAngleBetweenVectors(v3a,v3b);
         getCrossProduct(v3a,v3b,dest);
         normalize(dest);
         scaleVector(dest, ang);
-//        VectorTranslator.debugVector("AXIS ",dest); AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    }
+    public static void getAxisAngle(float aX, float aY, float aZ, float bX, float bY, float bZ, @Modified float[] dest){
+        buffer1[0] = aX; buffer1[1] = aY; buffer1[2] = aZ;
+        buffer2[0] = bX; buffer2[1] = bY; buffer2[2] = bZ;
+        getAxisAngle(buffer1,buffer2,dest);
     }
 
     //**Rotates a vector given an axis-angle*/

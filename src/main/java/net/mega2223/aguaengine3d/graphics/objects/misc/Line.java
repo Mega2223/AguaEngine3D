@@ -21,9 +21,17 @@ public class Line implements Renderable {
         updateVerticesVBO();
     }
 
+    public void setStart(float[] vec3){
+        setStart(vec3[0], vec3[1], vec3[2]);
+    }
+
     public void setStart(float x, float y, float z){
         vertices[0] = x; vertices[1] = y; vertices[2] = z;
         updateVerticesVBO();
+    }
+
+    public void setEnd(float[] vec3){
+        setEnd(vec3[0],vec3[1],vec3[2]);
     }
 
     public void setEnd(float x, float y, float z){
