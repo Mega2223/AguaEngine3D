@@ -8,7 +8,7 @@
     <artifactId>aguaengine3d</artifactId>
     <packaging>jar</packaging>
 
-    <version>BETA-0.5-U</version>
+    <version>DEV-0.5-U</version>
 
     <properties>
         <lwjgl.version>3.2.3</lwjgl.version>

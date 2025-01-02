@@ -33,13 +33,11 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
         GL30.glUseProgram(getID());
         super.setUniforms(interation, translationMatrix, projectionMatrix);
         GL30.glUniform4f(uniformColorLocation,color[0],color[1],color[2],color[3]);
-
     }
 
     public void initUniforms(){
         uniformColorLocation = GL30.glGetUniformLocation(getID(),"color2");
-        rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
-        projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
-        translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
+        super.initUniforms();
+        //TODO olha os outros shaders pra ver se eles tbm estão fazendo o check errado que nem esse taa
     }
 }

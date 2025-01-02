@@ -1,6 +1,8 @@
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.NormalDebugShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -42,7 +44,7 @@ public class Geometry {
     private static final float SIN_60 = (float) Math.sin(Math.toRadians(60));
 
     public static Model genPolyhedron(int m, int n){
-        SolidColorShaderProgram shader = new SolidColorShaderProgram(.5F, 1F, .6F,1F);
+        ShaderProgram shader = new NormalDebugShaderProgram();
 
         List<Model> models = new ArrayList<>();
         float radius = Math.max(m,n), scale = 1F/radius, bound = (m + n) * SQRT_3;
@@ -64,18 +66,17 @@ public class Geometry {
             float[] current = {planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2),0};
             VectorTranslator.rotateAlongAxis(current,axis,buffer);
             System.arraycopy(buffer,0,current,0,3);
-//            for (int j = 0; j < 3; j++) {planeSample.set(i+j,current[j]/mag);}
+            for (int j = 0; j < 3; j++) {planeSample.set(i+j,current[j]/mag);}
         }
 
 
-        planeSample.removeAll(planeSample);
-        float rad = .5F;
+//        planeSample.removeAll(planeSample);
 
-        for (float k = -.25F; k <= .25F; k+=.025F) {
-            planeSample.add(k); planeSample.add(0F); planeSample.add(0F); planeSample.add(0F);
+//        for (float k = -.25F; k <= .25F; k+=.025F) {
+//            planeSample.add(k); planeSample.add(0F); planeSample.add(0F); planeSample.add(0F);
 //            planeSample.add(0F); planeSample.add(k); planeSample.add(0F); planeSample.add(0F);
 //            planeSample.add(0F); planeSample.add(0F); planeSample.add(k); planeSample.add(0F);
-        }
+//        }
 //        for (float t = 0; t <= Math.PI * 2; t+=Math.PI/10F){
 //            planeSample.add((float) Math.sin(t)); planeSample.add((float) Math.cos(t));
 //            planeSample.add(0F); planeSample.add(0F);
@@ -123,8 +124,7 @@ public class Geometry {
                 currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
                 VectorTranslator.rotateAlongAxis(currentSample,rotAxis,rotated);
                 for (int k = 0; k < 3; k++) {
-//                    finalSample.add(rotated[k] + center[k]);
-                    finalSample.add(rotated[k]+center[k]);
+                    finalSample.add(rotated[k] + center[k]);
                 }
                 finalSample.add(0F);
             }
