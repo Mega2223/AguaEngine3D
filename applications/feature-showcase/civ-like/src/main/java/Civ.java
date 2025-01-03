@@ -27,6 +27,9 @@ public class Civ {
         setup();
         Model polyhedron = Geometry.genPolyhedron(4, 0);
         context.addObject(polyhedron);
+//        polyhedron = Geometry.genPolyhedron(4, 0);
+//        polyhedron.setCoords(0,5,0);
+//        context.addObject(polyhedron);
         begin();
     }
 

@@ -4,6 +4,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.NormalDebugShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.mathematics.Transform;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 
@@ -42,6 +43,7 @@ public class Geometry {
     private static final float COS_60 = (float) Math.cos(Math.toRadians(60));
     private static final float SIN_60 = (float) Math.sin(Math.toRadians(60));
 
+    static boolean temp = false;
     public static Model genPolyhedron(int m, int n){
         ShaderProgram shader = new NormalDebugShaderProgram();
 
@@ -52,8 +54,21 @@ public class Geometry {
         for (int i = 0; i < planeSample.size(); i++) { planeSample.set(i,planeSample.get(i)/SQRT_3);}
         planeSample = filter(planeSample,m,n);
 
-        float[] p1 = new float[4];
-        float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
+//        planeSample.removeAll(planeSample);
+//        for (int i = 0; i < 10; i++) {
+//            planeSample.add(0F);
+//            planeSample.add(0F);
+//            planeSample.add((float) i);
+//            planeSample.add(0F);
+//
+//            planeSample.add(0F);
+//            planeSample.add((float) i);
+//            planeSample.add(0F);
+//            planeSample.add(0F);
+//        }
+
+        final float[] p1 = new float[4];
+        final float[] p2 = { m + n*COS_60 , n*SIN_60 , 0,0};
         float sideLen = VectorTranslator.getMagnitude(p2);
 
         float[] triangleCenter = {-p2[1],p2[0],0,0};
@@ -62,26 +77,35 @@ public class Geometry {
         VectorTranslator.addToVector(triangleCenter,p2);
         VectorTranslator.scaleVector(triangleCenter,1F/3F);
 
-        float[] right = {1,0,0,0};
+        float[] xPositive = {1,0,0,0};
+        float[] zPositive = {0,0,1,0};
+
         float[] axis = new float[4];
-        VectorTranslator.getAxisAngle(p2,right,axis);
+        VectorTranslator.getAxisAngle(p2,xPositive,axis);
+
+        Transform planeNormalization = new Transform() {
+            private final float[] buffer = new float[4];
+            @Override
+            public void transform(float x, float y, float z, float[] dest) {
+                buffer[0] = x; buffer[1] = y; buffer[2] = z;
+                VectorTranslator.subtractFromVector(buffer,triangleCenter);
+                VectorTranslator.rotateAlongAxis(buffer,axis,dest);
+                VectorTranslator.scaleVector(dest,1F/sideLen);
+            }
+
+            @Override
+            public void reverse(float x, float y, float z, float[] dest) {}
+        };
 
         float[] buffer = new float[4];
 
         for (int i = 0; i < planeSample.size(); i+=4) {
-            float[] current = {planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2),0};
-            VectorTranslator.subtractFromVector(current,triangleCenter);
-            VectorTranslator.rotateAlongAxis(current,axis,buffer);
-            System.arraycopy(buffer,0,current,0,3);
-            for (int j = 0; j < 3; j++) {planeSample.set(i+j,(.2F*current[j])/sideLen);}
-            //todo eu tô fazendo essa transformação 3 VEZES, não é melhor tacar tudo numa matriz?
+            float x = planeSample.get(i), y = planeSample.get(i + 1), z = planeSample.get(i + 2);
+            planeNormalization.transform(x,y,z,buffer);
+            for (int j = 0; j < 3; j++) {planeSample.set(i+j,(buffer[j]));}
         }
-
-        VectorTranslator.subtractFromVector(p2,triangleCenter);
-        VectorTranslator.subtractFromVector(p1,triangleCenter);
-
-        VectorTranslator.scaleVector(p2,1F/sideLen);
-        VectorTranslator.scaleVector(p1,1F/sideLen);
+        planeNormalization.transform(p1,p1);
+        planeNormalization.transform(p2,p2);
 
         List<Float> finalSample = new ArrayList<>(planeSample.size() * 20);
 
@@ -89,95 +113,83 @@ public class Geometry {
 
         int[] indices = icosahedron.getIndices();
         float[] vertices = icosahedron.getVertices();
-        int trC = indices.length;
+        int indexC = indices.length;
 
-        float[] zPositive = {0,0,1,0};
-        float[] normalRotAxis = new float[4];
-        float[] currentSample = new float[4];
+        float[] normalRotationAxis = new float[4];
+        float[] planeVertex = new float[4];
         float[] rotated = new float[4];
-        float[] center = new float[4];
-        float[] normal = new float[4];
+        float[] trCenter = new float[4];
+        float[] trNormal = new float[4];
         float[] p2Trans = new float[4], p1Trans = new float[4];
 
         Model icosaModel = icosahedron.toModel(shader);
         models.add(icosaModel);
 
-        for (int i = 0; i < trC; i+=3) {
+        for (int i = 0; i < indexC; i+=3) {
             int a = indices[i], b = indices[i+1], c = indices[i+2];
-            float aX = vertices[a*4], aY = vertices[a*4+1], aZ = vertices[a*4+2];
-            float bX = vertices[b*4], bY = vertices[b*4+1], bZ = vertices[b*4+2];
-            float cX = vertices[c*4], cY = vertices[c*4+1], cZ = vertices[c*4+2];
-            center[0] = (aX + bX + cX)/3; center[1] = (aY + bY + cY)/3; center[2] = (aZ + bZ + cZ)/3;
+            final float aX = vertices[a*4], aY = vertices[a*4+1], aZ = vertices[a*4+2];
+            final float bX = vertices[b*4], bY = vertices[b*4+1], bZ = vertices[b*4+2];
+            final float cX = vertices[c*4], cY = vertices[c*4+1], cZ = vertices[c*4+2];
 
             final float v1x = aX - cX, v1y = aY - cY, v1z = aZ - cZ;
-            final float v2x = bX - cX, v2y = bY - cY, v2z = bZ - cZ;
-            final float v3x = aX - bX, v3y = aY - bY, v3z = aZ - bZ;
+            final float v2x = cX - bX, v2y = cY - bY, v2z = cZ - bZ;
+            final float v3x = bX - aX, v3y = bY - aY, v3z = bZ - aZ;
 
-            float[][] directions = {
-                    {-center[0]+aX,-center[1]+aY,-center[2]+aZ,0},
-                    {-center[0]+bX,-center[1]+bY,-center[2]+bZ,0},
-                    {-center[0]+cX,-center[1]+cY,-center[2]+cZ,0}
+            trCenter[0] = (aX + bX + cX)/3F; trCenter[1] = (aY + bY + cY)/3F; trCenter[2] = (aZ + bZ + cZ)/3F;
+
+//            float[][] directions = {
+//                    {-center[0]+aX,-center[1]+aY,-center[2]+aZ,0},
+//                    {-center[0]+bX,-center[1]+bY,-center[2]+bZ,0},
+//                    {-center[0]+cX,-center[1]+cY,-center[2]+cZ,0}
+//            };
+
+//            VectorTranslator.getCrossProduct(v1x, v1y, v1z, v2x, v2y, v2z, faceNormal);
+//            VectorTranslator.normalize(faceNormal);
+//
+//                if(VectorTranslator.getAngleBetweenVectors(faceNormal,center) > .001F){
+//                    System.out.println("DESTROY!");
+//                    VectorTranslator.flipVector(faceNormal);
+//                }
+            //fixme isso não funciona com o produto vetorial
+            // MESMO QUANDO eu verifico o ângulo entre o normal e o centro do triângulo
+            System.arraycopy(trCenter,0,trNormal,0,3);
+            VectorTranslator.normalize(trNormal);
+
+            Transform normalAlign = new Transform() {
+                final float[] localBuffer = new float[4];
+                public void transform(float x, float y, float z, float[] dest) {
+                    localBuffer[0] = x; localBuffer[1] = y; localBuffer[2] = z;
+                    VectorTranslator.rotateAlongAxis(localBuffer,normalRotationAxis, dest);
+                    VectorTranslator.addToVector(dest,trCenter);
+                }
+                public void reverse(float x, float y, float z, float[] dest) {
+
+                }
             };
 
-            VectorTranslator.getCrossProduct(v1x, v1y, v1z, v2x, v2y, v2z,normal);
-            VectorTranslator.normalize(normal);
-            if(VectorTranslator.getAngleBetweenVectors(normal,center) > Math.PI){
-                VectorTranslator.flipVector(normal);
-            }
-            VectorTranslator.getAxisAngle(normal,zPositive,normalRotAxis);
-            VectorTranslator.flipVector(normalRotAxis);
+            VectorTranslator.getAxisAngle(trNormal,zPositive,normalRotationAxis);
+            VectorTranslator.flipVector(normalRotationAxis);
 
             for (int j = 0; j < planeSample.size(); j+=4) {
-                currentSample[0] = planeSample.get(j); currentSample[1] = planeSample.get(j+1);
-                currentSample[2] = planeSample.get(j+2); currentSample[3] = 0;
+                planeVertex[0] = planeSample.get(j); planeVertex[1] = planeSample.get(j+1);
+                planeVertex[2] = planeSample.get(j+2); planeVertex[3] = 0;
 
                 float[] current = new float[4];
-                float[] currentY = {0,1,0,0};
+                float[] planeBoundI = p1.clone();
+                float[] planeBoundF = p2.clone();
 
-                VectorTranslator.rotateAlongAxis(currentSample,normalRotAxis,rotated);
-                VectorTranslator.rotateAlongAxis(currentY.clone(),normalRotAxis,currentY);
+                normalAlign.transform(planeBoundF,planeBoundF);
+                normalAlign.transform(planeBoundI,planeBoundI);
 
-                VectorTranslator.rotateAlongAxis(p2,normalRotAxis,p2Trans);
-                VectorTranslator.addToVector(p2Trans,center);
-                VectorTranslator.rotateAlongAxis(p1,normalRotAxis,p1Trans);
-                VectorTranslator.addToVector(p1Trans,center);
+                Line normal = new Line(1, 1, 0);
+                normal.setStart(trCenter); normal.setDirection(trNormal);
+                Civ.context.addObject(normal);
 
-                Line line = new Line(1, 0, 0);
-                line.setEnd(p2Trans); line.setStart(p1Trans);
-                Civ.context.addObject(line);
+                Line initialBound = new Line(0, 1, 1);
+                initialBound.setStart(planeBoundI); initialBound.setEnd(planeBoundF);
+                Civ.context.addObject(initialBound);
 
-                line = new Line(1, 1, 0);
-                line.setEnd(aX,aY,aZ); line.setStart(bX,bY,bZ);
-                Civ.context.addObject(line);
-
-                VectorTranslator.addToVector(current,rotated);
-                VectorTranslator.addToVector(current,center);
-
-
-                float[] triangleAxis = new float[4];
-                float p2x = p2Trans[0] - p1Trans[0], p2y = p2Trans[1] - p1Trans[1], p2z = p2Trans[2] - p1Trans[2];
-                VectorTranslator.getAxisAngle(p2x, p2y, p2z,v3x,v3y,v3z,triangleAxis);
-
-                VectorTranslator.rotateAlongAxis(currentY.clone(),triangleAxis,currentY);
-
-                boolean isRightAngle = true;
-                for (int d = 0; d < directions.length; d++) {
-                    Line obj = new Line(0,1,0);
-                    obj.setStart(center);
-                    obj.setDirection(directions[d]);
-                    Civ.context.addObject(obj);
-                    isRightAngle &= VectorTranslator.isColinear(directions[d],currentY,0.01F);
-                    System.out.println(isRightAngle);
-                }
-                if(!isRightAngle){
-                    VectorTranslator.flipVector(triangleAxis);
-                }
-                VectorTranslator.rotateAlongAxis(current.clone(),triangleAxis,current);
-
-                Line up = new Line(0, 0, 1);
-                up.setStart(center);
-                up.setDirection(currentY);
-                Civ.context.addObject(up);
+                normalAlign.transform(planeVertex,current);
 
                 for (int k = 0; k < 4; k++) {
                     finalSample.add(current[k]);
@@ -190,9 +202,6 @@ public class Geometry {
                 finalSample.add(planeSample.get(i+j));
             }
             finalSample.add(0f);
-//            System.out.printf(Locale.US,"%.3f,%.3f,%.3f\n",
-//                    planeSample.get(i),planeSample.get(i+1),planeSample.get(i+2)
-//                    );
         }
 
         Model points = ModelUtils.plotPoints(
