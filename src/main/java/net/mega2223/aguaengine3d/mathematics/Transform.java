@@ -7,7 +7,13 @@ public interface Transform {
     default void transform(float[] vec3, float[] dest){
         transform(vec3[0],vec3[1],vec3[2],dest);
     }
+    default void transform(float[] vec3){
+        transform(vec3,vec3);
+    }
     default void reverse(float[] vec3, float[] dest){
         reverse(vec3[0],vec3[1],vec3[2],dest);
+    }
+    default void reverse(float[] vec3){
+        reverse(vec3,vec3);
     }
 }

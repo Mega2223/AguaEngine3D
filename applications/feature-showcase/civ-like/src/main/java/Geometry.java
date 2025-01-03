@@ -4,6 +4,7 @@ import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.ModelUtils;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.NormalDebugShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.Transform;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
@@ -78,6 +79,7 @@ public class Geometry {
         VectorTranslator.scaleVector(triangleCenter,1F/3F);
 
         float[] xPositive = {1,0,0,0};
+        float[] yPositive = {0,1,0,0};
         float[] zPositive = {0,0,1,0};
 
         float[] axis = new float[4];
@@ -137,11 +139,18 @@ public class Geometry {
 
             trCenter[0] = (aX + bX + cX)/3F; trCenter[1] = (aY + bY + cY)/3F; trCenter[2] = (aZ + bZ + cZ)/3F;
 
-//            float[][] directions = {
-//                    {-center[0]+aX,-center[1]+aY,-center[2]+aZ,0},
-//                    {-center[0]+bX,-center[1]+bY,-center[2]+bZ,0},
-//                    {-center[0]+cX,-center[1]+cY,-center[2]+cZ,0}
-//            };
+            float[][] directions = {
+                    {-trCenter[0]+aX,-trCenter[1]+aY,-trCenter[2]+aZ,0},
+                    {-trCenter[0]+bX,-trCenter[1]+bY,-trCenter[2]+bZ,0},
+                    {-trCenter[0]+cX,-trCenter[1]+cY,-trCenter[2]+cZ,0}
+            };
+
+            for (int j = 0; j < 3; j++) {
+                Line dir = new Line(0,0,0);
+                dir.setStart(trCenter);
+                dir.setDirection(directions[j]);
+                Civ.context.addObject(dir);
+            }
 
 //            VectorTranslator.getCrossProduct(v1x, v1y, v1z, v2x, v2y, v2z, faceNormal);
 //            VectorTranslator.normalize(faceNormal);
@@ -175,25 +184,76 @@ public class Geometry {
                 planeVertex[2] = planeSample.get(j+2); planeVertex[3] = 0;
 
                 float[] current = new float[4];
-                float[] planeBoundI = p1.clone();
-                float[] planeBoundF = p2.clone();
+                float[] planeBoundB = p1.clone(), nPlaneBoundB = new float[4],nPlaneBoundB2 = new float[4];
+                float[] planeBoundF = p2.clone(), nPlaneBoundF = new float[4],nPlaneBoundF2 = new float[4];
+                float[] planeBoundV = new float[4];
 
                 normalAlign.transform(planeBoundF,planeBoundF);
-                normalAlign.transform(planeBoundI,planeBoundI);
+                normalAlign.transform(planeBoundB,planeBoundB);
+                normalAlign.transform(planeVertex,current);
+                VectorTranslator.subtractFromVector(planeBoundB,planeBoundF,planeBoundV);
+
+                float[] triangleAlignAxis = new float[4];
+                VectorTranslator.getAxisAngle(
+                        planeBoundV[0],planeBoundV[1],planeBoundV[2],v1x,v1y,v1z,
+                        triangleAlignAxis);
+
+                Transform triangleCorrection = new Transform() {
+                    @Override
+                    public void transform(float x, float y, float z, float[] dest) {
+                        buffer[0] = x; buffer[1] = y; buffer[2] = z; buffer[3] = 0;
+                        VectorTranslator.rotateAlongAxis(buffer,triangleAlignAxis,dest);
+                    }
+
+                    public void reverse(float x, float y, float z, float[] dest) {}
+                };
+                triangleCorrection.transform(planeBoundF,nPlaneBoundF);
+                triangleCorrection.transform(planeBoundB,nPlaneBoundB);
+
+                VectorTranslator.flipVector(triangleAlignAxis);
+                triangleCorrection.transform(planeBoundF,nPlaneBoundF2);
+                triangleCorrection.transform(planeBoundB,nPlaneBoundB2);
+                VectorTranslator.flipVector(triangleAlignAxis);
+
+                float[] nYpositive = new float[4];
+                normalAlign.transform(yPositive,nYpositive);
+                triangleCorrection.transform(nYpositive);
+                VectorTranslator.subtractFromVector(nYpositive,trCenter);
+
+                boolean isRightAngle = false;
+                for (int k = 0; k < 3; k++) {
+                    isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
+                }
+                if(!isRightAngle){
+                    Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
+                    ModelUtils.scaleModel(WRONG,.1F);
+                    WRONG.setCoords(1.5F*trNormal[0],1.5F*trNormal[1],1.5F*trNormal[2]);
+                    Civ.context.addObject(WRONG);
+                    System.out.println("AAAAAAAAAAGSDG");
+                }
+                triangleCorrection.transform(current);
+
+                for (int k = 0; k < 4; k++) { finalSample.add(current[k]); }
 
                 Line normal = new Line(1, 1, 0);
                 normal.setStart(trCenter); normal.setDirection(trNormal);
                 Civ.context.addObject(normal);
 
                 Line initialBound = new Line(0, 1, 1);
-                initialBound.setStart(planeBoundI); initialBound.setEnd(planeBoundF);
+                initialBound.setStart(planeBoundB); initialBound.setEnd(planeBoundF);
                 Civ.context.addObject(initialBound);
 
-                normalAlign.transform(planeVertex,current);
+                Line finalBound = new Line(.7F, .5F, .2F);
+                finalBound.setStart(nPlaneBoundB); finalBound.setEnd(nPlaneBoundF);
+                Civ.context.addObject(finalBound);
 
-                for (int k = 0; k < 4; k++) {
-                    finalSample.add(current[k]);
-                }
+                Line final2 = new Line(.7F,.5F,.35F);
+                final2.setStart(nPlaneBoundB2); final2.setEnd(nPlaneBoundF2);
+                Civ.context.addObject(final2);
+
+                Line yPosit = new Line(1,1,1);
+                yPosit.setStart(trCenter); yPosit.setDirection(nYpositive);
+                Civ.context.addObject(yPosit);
             }
         }
 
