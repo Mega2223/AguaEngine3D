@@ -224,14 +224,18 @@ public class Geometry {
                 for (int k = 0; k < 3; k++) {
                     isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
                 }
+                triangleCorrection.transform(current);
                 if(!isRightAngle){
                     Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
                     ModelUtils.scaleModel(WRONG,.1F);
-                    WRONG.setCoords(1.5F*trNormal[0],1.5F*trNormal[1],1.5F*trNormal[2]);
+                    WRONG.setCoords(2.5F*trNormal[0],2.5F*trNormal[1],2.5F*trNormal[2]);
                     Civ.context.addObject(WRONG);
-                    System.out.println("AAAAAAAAAAGSDG");
+//                    System.out.println("AAAAAAAAAAGSDG");
+                    float[] normal2 = trNormal.clone();
+                    VectorTranslator.normalize(normal2);
+                    VectorTranslator.scaleVector(normal2, (float) Math.PI);
+                    VectorTranslator.rotateAlongAxis(current.clone(),normal2,current);
                 }
-                triangleCorrection.transform(current);
 
                 for (int k = 0; k < 4; k++) { finalSample.add(current[k]); }
 
