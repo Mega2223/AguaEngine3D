@@ -48,6 +48,7 @@ The engine has a variety of utilities and abstractions for Graphics and general 
 - GLFW abstraction.
 - Ready-to-use shader classes.
 - OpenGL abstraction (models and other renderable types).
+- Geometry shader support
 - Dynamic lighting.
 - An pseudo-wave-function-collapse algorithm.
 - A procedual noise framework that can generate custom models.
