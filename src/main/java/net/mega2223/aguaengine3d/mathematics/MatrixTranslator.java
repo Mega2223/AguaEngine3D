@@ -337,7 +337,7 @@ public class MatrixTranslator {
     /**Generates a rotation angle given an axis angle, pretty inaccurate*/
     public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
         Arrays.fill(dest,0);
-        float ang = VectorTranslator.getMagnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
+        float ang = VectorTranslator.magnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
         float c = (float) Math.cos(ang), s = (float) Math.sin(ang),  C = 1F - c;
         float x = axisAngle[0] / ang, y = axisAngle[1] / ang, z = axisAngle[2] / ang;
         dest[0] = x * x * C + c; dest[1] = x * y * C - (z * s); dest[2] = x * z * C + (y * s);

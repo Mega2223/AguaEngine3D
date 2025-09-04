@@ -52,7 +52,7 @@ public class AxisAngleTest {
             );
             float[] t = new float[4];
             for (int i = 0; i < 4; i++) {t[i] = res[i] - b[i];}
-            if(VectorTranslator.getMagnitude(t) > .001F){
+            if(VectorTranslator.magnitude(t) > .001F){
                 throw new RuntimeException("Invalid vector transformation");
             }
             System.out.println("\nTESTING REVERSE");

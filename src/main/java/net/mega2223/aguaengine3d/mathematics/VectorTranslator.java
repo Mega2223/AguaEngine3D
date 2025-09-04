@@ -74,30 +74,30 @@ public class VectorTranslator {
         vector[2]=-vector[2];
     }
 
-    public static void getCrossProduct(@Modified float[] vector, float[] vector2){
-        getCrossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], buffer1);
+    public static void crossProduct(@Modified float[] vector, float[] vector2){
+        crossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], buffer1);
         System.arraycopy(buffer1,0,vector,0,3);
     }
 
-    public static void getCrossProduct(float[] vector, float[] vector2, @Modified float[] result){
-        getCrossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], result);
+    public static void crossProduct(float[] vector, float[] vector2, @Modified float[] result){
+        crossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], result);
     }
 
-    public static void getCrossProduct(float x1, float y1, float z1, float x2, float y2, float z2, @Modified float[] result){
+    public static void crossProduct(float x1, float y1, float z1, float x2, float y2, float z2, @Modified float[] result){
         result[0] = y1*z2-z1*y2;
         result[1] = z1*x2-x1*z2;
         result[2] = x1*y2-y1*x2;
     }
 
-    public static float getMagnitude(float[] vec3){
+    public static float magnitude(float[] vec3){
         return (float) Math.sqrt(vec3[0]*vec3[0]+vec3[1]*vec3[1]+vec3[2]*vec3[2]);
     }
 
-    public static float getMagnitude(float x, float y, float z){
+    public static float magnitude(float x, float y, float z){
         return (float) Math.sqrt(x*x+y*y+z*z);
     }
     
-    public static float get2DDotProduct(float[] vec, float[] vec2){
+    public static float dotProduct2D(float[] vec, float[] vec2){
         return vec[0]*vec2[0] + vec[1]*vec2[1];
     }
     
@@ -110,13 +110,13 @@ public class VectorTranslator {
     }
 
     public static void normalize(@Modified float[] vector){
-        float magnitude = getMagnitude(vector);
+        float magnitude = magnitude(vector);
         if(magnitude == 0){return;}
         divideVector(vector,magnitude);
     }
 
     public static float getAngleBetweenVectors(float[] vecA, float[] vecB){
-        float m1 = getMagnitude(vecA), m2 = getMagnitude(vecB);
+        float m1 = magnitude(vecA), m2 = magnitude(vecB);
         float x1 = vecA[0], y1 = vecA[1], z1 = vecA[2];
         float x2 = vecB[0], y2 = vecB[1], z2 = vecB[2];
         float dot = dotProduct(x1,y1,z1,x2,y2,z2);
@@ -132,7 +132,7 @@ public class VectorTranslator {
     public static void getAxisAngle(float[] v3a, float[] v3b, @Modified float[] dest){
         dest[3] = 0; dest[2] = 0; dest[1] = 0; dest[0] = 0;
         float ang = getAngleBetweenVectors(v3a,v3b);
-        getCrossProduct(v3a,v3b,dest);
+        crossProduct(v3a,v3b,dest);
         normalize(dest);
         scaleVector(dest, ang);
     }
@@ -145,14 +145,14 @@ public class VectorTranslator {
     //**Rotates a vector given an axis-angle*/
     public static void rotateAlongAxis(float[] vec3, float[] axis, @Modified float[] dest){
         Arrays.fill(dest,0);
-        float ang = getMagnitude(axis) % PI2;
+        float ang = magnitude(axis) % PI2;
         if(ang == 0){ System.arraycopy(vec3,0,dest,0,3); return;}
         float s = (float) Math.sin(ang), C = 1F - (float) Math.cos(ang);
 
         buffer1[0] = axis[0] / ang; buffer1[1] = axis[1] / ang;buffer1[2] = axis[2] / ang; buffer1[3] = 0;
         //b1 = e    vec3 = v
-        getCrossProduct(buffer1,vec3,buffer2); // b2 = (e X v)
-        getCrossProduct(buffer1,buffer2,buffer3); // b3 = e X (e X v)
+        crossProduct(buffer1,vec3,buffer2); // b2 = (e X v)
+        crossProduct(buffer1,buffer2,buffer3); // b3 = e X (e X v)
         scaleVector(buffer3,C); // b3 = ( 1 - cos(T) ) (e X (e X v))
         scaleVector(buffer2,s); // b2 = sin(T) (e X v)
 
@@ -202,8 +202,8 @@ public class VectorTranslator {
         }
     }
 
-    public static void scaleAllVectors(@Modified float[] vectors, float[] scaleFactor){
-        scaleAllVectors(vectors,scaleFactor[0],scaleFactor[1],scaleFactor[2]);
+    public static void scaleAllVectors(@Modified float[] vectors, float[] scaleAxis){
+        scaleAllVectors(vectors,scaleAxis[0],scaleAxis[1],scaleAxis[2]);
     }
 
     public static void scaleAllVectors(@Modified float[] vectors, float x, float y, float z){
@@ -231,12 +231,6 @@ public class VectorTranslator {
             vectors[i]=-vectors[i];
             vectors[i+1]=-vectors[i+1];
             vectors[i+2]=-vectors[i+2];
-        }
-    }
-
-    public static void flipArray(@Modified float[] array){
-        for (int i = 0; i < array.length; i++) {
-            array[i]=-array[i];
         }
     }
 
