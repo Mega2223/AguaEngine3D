@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Random;
 
 public class MathUtils {
-    public static Object doWeightedSelection(@SuppressWarnings("rawtypes") List objectList, float[] weights){
-        return doWeightedSelection(objectList.toArray(),weights);
+    public static <T> T doWeightedSelection(List<T> objectList, float[] weights){
+        T[] array = (T[]) objectList.toArray(); // Como assim esse cast não é seguro????
+        return doWeightedSelection(array,weights);
     }
     public static <T> T doWeightedSelection(T[] objects, float[] weights){
         if(objects.length!= weights.length){throw new UnsupportedOperationException("Objects or weights not set up correctly");}

@@ -111,7 +111,10 @@ public class VectorTranslator {
 
     public static void normalize(@Modified float[] vector){
         float magnitude = magnitude(vector);
-        if(magnitude == 0){return;}
+        if(magnitude == 0){
+            vector[0] = 1F;
+            return;
+        }
         divideVector(vector,magnitude);
     }
 
@@ -129,17 +132,17 @@ public class VectorTranslator {
     }
 
     /**Gets the axis angle rotation which represents the angle difference between these vectors*/
-    public static void getAxisAngle(float[] v3a, float[] v3b, @Modified float[] dest){
+    public static void getRotationAxis(float[] v3a, float[] v3b, @Modified float[] dest){
         dest[3] = 0; dest[2] = 0; dest[1] = 0; dest[0] = 0;
         float ang = getAngleBetweenVectors(v3a,v3b);
         crossProduct(v3a,v3b,dest);
         normalize(dest);
         scaleVector(dest, ang);
     }
-    public static void getAxisAngle(float aX, float aY, float aZ, float bX, float bY, float bZ, @Modified float[] dest){
+    public static void getRotationAxis(float aX, float aY, float aZ, float bX, float bY, float bZ, @Modified float[] dest){
         buffer1[0] = aX; buffer1[1] = aY; buffer1[2] = aZ;
         buffer2[0] = bX; buffer2[1] = bY; buffer2[2] = bZ;
-        getAxisAngle(buffer1,buffer2,dest);
+        getRotationAxis(buffer1,buffer2,dest);
     }
 
     //**Rotates a vector given an axis-angle*/
@@ -234,19 +237,30 @@ public class VectorTranslator {
         }
     }
 
-    public static boolean isColinear(float[] vec, float[] vec2, float tolerance){
-        return getAngleBetweenVectors(vec,vec2) > tolerance;
+    public static boolean isColinear(float[] vec3A, float[] vec3B, float tolerance){
+        return getAngleBetweenVectors(vec3A,vec3B) > tolerance;
     }
 
-    public static void debugVector (String prefix, float... vec){
-        System.out.print(prefix + ": [");
-        for (int i = 0; i < vec.length - 1; i++) {
-            System.out.print(vec[i] + ",");
+    public static boolean equals(float[] vec3A, float[] vec3B){
+        for (int i = 0; i < 3; i++) {
+            if(vec3A[i] != vec3B[i]){
+                return false;
+            }
         }
-        System.out.print(vec[vec.length-1]+"]\n");
+        return true;
+    }
+
+    public static void debugVector (String prefix, float... vecN){
+        //TODO coloca tudo isso num StringBuilder
+        System.out.print(prefix + ": [");
+        for (int i = 0; i < vecN.length - 1; i++) {
+            System.out.print(vecN[i] + ",");
+        }
+        System.out.print(vecN[vecN.length-1]+"]\n");
     }
 
     public static void debugVector (float... vec){
+        //TODO coloca tudo isso num StringBuilder
         System.out.print("v: [");
         for (int i = 0; i < vec.length; i++) {
             System.out.printf(Locale.US,"%2.2f ",vec[i]);
@@ -256,6 +270,7 @@ public class VectorTranslator {
     }
 
     public static void debugV4(float... vec){
+        //TODO coloca tudo isso num StringBuilder
         System.out.print("[");
         for (int i = 0; i < vec.length; i+=4) {
             System.out.print("[");
@@ -269,6 +284,7 @@ public class VectorTranslator {
     }
 
     public static void debugVector (int... vec){
+        //TODO coloca tudo isso num StringBuilder
         System.out.print("v: [");
         for (int i = 0; i < vec.length - 1; i++) {
             System.out.print(vec[i] + ",");
@@ -277,6 +293,7 @@ public class VectorTranslator {
     }
 
     public static void debugVector (String prefix, int... vec){
+        //TODO coloca tudo isso num StringBuilder
         System.out.print(prefix + ": [");
         for (int i = 0; i < vec.length - 1; i++) {
             System.out.print(vec[i] + ",");

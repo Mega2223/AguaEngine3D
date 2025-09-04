@@ -153,7 +153,7 @@ public interface Noise {
         }
         float[] normals = model.getNormals();
         if(VectorTranslator.dotProduct(normals[0],normals[1],normals[2],0,1,0) < 0){
-            VectorTranslator.flipArray(normals);
+            VectorTranslator.flipVector(normals);
             model.setNormals(normals);
         }
         return model;

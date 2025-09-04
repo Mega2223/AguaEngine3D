@@ -21,7 +21,7 @@ public class AxisAngleTest {
 
 //            VectorTranslator.normalize(a); VectorTranslator.normalize(b);
 
-            VectorTranslator.getAxisAngle(a,b,axis);
+            VectorTranslator.getRotationAxis(a,b,axis);
 //
 //        VectorTranslator.getCrossProduct(a,b,axis);
 //        VectorTranslator.normalize(axis);
