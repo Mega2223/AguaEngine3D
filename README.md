@@ -48,11 +48,12 @@ The engine has a variety of utilities and abstractions for Graphics and general 
 - GLFW abstraction.
 - Ready-to-use shader classes.
 - OpenGL abstraction (models and other renderable types).
+- Geometry shader support
 - Dynamic lighting.
 - An pseudo-wave-function-collapse algorithm.
 - A procedual noise framework that can generate custom models.
 - General vector and matrix mathematics.
-- Other math tools (interpolators, colisions etc.).
+- Other math tools (interpolators, collisions etc.).
 - Shadow mapping (unstable for now).
 - A physics module (unfinished).
 - Rendering miscs. (Skyboxes, interface components)
