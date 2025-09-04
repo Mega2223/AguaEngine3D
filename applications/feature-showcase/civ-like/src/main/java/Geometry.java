@@ -188,10 +188,13 @@ public class Geometry {
                 normalAlign.transform(planeVertex,current);
                 VectorTranslator.subtractFromVector(planeBoundB,planeBoundF,planeBoundV);
 
+                float[] nYpositive = new float[4];
+                normalAlign.transform(yPositive,nYpositive);
+                VectorTranslator.subtractFromVector(nYpositive,trCenter);
+
                 float[] triangleAlignAxis = new float[4];
-                VectorTranslator.getAxisAngle(
-                        planeBoundV[0],planeBoundV[1],planeBoundV[2],v1x,v1y,v1z,
-                        triangleAlignAxis);
+                VectorTranslator.getAxisAngle(nYpositive, directions[0], triangleAlignAxis);
+                VectorTranslator.flipVector(triangleAlignAxis);
 
                 Transform triangleCorrection = new Transform() {
                     @Override
@@ -209,28 +212,25 @@ public class Geometry {
                 triangleCorrection.transform(planeBoundF,nPlaneBoundF2);
                 triangleCorrection.transform(planeBoundB,nPlaneBoundB2);
                 VectorTranslator.flipVector(triangleAlignAxis);
+                // eu não AGUENTO MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIS
 
-                float[] nYpositive = new float[4];
-                normalAlign.transform(yPositive,nYpositive);
-                triangleCorrection.transform(nYpositive);
-                VectorTranslator.subtractFromVector(nYpositive,trCenter);
+//                boolean isRightAngle = false;
+//                for (int k = 0; k < 3; k++) {
+//                    isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
+//                }
+//                if(!isRightAngle){
+//                    Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
+//                    ModelUtils.scaleModel(WRONG,.1F);
+//                    WRONG.setCoords(2.5F*trNormal[0],2.5F*trNormal[1],2.5F*trNormal[2]);
+//                    Civ.context.addObject(WRONG);
+//                    System.out.println("AAAAAAAAAAGSDG"); // ÇSAJDKAJKDLSJALKSDJ :'(
+//                    float[] normal2 = trNormal.clone();
+//                    VectorTranslator.normalize(normal2);
+//                    VectorTranslator.scaleVector(normal2, (float) Math.PI);
+//                    VectorTranslator.rotateAlongAxis(current.clone(),normal2,current);
+//                }
 
-                boolean isRightAngle = false;
-                for (int k = 0; k < 3; k++) {
-                    isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
-                }
                 triangleCorrection.transform(current);
-                if(!isRightAngle){
-                    Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
-                    ModelUtils.scaleModel(WRONG,.1F);
-                    WRONG.setCoords(2.5F*trNormal[0],2.5F*trNormal[1],2.5F*trNormal[2]);
-                    Civ.context.addObject(WRONG);
-                    System.out.println("AAAAAAAAAAGSDG"); // ÇSAJDKAJKDLSJALKSDJ :'(
-                    float[] normal2 = trNormal.clone();
-                    VectorTranslator.normalize(normal2);
-                    VectorTranslator.scaleVector(normal2, (float) Math.PI);
-                    VectorTranslator.rotateAlongAxis(current.clone(),normal2,current);
-                }
 
                 for (int k = 0; k < 4; k++) { finalSample.add(current[k]); }
 
