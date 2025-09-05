@@ -2,10 +2,11 @@ package net.mega2223.aguaengine3d.physics.collisions;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 public class CollisionMath {
     private CollisionMath(){};
-    private static final float[][] buffers = new float[3][4];
+    private static final float[][] buffers = new float[5][4];
 
     /**
      * Calculates closing velocity between two objects,
@@ -36,5 +37,33 @@ public class CollisionMath {
     public static void getContactNormal(float[] posA, float[] posB, @Modified float[] result) {
         VectorTranslator.subtractFromVector(posA,posB,result);
         VectorTranslator.normalize(result);
+    }
+
+    /**
+     * Solves a collision assuming both objects are particles
+     * */
+    public static void SolveCollision(Particle a, Particle b, float restitution){
+        float[] posA = buffers[0], posB = buffers[1], velA = buffers[2], velB = buffers[3];
+        float[] contact = buffers[4]; // from A's perspective
+        a.getPos(posA); b.getPos(posB); a.getVelocity(velA); b.getVelocity(velB);
+
+        float sep = separatingVelocity(posA,velA,posB,velB);
+        if(sep > 0){return;}
+
+        getContactNormal(posA,posB,contact);
+
+        final float inverseSum = a.getInverseMass() + b.getInverseMass();
+        if(inverseSum <= 0) {return;}
+
+        final float nSep = - restitution * sep;
+        final float deltaVelocity = nSep - sep;
+        final float impulse = deltaVelocity / inverseSum;
+
+        float[] impulsePerIMass = buffers[0];
+        VectorTranslator.scaleVector(contact,impulse,impulsePerIMass);
+
+        a.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
+        VectorTranslator.flipVector(impulsePerIMass);
+        b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
     }
 }

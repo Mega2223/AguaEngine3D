@@ -3,9 +3,9 @@ package net.mega2223.aguaengine3d.physics.decorators;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.objects.Particle;
 
-public class PhysicsObjectDecorator extends PhysicsObject implements Renderable {
+public class PhysicsObjectDecorator extends Particle implements Renderable {
 
     protected Positionable renderable;
 

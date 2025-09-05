@@ -1,7 +1,7 @@
 package net.mega2223.aguaengine3d.physics.forces;
 
-import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 public interface Force {
-    void apply(PhysicsObject object);
+    void apply(Particle object);
 }

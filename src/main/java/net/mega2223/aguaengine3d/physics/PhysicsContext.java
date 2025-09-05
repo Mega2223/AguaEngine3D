@@ -2,15 +2,15 @@ package net.mega2223.aguaengine3d.physics;
 
 import net.mega2223.aguaengine3d.physics.actors.PhysicsActor;
 import net.mega2223.aguaengine3d.physics.forces.Force;
+import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class PhysicsContext {
 
-    protected List<PhysicsObject> objects = new ArrayList<>(32);
+    protected List<Particle> objects = new ArrayList<>(32);
     protected List<PhysicsActor> actors = new ArrayList<>(16);
     protected List<Force> forces = new ArrayList<>(16);
 
@@ -23,24 +23,24 @@ public class PhysicsContext {
             actor.act(deltaT,this);
         }
         for(Force f : forces){
-            for(PhysicsObject o : objects){
+            for(Particle o : objects){
                 f.apply(o);
             }
         }
-        for(PhysicsObject o : objects){
+        for(Particle o : objects){
             o.update(deltaT);
         }
     }
 
-    public void addObject(PhysicsObject object){
+    public void addObject(Particle object){
         objects.add(object);
     }
 
-    public void removeObject(PhysicsObject object){
+    public void removeObject(Particle object){
         objects.remove(object);
     }
 
-    public List<PhysicsObject> getObjects() {
+    public List<Particle> getObjects() {
         return Collections.unmodifiableList(objects);
     }
 
