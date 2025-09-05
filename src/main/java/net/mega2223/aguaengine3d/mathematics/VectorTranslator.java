@@ -22,6 +22,12 @@ public class VectorTranslator {
         scaleVector(vector,factor,0);
     }
 
+    public static void scaleVector(float[] vec3, float factor, @Modified float[] dest){
+        dest[0] = factor * vec3[0];
+        dest[1] = factor * vec3[1];
+        dest[2] = factor * vec3[2];
+    }
+
     public static void divideVector(@Modified float[] vector, float factor){
         for (int i = 0; i < 3; i++) {
             vector[i]/=factor;
@@ -42,9 +48,9 @@ public class VectorTranslator {
         return (float) Math.sqrt(x*x+y*y+z*z);
     }
 
-    public static void addToVector(@Modified float[] vector, float[] vector2){
-        for (int i = 0; i < 3; i++) {
-            vector[i]+=vector2[i];
+    public static void addToVector(@Modified float[] vec3A, float[] vec3B){
+        for (int i = 0; i < 3; i++) { // TODO acho melhor fazer isso na marra msm
+            vec3A[i]+=vec3B[i];
         }
     }
 
@@ -68,10 +74,22 @@ public class VectorTranslator {
         result[2] = z1 - z2;
     }
 
-    public static void flipVector(@Modified float[] vector){
-        vector[0]=-vector[0];
-        vector[1]=-vector[1];
-        vector[2]=-vector[2];
+    public static void flipVector(@Modified float[] vec3){
+        vec3[0]=-vec3[0];
+        vec3[1]=-vec3[1];
+        vec3[2]=-vec3[2];
+    }
+
+    public static void getFlipped(float[] vec3,@Modified float[] result){
+        result[0]=-vec3[0];
+        result[1]=-vec3[1];
+        result[2]=-vec3[2];
+    }
+
+    public static void copy(float[] vec3,@Modified float[] dest){
+        dest[0] = vec3[0];
+        dest[1] = vec3[1];
+        dest[2] = vec3[2];
     }
 
     public static void crossProduct(@Modified float[] vector, float[] vector2){

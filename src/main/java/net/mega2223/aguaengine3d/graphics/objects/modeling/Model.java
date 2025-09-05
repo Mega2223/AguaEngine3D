@@ -1,16 +1,18 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling;
 
+import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import org.lwjgl.opengl.GL30;
 
 import java.util.ArrayList;
 
 import static net.mega2223.aguaengine3d.graphics.utils.RenderingManager.drawnIndexBufferVBO;
 
-public class Model implements Renderable {
+public class Model implements Renderable, Positionable {
 
     public static final int SHADER_VERTEX_DATA_LOCATION = 0;
     public static final int SHADER_TEXTURE_DATA_LOCATION = 1;
@@ -185,15 +187,22 @@ public class Model implements Renderable {
         return getVertexVBO() != -1 && getIndicesVBO() != -1;
     }
 
-    public float[] getCoords(){
-        return coords.clone();
-    }
-
-    public void setCoords(float[] coords){
-        System.arraycopy(coords, 0, this.coords, 0, this.coords.length);
-    }
-
     public void setCoords(float x, float y, float z){coords[0] = x; coords[1] = y; coords[2] = z;}
+
+    @Override
+    public float x() {
+        return coords[0];
+    }
+
+    @Override
+    public float y(){
+        return coords[1];
+    }
+
+    @Override
+    public float z() {
+        return coords[2];
+    }
 
     public int getVertexVBO() {
         return vertexVBO;

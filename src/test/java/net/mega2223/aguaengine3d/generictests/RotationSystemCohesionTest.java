@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.generictests;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Locale;
 
@@ -11,10 +12,11 @@ public class RotationSystemCohesionTest {
      * */
 
     public static final int TESTS = 10;
-    public static final float ANGULAR_ERROR_TOLERANCE = (float) Math.toRadians(1);
+    public static final float ANGULAR_ERROR_TOLERANCE = (float) Math.toRadians(.25); // 1/4 graus pra mim é bem bom já
 
     public static void main(String[] args) {
         // TODO essa classe deve medir se as rotações de matriz, axis angle e quaternion são equivalentes
+        // TODO talvez calcular o erro máximo, mínimo e médio de cada medida
         for (int i = 0; i < TESTS; i++) {
             performTest();
         }
@@ -45,7 +47,7 @@ public class RotationSystemCohesionTest {
 
         VectorTranslator.getRotationAxis(vecA,vecB,rotationAxis);
         MatrixTranslator.rotationMatrixFromAxisAngle(rotationAxis,rotationMatrix);
-        // TODO quaternion
+        QuaternionTranslator.axisAngleToQuaternion(rotationAxis,rotationQuaternion);
 
         VectorTranslator.rotateAlongAxis(vecA,rotationAxis,buffer);
         float error = VectorTranslator.getAngleBetweenVectors(buffer, vecB);
@@ -74,5 +76,9 @@ public class RotationSystemCohesionTest {
         } else {
             System.out.println("Matrix rotation test is cohesive :)");
         }
+
+
+
+        System.out.println();
     }
 }

@@ -9,11 +9,12 @@ public class QuaternionTranslator {
     public static final int W = 0, X = 1, Y = 2, Z = 3;
 
     public static void rotationMatrixToQuaternion(float[] rotationMat4, @Modified float[] result){
-
+        // TODO womp womp
+        throw new RuntimeException("Fala pro Julio que ele esqueceu de implementar isso :p");
     }
 
     public static void axisAngleToQuaternion(float[] axisAngle, @Modified float[] result){
-
+        axisAngleToQuaternion(axisAngle[0], axisAngle[1], axisAngle[2], result);
     }
 
     public static void axisAngleToQuaternion(float x, float y, float z, @Modified float[] result) {
@@ -42,7 +43,7 @@ public class QuaternionTranslator {
     }
 
     public static float getMagnitude(float[] q4){
-        return (float) Math.sqrt(q4[0] * q4[0] + q4[1] * q4[1] + q4[2] * q4[2] +  q4[3] * q4[3]);
+        return (float) Math.sqrt(q4[W] * q4[W] + q4[X] * q4[X] + q4[Y] * q4[Y] +  q4[Z] * q4[Z]);
     }
 
     public static void normalize(@Modified float[] q4){

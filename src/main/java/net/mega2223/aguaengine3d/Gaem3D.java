@@ -2,11 +2,10 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
+import net.mega2223.aguaengine3d.graphics.objects.ScriptedSequence;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.Noise;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.procedural.noisegenerator.PerlinNoise;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -16,10 +15,14 @@ import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
+import net.mega2223.aguaengine3d.physics.PhysicsContext;
+import net.mega2223.aguaengine3d.physics.actors.FloorActor;
+import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
+import net.mega2223.aguaengine3d.physics.forces.Drag;
+import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 @SuppressWarnings({"unused"})
 
@@ -43,7 +46,7 @@ import java.io.IOException;
 * Model blueprint class <- Done
 * Coverage testing <- what
 * Sound stuff
-* Physics stuff <- WIP lol
+* Physics stuff <- Uma hora eu chego lá kkkkkkkkk
 * Trigger stuff
 * Collision stuff <- WIP
 * Animation stuff
@@ -53,8 +56,8 @@ import java.io.IOException;
 * Object declaration instantiation generation annotation?
 * Standardize array arguments (especially for the phyisics module)
 * Calculate the restitution variable lol <- Done?
-* Also the physics module needs the friction force
-* Parallel contact is weird currently
+* Also the physics module needs the friction force <- Womp womp
+* Parallel contact is weird currently <- Womp womp
 * Static functions that creates objects with bound buffers
 * Shader recompile function
 * Render order priority variable/method? (Done)
@@ -62,13 +65,13 @@ import java.io.IOException;
 * Model editor (maybe a inbuilt tools tools package)
 * Interpolation interface and objects (Done)
 * FPS manager for windowmanagers
-* TAG para operações que criam objetos
+* TAG para operações que criam objetos <- +- feito
 * Filter functions? (functions that filter :p) <- what was bro yapping about
 * Dinamically alocated text object
 * Texturable interface?
 * Modular uniform sync
 * Subdividing triangles of a model for debugging purposes
-* Classe que representa uma série de transformações?
+* Classe que representa uma série de transformações? <- Transform?
 * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
@@ -77,17 +80,24 @@ public class Gaem3D {
 
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
+    public static final float SPEED = .1F;
     protected static final String TITLE = "3 DIMENSÇÕES";
     protected static final int D = 512;
     public static final float[] camera = {0, 4, 0, 0};
     public static int framesElapsed = 0;
     static WindowManager manager;
     static RenderingContext context;
+    static PhysicsContext physicsContext = new PhysicsContext();
 
     static float[] trans = new float[16];
     static float[] proj = new float[16];
 
-    public static void main(String[] args) throws IOException {
+    static PhysicsObjectDecorator p = null;
+
+    // Pelo amor de deus eu não vou fazer isso para todas as teclas
+    // me dá um tempo
+    @SuppressWarnings("lossy-conversions")
+    public static void main(String[] args) {
 
         //GLFW
         manager = new WindowManager(300, 300, TITLE);
@@ -95,15 +105,19 @@ public class Gaem3D {
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
             double c = Math.cos(camera[3]);
-            float speed = .075F;
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += speed*c;camera[0] += speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= speed*c;camera[0] -= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += speed*c;camera[2]-= speed*s;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= speed*c;camera[2]+= speed*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_W)==GLFW.GLFW_PRESS){camera[2] += SPEED*c;camera[0] += SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_S)==GLFW.GLFW_PRESS){camera[2] -= SPEED*c;camera[0] -= SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_A)==GLFW.GLFW_PRESS){camera[0] += SPEED*c;camera[2]-= SPEED*s;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_D)==GLFW.GLFW_PRESS){camera[0] -= SPEED*c;camera[2]+= SPEED*s;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Q)==GLFW.GLFW_PRESS){camera[3] += Math.PI/90;}
             if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_E)==GLFW.GLFW_PRESS){camera[3] -= Math.PI/90;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += speed;}
-            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= speed;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_Z)==GLFW.GLFW_PRESS){camera[1] += SPEED;}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_X)==GLFW.GLFW_PRESS){camera[1] -= SPEED;}
+
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_LEFT)==GLFW.GLFW_PRESS){p.applyAcceleration(.1F,0,0);}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_DOWN)==GLFW.GLFW_PRESS){p.applyAcceleration(0,0,-.1F);}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_UP)==GLFW.GLFW_PRESS){p.applyAcceleration(0,0,.1F);}
+            if(GLFW.glfwGetKey(manager.getWindow(),GLFW.GLFW_KEY_RIGHT)==GLFW.GLFW_PRESS){p.applyAcceleration(-.1F,0,0);}
         });
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
@@ -134,6 +148,27 @@ public class Gaem3D {
         //context.addObject(sk);
         context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
 
+        // Phys Obj
+        p = new PhysicsObjectDecorator( 1f,
+                Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
+        );
+
+        context.addObject(p);
+        physicsContext.addObject(p);
+        p.setCoordinates(0 ,7,0);
+        p.setVelocity(0, -3, 0);
+
+        physicsContext.addForce(new Gravity(.1F));
+        physicsContext.addForce(new Drag(.01F));
+        physicsContext.addActor(new FloorActor());
+
+//        context.addScript(new ScriptedSequence("PhysFollower") {
+//            @Override
+//            protected void preLogic(int iteration, RenderingContext context) {
+//                camera[0] = p.x(); camera[1] = p.y()+.6F; camera[2] = p.z()-5;
+//            }
+//        });
+
         //Render Logic be like:
         long notRendered = 0;
         long lastLoop = System.currentTimeMillis();
@@ -146,7 +181,7 @@ public class Gaem3D {
             lastLoop = System.currentTimeMillis();
             if (System.currentTimeMillis() - fLSLastUpdate > 1000) {
                 fLSLastUpdate = System.currentTimeMillis();
-                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " z:" + camera[2] + ")");
+                GLFW.glfwSetWindowTitle(manager.windowName, TITLE + "    FPS: " + (framesLastSecond) + "(x: " + camera[0] + " y: " + camera[1] + " z:" + camera[2] + ")");
                 framesLastSecond = 0;
 
             }
@@ -166,7 +201,7 @@ public class Gaem3D {
 
 
     protected static void doLogic() {
-
+        physicsContext.update(1F/60F);
     }
 
     protected static void doRenderLogic() {
