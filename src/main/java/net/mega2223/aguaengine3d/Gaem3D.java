@@ -138,18 +138,33 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png")
         );
-        context.addObject(chessFloor);
+	Model nonChessFloor = new Model(
+		new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
+		new int[]{0,1,2,2,1,3},
+		new SolidColorShaderProgram(.6F,.8F,.6F)
+	);
+        //context.addObject(chessFloor);
+	context.addObject(nonChessFloor);
 
         Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0));
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat,cat,cat,cat,cat,cat}
         ));
-        //context.addObject(sk);
+        context.addObject(sk);
         context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
 
         // Phys Obj
         p = new PhysicsObjectDecorator( 1f,
+                Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
+        );
+
+        context.addObject(p);
+        physicsContext.addObject(p);
+        p.setCoordinates(0 ,7,0);
+        p.setVelocity(0, -3, 0);
+	
+	p = new PhysicsObjectDecorator( 1f,
                 Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
         );
 
