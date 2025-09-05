@@ -1,7 +1,5 @@
 package net.mega2223.aguaengine3d.misc;
 
-import javafx.print.Collation;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
