@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.physics.forces;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 public class Drag implements Force{
@@ -18,7 +19,7 @@ public class Drag implements Force{
     }
 
     @Override
-    public void apply(Particle object) {
+    public void apply(PhysicsObject object) {
         object.getVelocity(buffer);
         final float vel = VectorTranslator.magnitude(buffer);
         VectorTranslator.normalize(buffer);

@@ -2,10 +2,11 @@ package net.mega2223.aguaengine3d.physics.collisions;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
-import net.mega2223.aguaengine3d.physics.objects.Particle;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
 public class CollisionMath {
-    private CollisionMath(){};
+    private CollisionMath(){}
+
     private static final float[][] buffers = new float[5][4];
 
     /**
@@ -42,10 +43,10 @@ public class CollisionMath {
     /**
      * Solves a collision assuming both objects are particles
      * */
-    public static void SolveCollision(Particle a, Particle b, float restitution){
+    public static void solveCollision(PhysicsObject a, PhysicsObject b, float restitution){
         float[] posA = buffers[0], posB = buffers[1], velA = buffers[2], velB = buffers[3];
         float[] contact = buffers[4]; // from A's perspective
-        a.getPos(posA); b.getPos(posB); a.getVelocity(velA); b.getVelocity(velB);
+        a.getCoords(posA); b.getCoords(posB); a.getVelocity(velA); b.getVelocity(velB);
 
         float sep = separatingVelocity(posA,velA,posB,velB);
         if(sep > 0){return;}

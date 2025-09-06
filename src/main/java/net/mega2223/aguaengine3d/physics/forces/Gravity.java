@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.physics.forces;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 public class Gravity implements Force {
@@ -20,7 +21,7 @@ public class Gravity implements Force {
     }
 
     @Override
-    public void apply(Particle object) {
+    public void apply(PhysicsObject object) {
         // since gravity is proportional to mass it cancels out
         // the inverse mass multiplication,
         // so it's easier to just apply the total acceleration

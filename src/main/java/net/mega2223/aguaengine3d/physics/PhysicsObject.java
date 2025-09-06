@@ -13,6 +13,8 @@ public interface PhysicsObject {
     float getMass();
     float getInverseMass();
 
+    void update(float deltaT);
+
     default void applyForce(float fx, float fy, float fz){
         float invMass = getInverseMass();
         applyVelocity(fx*invMass,fy*invMass,fz*invMass);
@@ -40,5 +42,9 @@ public interface PhysicsObject {
 
     default void getVelocity(@Modified float[] dest){
         dest[0] = vx(); dest[1] = vy(); dest[2] = vz();
+    }
+
+    default PhysicsObject getActor(){
+        return this;
     }
 }

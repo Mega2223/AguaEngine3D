@@ -1,17 +1,17 @@
 package net.mega2223.aguaengine3d.physics.decorators;
 
-import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
-import net.mega2223.aguaengine3d.physics.objects.Particle;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
-public class PhysicsObjectDecorator extends Particle implements Renderable {
+public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positionable> implements Positionable, PhysicsObject {
 
-    protected Positionable renderable;
+    protected R renderable;
+    protected P physicsObject;
 
-    public PhysicsObjectDecorator(float mass, Positionable object) {
-        super(mass);
-        this.renderable = object;
+    public PhysicsObjectDecorator(P physicsObject, R renderable) {
+        this.physicsObject = physicsObject;
+        this.renderable = renderable;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class PhysicsObjectDecorator extends Particle implements Renderable {
 
     @Override
     public void doLogic(int iteration) {
-        renderable.setCoords(pos[0], pos[1], pos[2]);
+        renderable.setCoords(physicsObject.x(), physicsObject.y(), physicsObject.z());
     }
 
     @Override
@@ -37,5 +37,95 @@ public class PhysicsObjectDecorator extends Particle implements Renderable {
     @Override
     public ShaderProgram getShader() {
         return renderable.getShader();
+    }
+
+    @Override
+    public void applyAcceleration(float ax, float ay, float az) {
+        physicsObject.applyAcceleration(ax,ay,az);
+    }
+
+    @Override
+    public void applyVelocity(float vx, float vy, float vz) {
+        physicsObject.applyVelocity(vx,vy,vz);
+    }
+
+    @Override
+    public void applyTranslation(float x, float y, float z) {
+        physicsObject.applyTranslation(x,y,z);
+    }
+
+    @Override
+    public void setVelocity(float vx, float vy, float vz) {
+        physicsObject.setVelocity(vx,vy,vz);
+    }
+
+    @Override
+    public void setCoordinates(float x, float y, float z) {
+        physicsObject.setCoordinates(x,y,z);
+    }
+
+    @Override
+    public float getMass() {
+        return physicsObject.getMass();
+    }
+
+    @Override
+    public float getInverseMass() {
+        return physicsObject.getInverseMass();
+    }
+
+    @Override
+    public void update(float deltaT) {
+        physicsObject.update(deltaT);
+    }
+
+    @Override
+    public float x() {
+        return physicsObject.x();
+    }
+
+    @Override
+    public float y() {
+        return physicsObject.y();
+    }
+
+    @Override
+    public float z() {
+        return physicsObject.z();
+    }
+
+    @Override
+    public void setCoords(float x, float y, float z) {
+        setCoordinates(x,y,z);
+    }
+
+    @Override
+    public void setCoords(float[] coords) {
+        setCoords(coords[0],coords[1],coords[2]);
+    }
+
+    @Override
+    public void getCoords(float[] result) {
+        Positionable.super.getCoords(result);
+    }
+
+    @Override
+    public float vx() {
+        return physicsObject.vx();
+    }
+
+    @Override
+    public float vy() {
+        return physicsObject.vy();
+    }
+
+    @Override
+    public float vz() {
+        return physicsObject.vz();
+    }
+
+    @Override
+    public PhysicsObject getActor() {
+        return this.physicsObject;
     }
 }

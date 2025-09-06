@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.physics.objects.collideable;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
 
@@ -32,4 +33,5 @@ public class Sphere extends Particle implements Collideable {
     public boolean collidesWith(Collideable c) {
         return false;
     }
+
 }

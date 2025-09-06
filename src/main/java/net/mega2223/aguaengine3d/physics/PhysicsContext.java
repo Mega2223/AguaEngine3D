@@ -1,6 +1,8 @@
 package net.mega2223.aguaengine3d.physics;
 
 import net.mega2223.aguaengine3d.physics.actors.PhysicsActor;
+import net.mega2223.aguaengine3d.physics.collisions.CollisionManager;
+import net.mega2223.aguaengine3d.physics.collisions.SimpleCollisionManager;
 import net.mega2223.aguaengine3d.physics.forces.Force;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 
@@ -10,37 +12,39 @@ import java.util.List;
 
 public class PhysicsContext {
 
-    protected List<Particle> objects = new ArrayList<>(32);
+    protected List<PhysicsObject> objects = new ArrayList<>(32);
     protected List<PhysicsActor> actors = new ArrayList<>(16);
     protected List<Force> forces = new ArrayList<>(16);
+    protected CollisionManager collisionManager = new SimpleCollisionManager(this);
 
     public PhysicsContext(){
 
     }
 
     public void update(float deltaT){
+        collisionManager.manageCollisions(deltaT);
         for(PhysicsActor actor : actors){
             actor.act(deltaT,this);
         }
         for(Force f : forces){
-            for(Particle o : objects){
+            for(PhysicsObject o : objects){
                 f.apply(o);
             }
         }
-        for(Particle o : objects){
+        for(PhysicsObject o : objects){
             o.update(deltaT);
         }
     }
 
-    public void addObject(Particle object){
+    public void addObject(PhysicsObject object){
         objects.add(object);
     }
 
-    public void removeObject(Particle object){
+    public void removeObject(PhysicsObject object){
         objects.remove(object);
     }
 
-    public List<Particle> getObjects() {
+    public List<PhysicsObject> getObjects() {
         return Collections.unmodifiableList(objects);
     }
 

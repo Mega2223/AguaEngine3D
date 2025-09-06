@@ -20,6 +20,7 @@ import net.mega2223.aguaengine3d.physics.actors.FloorActor;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
+import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
@@ -155,16 +156,18 @@ public class Gaem3D {
         context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
 
         // Phys Obj
-        p = new PhysicsObjectDecorator( 1f,
+        p = new PhysicsObjectDecorator<Sphere, Model>(
+                new Sphere(1.0F,1.0F),
                 Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
         );
 
         context.addObject(p);
         physicsContext.addObject(p);
         p.setCoordinates(0 ,7,0);
-        p.setVelocity(0, -3, 0);
-	
-	p = new PhysicsObjectDecorator( 1f,
+        p.setVelocity(0, 3, 0);
+
+        p = new PhysicsObjectDecorator<Sphere, Model>(
+                new Sphere(1.0F,1.0F),
                 Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
         );
 
