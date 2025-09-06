@@ -31,6 +31,9 @@ public class Sphere extends Particle implements Collideable {
 
     @Override
     public boolean collidesWith(Collideable c) {
+        if(c instanceof Sphere){
+            return ((Sphere) c).radius + radius > VectorTranslator.getDistance(((Sphere) c).pos,pos);
+        }
         return false;
     }
 
