@@ -3,14 +3,17 @@ package net.mega2223.aguaengine3d.physics;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
+import java.util.Arrays;
+
 public class QuaternionTranslator {
     private QuaternionTranslator(){}
 
     public static final int W = 0, X = 1, Y = 2, Z = 3;
 
-    public static void rotationMatrixToQuaternion(float[] rotationMat4, @Modified float[] result){
-        // TODO womp womp
-        throw new RuntimeException("Fala pro Julio que ele esqueceu de implementar isso :p");
+    public static void rotationMatrixToQuaternion(float[] rotationMat4, @Modified float[] resultM4){
+        //MatrixTranslator.rotationMatrixFromQuaternion(rotationMat4,resultM4);
+        //todo
+
     }
 
     public static void axisAngleToQuaternion(float[] axisAngle, @Modified float[] result){
@@ -30,8 +33,8 @@ public class QuaternionTranslator {
     public static void rotateAlongQuaternion(float[] vec4, float[] rotationQ4, @Modified float[] result){
         // TODO
     }
-
-    public static void multiplyQuaternions(float[] q4A, float[] q4B, @Modified float[] result){
+    //funciona
+    public static void quaternionProduct(float[] q4A, float[] q4B, @Modified float[] result){
         result[W] = q4A[W] * q4B[W] - q4A[X] * q4B[X] - q4A[Y] * q4B[Y] - q4A[Z] * q4B[Z];
         result[X] = q4A[W] * q4B[X] + q4A[X] * q4B[W] + q4A[Y] * q4B[Z] - q4A[Z] * q4B[Y];
         result[Y] = q4A[W] * q4B[Y] - q4A[X] * q4B[Z] + q4A[Y] * q4B[W] + q4A[Z] * q4B[X];
@@ -65,6 +68,13 @@ public class QuaternionTranslator {
         q4A[3] += q4B[3];
     }
 
+    public static void simpleAddition(float[] q4A, float[] q4B, @Modified float[] dest){
+        dest[0] = q4A[0] + q4B[0];
+        dest[1] = q4A[1] + q4B[1];
+        dest[2] = q4A[2] + q4B[2];
+        dest[3] = q4A[3] + q4B[3];
+    }
+
     public static void conjugate(float[] q4, @Modified float[] dest){
         dest[W] = q4[W];
         dest[X] = -q4[X];
@@ -72,19 +82,31 @@ public class QuaternionTranslator {
         dest[Z] = -q4[Z];
     }
 
-    static final float[] conjugateBuffer = new float[4], vectorBuffer = new float[4];
+    private static final float[] rotationBuffer = new float[4];
     public static void rotateQuaternion(float[] q4, float[] amountQ4, @Modified float[] dest){
-        multiplyQuaternions(amountQ4,q4,dest);
-//        conjugate(q4,conjugateBuffer);
-//        vectorBuffer[0] = 0; vectorBuffer[1] = amountQ4[0]; vectorBuffer[2] = amountQ4[1]; vectorBuffer[3] = amountQ4[2];
-
+        //multiplyQuaternions(amountQ4,q4,dest);
+        throw new RuntimeException("oopsies :3");
     }
 
+    static final float[] qRotationBuffer = new float[4];
+    public static void rotateQuaternionByAxis(float[] q4, float[] axisVec3, @Modified float[] dest){
+        Arrays.fill(dest,0); // FIXME KKKKKKKKKKKKKKK isso pelomenos funciona
+        quaternionToAxisAngle(q4,qRotationBuffer);
+        VectorTranslator.rotateAlongAxis(qRotationBuffer,axisVec3,dest);
+        copy(dest,qRotationBuffer);
+        axisAngleToQuaternion(qRotationBuffer,dest);
+    }
+
+    private static void vecToImaginary(float[] vec3, @Modified float[] dest){
+        dest[0] = 0; dest[1] = vec3[0]; dest[2] = vec3[1]; dest[3] = vec3[2];
+    }
+    // Isso 100% funciona
+    static final float[] conjugateBuffer = new float[4], vectorBuffer = new float[4];
     public static void rotateVectorByQuaternion(float[] vec3, float[] q4, @Modified float[] dest){
         conjugate(q4,conjugateBuffer);
-        vectorBuffer[0] = 0; vectorBuffer[1] = vec3[0]; vectorBuffer[2] = vec3[1]; vectorBuffer[3] = vec3[2];
-        multiplyQuaternions(vectorBuffer,conjugateBuffer,dest);
-        multiplyQuaternions(q4,dest,vectorBuffer);
+        vecToImaginary(vec3,vectorBuffer);
+        quaternionProduct(vectorBuffer,conjugateBuffer,dest);
+        quaternionProduct(q4,dest,vectorBuffer);
         dest[0] = vectorBuffer[1]; dest[1] = vectorBuffer[2]; dest[2] = vectorBuffer[3]; dest[3] = 0;
     }
 

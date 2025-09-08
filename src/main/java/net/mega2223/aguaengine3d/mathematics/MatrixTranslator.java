@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.mathematics;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -18,55 +19,8 @@ public class MatrixTranslator {
      * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
      * */
 
-    public static final int ISOMETRIC_PROJECTION = 0;
-    public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
-    public static final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
-    protected static final int TRUE_PERSPECTIVE_PROJECTION = 3;
-    protected static final int WEAKER_PERSPECTIVE_PROJECTION = 4;
 
     private static final float[] bufferMatrix4 = new float[16];
-
-    @Deprecated
-    public static void projectVec3(float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg) {
-        float fieldOfView = 90;
-
-        switch (projectionAlg) {
-
-            case ISOMETRIC_PROJECTION:
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                return;
-            case WEAK_PERSPECTIVE_PROJECTION:
-
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                System.out.println();
-                System.out.println(vec3[startingPoint + 2]);
-
-                float mult = fieldOfView / (fieldOfView + vec3[startingPoint + 2]);
-                System.out.println(fieldOfView + "/(" + fieldOfView + "+" + vec3[startingPoint + 2] + ") =" + mult);
-
-                vec3[startingPoint] *= mult;
-                vec3[startingPoint + 1] *= mult;
-                return;
-            case WEAKER_PERSPECTIVE_PROJECTION:
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                vec3[startingPoint] /= -vec3[startingPoint + 2];
-                vec3[startingPoint + 1] /= -vec3[startingPoint + 2];
-                return;
-            case TRUE_PERSPECTIVE_PROJECTION:
-                float near = .01f;
-                float far = 1000f;
-
-        }
-    }
 
     public static void multiplyVectorMatrix(@Modified float[] vector, float[][] mat4) {
         if (mat4.length != 4 || vector.length != 4) {
@@ -580,11 +534,20 @@ public class MatrixTranslator {
                 (mat3[6]*mat3[4]*mat3[2] + mat3[7]*mat3[5]*mat3[0] + mat3[8]*mat3[3]*mat3[1]);
     }
 
-    public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] resultMat4){
+    public static void getRotationMat4FromQuaternion(float[] q4, @Modified float[] resultMat4){
+        rotationMatrixFromQuaternion(
+                q4[QuaternionTranslator.W],
+                q4[QuaternionTranslator.X],
+                q4[QuaternionTranslator.Y],
+                q4[QuaternionTranslator.Z], resultMat4);
+    }
+
+    public static void rotationMatrixFromQuaternion(float w, float x, float y, float z, float[] resultMat4){
         Arrays.fill(resultMat4,0);
         float[] stolenVector = VectorTranslator.buffer1;
         VectorTranslator.getRotationRadians(w,x,y,z, stolenVector);
         MatrixTranslator.generateRotationMatrix(stolenVector[0], stolenVector[1], stolenVector[2], resultMat4);
+        //TODO wtf isso funciona???
         /*This doesn't work lol
         resultMat4[0] = 1-(2*y*y+2*z*z);
         resultMat4[1] = 2*x*y + 2*z*w;
@@ -631,7 +594,7 @@ public class MatrixTranslator {
         System.out.println("Comparing " + m1N + " with " + m2N + ": ");
         for (int i = 0; i < m1.length; i++) {
             String m = "m" + i/4 + "" + i%4;
-            if(m1[i]!=m2[i]){System.out.println("Descrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
+            if(m1[i]!=m2[i]){System.out.println("Discrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
         }
         System.out.println("Comparison complete!");
     }
@@ -669,7 +632,7 @@ public class MatrixTranslator {
     public static void debugPolygon(float[] poly, int debugN){
         if(debugN >= 0){System.out.println("Debugging polygon " + debugN + ": ");}
         for (int i = 0; i < poly.length; i+=4) {
-            System.out.println("| Vertice " + i/4 + ": [" + poly[i] + "," + poly[i+1] + "," + poly[i+2] + "]");
+            System.out.println("| Vertex " + i/4 + ": [" + poly[i] + "," + poly[i+1] + "," + poly[i+2] + "]");
         }
     }
 
@@ -679,8 +642,54 @@ public class MatrixTranslator {
             float[] poly = model[i];
             System.out.println("| Debugging polygon " + i + ": ");
             for (int j = 0; j < poly.length; j+=4) {
-                System.out.println("|| Vertice " + j/4 + ": [" + poly[j] + "," + poly[j+1] + "," + poly[j+2] + "]");
+                System.out.println("|| Vertex " + j/4 + ": [" + poly[j] + "," + poly[j+1] + "," + poly[j+2] + "]");
             }
+        }
+    }
+
+    @Deprecated
+    public static void projectVec3(float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg) {
+        float fieldOfView = 90;
+        final int ISOMETRIC_PROJECTION = 0;
+        final int WEAK_PERSPECTIVE_PROJECTION = 1;
+        final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
+        final int TRUE_PERSPECTIVE_PROJECTION = 3;
+        final int WEAKER_PERSPECTIVE_PROJECTION = 4;
+        switch (projectionAlg) {
+
+            case ISOMETRIC_PROJECTION:
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                return;
+            case WEAK_PERSPECTIVE_PROJECTION:
+
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                System.out.println();
+                System.out.println(vec3[startingPoint + 2]);
+
+                float mult = fieldOfView / (fieldOfView + vec3[startingPoint + 2]);
+                System.out.println(fieldOfView + "/(" + fieldOfView + "+" + vec3[startingPoint + 2] + ") =" + mult);
+
+                vec3[startingPoint] *= mult;
+                vec3[startingPoint + 1] *= mult;
+                return;
+            case WEAKER_PERSPECTIVE_PROJECTION:
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                vec3[startingPoint] /= -vec3[startingPoint + 2];
+                vec3[startingPoint + 1] /= -vec3[startingPoint + 2];
+                return;
+            case TRUE_PERSPECTIVE_PROJECTION:
+                float near = .01f;
+                float far = 1000f;
+
         }
     }
 }

@@ -53,7 +53,7 @@ public class RotationSystemCohesionTest {
         float[] rotationMatrix = new float[16];
         float[] rotationQuaternion = new float[4];
 
-        float[] buffer = new float[4];
+        float[] resultBufferV3 = new float[4];
 
         VectorTranslator.normalize(vecA);
         VectorTranslator.normalize(vecB);
@@ -62,22 +62,22 @@ public class RotationSystemCohesionTest {
         MatrixTranslator.rotationMatrixFromAxisAngle(rotationAxis,rotationMatrix);
         QuaternionTranslator.axisAngleToQuaternion(rotationAxis,rotationQuaternion);
 
-        VectorTranslator.rotateAlongAxis(vecA,rotationAxis,buffer);
-        float error = VectorTranslator.getAngleBetweenVectors(buffer, vecB);
+        VectorTranslator.rotateAlongAxis(vecA,rotationAxis,resultBufferV3);
+        float error = VectorTranslator.getAngleBetweenVectors(resultBufferV3, vecB);
         if(Float.isNaN(error) || error > ANGULAR_ERROR_TOLERANCE){
             String message = "Vectors B and (A [[x]] RotationAxis) are not the same\n" +
                     String.format("A = v(%.4f,%.4f,%.4f)\n", vecA[0], vecA[1], vecA[2]) +
                     String.format("B = v(%.4f,%.4f,%.4f)\n", vecB[0], vecB[1], vecB[2]) +
                     String.format("axis = v(%.4f,%.4f,%.4f)\n", rotationAxis[0], rotationAxis[1], rotationAxis[2]) +
-                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", buffer[0], buffer[1], buffer[2]) +
+                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", resultBufferV3[0], resultBufferV3[1], resultBufferV3[2]) +
                     String.format("error = %f\n",error);
             throw new RuntimeException(message);
         } else {
             System.out.println("Rotation axis test is cohesive :)");
         }
 
-        MatrixTranslator.multiplyVec4Mat4(vecA,rotationMatrix,buffer);
-        error = VectorTranslator.getAngleBetweenVectors(buffer, vecB);
+        MatrixTranslator.multiplyVec4Mat4(vecA,rotationMatrix,resultBufferV3);
+        error = VectorTranslator.getAngleBetweenVectors(resultBufferV3, vecB);
         if(Float.isNaN(error) || error > ANGULAR_ERROR_TOLERANCE){
             String message = "Vectors B and (A x RotationMatrix) are not the same\n" +
                     String.format("A = v(%.4f,%.4f,%.4f)\n", vecA[0], vecA[1], vecA[2]) +
@@ -87,90 +87,71 @@ public class RotationSystemCohesionTest {
                             rotationMatrix[4],rotationMatrix[5],rotationMatrix[6],rotationMatrix[7],
                             rotationMatrix[8],rotationMatrix[9],rotationMatrix[10],rotationMatrix[11],
                             rotationMatrix[12],rotationMatrix[13],rotationMatrix[14],rotationMatrix[15]) +
-                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", buffer[0], buffer[1], buffer[2]) +
+                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", resultBufferV3[0], resultBufferV3[1], resultBufferV3[2]) +
                     String.format("error = %f\n",error);
             throw new RuntimeException(message);
         } else {
             System.out.println("Matrix rotation test is cohesive :)");
         }
 
-//        float[] pvrEuTeImploro = new float[4];
-//        QuaternionTranslator.multiplyQuaternions(
-//                new float[]{.1F,.2F,.3F,.4F},
-//                new float[]{.5F,.6F,.7F,.8F},
-//                pvrEuTeImploro
-//        );
-//        VectorTranslator.debugVector(pvrEuTeImploro);
-//        System.exit(0); ok isso faz sentido
-
-        QuaternionTranslator.rotateVectorByQuaternion(vecA,rotationQuaternion,buffer);
-        error = VectorTranslator.getAngleBetweenVectors(buffer, vecB);
+        QuaternionTranslator.rotateVectorByQuaternion(vecA,rotationQuaternion,resultBufferV3);
+        error = VectorTranslator.getAngleBetweenVectors(resultBufferV3, vecB);
         if(Float.isNaN(error) || error > ANGULAR_ERROR_TOLERANCE){
             String message = "Vector times Quaternion rotation is not cohesive\n" +
                     String.format("A = v(%.4f,%.4f,%.4f)\n", vecA[0], vecA[1], vecA[2]) +
                     String.format("B = v(%.4f,%.4f,%.4f)\n", vecB[0], vecB[1], vecB[2]) +
                     String.format("rotQ = v(%.4f,%.4f,%.4f,%.4f)\n", rotationQuaternion[0], rotationQuaternion[1], rotationQuaternion[2],rotationQuaternion[3]) +
-                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", buffer[0], buffer[1], buffer[2]) +
+                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", resultBufferV3[0], resultBufferV3[1], resultBufferV3[2]) +
                     String.format("error = %f\n",error);
             throw new RuntimeException(message);
         } else {
             System.out.println("Vector times Quaternion rotation is cohesive :)");
         }
 
-        //asdksalçkd
-//        float[] tatatata = new float[4];
-//        float[] coma2 = {0, -1, 0, 0};
-//        float[] cima = coma2.clone();
-//        QuaternionTranslator.axisAngleToQuaternion(cima, tatatata);
+        float[] quatA = new float[4], quatB = new float[4], bufferQ = new float[4];
+        QuaternionTranslator.axisAngleToQuaternion(vecA,quatA);
+        QuaternionTranslator.axisAngleToQuaternion(vecB,quatB);
+
+        QuaternionTranslator.rotateQuaternionByAxis(quatA,rotationAxis,bufferQ);
+        QuaternionTranslator.quaternionToAxisAngle(bufferQ,resultBufferV3);
+
+        error = VectorTranslator.getAngleBetweenVectors(resultBufferV3, vecB);
+
+        if(Float.isNaN(error) || error > ANGULAR_ERROR_TOLERANCE){
+            float[] gottenAxisBuffer = new float[4];
+            VectorTranslator.getRotationAxis(vecA,resultBufferV3,gottenAxisBuffer);
+            String message = "Quaternion by axis rotation is not cohesive\n" +
+                    String.format("A = v(%.4f,%.4f,%.4f)\n", vecA[0], vecA[1], vecA[2]) +
+                    String.format("B = v(%.4f,%.4f,%.4f)\n", vecB[0], vecB[1], vecB[2]) +
+                    String.format("axis (expected) = v(%.4f,%.4f,%.4f)\n", rotationAxis[0], rotationAxis[1], rotationAxis[2]) +
+                    String.format("axis (gotten) = v(%.4f,%.4f,%.4f)\n", gottenAxisBuffer[0], gottenAxisBuffer[1], gottenAxisBuffer[2]) +
+                    String.format("rotQ = v(%.4f,%.4f,%.4f,%.4f)\n", rotationQuaternion[0], rotationQuaternion[1], rotationQuaternion[2],rotationQuaternion[3]) +
+                    String.format("qB (gotten) = v(%.4f,%.4f,%.4f,%.4f)\n", bufferQ[0], bufferQ[1], bufferQ[2],bufferQ[3]) +
+                    String.format("qB (expected) = v(%.4f,%.4f,%.4f,%.4f)\n", quatB[0], quatB[1], quatB[2],quatB[3]) +
+                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", resultBufferV3[0], resultBufferV3[1], resultBufferV3[2]) +
+                    String.format("error = %f\n",error);
+            throw new RuntimeException(message);
+        } else {
+            System.out.println("Quaternion by axis rotation is cohesive :)");
+        }
+
+//        QuaternionTranslator.axisAngleToQuaternion(vecA,quatA);
+//        QuaternionTranslator.rotateQuaternion(quatA,rotationQuaternion,bufferQ);
+//        QuaternionTranslator.quaternionToAxisAngle(bufferQ,resultBufferV3);
 //
-//        VectorTranslator.debugVector(tatatata);
-//        System.exit(0);
-//        //saçl~çsald~ça
+//        error = VectorTranslator.getAngleBetweenVectors(resultBufferV3, vecB);
 //
-//        QuaternionTranslator.quaternionToAxisAngle(rotationQuaternion,buffer);
-//        error = VectorTranslator.getAngleBetweenVectors(rotationAxis,buffer);
-//
-//        if(error > ANGULAR_ERROR_TOLERANCE){
-//            String message = "Quaternion to axis and axis to quaternion are not inverse from one another\n" +
-//                    String.format("error = %f\n",error);
-//            throw new RuntimeException(message);
-//        } else {
-//            System.out.println("Axis to Quaternion test is cohesive :)");
-//        }
-//
-//        float[] aQ4 = new float[4], bQ4 = new float[4], bufferQ4 = new float[4];
-//        QuaternionTranslator.axisAngleToQuaternion(vecA,aQ4);
-//        QuaternionTranslator.axisAngleToQuaternion(vecB,bQ4);
-//
-//        QuaternionTranslator.rotateQuaternion(aQ4,rotationQuaternion,bufferQ4);
-//        QuaternionTranslator.quaternionToAxisAngle(bufferQ4,buffer);
-//
-//        error = VectorTranslator.getAngleBetweenVectors(vecB,buffer);
 //        if(Float.isNaN(error) || error > ANGULAR_ERROR_TOLERANCE){
-//            String message = "Quaternion rotation is not cohesive\n" +
+//            String message = "Quaternion times Quaternion rotation is not cohesive\n" +
 //                    String.format("A = v(%.4f,%.4f,%.4f)\n", vecA[0], vecA[1], vecA[2]) +
 //                    String.format("B = v(%.4f,%.4f,%.4f)\n", vecB[0], vecB[1], vecB[2]) +
-//                    String.format("Aq = v(%.4f,%.4f,%.4f,%.4f)\n", aQ4[0], aQ4[1], aQ4[2], aQ4[3]) +
-//                    String.format("Bq = v(%.4f,%.4f,%.4f,%.4f)\n", bQ4[0], bQ4[1], bQ4[2], bQ4[3]) +
 //                    String.format("axis = v(%.4f,%.4f,%.4f)\n", rotationAxis[0], rotationAxis[1], rotationAxis[2]) +
-//                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", buffer[0], buffer[1], buffer[2]) +
+//                    String.format("rotQ = v(%.4f,%.4f,%.4f,%.4f)\n", rotationQuaternion[0], rotationQuaternion[1], rotationQuaternion[2],rotationQuaternion[3]) +
+//                    String.format("rotated = v(%.4f,%.4f,%.4f)\n", resultBufferV3[0], resultBufferV3[1], resultBufferV3[2]) +
 //                    String.format("error = %f\n",error);
 //            throw new RuntimeException(message);
 //        } else {
-//            System.out.println("Quaternion rotation test is cohesive :)");
-//        }
-//
-//        QuaternionTranslator.copy(aQ4,bufferQ4);
-//        QuaternionTranslator.applyRotation(bufferQ4,rotationAxis);
-//        QuaternionTranslator.quaternionToAxisAngle(bufferQ4,buffer);
-//
-//        error = VectorTranslator.getAngleBetweenVectors(vecB,buffer);
-//        if(error > ANGULAR_ERROR_TOLERANCE){
-//            String message = "Quaternion rotation with axis angle is not cohesive\n" +
-//                    String.format("error = %f\n",error);
-//            throw new RuntimeException(message);
-//        } else {
-//            System.out.println("Quaternion rotation with axis angle test is cohesive :)");
+//            System.out.println("Quaternion by quaternion rotation is cohesive :)");
 //        }
 
         System.out.println();
