@@ -28,9 +28,9 @@ public class VectorTranslator {
         dest[2] = factor * vec3[2];
     }
 
-    public static void divideVector(@Modified float[] vector, float factor){
+    public static void divideVector(@Modified float[] vec3, float factor){
         for (int i = 0; i < 3; i++) {
-            vector[i]/=factor;
+            vec3[i]/=factor;
         }
     }
 
@@ -186,8 +186,9 @@ public class VectorTranslator {
 
     //**Rotates a vector given an axis-angle*/
     public static void rotateAlongAxis(float[] vec3, float[] axis, @Modified float[] dest){
+
         Arrays.fill(dest,0);
-        float ang = magnitude(axis) % PI2;
+        float ang = magnitude(axis);
         if(ang == 0){ System.arraycopy(vec3,0,dest,0,3); return;}
         float s = (float) Math.sin(ang), C = 1F - (float) Math.cos(ang);
 
