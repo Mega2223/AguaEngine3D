@@ -24,6 +24,7 @@ import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 @SuppressWarnings({"unused"})
 
@@ -93,7 +94,7 @@ public class Gaem3D {
     static float[] trans = new float[16];
     static float[] proj = new float[16];
 
-    static PhysicsObjectDecorator p = null;
+    static PhysicsObjectDecorator<Sphere, Model> p = null;
 
     // Pelo amor de deus eu não vou fazer isso para todas as teclas
     // me dá um tempo
@@ -131,7 +132,7 @@ public class Gaem3D {
         context.setLight(0, 0, 10, 0, 1000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
-                .setFogDetails(7, 20);
+                .setFogDetails(700, 20);
 
         TexturedModel chessFloor = new TexturedModel(
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
@@ -156,25 +157,6 @@ public class Gaem3D {
         context.addScript(((CubemapInterpreterShaderProgram)sk.getShader()).genRotationUpdateRunnable(camera));
 
         // Phys Obj
-        p = new PhysicsObjectDecorator<Sphere, Model>(
-                new Sphere(1.0F,1.0F),
-                Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
-        );
-
-        context.addObject(p);
-        physicsContext.addObject(p);
-        p.setCoordinates(0 ,7,0);
-        p.setVelocity(0, 3, 0);
-
-        p = new PhysicsObjectDecorator<Sphere, Model>(
-                new Sphere(1.0F,1.0F),
-                Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
-        );
-
-        context.addObject(p);
-        physicsContext.addObject(p);
-        p.setCoordinates(0 ,7,0);
-        p.setVelocity(0, -3, 0);
 
         physicsContext.addForce(new Gravity(.1F));
         physicsContext.addForce(new Drag(.01F));
@@ -217,9 +199,24 @@ public class Gaem3D {
         }
     }
 
+    static Random r = new Random(2223);
 
     protected static void doLogic() {
         physicsContext.update(1F/60F);
+
+        if(framesElapsed % 60 == 0){
+            System.out.println("SHAW");
+            p = new PhysicsObjectDecorator<Sphere, Model>(
+                    new Sphere(1.0F,1.0F),
+                    Model.loadModel(Utils.readFile(Utils.MODELS_DIR+"/cube.obj"),new SolidColorShaderProgram(0,1,0))
+            );
+
+            context.addObject(p);
+            physicsContext.addObject(p);
+            p.setCoordinates(r.nextFloat()-.5F,15f,r.nextFloat()-.5F);
+            p.setVelocity(0, -5, 0);
+        }
+
     }
 
     protected static void doRenderLogic() {

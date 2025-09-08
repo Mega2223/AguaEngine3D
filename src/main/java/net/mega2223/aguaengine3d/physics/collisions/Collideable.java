@@ -16,5 +16,7 @@ public interface Collideable {
      * */
     void getContactNormal(float[] coord, @Modified float[] result);
 
-    boolean collidesWith(Collideable c);
+    float getCollision(Collideable c, @Modified float[] contactNormalDest);
+
+    float x(); float y(); float z();
 }

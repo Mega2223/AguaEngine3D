@@ -41,7 +41,8 @@ public class CollisionMath {
     }
 
     /**
-     * Solves a collision assuming both objects are particles
+     * Solves a collision assuming both objects are particles,
+     * does not correct the position, only the velocity
      * */
     public static void solveCollision(PhysicsObject a, PhysicsObject b, float restitution){
         float[] posA = buffers[0], posB = buffers[1], velA = buffers[2], velB = buffers[3];
@@ -66,5 +67,26 @@ public class CollisionMath {
         a.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
         VectorTranslator.flipVector(impulsePerIMass);
         b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
+    }
+
+    /**
+     * Distances two objects that are colliding with one another
+     * @param contactNormal contact normal from A's perspective
+     * */
+    public static void solveContact(PhysicsObject a, PhysicsObject b, float[] contactNormal, float contactDepth){
+        if(contactDepth <= 0){return;}
+
+        final float invMassSum = a.getInverseMass() + b.getInverseMass();
+        //invMassSum *= contactDepth;
+
+        VectorTranslator.getNormalized(contactNormal,buffers[0]);
+        contactNormal = buffers[0];
+        VectorTranslator.scaleVector(contactNormal,- contactDepth / invMassSum, buffers[1]);
+
+        VectorTranslator.scaleVector(buffers[1], -a.getInverseMass(), buffers[2]);
+        a.applyTranslation(buffers[2]);
+
+        VectorTranslator.scaleVector(buffers[1],  b.getInverseMass(), buffers[2]);
+        b.applyTranslation(buffers[2]);
     }
 }

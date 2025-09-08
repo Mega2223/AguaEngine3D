@@ -33,6 +33,10 @@ public interface PhysicsObject {
         applyImpulse(impulse[0],impulse[1],impulse[2]);
     }
 
+    default void applyTranslation(float[] translation){
+        applyTranslation(translation[0], translation[1], translation[2]);
+    }
+
     float x(); float y(); float z();
     float vx(); float vy(); float vz();
 

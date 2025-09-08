@@ -127,13 +127,18 @@ public class VectorTranslator {
         return x1*x2+y1*y2+z1*z2;
     }
 
-    public static void normalize(@Modified float[] vector){
-        float magnitude = magnitude(vector);
+    public static void normalize(@Modified float[] vec3){
+        float magnitude = magnitude(vec3);
         if(magnitude == 0){
-            vector[0] = 1F;
+            vec3[0] = 1F;
             return;
         }
-        divideVector(vector,magnitude);
+        divideVector(vec3,magnitude);
+    }
+
+    public static void getNormalized(float[] vec3, @Modified float[] dest){
+        VectorTranslator.copy(vec3, dest);
+        VectorTranslator.normalize(dest);
     }
 
     public static float getAngleBetweenVectors(float[] vecA, float[] vecB){

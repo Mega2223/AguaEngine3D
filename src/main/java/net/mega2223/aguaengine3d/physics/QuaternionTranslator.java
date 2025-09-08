@@ -20,8 +20,8 @@ public class QuaternionTranslator {
     public static void axisAngleToQuaternion(float x, float y, float z, @Modified float[] result) {
         //w + xi + yj + yk
         final float angle = VectorTranslator.magnitude(x,y,z);
-        x /= angle; y /= angle; z /= angle;
         if(angle == 0){ x = y = z = 0; }
+        else { x /= angle; y /= angle; z /= angle; }
         result[W] = (float) Math.cos(angle / 2);
         float s = (float) Math.sin(angle / 2);
         result[X] = x * s; result[Y] = y * s; result[Z] = z * s;
