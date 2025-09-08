@@ -186,7 +186,6 @@ public class VectorTranslator {
 
     //**Rotates a vector given an axis-angle*/
     public static void rotateAlongAxis(float[] vec3, float[] axis, @Modified float[] dest){
-
         Arrays.fill(dest,0);
         float ang = magnitude(axis);
         if(ang == 0){ System.arraycopy(vec3,0,dest,0,3); return;}

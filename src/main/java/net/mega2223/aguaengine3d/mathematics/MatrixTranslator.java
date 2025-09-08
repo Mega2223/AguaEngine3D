@@ -19,6 +19,14 @@ public class MatrixTranslator {
      * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
      * */
 
+    public enum M {
+        M_11(0), M_12(1), M_13(2), M_14(3),
+        M_21(4), M_22(5), M_23(6), M_24(7),
+        M_31(8), M_32(9), M_33(10), M_34(11),
+        M_41(12), M_42(13), M_43(14), M_44(15);
+        final int i;
+        M(int i) {this.i = i;}
+    }
 
     private static final float[] bufferMatrix4 = new float[16];
 
@@ -27,6 +35,7 @@ public class MatrixTranslator {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
+        //FIXME not it isnt lmao
         for (int i = 0; i < 4; i++) {
             vector[i] = (mat4[i][0] * vector[0]) + (mat4[i][1] * vector[1]) + (mat4[i][2] * vector[2]) + (mat4[i][3] * vector[3]);
         }
@@ -37,6 +46,7 @@ public class MatrixTranslator {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
+        //FIXME not it isnt lmao
         for (int i = 0; i < 4; i++) {
             int i1 = i * 4;
             vector[i] = (mat4[i1] * vector[0]) + (mat4[i1 + 1] * vector[1]) + (mat4[i1 + 2] * vector[2]) + (mat4[i1 + 3] * vector[3]);
@@ -230,36 +240,35 @@ public class MatrixTranslator {
         return ret;
     }
 
-    public static void multiply4x4Matrices(@Modified float[] m1, float[] m2){
-        multiply4x4Matrices(m1,m2,bufferMatrix4);
-        System.arraycopy(bufferMatrix4,0,m1,0,16);
+    public static void multiply4x4Matrices(@Modified float[] m4A, float[] m4B){
+        multiply4x4Matrices(m4A,m4B,bufferMatrix4);
+        System.arraycopy(bufferMatrix4,0,m4A,0,16);
     }
 
     //very proud of that one
-    public static void multiply4x4Matrices(float[] m1, float[] m2, @Modified float[] result){
+    public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
         Arrays.fill(bufferMatrix4,0);
         for (int c = 0; c < 4; c++) {
             for (int r = 0; r <4; r++) {
                 for (int i = 0; i < 4; i++) {
-                    int m1Loc = r*4+i;
-                    int m2Loc = c+i*4;//(c)*4+(3-r);
-                    bufferMatrix4[c + r*4] += m1[m1Loc]*m2[m2Loc];
+                    int m1Loc = r*4+i; int m2Loc = c+i*4;
+                    bufferMatrix4[c + r*4] += m4A[m1Loc]*m4B[m2Loc];
                 }
             }
         }
         System.arraycopy(bufferMatrix4, 0, result, 0, 16);
     }
 
-    public static void multiply3x3Matrices(float[] m1, float[] m2, @Modified float[] result){
+    public static void multiply3x3Matrices(float[] m3A, float[] m3B, @Modified float[] result){
         Arrays.fill(result,0);
         for (int c = 0; c < 3; c++) {
             for (int r = 0; r < 3; r++) {
                 for (int i = 0; i < 3; i++) {
-                    result[c + r*3] += m1[r*3+i]*m2[c+i*3];
+                    result[c + r*3] += m3A[r*3+i]*m3B[c+i*3];
                 }
             }
         }
-        System.arraycopy(result, 0, m1, 0, result.length);
+        System.arraycopy(result, 0, m3A, 0, result.length);
     }
 
     public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){

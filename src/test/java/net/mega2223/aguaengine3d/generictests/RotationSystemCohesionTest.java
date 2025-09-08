@@ -5,6 +5,7 @@ import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Locale;
+import java.util.Random;
 
 public class RotationSystemCohesionTest {
     /**
@@ -14,19 +15,15 @@ public class RotationSystemCohesionTest {
     public static final int TESTS = 10;
     public static final float ANGULAR_ERROR_TOLERANCE = (float) Math.toRadians(.25); // 1/4 graus pra mim é bem bom já
 
+    public static final Random r = new Random(2223 + System.currentTimeMillis());
+
     public static void main(String[] args) {
         // TODO essa classe deve medir se as rotações de matriz, axis angle e quaternion são equivalentes
         // TODO talvez calcular o erro máximo, mínimo e médio de cada medida
         int failures = 0;
         for (int i = 0; i < TESTS; i++) {
-            performTest();
-            try{
-
-            } catch (RuntimeException e){
-                System.out.println("Failed test " + (i+1));
-                failures++;
-                e.printStackTrace();
-            }
+            testRotations();
+            testRotationSequence();
         }
         if(failures > 0){
             String message = String.format("Failed (%d/%d) of tests", failures, TESTS);
@@ -35,14 +32,14 @@ public class RotationSystemCohesionTest {
         }
     }
 
-    public static void performTest(){
+    public static void testRotations(){
 
         float[] vecA = new float[4];
         float[] vecB = new float[4];
 
-        for(int i = 0; i < 4; i++){
-            vecA[i] = (float) Math.random();
-            vecB[i] = (float) Math.random();
+        for(int i = 0; i < 3; i++){
+            vecA[i] = r.nextFloat();
+            vecB[i] = r.nextFloat();
         }
 
         System.out.printf(Locale.US,"Starting angular transform cohesion test -> " +
@@ -135,6 +132,7 @@ public class RotationSystemCohesionTest {
             System.out.println("Quaternion by axis rotation is cohesive :)");
         }
 
+
 //        QuaternionTranslator.axisAngleToQuaternion(vecA,quatA);
 //        QuaternionTranslator.rotateQuaternion(quatA,rotationQuaternion,bufferQ);
 //        QuaternionTranslator.quaternionToAxisAngle(bufferQ,resultBufferV3);
@@ -155,5 +153,85 @@ public class RotationSystemCohesionTest {
 //        }
 
         System.out.println();
+    }
+
+    public static void testRotationSequence(){
+
+        System.out.println("\nStarting sequential rotation test sequence");
+
+        float[] vecA = new float[4], vecB = new float[4];
+        float[][] buffers = new float[6][4];
+
+        for(int i = 0; i < 3; i++){
+            vecA[i] = (float) Math.random();
+            vecB[i] = vecA[i];
+        }
+        VectorTranslator.normalize(vecA);
+        VectorTranslator.normalize(vecB);
+
+        final int N = 7;
+        float[][] rotations = new float[N][4];
+        for (int i = 0; i < N; i++) {
+            for (int v = 0; v < 3; v++) {
+                rotations[i][v] = (float) Math.random() * 2 - 1;
+            }
+            VectorTranslator.normalize(rotations[i]);
+            VectorTranslator.scaleVector(rotations[i], (float) (Math.random()*10F));
+        }
+
+        for (int i = 0; i < N; i++) {
+            VectorTranslator.rotateAlongAxis(vecB,rotations[i],buffers[0]);
+//            System.out.printf("(%.3f %.3f %.3f) =>[%.3f %.3f %.3f]=> (%.3f %.3f %.3f) [mag = %.4f]\n",
+//                    vecB[0],vecB[1],vecB[2],
+//                    rotations[i][0],rotations[i][1],rotations[i][2],
+//                    buffers[0][0],buffers[0][1], buffers[0][2],
+//                    VectorTranslator.magnitude(buffers[0]));
+            VectorTranslator.copy(buffers[0],vecB);
+        }
+
+        System.out.printf("\nA(%.3f %.3f %.3f) -> (N=%d) -> B(%.3f %.3f %.3f)\n",
+                vecA[0],vecA[1],vecA[2],N,vecB[0],vecB[1],vecB[2]
+        );
+
+        // TESTS
+
+        VectorTranslator.copy(vecA,buffers[0]);
+
+        float[][] rotationMatrices = new float[N][16];
+        for (int i = 0; i < N; i++) {
+            MatrixTranslator.rotationMatrixFromAxisAngle(rotations[i],rotationMatrices[i]);
+            MatrixTranslator.multiplyVec4Mat4(buffers[0],rotationMatrices[i]);
+        }
+
+        float error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            throw new RuntimeException("Sequential matrix rotation is incoherent");
+        }
+
+        VectorTranslator.copy(vecA,buffers[0]);
+        float[][] rotationQuaternions = new float[N][4];
+        for (int i = 0; i < N; i++) {
+            QuaternionTranslator.axisAngleToQuaternion(rotations[i],rotationQuaternions[i]);
+            QuaternionTranslator.rotateVectorByQuaternion(buffers[0],rotationQuaternions[i],buffers[1]);
+            QuaternionTranslator.copy(buffers[1],buffers[0]);
+        }
+
+        error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            throw new RuntimeException("Sequential quaternion rotation is incoherent");
+        }
+
+        VectorTranslator.copy(vecA,buffers[0]);
+        QuaternionTranslator.copy(rotationQuaternions[0], buffers[1]);
+        for (int i = 1; i < N; i++) {
+            QuaternionTranslator.quaternionProduct(rotationQuaternions[i], buffers[1], buffers[2]);
+            QuaternionTranslator.copy(buffers[2],buffers[1]);
+        }
+        QuaternionTranslator.rotateVectorByQuaternion(vecA,buffers[1],buffers[0]);
+
+        error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            throw new RuntimeException("Sequential quaternion multiplication is incoherent");
+        }
     }
 }

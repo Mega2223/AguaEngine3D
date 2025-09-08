@@ -57,7 +57,7 @@ public class QuaternionTranslator {
         q4[W]/=mag; q4[X]/=mag; q4[Y]/=mag; q4[Z]/=mag;
     }
 
-    public static void scalarMultiplication(@Modified float[] q4,float scalar){
+    public static void scalarProduct(@Modified float[] q4, float scalar){
         q4[0]*=scalar; q4[1]*=scalar; q4[2]*=scalar; q4[3]*=scalar;
     }
 
@@ -90,7 +90,10 @@ public class QuaternionTranslator {
 
     static final float[] qRotationBuffer = new float[4];
     public static void rotateQuaternionByAxis(float[] q4, float[] axisVec3, @Modified float[] dest){
-        Arrays.fill(dest,0); // FIXME KKKKKKKKKKKKKKK isso pelomenos funciona
+//        axisAngleToQuaternion(axisVec3,qRotationBuffer);
+//        quaternionProduct(qRotationBuffer,q4,dest);
+
+        Arrays.fill(dest,0); // FIXME KKKKKKKKKKKKKKK isso pelo menos funciona
         quaternionToAxisAngle(q4,qRotationBuffer);
         VectorTranslator.rotateAlongAxis(qRotationBuffer,axisVec3,dest);
         copy(dest,qRotationBuffer);
