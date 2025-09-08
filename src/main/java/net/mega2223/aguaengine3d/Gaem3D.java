@@ -192,6 +192,25 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
+
+
+        physicsContext.addObject(new FixedPlane(
+                new float[]{5,0,0},
+                new float[]{-5,0,0}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{-5,0,0},
+                new float[]{5,0,0}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{0,0,5},
+                new float[]{0,0,-5}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{0,0,-5},
+                new float[]{0,0,5}
+        ));
+
         physicsContext.addForce(new Gravity(.1F));
         physicsContext.addForce(new Drag(.01F));
 //        physicsContext.addActor(new FloorActor());
@@ -234,12 +253,16 @@ public class Gaem3D {
     }
 
     protected static void doLogic() {
-        physicsContext.update(1F / 60F);
+
+        int n = 1;
+        for (int i = 0; i < n; i++) {
+            physicsContext.update(1F / (60F*n));
+        }
 
         if (framesElapsed % (60 /* 39284*/) == 0) {
             System.out.println("SHAW");
             p = new PhysicsObjectDecorator<Sphere, Model>(
-                    new Sphere(/*2*r.nextFloat()+.01*/1, 1.0F),
+                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
                     Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0))
             );
 

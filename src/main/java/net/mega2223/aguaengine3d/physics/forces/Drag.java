@@ -19,12 +19,12 @@ public class Drag implements Force{
     }
 
     @Override
-    public void apply(PhysicsObject object) {
+    public void apply(PhysicsObject object,float deltaT) {
         object.getVelocity(buffer);
         final float vel = VectorTranslator.magnitude(buffer);
         VectorTranslator.normalize(buffer);
         VectorTranslator.flipVector(buffer);
         VectorTranslator.scaleVector(buffer,kLinear * vel + kSquared * vel * vel);
-        object.applyForce(buffer[0],buffer[1],buffer[2]);
+        object.applyForce(buffer[0]*deltaT,buffer[1]*deltaT,buffer[2]*deltaT);
     }
 }
