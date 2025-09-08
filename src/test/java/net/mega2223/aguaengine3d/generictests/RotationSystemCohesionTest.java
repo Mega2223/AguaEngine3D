@@ -77,7 +77,32 @@ public class RotationSystemCohesionTest {
             System.out.println("Matrix rotation test is cohesive :)");
         }
 
+        float[] aQ4 = new float[4], bQ4 = new float[4], axisQ = new float[4], result = new float[4];
+        QuaternionTranslator.axisAngleToQuaternion(vecA,aQ4);
+        QuaternionTranslator.axisAngleToQuaternion(vecB,bQ4);
+        QuaternionTranslator.axisAngleToQuaternion(rotationAxis,axisQ);
 
+        QuaternionTranslator.rotateQuaternion(aQ4,axisQ,result);
+        QuaternionTranslator.quaternionToAxisAngle(result,buffer);
+
+        error = VectorTranslator.getAngleBetweenVectors(vecB,buffer);
+        if(error > ANGULAR_ERROR_TOLERANCE){
+            String message = "Quaternion rotation is not cohesive\n" +
+                    String.format("error = %f\n",error);
+            throw new RuntimeException(message);
+        } else {
+            System.out.println("Quaternion rotation test is cohesive :)");
+        }
+
+        QuaternionTranslator.quaternionToAxisAngle(rotationQuaternion,buffer);
+        error = VectorTranslator.getAngleBetweenVectors(rotationAxis,buffer);
+        if(error > ANGULAR_ERROR_TOLERANCE){
+            String message = "Quaternion to axis and axis to quaternion are not inverse from one another\n" +
+                    String.format("error = %f\n",error);
+            throw new RuntimeException(message);
+        } else {
+            System.out.println("Axis to Quaternion test is cohesive :)");
+        }
 
         System.out.println();
     }

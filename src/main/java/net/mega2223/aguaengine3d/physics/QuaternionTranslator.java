@@ -53,4 +53,29 @@ public class QuaternionTranslator {
         }
         q4[0]/=mag; q4[1]/=mag; q4[2]/=mag; q4[3]/=mag;
     }
+
+    public static void scalarMultiplication(@Modified float[] q4,float scalar){
+        q4[0]*=scalar; q4[1]*=scalar; q4[2]*=scalar; q4[3]*=scalar;
+    }
+
+    public static void simpleAddition(@Modified float[] q4A, float[] q4B){
+        q4A[0] += q4B[0];
+        q4A[1] += q4B[1];
+        q4A[2] += q4B[2];
+        q4A[3] += q4B[3];
+    }
+
+    public static void rotateQuaternion(float[] q4, float[] amountQ4, @Modified float[] dest){
+        multiplyQuaternions(q4,amountQ4,dest);
+        scalarMultiplication(dest,.5F);
+        simpleAddition(dest,q4);
+    }
+
+    public static void quaternionToAxisAngle(float[] q4, @Modified float[] dest){
+        final float wS = q4[W] * q4[W];
+        final float ang = (float) (2 * Math.acos(q4[W]));
+        dest[0] = ang * (float) (q4[X] / Math.sqrt(1 - wS));
+        dest[1] = ang * (float) (q4[Y] / Math.sqrt(1 - wS));
+        dest[2] = ang * (float) (q4[Z] / Math.sqrt(1 - wS));
+    }
 }
