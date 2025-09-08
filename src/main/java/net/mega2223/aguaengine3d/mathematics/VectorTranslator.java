@@ -92,6 +92,12 @@ public class VectorTranslator {
         dest[2] = vec3[2];
     }
 
+    public static void copy(float x, float y, float z, @Modified float[] dest){
+        dest[0] = x;
+        dest[1] = y;
+        dest[2] = z;
+    }
+
     public static void crossProduct(@Modified float[] vector, float[] vector2){
         crossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], buffer1);
         System.arraycopy(buffer1,0,vector,0,3);

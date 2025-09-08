@@ -1,8 +1,9 @@
 package net.mega2223.aguaengine3d.physics.collisions;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
-public interface Collideable {
+public interface Collideable extends PhysicsObject {
     /** Whether the point is 'inside the object'
      * @implNote (x,y,z) are absolute coordinates, in respect to the world, not the object.
      */
@@ -13,6 +14,7 @@ public interface Collideable {
     float maxRadius();
     /**
      * Gets the contact normal with same orientation as the world
+     * from this object's perspective (not from coord's perspective)
      * */
     void getContactNormal(float[] coord, @Modified float[] result);
 

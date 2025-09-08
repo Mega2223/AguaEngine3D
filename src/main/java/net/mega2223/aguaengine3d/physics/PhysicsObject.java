@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.physics;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.collisions.CollisionMath;
 
 public interface PhysicsObject {
     void applyAcceleration(float ax, float ay, float az);
@@ -46,6 +47,14 @@ public interface PhysicsObject {
 
     default void getVelocity(@Modified float[] dest){
         dest[0] = vx(); dest[1] = vy(); dest[2] = vz();
+    }
+
+    default float getClosingVelocity(float[] coord, float[] velocity){
+        return getClosingVelocity(coord[0],coord[1],coord[2],velocity[0],velocity[1],velocity[2]);
+    }
+
+    default float getClosingVelocity(float x, float y, float z, float vx, float vy, float vz){
+        return CollisionMath.closingVelocity(x(),y(),z(),vx(),vy(),vz(),x,y,z,vx,vy,vz);
     }
 
     default PhysicsObject getActor(){

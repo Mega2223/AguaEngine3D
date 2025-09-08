@@ -24,7 +24,7 @@ public class SimpleCollisionManager extends CollisionManager{
                 float depth = ((Collideable) o1).getCollision((Collideable) o2,buffer);
                 if (depth > 0){
                     CollisionMath.solveContact(o1, o2, buffer, depth);
-			        CollisionMath.solveCollision(o1, o2, 1.0F);
+			        CollisionMath.solveCollision((Collideable) o1, (Collideable) o2, 1.0F);
                 }
             }
         }

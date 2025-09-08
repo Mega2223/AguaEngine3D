@@ -31,7 +31,7 @@ public class Sphere extends Particle implements Collideable {
 
     @Override
     public void getContactNormal(float[] coord, float[] result) {
-        // TODO
+        CollisionMath.getContactNormal(pos,coord,result);
     }
 
     @Override
@@ -41,6 +41,8 @@ public class Sphere extends Particle implements Collideable {
             float depth = (sphere.radius + radius) - VectorTranslator.getDistance(pos,sphere.pos);
             CollisionMath.getContactNormal(pos,sphere.pos,contactNormalBuffer);
             return Math.max(depth,0);
+        } else if (c instanceof FixedPlane) {
+//            System.out.println("womp womp");
         }
         return 0;
     }
