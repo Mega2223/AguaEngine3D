@@ -43,70 +43,7 @@ public class Model implements Renderable, Positionable {
         this.normals = ModelUtils.generateNormals(this);
     }
 
-    public static Model loadModel(String objData, ShaderProgram shader){
-        return loadModel(objData.split("\n"),shader);
-    }
 
-    public static Model loadModel(String[] objData, ShaderProgram shader){
-        ArrayList<String> existingVerticeCombinations = new ArrayList<>();
-        ArrayList<Float> vertices = new ArrayList<>();
-        ArrayList<Integer> indices = new ArrayList<>();
-
-        //extracts vertices and texture coordinates and puts them in their respective arrays
-        for (int i = 0; i < objData.length; i++) {
-            String[] split = objData[i].split(" ");
-            String type = split[0];
-            if(type.equalsIgnoreCase("v")&&split.length == 4){
-                vertices.add(Float.parseFloat(split[1]));
-                vertices.add(Float.parseFloat(split[2]));
-                vertices.add(Float.parseFloat(split[3]));
-                vertices.add(0f);
-                //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
-            }
-
-
-        }
-        if(vertices.size()%4 != 0){
-            throw new UnsupportedOperationException("invalid model");
-        }
-
-        for (String objDatum : objData) {
-            String[] split = objDatum.split(" ");
-            String type = split[0];
-            if (type.equalsIgnoreCase("f") && split.length == 4) {
-                for (int j = 1; j < split.length; j++) {
-                    String act = split[j]; act = act.split("/")[0]; //removes the texture coordinate since the Model class does not support them
-                    int index = existingVerticeCombinations.indexOf(act);
-                    if (index == -1) {
-                        existingVerticeCombinations.add(act);
-                        index = existingVerticeCombinations.indexOf(act);
-                    }
-                    indices.add(index);
-                }
-            }
-        }
-        float[] vertData = new float[existingVerticeCombinations.size()*4];
-        int[] indData = new int[indices.size()];
-
-        for(int i = 0; i<existingVerticeCombinations.size(); i++){
-            String[] sp = existingVerticeCombinations.get(i).split("/");
-            int[] combination = new int[sp.length];
-            for (int j = 0; j < sp.length; j++) {
-                if(sp[j].isEmpty()){continue;}
-                combination[j] = Integer.parseInt(sp[j]);
-            }
-            for (int j = 0; j < 3; j++) {
-                vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
-            }
-
-        }
-
-        for (int i = 0; i < indData.length; i++) {
-            indData[i]=indices.get(i);
-        }
-
-        return new Model(vertData,indData,shader);
-    }
 
     public float[] getRelativeVertices() {
         return vertices.clone();
@@ -235,6 +172,71 @@ public class Model implements Renderable, Positionable {
     public void setUniforms(int iteration, float[] projectionMatrix){
         MatrixTranslator.generateTranslationMatrix(coords, bufferTranslationMatrix);
         shader.setUniforms(iteration,bufferTranslationMatrix,projectionMatrix);
+    }
+
+    public static Model loadModel(String objData, ShaderProgram shader){
+        return loadModel(objData.split("\n"),shader);
+    }
+
+    public static Model loadModel(String[] objData, ShaderProgram shader){
+        ArrayList<String> existingVerticeCombinations = new ArrayList<>();
+        ArrayList<Float> vertices = new ArrayList<>();
+        ArrayList<Integer> indices = new ArrayList<>();
+
+        //extracts vertices and texture coordinates and puts them in their respective arrays
+        for (int i = 0; i < objData.length; i++) {
+            String[] split = objData[i].split(" ");
+            String type = split[0];
+            if(type.equalsIgnoreCase("v")&&split.length == 4){
+                vertices.add(Float.parseFloat(split[1]));
+                vertices.add(Float.parseFloat(split[2]));
+                vertices.add(Float.parseFloat(split[3]));
+                vertices.add(0f);
+                //wavefront only has 3 vertex coordinates, but our model system has 4, last line accounts for the 4th
+            }
+
+
+        }
+        if(vertices.size()%4 != 0){
+            throw new UnsupportedOperationException("invalid model");
+        }
+
+        for (String objDatum : objData) {
+            String[] split = objDatum.split(" ");
+            String type = split[0];
+            if (type.equalsIgnoreCase("f") && split.length == 4) {
+                for (int j = 1; j < split.length; j++) {
+                    String act = split[j]; act = act.split("/")[0]; //removes the texture coordinate since the Model class does not support them
+                    int index = existingVerticeCombinations.indexOf(act);
+                    if (index == -1) {
+                        existingVerticeCombinations.add(act);
+                        index = existingVerticeCombinations.indexOf(act);
+                    }
+                    indices.add(index);
+                }
+            }
+        }
+        float[] vertData = new float[existingVerticeCombinations.size()*4];
+        int[] indData = new int[indices.size()];
+
+        for(int i = 0; i<existingVerticeCombinations.size(); i++){
+            String[] sp = existingVerticeCombinations.get(i).split("/");
+            int[] combination = new int[sp.length];
+            for (int j = 0; j < sp.length; j++) {
+                if(sp[j].isEmpty()){continue;}
+                combination[j] = Integer.parseInt(sp[j]);
+            }
+            for (int j = 0; j < 3; j++) {
+                vertData[(i*4)+j] = vertices.get((combination[0]-1)*4+j);
+            }
+
+        }
+
+        for (int i = 0; i < indData.length; i++) {
+            indData[i]=indices.get(i);
+        }
+
+        return new Model(vertData,indData,shader);
     }
 
 }

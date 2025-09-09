@@ -60,4 +60,19 @@ public interface PhysicsObject {
     default PhysicsObject getActor(){
         return this;
     }
+
+    /** Converts a global coordinate to a coordinate from the object's internal coordinate system*/
+    void toLocalCoordinateSystem(@Modified float[] vec3);
+
+    /** Converts a coordinate from the object's internal coordinate system to a global coordinate*/
+    void toGlobalCoordinateSystem(@Modified float[] vec3);
+
+    /** Gets the relative velocity of the point in relation to the object
+     * @param point point in world coordinates
+     * @param pointVelocity velocity in world coordinates
+     * @param dest returns the velocity of the point in relation to the object in world coordinates
+     * */
+    void toLocalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
+
+    void toGlobalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
 }

@@ -249,11 +249,6 @@ public class RotationSystemCohesionTest {
 
         for (int i = 0; i < N; i++) {
             VectorTranslator.rotateAlongAxis(vecB,rotations[i],buffers[0]);
-//            System.out.printf("(%.3f %.3f %.3f) =>[%.3f %.3f %.3f]=> (%.3f %.3f %.3f) [mag = %.4f]\n",
-//                    vecB[0],vecB[1],vecB[2],
-//                    rotations[i][0],rotations[i][1],rotations[i][2],
-//                    buffers[0][0],buffers[0][1], buffers[0][2],
-//                    VectorTranslator.magnitude(buffers[0]));
             VectorTranslator.copy(buffers[0],vecB);
         }
 
@@ -296,7 +291,7 @@ public class RotationSystemCohesionTest {
         VectorTranslator.copy(vecA,buffers[0]);
         QuaternionTranslator.copy(rotationQuaternions[0], buffers[1]);
         for (int i = 1; i < N; i++) {
-            QuaternionTranslator.quaternionProduct(rotationQuaternions[i], buffers[1], buffers[2]);
+            QuaternionTranslator.addRotations(rotationQuaternions[i], buffers[1], buffers[2]);
             QuaternionTranslator.copy(buffers[2],buffers[1]);
         }
         QuaternionTranslator.rotateVectorByQuaternion(vecA,buffers[1],buffers[0]);

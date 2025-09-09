@@ -558,33 +558,9 @@ public class MatrixTranslator {
                 (mat3[6]*mat3[4]*mat3[2] + mat3[7]*mat3[5]*mat3[0] + mat3[8]*mat3[3]*mat3[1]);
     }
 
-    public static void getRotationMat4FromQuaternion(float[] q4, @Modified float[] resultMat4){
-        rotationMatrixFromQuaternion(
-                q4[QuaternionTranslator.W],
-                q4[QuaternionTranslator.X],
-                q4[QuaternionTranslator.Y],
-                q4[QuaternionTranslator.Z], resultMat4);
+    public static void copy(float[] m4,@Modified float[] dest){
+        System.arraycopy(m4, 0, dest, 0, 16);
     }
-
-    public static void rotationMatrixFromQuaternion(float w, float x, float y, float z, float[] resultMat4){
-        Arrays.fill(resultMat4,0);
-        float[] stolenVector = VectorTranslator.buffer1;
-        VectorTranslator.getRotationRadians(w,x,y,z, stolenVector);
-        MatrixTranslator.generateRotationMatrix(stolenVector[0], stolenVector[1], stolenVector[2], resultMat4);
-        //TODO wtf isso funciona???
-        /*This doesn't work lol
-        resultMat4[0] = 1-(2*y*y+2*z*z);
-        resultMat4[1] = 2*x*y + 2*z*w;
-        resultMat4[2] = 2*x*z - 2*y*w;
-        resultMat4[4] = 2*x*y - 2*z*w;
-        resultMat4[5] = 1-(2*x*x+2*z*z);
-        resultMat4[6] = 2*y*z + 2*x*w;
-        resultMat4[8] = 2*x*z + 2*y*w;
-        resultMat4[9] = 2*y*z - 2*x*w;
-        resultMat4[10] = 1-(2*x*x+2*y*y);
-        resultMat4[15] = 1;*/
-    }
-
 
     public static void debugMatrix4x4(float[] matrix4) {
         StringBuilder debug = new StringBuilder("[ ");

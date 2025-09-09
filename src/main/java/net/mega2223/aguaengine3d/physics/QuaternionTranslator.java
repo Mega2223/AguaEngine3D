@@ -132,8 +132,8 @@ public class QuaternionTranslator {
     }
 
     private static final float[] rotationBuffer = new float[4];
-    public static void addRotations(float[] q4, float[] amountQ4, @Modified float[] dest){
-        quaternionProduct(amountQ4,q4,dest); // FIXME isso em tese deveria funcionar
+    public static void addRotations(float[] q4a, float[] q4b, @Modified float[] dest){
+        quaternionProduct(q4a,q4b,dest); // Passa os testes
     }
 
     static final float[] qRotationBuffer = new float[4];
@@ -176,5 +176,14 @@ public class QuaternionTranslator {
     public static void flip(@Modified float[] q4){
         q4[0] = -q4[0]; q4[1] = -q4[1];
         q4[2] = -q4[2]; q4[3] = -q4[3];
+    }
+
+    private static final float[] angularVelocityQ4Buffer = new float[4];
+    public static void addAngularVelocity(float[] rotationQ4, float[] angVelVec3, float deltaT, @Modified float[] dest){
+        vecToImaginary(angVelVec3, angularVelocityQ4Buffer);
+        quaternionProduct(angularVelocityQ4Buffer,rotationQ4,qRotationBuffer);
+        scalarProduct(qRotationBuffer,deltaT/2);
+        //addRotations(rotationQ4,qRotationBuffer,dest); // TODO veja
+        simpleAddition(rotationQ4,qRotationBuffer,dest);
     }
 }
