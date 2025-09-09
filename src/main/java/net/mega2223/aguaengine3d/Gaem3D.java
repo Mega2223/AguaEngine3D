@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d;
 
 
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -15,6 +16,8 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
+import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.RigidBody;
 import net.mega2223.aguaengine3d.physics.actors.FloorActor;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
@@ -94,7 +97,7 @@ public class Gaem3D {
     static float[] trans = new float[16];
     static float[] proj = new float[16];
 
-    static PhysicsObjectDecorator<Sphere, Model> p = null;
+    static PhysicsObjectDecorator<PhysicsObject, Positionable> p = null;
     static Random r = new Random(2223);
 
     // Pelo amor de deus eu não vou fazer isso para todas as teclas
@@ -211,9 +214,9 @@ public class Gaem3D {
                 new float[]{0,0,5}
         ));
 
-        physicsContext.addForce(new Gravity(.1F));
-        physicsContext.addForce(new Drag(.01F));
-//        physicsContext.addActor(new FloorActor());
+        physicsContext.addForce(new Gravity(9.8F));
+        physicsContext.addForce(new Drag(.001F,.01F));
+        physicsContext.addActor(new FloorActor(-.001F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
 //            @Override
@@ -254,22 +257,26 @@ public class Gaem3D {
 
     protected static void doLogic() {
 
-        int n = 1;
+        int n = 60;
         for (int i = 0; i < n; i++) {
             physicsContext.update(1F / (60F*n));
         }
 
-        if (framesElapsed % (60 /* 39284*/) == 0) {
+        if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
-            p = new PhysicsObjectDecorator<Sphere, Model>(
-                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
+            RigidBody r = new RigidBody(1);
+            r.angularAccelAccumulator[0] = .1F;
+            p = new PhysicsObjectDecorator<>(
+//                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
+//                    new Sphere(1, 1.0F),
+                    r,
                     Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0))
             );
 
             context.addObject(p);
             physicsContext.addObject(p);
-            p.setCoordinates(r.nextFloat() - .5F, 15f, r.nextFloat() - .5F);
-            p.setVelocity(0, -5, 0);
+            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 15f, Gaem3D.r.nextFloat() - .5F);
+//            p.setVelocity(0, -5, 0);
         }
 
     }

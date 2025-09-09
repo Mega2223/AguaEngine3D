@@ -14,13 +14,13 @@ public class RigidBody implements Rotatable {
     protected final float[] pos = new float[3];
     protected final float[] velocity = new float[3];
 
-    protected final float[] rotationQ4 = new float[4];
+    protected final float[] rotationQ4 = {1F,0F,0F,0F};
     protected final float[] angularVelocityV3 = new float[4];
 
-    protected float mass, invMass;
+    protected final float mass, invMass;
 
     private final float[] accelerationAccumulator = new float[4];
-    private final float[] angularAccelAccumulator = new float[4];
+    public final float[] angularAccelAccumulator = new float[4]; //TODO
     private final float[] posDerivative = new float[4];
     private final float[] rotationMatrix = new float[16];
 
@@ -40,7 +40,9 @@ public class RigidBody implements Rotatable {
         VectorTranslator.addToVector(angularVelocityV3,angularAccelAccumulator);
         Arrays.fill(angularAccelAccumulator,0);
         QuaternionTranslator.addAngularVelocity(rotationQ4,angularVelocityV3,deltaT,buffers[0]);
+        QuaternionTranslator.copy(buffers[0],rotationQ4);
 
+        QuaternionTranslator.rotationMatrixFromQuaternion(rotationQ4,rotationMatrix);
     }
 
     @Override
