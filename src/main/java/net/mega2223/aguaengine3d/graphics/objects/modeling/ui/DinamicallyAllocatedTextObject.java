@@ -7,7 +7,7 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
-public class DinAllocTextComponent implements Renderable, InterfaceComponent {
+public class DinamicallyAllocatedTextObject implements Renderable, InterfaceComponent {
 
     protected int vertexVBO = -1, indexVBO = -1;
     protected int aligment = InterfaceComponent.CENTER_ALIGMENT;
@@ -22,14 +22,14 @@ public class DinAllocTextComponent implements Renderable, InterfaceComponent {
     private final float[] translationMatrix = new float[16];
     protected boolean areVBOSvalid = true;
 
-    DinAllocTextComponent(float[] vertices, int[] indices, float[] textureCoords, int texture) {
+    DinamicallyAllocatedTextObject(float[] vertices, int[] indices, float[] textureCoords, int texture) {
         this.vertices = vertices; this.indices = indices; this.textureCoords = textureCoords;
         genVBOS();
         this.displayShaderProgram = new DisplayComponentShaderProgram(texture,textureCoords,1F);
         this.texture = texture;
     }
 
-    public static DinAllocTextComponent generate(CharSequence data, BitmapFont font){
+    public static DinamicallyAllocatedTextObject generate(CharSequence data, BitmapFont font){
         return font.genFromString(data, null);
     }
 

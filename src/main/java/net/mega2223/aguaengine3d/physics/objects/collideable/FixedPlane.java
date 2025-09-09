@@ -3,18 +3,21 @@ package net.mega2223.aguaengine3d.physics.objects.collideable;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
-import net.mega2223.aguaengine3d.physics.collisions.CollisionManager;
 import net.mega2223.aguaengine3d.physics.collisions.CollisionMath;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 import java.util.Arrays;
-
-public class FixedPlane extends Particle implements Collideable
-{
+/** Represents an infinite plane collideable object
+ * */
+public class FixedPlane extends Particle implements Collideable {
     private static final float[] buffer = new float[4];
 
     float[] normal = new float[4], point = new float[4];
 
+    /** Creates a FixedPlane object
+     * @param normal Plane normal, that is, a vector which is orthogonal with all possible vectors inside the plane
+     * @param point Some point that belongs to the plane
+     * */
     public FixedPlane(float[] normal, float[] point){
         super(Float.POSITIVE_INFINITY);
         VectorTranslator.getNormalized(normal,this.normal);
@@ -23,7 +26,6 @@ public class FixedPlane extends Particle implements Collideable
 
     @Override
     public boolean collides(float x, float y, float z) {
-        //VectorTranslator.subtractFromVector(x,y,z,point[0],point[1],point[2],buffer);
         buffer[0] = x; buffer[1] = y; buffer[2] = z;
         return VectorTranslator.dotProduct(buffer,normal) == 0;
     }
@@ -53,7 +55,7 @@ public class FixedPlane extends Particle implements Collideable
         return 0;
     }
 
-    /**Return distance from the plane*/
+    /**Returns distance from the closest point iin the plane*/
     public float getDistance(float[] coord){
         VectorTranslator.subtractFromVector(point,coord,buffer);
         return VectorTranslator.dotProduct(buffer,normal) + VectorTranslator.magnitude(coord);

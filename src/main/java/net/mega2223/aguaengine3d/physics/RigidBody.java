@@ -15,7 +15,7 @@ public class RigidBody implements Rotatable {
     protected final float[] velocity = new float[3];
 
     protected final float[] rotationQ4 = {1F,0F,0F,0F};
-    protected final float[] angularVelocityV3 = new float[4];
+    protected final float[] angularVelocity = new float[4];
 
     protected final float mass, invMass;
 
@@ -23,6 +23,7 @@ public class RigidBody implements Rotatable {
     public final float[] angularAccelAccumulator = new float[4]; //TODO
     private final float[] posDerivative = new float[4];
     private final float[] rotationMatrix = new float[16];
+    private final float[] inverseRotationMatrix = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -37,12 +38,14 @@ public class RigidBody implements Rotatable {
         VectorTranslator.addToVector(pos, posDerivative);
 
         //Angular Velocity
-        VectorTranslator.addToVector(angularVelocityV3,angularAccelAccumulator);
+        VectorTranslator.addToVector(angularVelocity,angularAccelAccumulator);
         Arrays.fill(angularAccelAccumulator,0);
-        QuaternionTranslator.addAngularVelocity(rotationQ4,angularVelocityV3,deltaT,buffers[0]);
+        QuaternionTranslator.addAngularVelocity(rotationQ4, angularVelocity,deltaT,buffers[0]);
         QuaternionTranslator.copy(buffers[0],rotationQ4);
 
         QuaternionTranslator.rotationMatrixFromQuaternion(rotationQ4,rotationMatrix);
+        MatrixTranslator.getTransposeMatrix4(rotationMatrix,inverseRotationMatrix);
+        // The inverse of a rotation matrix is it's transpose, much quicker to calculate :)
     }
 
     @Override
@@ -130,7 +133,12 @@ public class RigidBody implements Rotatable {
     }
 
     @Override
-    public void getLocalPointVelocity(float[] point, float[] dest) {
+    public void getLocalPointVelocity(float[] point, @Modified float[] dest) {
         // point e dest estão em world coordinates
+        VectorTranslator.subtractFromVector(point,pos,buffer1);
+        VectorTranslator.crossProduct(angularVelocity,buffer1);
+        VectorTranslator.addToVector(dest,velocity); // TODO isso funciona?
     }
+
+    private final float[] buffer1 = new float[4];
 }

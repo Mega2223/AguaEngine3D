@@ -1,7 +1,9 @@
 package net.mega2223.aguaengine3d;
 
 
+import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
@@ -14,6 +16,7 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
@@ -23,8 +26,8 @@ import net.mega2223.aguaengine3d.physics.actors.FloorActor;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
+import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
-import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
@@ -36,13 +39,13 @@ import java.util.Random;
  * The official AguaEngine3D TODO list:
  * Remove shadow acnes somehow (I hate normals so much it's unreal) <- At least i did make the normal calculator lol
  * Font rendering <- unfinished <- almost finished
- * Rewrite texture loading function
+ * Rewrite texture loading function <- maybe not???
  * Convert light objects to structs in shaders
  * The floor is slightly transparent somehow <- FIXED
  * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade) <- Done
  * Move aero to another module? (also finish it lol) <- DONE
  * Move shadow calculation algorithm to the default shader dictionary <- goes along with standardizing uniforms i guess
- * Reform the shader dictionary lol
+ * Reform the shader dictionary lol <- SHADER MACROS !!!
  * Cubemap support (for lights and skyboxes) <- Done
  * Logo (kindadone) and Readme.md (done)
  * Figure out why the FPS loop is weird
@@ -60,8 +63,7 @@ import java.util.Random;
  * Denote static buffers explicitly as static? <- DONE afaik
  * Interaction radius detection interface <- Done
  * Object declaration instantiation generation annotation?
- * Standardize array arguments (especially for the phyisics module)
- * Calculate the restitution variable lol <- Done?
+ * Calculate the restitution variable lol <- Womp womp
  * Also the physics module needs the friction force <- Womp womp
  * Parallel contact is weird currently <- Womp womp
  * Static functions that creates objects with bound buffers
@@ -77,7 +79,10 @@ import java.util.Random;
  * Texturable interface?
  * Modular uniform sync
  * Subdividing triangles of a model for debugging purposes
+ * Shader macros (better than the shaderdict) [fog calculations, light calculations, shadow calculations etc.]
+ *      maybe bind it to the RenderingContext object (for global qualities like fog rendering)
  * Classe que representa uma série de transformações? <- Transform?
+ * Multi threadening <- lmao good luck with all these static buffers
  * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
@@ -171,13 +176,13 @@ public class Gaem3D {
                 new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
                 new int[]{0, 1, 2, 2, 1, 3},
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
-                TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png")
+                TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png") // não funciona em distribuições unix???
         );
-        Model nonChessFloor = new Model(
-                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
-                new int[]{0, 1, 2, 2, 1, 3},
-                new SolidColorShaderProgram(.6F, .8F, .6F)
-        );
+//        Model nonChessFloor = new Model(
+//                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
+//                new int[]{0, 1, 2, 2, 1, 3},
+//                new SolidColorShaderProgram(.6F, .8F, .6F)
+//        );
         context.addObject(chessFloor);
 //	    context.addObject(nonChessFloor);
 
@@ -195,8 +200,6 @@ public class Gaem3D {
                 new float[]{0,1,0},
                 new float[]{0,0,0}
         ));
-
-
 
         physicsContext.addObject(new FixedPlane(
                 new float[]{5,0,0},
@@ -256,6 +259,8 @@ public class Gaem3D {
         }
     }
 
+    Renderable line = null;
+
     protected static void doLogic() {
 
         int n = 1;
@@ -265,19 +270,44 @@ public class Gaem3D {
 
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
-            RigidBody r = new RigidBody(1);
+            RigidBody r = new Cube(1);
             r.angularAccelAccumulator[1] = .25F;
+            Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
 //                    new Sphere(1, 1.0F),
                     r,
-                    Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0))
+                    m
             );
 
             context.addObject(p);
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
             p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 15f, Gaem3D.r.nextFloat() - .5F);
+
+            final float[] rVertices = m.getRelativeVertices();
+            for (int i = 0; i < rVertices.length; i+= 4) {
+                final int finalI = i;
+                Line l = new Line(0, 0, 1){
+                    final int xi = finalI, yi = finalI + 1, zi = finalI + 2;
+                    final float[] vertices = rVertices.clone();
+                    final float[] bufferV4 = new float[4];
+                    final float[] bufferM4 = new float[16];
+                    final Model model = m;
+                    @Override
+                    public void doLogic(int iteration) {
+                        super.doLogic(iteration);
+                        //setStart(vertices[xi],vertices[yi],vertices[zi]);
+                        VectorTranslator.copy(vertices[xi],vertices[yi],vertices[zi], bufferV4);
+                        m.getRotationMatrix(bufferM4);
+                        MatrixTranslator.multiplyVec4Mat4(bufferV4,bufferM4);
+                        VectorTranslator.addToVector(m.x(),m.y(),m.z(),bufferV4);
+                        setStart(bufferV4);
+                        setEnd(0,3,0);
+                    }
+                };
+                context.addObject(l);
+            }
 //            p.setVelocity(0, -5, 0);
         }
 

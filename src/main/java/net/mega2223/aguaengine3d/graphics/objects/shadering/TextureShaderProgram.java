@@ -28,7 +28,7 @@ public class TextureShaderProgram extends ShaderProgramTemplate implements Shade
     }
 
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
-        super.setUniforms(interation, translationMatrix, projectionMatrix);
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
+        super.setUniforms(iteration, translationMatrix, projectionMatrix);
     }
 }

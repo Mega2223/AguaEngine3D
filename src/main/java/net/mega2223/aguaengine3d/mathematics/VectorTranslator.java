@@ -60,6 +60,8 @@ public class VectorTranslator {
         vector[2]+=z;
     }
 
+
+
     public static void subtractFromVector(@Modified float[] v1, float[] v2){
         subtractFromVector(v1,v2,v1);
     }

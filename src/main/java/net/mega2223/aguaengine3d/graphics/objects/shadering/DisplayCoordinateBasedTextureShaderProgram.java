@@ -32,9 +32,9 @@ public class DisplayCoordinateBasedTextureShaderProgram extends ShaderProgramTem
     }
 
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
-        super.setUniforms(interation, translationMatrix, projectionMatrix);
+        super.setUniforms(iteration, translationMatrix, projectionMatrix);
         GL30.glBindTexture(GL30.GL_TEXTURE_2D,texture);
         GL30.glActiveTexture(texture);
     }

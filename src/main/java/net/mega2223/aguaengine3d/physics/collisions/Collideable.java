@@ -13,9 +13,9 @@ public interface Collideable extends PhysicsObject {
     }
     float maxRadius();
     /**
-     * Gets the contact normal with same orientation as the world
+     * Gets the contact normal in the world's rotation system, with relation
      * from this object's perspective (not from coord's perspective)
-     * */
+     * */// TODO o vetor normal é rotacionado igual o mundo, mas o normal é em relação a A e não a B (são inversos)
     void getContactNormal(float[] coord, @Modified float[] result);
 
     float getCollision(Collideable c, @Modified float[] contactNormalDest);

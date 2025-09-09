@@ -36,19 +36,14 @@ public class VertexTracker implements Renderable {
         models.forEach((m)->m.drawForceShader(shader));
     }
 
-    float[] rotationBuffer = new float[16];
-    float[] posBuffer = new float[4];
+    private final float[] rotationBuffer = new float[16];
+    private final float[] posBuffer = new float[4];
     @Override
     public void doLogic(int iteration) {
-//        for (int i = 0; i < models.size(); i++) {
-//            Model m = models.get(i);
-//            model.getRotationMatrix(r);
-//            m.setRotationMatrix(rotationBuffer);
-//        }
         model.getRotationMatrix(rotationBuffer);
         s.setRotationMatrix(rotationBuffer);
         model.getCoords(posBuffer);
-        models.forEach((m)->{m.setCoords(posBuffer);}); // FIXME o consumer é um objeto !!!
+        models.forEach((m)-> m.setCoords(posBuffer)); // FIXME o consumer é um OBJETO !!!
     }
 
     @Override

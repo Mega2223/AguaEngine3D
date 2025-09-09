@@ -563,16 +563,10 @@ public class MatrixTranslator {
     }
 
     public static void debugMatrix4x4(float[] matrix4) {
-        StringBuilder debug = new StringBuilder("[ ");
-        for (int i = 0; i < matrix4.length; i += 4) {
-            for (int j = 0; j < 4; j++) {
-                debug.append(String.format(Locale.US,"%.2f",matrix4[i + j])).append(" ");
-            }
-            debug.append("]\n");
-            if (i + 4 < matrix4.length) {
-                debug.append("[ ");
-            }
-        }
+        String debug = String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[0], matrix4[1], matrix4[2], matrix4[3]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[4], matrix4[5], matrix4[6], matrix4[7]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[8], matrix4[9], matrix4[10], matrix4[11]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[12], matrix4[13], matrix4[14], matrix4[15]);
         System.out.println(debug);
     }
 
