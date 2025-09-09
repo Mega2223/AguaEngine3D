@@ -56,6 +56,8 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         MatrixTranslator.copy(m4,rotationMatrix);
         GL30.glUniformMatrix4fv(rotationMatrixLocation,true,m4);
         // TODO pq só matrizes de rotação dão ruim? INVESTIGUE !!!
+        // em tese todas as matrizes deveriam ser transpostas, mas a matriz de tradução
+        // funciona ok
         // cpa talvez seja a ordem de multiplicação no código dos shaders
     }
 

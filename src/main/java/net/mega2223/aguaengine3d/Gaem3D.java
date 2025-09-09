@@ -291,7 +291,7 @@ public class Gaem3D {
                 Line l = new Line(0, 0, 1){
                     final int xi = finalI, yi = finalI + 1, zi = finalI + 2;
                     final float[] vertices = rVertices.clone();
-                    final float[] bufferV4 = new float[4];
+                    final float[] bufferV4 = new float[4], bufferRot = new float[4];
                     final float[] bufferM4 = new float[16];
                     final Model model = m;
                     @Override
@@ -303,7 +303,9 @@ public class Gaem3D {
                         MatrixTranslator.multiplyVec4Mat4(bufferV4,bufferM4);
                         VectorTranslator.addToVector(m.x(),m.y(),m.z(),bufferV4);
                         setStart(bufferV4);
-                        setEnd(0,3,0);
+                        r.getLocalPointVelocity(bufferV4,bufferRot);
+                        VectorTranslator.addToVector(bufferRot,bufferV4);
+                        setEnd(bufferRot);
                     }
                 };
                 context.addObject(l);

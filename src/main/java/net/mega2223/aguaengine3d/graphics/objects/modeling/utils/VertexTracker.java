@@ -28,12 +28,12 @@ public class VertexTracker implements Renderable {
 
     @Override
     public void draw() {
-        models.forEach(Model::draw);
+        models.forEach(Model::draw); // FIXME ISSO CRIA UM CONSUMER RHAAARRRGHHHH
     }
 
     @Override
     public void drawForceShader(ShaderProgram shader) {
-        models.forEach((m)->m.drawForceShader(shader));
+        models.forEach((m)->m.drawForceShader(shader)); // FIXME isso tb :)
     }
 
     private final float[] rotationBuffer = new float[16];

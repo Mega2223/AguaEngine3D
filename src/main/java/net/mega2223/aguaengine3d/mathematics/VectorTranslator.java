@@ -54,10 +54,8 @@ public class VectorTranslator {
         }
     }
 
-    public static void addToVector(float x, float y, float z, @Modified float[] vector){
-        vector[0]+=x;
-        vector[1]+=y;
-        vector[2]+=z;
+    public static void addToVector(float x, float y, float z, @Modified float[] vec3){
+        vec3[0]+=x; vec3[1]+=y; vec3[2]+=z;
     }
 
 

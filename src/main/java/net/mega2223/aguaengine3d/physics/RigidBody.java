@@ -136,7 +136,7 @@ public class RigidBody implements Rotatable {
     public void getLocalPointVelocity(float[] point, @Modified float[] dest) {
         // point e dest estão em world coordinates
         VectorTranslator.subtractFromVector(point,pos,buffer1);
-        VectorTranslator.crossProduct(angularVelocity,buffer1);
+        VectorTranslator.crossProduct(angularVelocity,buffer1,dest);
         VectorTranslator.addToVector(dest,velocity); // TODO isso funciona?
     }
 
