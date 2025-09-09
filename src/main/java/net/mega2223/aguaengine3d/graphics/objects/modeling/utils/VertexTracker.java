@@ -48,7 +48,7 @@ public class VertexTracker implements Renderable {
         model.getRotationMatrix(rotationBuffer);
         s.setRotationMatrix(rotationBuffer);
         model.getCoords(posBuffer);
-        models.forEach((m)->{m.setCoords(posBuffer);});
+        models.forEach((m)->{m.setCoords(posBuffer);}); // FIXME o consumer é um objeto !!!
     }
 
     @Override
