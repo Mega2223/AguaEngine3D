@@ -23,7 +23,7 @@ public class QuaternionTranslator {
         resultM4[5] = q0_2 - q1_2 + q2_2 - q3_2;
         resultM4[6] = 2 * q[2] * q[3] - 2 * q[0] *q [1];
         resultM4[7] = 0;
-        resultM4[8] = 2 * q[1] * q[3]; // l3
+        resultM4[8] = 2 * q[1] * q[3] - 2 * q[0] * q[2]; // l3
         resultM4[9] = 2 * q[2] * q[3] + 2 * q[0] * q[1];
         resultM4[10] = q0_2 - q1_2 - q2_2 + q3_2;
         resultM4[11] = 0;
@@ -34,8 +34,7 @@ public class QuaternionTranslator {
     }
 
     public static void quaternionFromRotationMatrix(float[] rotationMat4, @Modified float[] resultQ4){
-        float[] m = rotationMat4;
-        float[] q = resultQ4;
+        float[] m = rotationMat4; float[] q = resultQ4;
         q[0] = (float) Math.sqrt((1 + m[0] + m[5] + m[10])/4F);
         q[1] = (float) Math.sqrt((1 + m[0] - m[5] - m[10])/4F);
         q[2] = (float) Math.sqrt((1 - m[0] + m[5] - m[10])/4F);
@@ -48,7 +47,6 @@ public class QuaternionTranslator {
                     q[1] > q[2] ?
                         q[1] > q[3] ? 1 : 3 :
                         q[2] > q[3] ? 2 : 3 ;
-//        System.out.printf("Greater [%.4f %.4f %.4f %.4f] is %d\n",q[0],q[1],q[2],q[3],greater); acho que funciona
         switch (greater){
             case 0:
                 q[1] = (m[M_32.i] - m[M_23.i])/(4*q[0]);
@@ -173,5 +171,10 @@ public class QuaternionTranslator {
     public static void copy(float[] q4, float[] dest){
         dest[0] = q4[0]; dest[1] = q4[1];
         dest[2] = q4[2]; dest[3] = q4[3];
+    }
+
+    public static void flip(@Modified float[] q4){
+        q4[0] = -q4[0]; q4[1] = -q4[1];
+        q4[2] = -q4[2]; q4[3] = -q4[3];
     }
 }

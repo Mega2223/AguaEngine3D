@@ -180,7 +180,6 @@ public class RotationSystemCohesionTest {
 
         QuaternionTranslator.axisAngleToQuaternion(axis,quaternion);
         QuaternionTranslator.quaternionToAxisAngle(quaternion,result);
-
         float error = VectorTranslator.getAngleBetweenVectors(result,axis);
         if(error >ANGULAR_ERROR_TOLERANCE){
             String message = "Quaternion to axis angle conversion is incoherent\n"+
@@ -194,7 +193,6 @@ public class RotationSystemCohesionTest {
 
         MatrixTranslator.rotationMatrixFromAxisAngle(axis,rotationMatrix);
         MatrixTranslator.axisAngleFromRotationMatrix(rotationMatrix, result);
-
         error = VectorTranslator.getAngleBetweenVectors(result,axis);
         if(error >ANGULAR_ERROR_TOLERANCE){
             throw new RuntimeException("Rotation matrix to axis angle conversion is incoherent");
@@ -203,6 +201,26 @@ public class RotationSystemCohesionTest {
         }
 
         QuaternionTranslator.quaternionFromRotationMatrix(rotationMatrix,result);
+        QuaternionTranslator.quaternionToAxisAngle(result.clone(),result);
+        error = VectorTranslator.getAngleBetweenVectors(result,axis);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            throw new RuntimeException("Rotation matrix to quaternion conversion is incoherent");
+        } else {
+            System.out.println("Rotation matrix to quaternion angle conversion is cohesive :)");
+        }
+
+        float[] buffer = new float[16];
+        QuaternionTranslator.rotationMatrixFromQuaternion(quaternion,buffer);
+        QuaternionTranslator.quaternionFromRotationMatrix(buffer,result);
+        QuaternionTranslator.quaternionToAxisAngle(result.clone(),result);
+        error = VectorTranslator.getAngleBetweenVectors(result,axis);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            MatrixTranslator.debugMatrix4x4(rotationMatrix);
+            MatrixTranslator.debugMatrix4x4(buffer);
+            throw new RuntimeException("Quaternion to rotation matrix conversion is incoherent");
+        } else {
+            System.out.println("Quaternion to rotation matrix conversion is cohesive :)");
+        }
     }
 
     public static void testRotationSequence(){
