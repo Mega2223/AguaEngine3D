@@ -12,7 +12,7 @@ public class RotationSystemCohesionTest {
      * Testa se os sistemas de rotação fazem operações equivalentes
      * */
 
-    public static final int TESTS = 10;
+    public static final int TESTS = 128;
     public static final float ANGULAR_ERROR_TOLERANCE = (float) Math.toRadians(.25); // 1/4 graus pra mim é bem bom já
 
     public static final Random r = new Random(2223 + System.currentTimeMillis());
@@ -22,8 +22,11 @@ public class RotationSystemCohesionTest {
         // TODO talvez calcular o erro máximo, mínimo e médio de cada medida
         int failures = 0;
         for (int i = 0; i < TESTS; i++) {
+            System.out.println("Doing test wave " + (i+1) + " of " + TESTS);
+            testConversions();
             testRotations();
             testRotationSequence();
+            System.out.println("Test ("+(i+1)+"/"+TESTS+") successful!");
         }
         if(failures > 0){
             String message = String.format("Failed (%d/%d) of tests", failures, TESTS);
@@ -42,7 +45,7 @@ public class RotationSystemCohesionTest {
             vecB[i] = r.nextFloat();
         }
 
-        System.out.printf(Locale.US,"Starting angular transform cohesion test -> " +
+        System.out.printf(Locale.US,"\nStarting angular transform cohesion test -> " +
                         "a = v(%.4f,%.4f,%.4f) b = v(%.4f,%.4f,%.4f)\n",
                 vecA[0],vecA[1],vecA[2],vecB[0],vecB[1],vecB[2]);
 
@@ -155,6 +158,53 @@ public class RotationSystemCohesionTest {
         System.out.println();
     }
 
+    public static void testConversions(){
+        System.out.println("\nStarting conversion test");
+
+        float[] axis = new float[4], result = new float[4];
+        float[] quaternion = new float[4];
+        float[] rotationMatrix = new float[16];
+
+        // Pela minha lógica interna o maior angulo entre quaisquer dois vetores é 180
+        {
+            float[] vA= new float[4];
+            float[] vB = new float[4];
+            for (int i = 0; i < 3; i++) {
+                vA[i] = r.nextFloat();
+                vB[i] = r.nextFloat();
+            }
+            VectorTranslator.normalize(vA);
+            VectorTranslator.normalize(vB);
+            VectorTranslator.getRotationAxis(vA,vB,axis);
+        }
+
+        QuaternionTranslator.axisAngleToQuaternion(axis,quaternion);
+        QuaternionTranslator.quaternionToAxisAngle(quaternion,result);
+
+        float error = VectorTranslator.getAngleBetweenVectors(result,axis);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            String message = "Quaternion to axis angle conversion is incoherent\n"+
+                    String.format("Rq = %.4f %.4f %.4f %.4f\n",quaternion[0],quaternion[1],quaternion[2],quaternion[3]) +
+                    String.format("axis = %.4f %.4f %.4f\n",axis[0],axis[1],axis[2]) +
+                    String.format("result axis = %.4f %.4f %.4f\n",result[0],result[1],result[2]);
+            throw new RuntimeException(message);
+        } else {
+            System.out.println("Quaternion to axis angle conversion is cohesive :)");
+        }
+
+        MatrixTranslator.rotationMatrixFromAxisAngle(axis,rotationMatrix);
+        MatrixTranslator.axisAngleFromRotationMatrix(rotationMatrix, result);
+
+        error = VectorTranslator.getAngleBetweenVectors(result,axis);
+        if(error >ANGULAR_ERROR_TOLERANCE){
+            throw new RuntimeException("Rotation matrix to axis angle conversion is incoherent");
+        } else {
+            System.out.println("Rotation matrix to axis angle conversion is cohesive :)");
+        }
+
+        QuaternionTranslator.quaternionFromRotationMatrix(rotationMatrix,result);
+    }
+
     public static void testRotationSequence(){
 
         System.out.println("\nStarting sequential rotation test sequence");
@@ -206,6 +256,8 @@ public class RotationSystemCohesionTest {
         float error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
         if(error >ANGULAR_ERROR_TOLERANCE){
             throw new RuntimeException("Sequential matrix rotation is incoherent");
+        } else {
+            System.out.println("Sequential matrix rotation is cohesive :)");
         }
 
         VectorTranslator.copy(vecA,buffers[0]);
@@ -219,6 +271,8 @@ public class RotationSystemCohesionTest {
         error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
         if(error >ANGULAR_ERROR_TOLERANCE){
             throw new RuntimeException("Sequential quaternion rotation is incoherent");
+        } else {
+            System.out.println("Sequential quaternion rotation is cohesive :)");
         }
 
         VectorTranslator.copy(vecA,buffers[0]);
@@ -230,8 +284,10 @@ public class RotationSystemCohesionTest {
         QuaternionTranslator.rotateVectorByQuaternion(vecA,buffers[1],buffers[0]);
 
         error = VectorTranslator.getAngleBetweenVectors(buffers[0],vecB);
-        if(error >ANGULAR_ERROR_TOLERANCE){
+        if(error > ANGULAR_ERROR_TOLERANCE){
             throw new RuntimeException("Sequential quaternion multiplication is incoherent");
+        } else {
+            System.out.println("Sequential quaternion multiplication is cohesive :)");
         }
     }
 }

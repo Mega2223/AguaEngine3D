@@ -19,13 +19,21 @@ public class MatrixTranslator {
      * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
      * */
 
-    public enum M {
-        M_11(0), M_12(1), M_13(2), M_14(3),
+    public enum M4 {
+         M_11(0), M_12(1), M_13(2), M_14(3),
         M_21(4), M_22(5), M_23(6), M_24(7),
         M_31(8), M_32(9), M_33(10), M_34(11),
         M_41(12), M_42(13), M_43(14), M_44(15);
-        final int i;
-        M(int i) {this.i = i;}
+        public final int i;
+        M4(int i) {this.i = i;}
+    }
+
+    public enum M3 {
+        M_11(0), M_12(1), M_13(2),
+        M_21(3), M_22(4), M_23(5),
+        M_31(6), M_32(7), M_33(8);
+        public final int i;
+        M3(int i) {this.i = i;}
     }
 
     private static final float[] bufferMatrix4 = new float[16];
@@ -297,7 +305,7 @@ public class MatrixTranslator {
         }
     }
 
-    /**Generates a rotation angle given an axis angle, pretty inaccurate*/
+    /**Generates a rotation matrix given an axis angle, somewhat inaccurate*/
     public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
         Arrays.fill(dest,0);
         float ang = VectorTranslator.magnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
@@ -307,6 +315,13 @@ public class MatrixTranslator {
         dest[4] = y * x * C + (z * s); dest[5] = y * y * C + c; dest[6] = y * z * C - (x * s);
         dest[8] = z * x * C - (y * s); dest[9] = z * y * C + (x * s); dest[10] = z * z * C + c;
         dest[15] = 1;
+    }
+
+    public static void axisAngleFromRotationMatrix(float[] rotMat4, @Modified float[] dest){
+        dest[0] = rotMat4[9] - rotMat4[6];
+        dest[1] = rotMat4[2] - rotMat4[8];
+        dest[2] = rotMat4[4] - rotMat4[1];
+        dest[3] = 0;
     }
 
     /**

@@ -5,34 +5,91 @@ import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.util.Arrays;
 
+import static net.mega2223.aguaengine3d.mathematics.MatrixTranslator.M4.*;
+
 public class QuaternionTranslator {
     private QuaternionTranslator(){}
 
     public static final int W = 0, X = 1, Y = 2, Z = 3;
 
-    public static void rotationMatrixToQuaternion(float[] rotationMat4, @Modified float[] resultM4){
-        //MatrixTranslator.rotationMatrixFromQuaternion(rotationMat4,resultM4);
-        //todo
+    public static void rotationMatrixFromQuaternion(float[] q, @Modified float[] resultM4){
+        float q0_2 = q[0] * q[0]; float q1_2 = q[1] * q[1];
+        float q2_2 = q[2] * q[2]; float q3_2 = q[3] * q[3];
+        resultM4[0] = q0_2 + q1_2 - q2_2 - q3_2;
+        resultM4[1] = 2 * q[1] * q[2] - 2 * q[0] * q[3];
+        resultM4[2] = 2 * q[1] * q[3] + 2 * q[0] * q[2];
+        resultM4[3] = 0;
+        resultM4[4] = 2 * q[1] * q[2] + 2 * q[0] * q[3]; // l2
+        resultM4[5] = q0_2 - q1_2 + q2_2 - q3_2;
+        resultM4[6] = 2 * q[2] * q[3] - 2 * q[0] *q [1];
+        resultM4[7] = 0;
+        resultM4[8] = 2 * q[1] * q[3]; // l3
+        resultM4[9] = 2 * q[2] * q[3] + 2 * q[0] * q[1];
+        resultM4[10] = q0_2 - q1_2 - q2_2 + q3_2;
+        resultM4[11] = 0;
+        resultM4[12] = 0; //l4
+        resultM4[13] = 0;
+        resultM4[14] = 0;
+        resultM4[15] = 1;
+    }
 
+    public static void quaternionFromRotationMatrix(float[] rotationMat4, @Modified float[] resultQ4){
+        float[] m = rotationMat4;
+        float[] q = resultQ4;
+        q[0] = (float) Math.sqrt((1 + m[0] + m[5] + m[10])/4F);
+        q[1] = (float) Math.sqrt((1 + m[0] - m[5] - m[10])/4F);
+        q[2] = (float) Math.sqrt((1 - m[0] + m[5] - m[10])/4F);
+        q[3] = (float) Math.sqrt((1 - m[0] - m[5] + m[10])/4F);
+        int greater = // I love programming :)
+                q[0] > q[1] ?
+                    q[0] > q[2] ?
+                        q[0] > q[3] ? 0 : 3 :
+                        q[2] > q[3] ? 2 : 3 :
+                    q[1] > q[2] ?
+                        q[1] > q[3] ? 1 : 3 :
+                        q[2] > q[3] ? 2 : 3 ;
+//        System.out.printf("Greater [%.4f %.4f %.4f %.4f] is %d\n",q[0],q[1],q[2],q[3],greater); acho que funciona
+        switch (greater){
+            case 0:
+                q[1] = (m[M_32.i] - m[M_23.i])/(4*q[0]);
+                q[2] = (m[M_13.i] - m[M_31.i])/(4*q[0]);
+                q[3] = (m[M_21.i] - m[M_12.i])/(4*q[0]);
+                return;
+            case 1:
+                q[0] = (m[M_32.i] - m[M_23.i])/(4*q[1]);
+                q[2] = (m[M_12.i] + m[M_21.i])/(4*q[1]);
+                q[3] = (m[M_13.i] + m[M_31.i])/(4*q[1]);
+                return;
+            case 2:
+                q[0] = (m[M_13.i] - m[M_31.i])/(4*q[2]);
+                q[1] = (m[M_12.i] + m[M_21.i])/(4*q[2]);
+                q[3] = (m[M_23.i] + m[M_32.i])/(4*q[2]);
+                return;
+            case 3:
+                q[0] = (m[M_21.i] - m[M_12.i])/(4*q[3]);
+                q[1] = (m[M_13.i] + m[M_31.i])/(4*q[3]);
+                q[2] = (m[M_23.i] + m[M_32.i])/(4*q[3]);
+                return;
+        }
     }
 
     public static void axisAngleToQuaternion(float[] axisAngle, @Modified float[] result){
         axisAngleToQuaternion(axisAngle[0], axisAngle[1], axisAngle[2], result);
     }
 
+    private static final float PI2 = (float) (Math.PI * 2);
+
     public static void axisAngleToQuaternion(float x, float y, float z, @Modified float[] result) {
         //w + xi + yj + yk
-        final float angle = VectorTranslator.magnitude(x,y,z);
+        float angle = VectorTranslator.magnitude(x,y,z);
         if(angle == 0){ x = y = z = 0; }
         else { x /= angle; y /= angle; z /= angle; }
+        angle %= PI2;
         result[W] = (float) Math.cos(angle / 2);
         float s = (float) Math.sin(angle / 2);
         result[X] = x * s; result[Y] = y * s; result[Z] = z * s;
     }
 
-    public static void rotateAlongQuaternion(float[] vec4, float[] rotationQ4, @Modified float[] result){
-        // TODO
-    }
     //funciona
     public static void quaternionProduct(float[] q4A, float[] q4B, @Modified float[] result){
         result[W] = q4A[W] * q4B[W] - q4A[X] * q4B[X] - q4A[Y] * q4B[Y] - q4A[Z] * q4B[Z];
@@ -42,7 +99,7 @@ public class QuaternionTranslator {
     }
 
     public static void getInverseRotation(float[] rotationQ4, @Modified float[] result){
-        // TODO
+        conjugate(rotationQ4,result);//TODO testar
     }
 
     public static float getMagnitude(float[] q4){
@@ -51,9 +108,7 @@ public class QuaternionTranslator {
 
     public static void normalize(@Modified float[] q4){
         float mag = getMagnitude(q4);
-        if(mag == 0){
-            q4[W] = 1; mag = 1;
-        }
+        if(mag == 0){q4[W] = 1; mag = 1;}
         q4[W]/=mag; q4[X]/=mag; q4[Y]/=mag; q4[Z]/=mag;
     }
 
@@ -62,17 +117,13 @@ public class QuaternionTranslator {
     }
 
     public static void simpleAddition(@Modified float[] q4A, float[] q4B){
-        q4A[0] += q4B[0];
-        q4A[1] += q4B[1];
-        q4A[2] += q4B[2];
-        q4A[3] += q4B[3];
+        q4A[0] += q4B[0]; q4A[1] += q4B[1];
+        q4A[2] += q4B[2]; q4A[3] += q4B[3];
     }
 
     public static void simpleAddition(float[] q4A, float[] q4B, @Modified float[] dest){
-        dest[0] = q4A[0] + q4B[0];
-        dest[1] = q4A[1] + q4B[1];
-        dest[2] = q4A[2] + q4B[2];
-        dest[3] = q4A[3] + q4B[3];
+        dest[0] = q4A[0] + q4B[0]; dest[1] = q4A[1] + q4B[1];
+        dest[2] = q4A[2] + q4B[2]; dest[3] = q4A[3] + q4B[3];
     }
 
     public static void conjugate(float[] q4, @Modified float[] dest){
@@ -83,16 +134,12 @@ public class QuaternionTranslator {
     }
 
     private static final float[] rotationBuffer = new float[4];
-    public static void rotateQuaternion(float[] q4, float[] amountQ4, @Modified float[] dest){
-        //multiplyQuaternions(amountQ4,q4,dest);
-        throw new RuntimeException("oopsies :3");
+    public static void addRotations(float[] q4, float[] amountQ4, @Modified float[] dest){
+        quaternionProduct(amountQ4,q4,dest); // FIXME isso em tese deveria funcionar
     }
 
     static final float[] qRotationBuffer = new float[4];
     public static void rotateQuaternionByAxis(float[] q4, float[] axisVec3, @Modified float[] dest){
-//        axisAngleToQuaternion(axisVec3,qRotationBuffer);
-//        quaternionProduct(qRotationBuffer,q4,dest);
-
         Arrays.fill(dest,0); // FIXME KKKKKKKKKKKKKKK isso pelo menos funciona
         quaternionToAxisAngle(q4,qRotationBuffer);
         VectorTranslator.rotateAlongAxis(qRotationBuffer,axisVec3,dest);
@@ -103,6 +150,7 @@ public class QuaternionTranslator {
     private static void vecToImaginary(float[] vec3, @Modified float[] dest){
         dest[0] = 0; dest[1] = vec3[0]; dest[2] = vec3[1]; dest[3] = vec3[2];
     }
+
     // Isso 100% funciona
     static final float[] conjugateBuffer = new float[4], vectorBuffer = new float[4];
     public static void rotateVectorByQuaternion(float[] vec3, float[] q4, @Modified float[] dest){
@@ -111,24 +159,6 @@ public class QuaternionTranslator {
         quaternionProduct(vectorBuffer,conjugateBuffer,dest);
         quaternionProduct(q4,dest,vectorBuffer);
         dest[0] = vectorBuffer[1]; dest[1] = vectorBuffer[2]; dest[2] = vectorBuffer[3]; dest[3] = 0;
-    }
-
-    public static void rotateQuaternionAndScale(float[] q4, float[] amountQ4, float scalar, @Modified float[] dest){
-//        multiplyQuaternions(q4,amountQ4,dest);
-//        scalarMultiplication(dest,.5F * scalar); // TODO isso funciona?
-//        simpleAddition(dest,q4); //provavelmente nao
-    }
-
-    private static final float[] rotationQ = new float[4];
-    private static final float[] bufferQ4 = new float[4];
-    public static void applyRotation(@Modified float[] q4, float[] rotation){
-//        rotation[0] = 0;
-//        rotation[1] = 0;
-//        rotation[2] = 0;
-//        rotation[3] = 0;
-//        axisAngleToQuaternion(rotation, rotationQ);
-//        rotateQuaternion(q4,rotation,bufferQ4);
-//        copy(bufferQ4,q4);
     }
 
     public static void quaternionToAxisAngle(float[] q4, @Modified float[] dest){
