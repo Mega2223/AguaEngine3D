@@ -159,4 +159,12 @@ public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positiona
     public void toGlobalVelocity(float[] point, float[] pointVelocity, float[] dest) {
         physicsObject.toGlobalVelocity(point, pointVelocity, dest);
     }
+
+    public R getRenderable() {
+        return renderable;
+    }
+
+    public P getPhysicsObject() {
+        return physicsObject;
+    }
 }

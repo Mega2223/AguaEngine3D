@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
 import net.mega2223.aguaengine3d.graphics.objects.LightspaceRenderingManager;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
@@ -47,9 +48,18 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         GL30.glUniform1i(itnerationLocation,interation);
     }
 
-    public void setRotationMatrix(float[] m4){
+
+    protected float[] rotationMatrix = new float[16];
+    @Override
+    public void setRotationMatrix(float[] m4) {
         GL30.glUseProgram(getID());
+        MatrixTranslator.copy(m4,rotationMatrix);
         GL30.glUniformMatrix4fv(rotationMatrixLocation,false,m4);
+    }
+
+    @Override
+    public void getRotationMatrix(float[] destM4) {
+        MatrixTranslator.copy(rotationMatrix,destM4);
     }
 
     @Override

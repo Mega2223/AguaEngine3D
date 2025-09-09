@@ -14,6 +14,8 @@ public interface ShaderProgram {
     void setRotationMatrix(float[] m4);
     void setRenderShadows(int index,boolean s);
 
+    void getRotationMatrix(float[] destM4);
+
     default void setLights(float[][] lights){
         GL30.glUseProgram(getID());
         for (int i = 0; i < lights.length; i++) {

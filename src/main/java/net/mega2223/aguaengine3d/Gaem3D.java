@@ -6,6 +6,7 @@ import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.utils.VertexTracker;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.CubemapInterpreterShaderProgram;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.SolidColorShaderProgram;
 import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
@@ -257,7 +258,7 @@ public class Gaem3D {
 
     protected static void doLogic() {
 
-        int n = 60;
+        int n = 1;
         for (int i = 0; i < n; i++) {
             physicsContext.update(1F / (60F*n));
         }
@@ -265,7 +266,7 @@ public class Gaem3D {
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
             RigidBody r = new RigidBody(1);
-            r.angularAccelAccumulator[0] = .1F;
+            r.angularAccelAccumulator[1] = .25F;
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
 //                    new Sphere(1, 1.0F),
@@ -274,6 +275,7 @@ public class Gaem3D {
             );
 
             context.addObject(p);
+            context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
             p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 15f, Gaem3D.r.nextFloat() - .5F);
 //            p.setVelocity(0, -5, 0);

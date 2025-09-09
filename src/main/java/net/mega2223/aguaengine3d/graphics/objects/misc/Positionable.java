@@ -10,6 +10,9 @@ public interface Positionable extends Renderable {
     default void setRotationMatrix(float[] rotationM4){
         getShader().setRotationMatrix(rotationM4);
     }
+    default void getRotationMatrix(@Modified float[] destM4){
+        getShader().getRotationMatrix(destM4);
+    }
 
     default void setCoords(float[] coords){setCoords(coords[0],coords[1],coords[2]);}
     default void getCoords(@Modified float[] result){result[0] = x(); result[1] = y(); result[2] = z();}

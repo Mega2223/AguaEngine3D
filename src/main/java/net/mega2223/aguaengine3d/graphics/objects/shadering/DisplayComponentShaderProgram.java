@@ -54,7 +54,7 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
     @Override
     public void initUniforms() {
         translationMatrixLoc = GL30.glGetUniformLocation(id,"translation");
-        rotationMatrixLoc = GL30.glGetUniformLocation(id,"translation");
+        // FIXME rotationMatrixLoc = GL30.glGetUniformLocation(id,"translation"); <- ?????????
         projectionMatrixLoc = GL30.glGetUniformLocation(id,"projection");
         scaleMatrixLoc = GL30.glGetUniformLocation(id,"scale");
         aligmentIntLoc =GL30.glGetUniformLocation(id,"aligment");
@@ -84,10 +84,19 @@ public class DisplayComponentShaderProgram implements ShaderProgram{
         GL30.glDisableVertexAttribArray(1);
     }
 
+    protected float[] rotationMatrix = new float[16];
     @Override
     public void setRotationMatrix(float[] m4) {
+        GL30.glUseProgram(getID());
+        MatrixTranslator.copy(m4,rotationMatrix);
         GL30.glUniformMatrix4fv(rotationMatrixLoc,false,m4);
     }
+
+    @Override
+    public void getRotationMatrix(float[] destM4) {
+        MatrixTranslator.copy(rotationMatrix,destM4);
+    }
+
     @Override
     public void setRenderShadows(int index, boolean s) {}
     @Override
