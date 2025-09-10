@@ -9,7 +9,8 @@ public class DeterminantAlgorithmComputation {
     public static void main(String[] args) {
         // Sim provavelmente tem um jeito mais rápido e não recursivo de fazer isso
         // mas isso funciona, tudo q eu preciso saber really são as ordens das operações
-        final int N = 3;
+        // para uma mat4
+        final int N = 4;
         float[] mat = new float[N * N];
         for (int i = 0; i < mat.length; i++) {
 //            mat[i] = (float) Math.random();
@@ -35,7 +36,7 @@ public class DeterminantAlgorithmComputation {
     public static float computeDeterminant(float[] m){
         int n = (int) Math.sqrt(m.length);
         if(n == 1){
-            operationLog.append((int)m[0]);
+            operationLog.append("M["+(int)m[0]+"]");
             return m[0];
         }
         int sign = 1;
@@ -43,8 +44,8 @@ public class DeterminantAlgorithmComputation {
         for (int col = 0; col < n; col++) {
             float[] submatrix = generateSubmatrix(m, 0, col);
             int index = MatrixTranslator.getIndexNSizedMatrix(0,col,n,n);
-            operationLog.append(sign > 0 ? " " : "-");
-            operationLog.append((int)m[index]).append("*(");
+            operationLog.append(sign > 0 ? "+" : "-");
+            operationLog.append("M["+(int)m[index]+"]").append("*(");
             float subMatrixDeterminant = computeDeterminant(submatrix);
             determinant += sign * m[index] * subMatrixDeterminant;
             operationLog.append(")");

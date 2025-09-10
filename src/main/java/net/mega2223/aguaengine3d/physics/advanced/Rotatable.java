@@ -22,5 +22,9 @@ public interface Rotatable extends PhysicsObject {
      * */
     void applyForce(float fx, float fy, float fz, float px, float py, float pz);
 
-    // TODO apply torque
+    void applyTorque(float tx, float ty, float tz);
+
+    default void applyTorque(float[] torque){
+        applyTorque(torque[0],torque[1],torque[2]);
+    }
 }

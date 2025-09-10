@@ -1,23 +1,22 @@
 package net.mega2223.aguaengine3d.mathematics;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
-import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
 
 //FIXME tem equações matriciais que mudam vetores os quais iterações seguintes ainda dependem
+//isso provavelmente será concertado com o buffer manager
 //ex translateAllVertices, dá uma olhada depois e verifica a translação de cada matriz
 
-public class MatrixTranslator {
+/**
+ * Class that stores handmade math calculations for matrix translation and stuff
+ * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
+ * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
+ * */
 
-    /**
-     * Class that stores handmade math calculations for matrix translation and stuff
-     * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
-     * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
-     * */
+public class MatrixTranslator {
 
     public enum M4 {
          M_11(0), M_12(1), M_13(2), M_14(3),
@@ -54,7 +53,7 @@ public class MatrixTranslator {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
-        //FIXME not it isnt lmao
+        //FIXME no it isnt lmao
         for (int i = 0; i < 4; i++) {
             int i1 = i * 4;
             vector[i] = (mat4[i1] * vector[0]) + (mat4[i1 + 1] * vector[1]) + (mat4[i1 + 2] * vector[2]) + (mat4[i1 + 3] * vector[3]);
@@ -74,8 +73,8 @@ public class MatrixTranslator {
         }
     }
 
-    public void rotateAllVectors(@Modified float[][] vectors, float[] rotationRadians) {
-        for (float[] polygon : vectors) {
+    public void rotateAllVectors(@Modified float[][] polygons, float[] rotationRadians) {
+        for (float[] polygon : polygons) {
             rotateAllVectors(polygon, rotationRadians);
         }
     }
@@ -83,34 +82,35 @@ public class MatrixTranslator {
     public void rotateAllVectors(@Modified float[] vectors, float[] rotationRadians) {
         for (int j = 0; j < vectors.length; j += 4) {
             float[] rot = vectors.clone();
-            MatrixTranslator.rotateVector(rotationRadians[0], rotationRadians[1], rotationRadians[2], j, vectors);
+            MatrixTranslator.rotateEulerAngles(rotationRadians[0], rotationRadians[1], rotationRadians[2], j, vectors);
         }
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, 0, 0, 0, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, 0, 0, 0, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, int startIndex, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, 0, 0, 0, startIndex, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, int startIndex, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, 0, 0, 0, startIndex, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, aX, aY, aZ, 0, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, float aX, float aY, float aZ, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, aX, aY, aZ, 0, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
+    public static void rotateEulerAngles(double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
         float x = result[startIndex];
         float y = result[startIndex + 1];
         float z = result[startIndex + 2];
-        rotateVector(x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex, result);
+        rotateEulerAngles(x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex, result);
     }
 
-    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, @Modified float[] result) {
-        rotateVector(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
+    public static void rotateEulerAngles(float x, float y, float z, double rX, double rY, double rZ, @Modified float[] result) {
+        rotateEulerAngles(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
     }
 
-    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
+    // TODO i have no idea if this is 1,2,3 or 3,2,1
+    public static void rotateEulerAngles(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
 
         if (!Double.isFinite(rX)) {rX = 0;}
         if (!Double.isFinite(rY)) {rY = 0;}
@@ -305,7 +305,9 @@ public class MatrixTranslator {
         }
     }
 
-    /**Generates a rotation matrix given an axis angle, somewhat inaccurate*/
+    /**
+     * Generates a rotation matrix given an axis angle, somewhat inaccurate
+     * */
     public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
         Arrays.fill(dest,0);
         float ang = VectorTranslator.magnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
@@ -326,14 +328,18 @@ public class MatrixTranslator {
 
     /**
      * resets the current matrix and sets it to a translation
+     * @deprecated use flat matrices
      */
+    @Deprecated
     public static void generateTranslationMatrix(float[] vec, @Modified float[][] resultMat4) {
         generateTranslationMatrix(vec[0], vec[1], vec[2], resultMat4);
     }
 
     /**
      * resets the current matrix and sets it to a translation
+     * @deprecated use flat matrices
      */
+    @Deprecated()
     public static void generateTranslationMatrix(float x, float y, float z, @Modified float[][] resultMat4) {
         if (resultMat4.length != 4) {
             return;
@@ -349,7 +355,6 @@ public class MatrixTranslator {
         resultMat4[0][3] = x;
         resultMat4[1][3] = y;
         resultMat4[2][3] = z;
-
     }
     
     public static void generateTranslationMatrix(float[] vec, @Modified float[] resultMat4) {
@@ -462,15 +467,11 @@ public class MatrixTranslator {
 
     public static void applyLookTransformation(float cX, float cY, float cZ, float x, float y, float z, float upX, float upY, float upZ, @Modified float[] resultMat4){
         float dX, dY, dZ;
-        dX = cX - x;
-        dY = cY - y;
-        dZ = cZ - z;
+        dX = cX - x; dY = cY - y; dZ = cZ - z;
         float i = 1F/(float)(Math.sqrt(dX*dX + dY*dY + dZ*dZ));
         dX*=i; dY*=i; dZ*=i;
         float lX,lY,lZ;
-        lX = upY*dZ-upZ*dY;
-        lY = upZ*dX-upX*dZ;
-        lZ = upX*dY-upY*dX;
+        lX = upY*dZ-upZ*dY; lY = upZ*dX-upX*dZ; lZ = upX*dY-upY*dX;
         float iL = 1F/((float)Math.sqrt(lX*lX+lY*lY+lZ*lZ));
         lX*=iL; lY*=iL; lZ*=iL;
         float uX, uY, uZ;
@@ -524,7 +525,11 @@ public class MatrixTranslator {
         }
     }
 
-    public static void getInverseMatrix3(float[] m3,@Modified float[] resultMat3){
+    public static void getInverseMatrix4(float[] m4, @Modified float[] dest){
+
+    }
+
+    public static void getInverseMatrix3(float[] m3,@Modified float[] dest){
         float determinantMatrix3 = getDeterminantMatrix3(m3);
         if(determinantMatrix3 == 0){throw new UnsupportedOperationException("Matrix does not have a determinant.");}
         float v1 = m3[0]*m3[4];
@@ -534,15 +539,15 @@ public class MatrixTranslator {
         float v5 = m3[1]*m3[6];
         float v6 = m3[2]*m3[6];
         float inv = 1/determinantMatrix3;
-        resultMat3[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
-        resultMat3[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
-        resultMat3[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
-        resultMat3[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
-        resultMat3[4] = (m3[0]*m3[8]-v6)*inv;
-        resultMat3[5] = -(v2-v4)*inv;
-        resultMat3[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
-        resultMat3[7] = -(m3[0]*m3[7]-v5)*inv;
-        resultMat3[8] = (v1-v3)*inv;
+        dest[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
+        dest[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
+        dest[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
+        dest[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
+        dest[4] = (m3[0]*m3[8]-v6)*inv;
+        dest[5] = -(v2-v4)*inv;
+        dest[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
+        dest[7] = -(m3[0]*m3[7]-v5)*inv;
+        dest[8] = (v1-v3)*inv;
     }
 
     public static void getTransposeMatrix3(float[] m3, @Modified float[] resultMat3){
@@ -551,6 +556,27 @@ public class MatrixTranslator {
             int c = i%3;
             resultMat3[r+c*3] = m3[r*3+c];
         }
+    }
+
+    // It works :p
+    public static float getDeterminantMatrix4(float[] M){
+        return +M[0]*(+M[5]*(+M[10]*(M[15])-M[11]*(M[14]))-M[6]*(+M[9]*(M[15])-M[11]*(M[13]))+M[7]*(+M[9]*(M[14])-M[10]*(M[13])))-M[1]*(+M[4]*(+M[10]*(M[15])-M[11]*(M[14]))-M[6]*(+M[8]*(M[15])-M[11]*(M[12]))+M[7]*(+M[8]*(M[14])-M[10]*(M[12])))+M[2]*(+M[4]*(+M[9]*(M[15])-M[11]*(M[13]))-M[5]*(+M[8]*(M[15])-M[11]*(M[12]))+M[7]*(+M[8]*(M[13])-M[9]*(M[12])))-M[3]*(+M[4]*(+M[9]*(M[14])-M[10]*(M[13]))-M[5]*(+M[8]*(M[14])-M[10]*(M[12]))+M[6]*(+M[8]*(M[13])-M[9]*(M[12])));
+    }
+
+    public static float getFromMat4(float[] mat4,int row, int column){
+        return mat4[(column%4) + (row*4)];
+    }
+
+    public static int getIndexMat4(int row, int column){
+        return (column%4) + (row*4);
+    }
+
+    public static float getFromNSizedMatrix(float[] mat4, int row, int column, int nRows, int nColumns){
+        return mat4[(column%nColumns) + (row*nRows)];
+    }
+
+    public static int getIndexNSizedMatrix(int row, int column, int nRows, int nColumns){
+        return (column%nColumns) + (row*nRows);
     }
 
     public static float getDeterminantMatrix3(float[] mat3){

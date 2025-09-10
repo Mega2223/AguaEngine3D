@@ -3,7 +3,7 @@ package net.mega2223.aguaengine3d.physics.objects.collideable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
-import net.mega2223.aguaengine3d.physics.RigidBody;
+import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
 
 public class Cube extends RigidBody implements Collideable {

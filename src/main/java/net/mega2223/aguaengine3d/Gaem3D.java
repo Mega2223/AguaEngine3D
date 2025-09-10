@@ -3,7 +3,6 @@ package net.mega2223.aguaengine3d;
 
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
-import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
@@ -16,13 +15,13 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.RigidBody;
+import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.actors.FloorActor;
+import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
@@ -263,7 +262,7 @@ public class Gaem3D {
 
     protected static void doLogic() {
 
-        int n = 1;
+        int n = 4;
         for (int i = 0; i < n; i++) {
             physicsContext.update(1F / (60F*n));
         }
@@ -287,30 +286,9 @@ public class Gaem3D {
 
             final float[] rVertices = m.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
-                final int finalI = i;
-                Line l = new Line(0, 0, 1){
-                    final int xi = finalI, yi = finalI + 1, zi = finalI + 2;
-                    final float[] vertices = rVertices.clone();
-                    final float[] bufferV4 = new float[4], bufferRot = new float[4];
-                    final float[] bufferM4 = new float[16];
-                    final Model model = m;
-                    @Override
-                    public void doLogic(int iteration) {
-                        super.doLogic(iteration);
-                        //setStart(vertices[xi],vertices[yi],vertices[zi]);
-                        VectorTranslator.copy(vertices[xi],vertices[yi],vertices[zi], bufferV4);
-                        m.getRotationMatrix(bufferM4);
-                        MatrixTranslator.multiplyVec4Mat4(bufferV4,bufferM4);
-                        VectorTranslator.addToVector(m.x(),m.y(),m.z(),bufferV4);
-                        setStart(bufferV4);
-                        r.getLocalPointVelocity(bufferV4,bufferRot);
-                        VectorTranslator.addToVector(bufferRot,bufferV4);
-                        setEnd(bufferRot);
-                    }
-                };
+                AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
                 context.addObject(l);
             }
-//            p.setVelocity(0, -5, 0);
         }
 
     }

@@ -1,9 +1,9 @@
-package net.mega2223.aguaengine3d.physics;
+package net.mega2223.aguaengine3d.physics.advanced;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
-import net.mega2223.aguaengine3d.physics.advanced.Rotatable;
+import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Arrays;
 
@@ -17,17 +17,26 @@ public class RigidBody implements Rotatable {
     protected final float[] rotationQ4 = {1F,0F,0F,0F};
     protected final float[] angularVelocity = new float[4];
 
-    protected final float mass, invMass;
+    protected float mass, invMass;
+    protected float[] inertialTensor = new float[16], inverseInertialTensor =  new float[16];
 
     private final float[] accelerationAccumulator = new float[4];
     public final float[] angularAccelAccumulator = new float[4]; //TODO
     private final float[] posDerivative = new float[4];
-    private final float[] rotationMatrix = new float[16];
-    private final float[] inverseRotationMatrix = new float[16];
+    protected final float[] rotationMatrix = new float[16];
+    protected final float[] inverseRotationMatrix = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
         this.invMass = 1F/mass;
+        MatrixTranslator.generateIdentity(inertialTensor);
+        MatrixTranslator.generateIdentity(inverseInertialTensor);
+    }
+
+    public RigidBody(float mass, float[] inertialTensor){
+        this.mass = mass;
+        this.invMass = 1F/mass;
+        this.setInertialTensor(inertialTensor);
     }
 
     public void update(float deltaT){
@@ -97,8 +106,19 @@ public class RigidBody implements Rotatable {
         VectorTranslator.addToVector(vec3,pos);
     }
 
+    private final float[] pBuffer = new float[4];
+    private final float[] fBuffer = new float[4];
     @Override
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
+        VectorTranslator.copy(px,py,pz,pBuffer);
+        VectorTranslator.copy(fx,fy,fz,fBuffer);
+        toLocalCoordinateSystem(pBuffer); // TODO presumindo que este seja nosso centro de massa (p.197)
+        VectorTranslator.crossProduct(pBuffer,fBuffer);
+        applyForce(pBuffer);
+    }
+
+    @Override
+    public void applyTorque(float tx, float ty, float tz) {
 
     }
 
@@ -135,10 +155,20 @@ public class RigidBody implements Rotatable {
     @Override
     public void getLocalPointVelocity(float[] point, @Modified float[] dest) {
         // point e dest estão em world coordinates
-        VectorTranslator.subtractFromVector(point,pos,buffer1);
-        VectorTranslator.crossProduct(angularVelocity,buffer1,dest);
+        VectorTranslator.subtractFromVector(point,pos, pointVelBuffer);
+        VectorTranslator.crossProduct(angularVelocity, pointVelBuffer,dest);
         VectorTranslator.addToVector(dest,velocity); // TODO isso funciona?
     }
 
-    private final float[] buffer1 = new float[4];
+    public void setInertialTensor(float[] inertialTensor){
+        MatrixTranslator.copy(inertialTensor,this.inertialTensor);
+        MatrixTranslator.getInverseMatrix4(inertialTensor,this.inverseInertialTensor);
+    }
+
+    public void setInverseInertialTensor(float[] inverseInertialTensor){
+        MatrixTranslator.copy(inverseInertialTensor,this.inverseInertialTensor);
+        MatrixTranslator.getInverseMatrix4(inverseInertialTensor,this.inertialTensor);
+    }
+
+    private final float[] pointVelBuffer = new float[4];
 }
