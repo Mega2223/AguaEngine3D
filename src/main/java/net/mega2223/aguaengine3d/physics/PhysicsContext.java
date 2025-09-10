@@ -22,7 +22,6 @@ public class PhysicsContext {
     }
 
     public void update(float deltaT){
-        collisionManager.manageCollisions(deltaT);
         for(PhysicsActor actor : actors){
             actor.act(deltaT,this);
         }
@@ -34,6 +33,7 @@ public class PhysicsContext {
         for(PhysicsObject o : objects){
             o.update(deltaT);
         }
+        collisionManager.manageCollisions(deltaT);
     }
 
     public void addObject(PhysicsObject object){

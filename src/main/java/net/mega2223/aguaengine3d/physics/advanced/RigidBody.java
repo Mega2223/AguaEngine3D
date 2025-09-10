@@ -25,6 +25,7 @@ public class RigidBody implements Rotatable {
     private final float[] posDerivative = new float[4];
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
+    protected final float[] inverseInertialTensorWorldCoords = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -40,6 +41,11 @@ public class RigidBody implements Rotatable {
     }
 
     public void update(float deltaT){
+        // Calculations
+        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix,inverseInertialTensorWorldCoords);
+        // TODO essa é a ordem certa?
+        // TODO precisa fazer isso?
+
         // Linear Velocity
         VectorTranslator.addToVector(velocity,accelerationAccumulator);
         Arrays.fill(accelerationAccumulator,0);
@@ -114,13 +120,17 @@ public class RigidBody implements Rotatable {
         VectorTranslator.copy(fx,fy,fz,fBuffer);
         toLocalCoordinateSystem(pBuffer); // TODO presumindo que este seja nosso centro de massa (p.197)
         VectorTranslator.crossProduct(pBuffer,fBuffer);
-        applyForce(pBuffer);
+        applyTorque(pBuffer);
+        applyForce(fBuffer);
     }
 
     @Override
     public void applyTorque(float tx, float ty, float tz) {
-
+        VectorTranslator.copy(tx,ty,tz,torqueBuffer);
+        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,inverseInertialTensor);
+        VectorTranslator.addToVector(angularAccelAccumulator,torqueBuffer);
     }
+    float[] torqueBuffer = new float[4];
 
     @Override
     public void toLocalVelocity(float[] point, float[] pointVelocity, float[] dest) {

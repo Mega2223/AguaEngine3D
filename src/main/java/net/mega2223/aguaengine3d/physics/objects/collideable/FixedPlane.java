@@ -55,6 +55,17 @@ public class FixedPlane extends Particle implements Collideable {
         return 0;
     }
 
+    //TODO coloca na super
+    public float getCollision(float[] point, float[] contactNormalDest){
+        VectorTranslator.copy(point,buffer);
+        VectorTranslator.subtractFromVector(buffer,this.point);
+        VectorTranslator.flipVector(buffer);
+        float depth = Math.max(0, VectorTranslator.dotProduct(buffer,normal));
+        VectorTranslator.copy(normal,contactNormalDest);
+        VectorTranslator.flipVector(contactNormalDest);
+        return Math.max(0,depth);
+    }
+
     /**Returns distance from the closest point iin the plane*/
     public float getDistance(float[] coord){
         VectorTranslator.subtractFromVector(point,coord,buffer);

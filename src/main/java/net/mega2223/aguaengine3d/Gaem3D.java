@@ -219,7 +219,7 @@ public class Gaem3D {
 
         physicsContext.addForce(new Gravity(9.8F));
         physicsContext.addForce(new Drag(.001F,.01F));
-        physicsContext.addActor(new FloorActor(-.001F));
+        //physicsContext.addActor(new FloorActor(-.001F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
 //            @Override
@@ -263,8 +263,9 @@ public class Gaem3D {
     protected static void doLogic() {
 
         int n = 4;
+        float rate = .1F;
         for (int i = 0; i < n; i++) {
-            physicsContext.update(1F / (60F*n));
+            physicsContext.update(rate / (60F*n));
         }
 
         if (framesElapsed % (60 * 39284) == 0) {
@@ -282,7 +283,7 @@ public class Gaem3D {
             context.addObject(p);
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
-            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 15f, Gaem3D.r.nextFloat() - .5F);
+            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
 
             final float[] rVertices = m.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
