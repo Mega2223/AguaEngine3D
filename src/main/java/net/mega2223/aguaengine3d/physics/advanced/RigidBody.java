@@ -42,6 +42,7 @@ public class RigidBody implements Rotatable {
 
     public void update(float deltaT){
         // Calculations
+        QuaternionTranslator.normalize(rotationQ4);
         MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix,inverseInertialTensorWorldCoords);
         // TODO essa é a ordem certa?
         // TODO precisa fazer isso?
@@ -106,9 +107,11 @@ public class RigidBody implements Rotatable {
 
     public void toLocalCoordinateSystem(@Modified float[] vec3) {
         VectorTranslator.subtractFromVector(vec3,pos);
+        MatrixTranslator.multiplyVec4Mat4(vec3,inverseRotationMatrix);
     }
 
     public void toGlobalCoordinateSystem(@Modified float[] vec3) {
+        MatrixTranslator.multiplyVec4Mat4(vec3,rotationMatrix);
         VectorTranslator.addToVector(vec3,pos);
     }
 

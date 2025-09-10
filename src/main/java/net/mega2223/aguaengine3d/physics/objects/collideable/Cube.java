@@ -78,9 +78,10 @@ public class Cube extends RigidBody implements Collideable {
                 float contactDepth = f.getCollision(vertexBuffer, buffer);
                 if(contactDepth > 0){
                     //TODO Alkdsaçlkdslçkaçl
-                    VectorTranslator.scaleVector(vertexBuffer,.00000001F,buffer);
-                    applyForce(0,1,0,buffer[0],buffer[1],buffer[2]);
-                    break;
+                    //VectorTranslator.scaleVector(vertexBuffer,1,buffer);
+                    applyForce(0,.1F,0,vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
+                    setCoordinates(x(),y()+.01F,z());
+                   // break;
                 }
             }
         }

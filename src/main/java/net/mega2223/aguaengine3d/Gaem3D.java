@@ -271,7 +271,7 @@ public class Gaem3D {
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
-            r.angularAccelAccumulator[1] = .25F;
+            //r.angularAccelAccumulator[1] = .25F;
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
@@ -283,7 +283,8 @@ public class Gaem3D {
             context.addObject(p);
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
-            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
+            //p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
+            p.setCoordinates(0,2,0);
 
             final float[] rVertices = m.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
