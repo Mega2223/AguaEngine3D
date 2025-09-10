@@ -53,7 +53,7 @@ public class RigidBody implements Rotatable {
         QuaternionTranslator.copy(buffers[0],rotationQ4);
 
         QuaternionTranslator.rotationMatrixFromQuaternion(rotationQ4,rotationMatrix);
-        MatrixTranslator.getTransposeMatrix4(rotationMatrix,inverseRotationMatrix);
+        MatrixTranslator.transposeMat4(rotationMatrix,inverseRotationMatrix);
         // The inverse of a rotation matrix is it's transpose, much quicker to calculate :)
     }
 

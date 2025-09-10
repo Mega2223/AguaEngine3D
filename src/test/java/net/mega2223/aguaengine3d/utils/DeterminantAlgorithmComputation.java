@@ -2,6 +2,9 @@ package net.mega2223.aguaengine3d.utils;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 
+/**
+ * Calcula a determinante de uma matriz quadrada de N^2 componentes conforme a fórmula de Leibniz
+ * */
 public class DeterminantAlgorithmComputation {
 
     static StringBuilder operationLog = new StringBuilder();

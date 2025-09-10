@@ -512,12 +512,12 @@ public class MatrixTranslator {
         System.arraycopy(bufferMatrix4, 0, resultMat4, 0, bufferMatrix4.length);
     }
 
-    public static void getTransposeMatrix4(@Modified float[] resultMat4){
-        getTransposeMatrix4(resultMat4,bufferMatrix4);
+    public static void transposeMat4(@Modified float[] resultMat4){
+        transposeMat4(resultMat4,bufferMatrix4);
         System.arraycopy(bufferMatrix4,0,resultMat4,0,16);
     }
 
-    public static void getTransposeMatrix4(float[] m4,@Modified float[] resultMat4){
+    public static void transposeMat4(float[] m4, @Modified float[] resultMat4){
         for (int i = 0; i < 16; i++) {
             int r = i/4;
             int c = i%4;
@@ -526,7 +526,24 @@ public class MatrixTranslator {
     }
 
     public static void getInverseMatrix4(float[] m4, @Modified float[] dest){
+        float inv = 1F/getDeterminantMatrix4(m4);
 
+        // Heavily based on cyclone's inverse mat4 algorithm
+        dest[0] = (-m4[9]*m4[6]+m4[5]*m4[10])*inv;
+        dest[4] = (m4[8]*m4[6]-m4[4]*m4[10])*inv;
+        dest[8] = (-m4[8]*m4[5]+m4[4]*m4[9])*inv;
+
+        dest[1] = (m4[9]*m4[2]-m4[1]*m4[10])*inv;
+        dest[5] = (-m4[8]*m4[2]+m4[0]*m4[10])*inv;
+        dest[9] = (m4[8]*m4[1]-m4[0]*m4[9])*inv;
+
+        dest[2] = (-m4[5]*m4[2]+m4[1]*m4[6])*inv;
+        dest[6] = (+m4[4]*m4[2]-m4[0]*m4[6])*inv;
+        dest[10] = (-m4[4]*m4[1]+m4[0]*m4[5])*inv;
+
+        dest[3] = (m4[9]*m4[6]*m4[3] -m4[5]*m4[10]*m4[3] -m4[9]*m4[2]*m4[7] +m4[1]*m4[10]*m4[7] +m4[5]*m4[2]*m4[11] -m4[1]*m4[6]*m4[11])*inv;
+        dest[7] = (-m4[8]*m4[6]*m4[3] +m4[4]*m4[10]*m4[3] +m4[8]*m4[2]*m4[7] -m4[0]*m4[10]*m4[7] -m4[4]*m4[2]*m4[11] +m4[0]*m4[6]*m4[11])*inv;
+        dest[11] =(m4[8]*m4[5]*m4[3] -m4[4]*m4[9]*m4[3] -m4[8]*m4[1]*m4[7] +m4[0]*m4[9]*m4[7] +m4[4]*m4[1]*m4[11] -m4[0]*m4[5]*m4[11])*inv;
     }
 
     public static void getInverseMatrix3(float[] m3,@Modified float[] dest){
