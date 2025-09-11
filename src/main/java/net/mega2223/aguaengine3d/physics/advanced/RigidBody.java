@@ -126,9 +126,7 @@ public class RigidBody implements Rotatable {
         MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
         VectorTranslator.crossProduct(pBuffer,fBuffer);
         applyTorque(pBuffer);
-        System.out.println(":P");
-        System.out.printf("%f.10f %f.10f %f.10f \n",pBuffer[0],pBuffer[1],pBuffer[2]);
-//        applyForce(fBuffer);
+        applyForce(fBuffer);
     }
 
     @Override
