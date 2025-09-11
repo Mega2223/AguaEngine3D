@@ -15,13 +15,13 @@ public class RigidBody implements Rotatable {
     protected final float[] velocity = new float[3];
 
     protected final float[] rotationQ4 = {1F,0F,0F,0F};
-    protected final float[] angularVelocity = new float[4];
+    public final float[] angularVelocity = new float[4]; //FIXME
 
     protected float mass, invMass;
     protected float[] inertialTensor = new float[16], inverseInertialTensor =  new float[16];
 
     private final float[] accelerationAccumulator = new float[4];
-    public final float[] angularAccelAccumulator = new float[4]; //TODO
+    private final float[] angularAccelAccumulator = new float[4];
     private final float[] posDerivative = new float[4];
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
@@ -121,10 +121,14 @@ public class RigidBody implements Rotatable {
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.copy(px,py,pz,pBuffer);
         VectorTranslator.copy(fx,fy,fz,fBuffer);
-        toLocalCoordinateSystem(pBuffer); // TODO presumindo que este seja nosso centro de massa (p.197)
+        toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
+
+        MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
         VectorTranslator.crossProduct(pBuffer,fBuffer);
         applyTorque(pBuffer);
-        applyForce(fBuffer);
+        System.out.println(":P");
+        System.out.printf("%f.10f %f.10f %f.10f \n",pBuffer[0],pBuffer[1],pBuffer[2]);
+//        applyForce(fBuffer);
     }
 
     @Override

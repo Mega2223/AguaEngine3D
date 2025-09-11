@@ -27,7 +27,7 @@ public class PhysicsContext {
         }
         for(Force f : forces){
             for(PhysicsObject o : objects){
-                f.apply(o, deltaT);
+                f.apply(o.getActor(), deltaT);
             }
         }
         for(PhysicsObject o : objects){

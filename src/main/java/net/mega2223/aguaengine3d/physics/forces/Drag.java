@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.physics.forces;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 public class Drag implements Force{
@@ -26,5 +27,11 @@ public class Drag implements Force{
         VectorTranslator.flipVector(buffer);
         VectorTranslator.scaleVector(buffer,kLinear * vel + kSquared * vel * vel);
         object.applyForce(buffer[0]*deltaT,buffer[1]*deltaT,buffer[2]*deltaT);
+        if(object instanceof RigidBody){
+            RigidBody r = (RigidBody) object;
+            float[] angularAccelAccumulator = r.angularVelocity.clone();
+            VectorTranslator.scaleVector(angularAccelAccumulator,-kLinear);
+            r.applyTorque(angularAccelAccumulator);
+        }
     }
 }

@@ -15,6 +15,7 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
+import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
@@ -157,6 +158,18 @@ public class Gaem3D {
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
                 p.applyAcceleration(-.1F, 0, 0);
             }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).applyTorque(.01F,0,0);
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_T) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).applyTorque(-.01F,0,0);
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Y) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).applyTorque(0,.01F,0);
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).applyTorque(0,-.01F,0);
+            }
         });
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
@@ -200,22 +213,22 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
-        physicsContext.addObject(new FixedPlane(
-                new float[]{5,0,0},
-                new float[]{-5,0,0}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{-5,0,0},
-                new float[]{5,0,0}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,0,5},
-                new float[]{0,0,-5}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,0,-5},
-                new float[]{0,0,5}
-        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{5,0,0},
+//                new float[]{-5,0,0}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{-5,0,0},
+//                new float[]{5,0,0}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,0,5},
+//                new float[]{0,0,-5}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,0,-5},
+//                new float[]{0,0,5}
+//        ));
 
         physicsContext.addForce(new Gravity(9.8F));
         physicsContext.addForce(new Drag(.001F,.01F));
@@ -262,8 +275,8 @@ public class Gaem3D {
 
     protected static void doLogic() {
 
-        int n = 4;
-        float rate = .1F;
+        int n = 1;
+        float rate = 1F;
         for (int i = 0; i < n; i++) {
             physicsContext.update(rate / (60F*n));
         }
@@ -291,6 +304,7 @@ public class Gaem3D {
                 AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
                 context.addObject(l);
             }
+            VectorTranslator.debugVector(p.x(),p.y(),p.z());
         }
 
     }
