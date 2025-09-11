@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d.graphics.objects.modeling.ui;
 
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TextureInterfaceComponent;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 @SuppressWarnings("ALL")
 public class BitmapFont {
@@ -66,7 +65,7 @@ public class BitmapFont {
         return new TextureInterfaceComponent(vertices,indices,textureCoords,texture,1);
     }
 
-    public DinAllocTextComponent genFromString(CharSequence text, DinAllocTextComponent component){
+    public DinamicallyAllocatedTextObject genFromString(CharSequence text, DinamicallyAllocatedTextObject component){
         float[] vertices = new float[text.length()*16];
         int[] indices = new int[text.length()*6];
         float[] textureCoords = getTextureCoords(text);
@@ -102,7 +101,7 @@ public class BitmapFont {
             component.textureCoords = textureCoords;
             return component;
         }
-        return new DinAllocTextComponent(vertices,indices,textureCoords,texture);
+        return new DinamicallyAllocatedTextObject(vertices,indices,textureCoords,texture);
     }
 
     public float[] getTextureCoords(CharSequence text){

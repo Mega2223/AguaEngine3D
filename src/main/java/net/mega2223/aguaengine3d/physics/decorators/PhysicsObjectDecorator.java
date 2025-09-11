@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.physics.decorators;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.advanced.Rotatable;
 
 public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positionable> implements Positionable, PhysicsObject {
 
@@ -15,6 +16,11 @@ public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positiona
     }
 
     @Override
+    public PhysicsObject getActor() {
+        return this.physicsObject.getActor();
+    }
+
+    @Override
     public void draw() {
         renderable.draw();
     }
@@ -24,9 +30,14 @@ public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positiona
         renderable.drawForceShader(shader);
     }
 
+    private static final float[] bufferM4 = new float[16];
     @Override
     public void doLogic(int iteration) {
         renderable.setCoords(physicsObject.x(), physicsObject.y(), physicsObject.z());
+        if(physicsObject instanceof Rotatable){
+            ((Rotatable) physicsObject).getRotationMatrix(bufferM4);
+            renderable.setRotationMatrix(bufferM4);
+        }
     }
 
     @Override
@@ -125,7 +136,35 @@ public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positiona
     }
 
     @Override
-    public PhysicsObject getActor() {
-        return this.physicsObject;
+    public void toLocalCoordinateSystem(float[] vec3) {
+        physicsObject.toLocalCoordinateSystem(vec3);
+    }
+
+    @Override
+    public void setRotationMatrix(float[] rotationM4) {
+        renderable.setRotationMatrix(rotationM4);
+    }
+
+    @Override
+    public void toGlobalCoordinateSystem(float[] vec3) {
+        physicsObject.toGlobalCoordinateSystem(vec3);
+    }
+
+    @Override
+    public void toLocalVelocity(float[] point, float[] pointVelocity, float[] dest) {
+        physicsObject.toLocalVelocity(point, pointVelocity, dest);
+    }
+
+    @Override
+    public void toGlobalVelocity(float[] point, float[] pointVelocity, float[] dest) {
+        physicsObject.toGlobalVelocity(point, pointVelocity, dest);
+    }
+
+    public R getRenderable() {
+        return renderable;
+    }
+
+    public P getPhysicsObject() {
+        return physicsObject;
     }
 }

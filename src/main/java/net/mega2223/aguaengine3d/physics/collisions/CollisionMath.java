@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.physics.collisions;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
 
 public class CollisionMath {
     private CollisionMath(){}
@@ -10,16 +11,28 @@ public class CollisionMath {
     private static final float[][] buffers = new float[5][4];
 
     /**
-     * Calculates closing velocity between two objects,
+     * Calculates closing velocity between two points,
      * less than zero if they are moving apart
      * */
     public static float closingVelocity(float[] posA, float[] velA, float[] posB, float[] velB){
         VectorTranslator.subtractFromVector(posA,posB,buffers[0]); //b[0] = pa - pb
         VectorTranslator.getFlipped(buffers[0], buffers[1]); // b[1] = pb - pa
         VectorTranslator.normalize(buffers[0]);
-        VectorTranslator.normalize(buffers[1]); //todo isso tá certo?
+        VectorTranslator.normalize(buffers[1]);
         return VectorTranslator.dotProduct(velA, buffers[1]) +
                VectorTranslator.dotProduct(velB, buffers[0]);
+    }
+
+    public static float closingVelocity(float aX, float aY, float aZ, float avX, float avY, float avZ, float bX, float bY, float bZ, float bvX, float bvY, float bvZ){
+        VectorTranslator.copy(aX, aY, aZ, buffers[0]);
+        VectorTranslator.copy(avX, avY, avZ, buffers[1]);
+        VectorTranslator.copy(bX, bY, bZ, buffers[2]);
+        VectorTranslator.copy(bvX, bvY, bvZ, buffers[3]);
+        return closingVelocity(buffers[0], buffers[1], buffers[2], buffers[3]); // Most thread-safe AguaEngine3D method
+    }
+
+    public static float closingVelocity(PhysicsObject objA, PhysicsObject objB){
+        return objA.getClosingVelocity(objB.x(),objB.y(),objB.z(),objB.vx(),objB.vy(),objB.vz());
     }
 
     /**
@@ -28,6 +41,10 @@ public class CollisionMath {
     public static float separatingVelocity(float[] posA, float[] velA, float[] posB, float[] velB){
         return - closingVelocity(posA, velA, posB, velB); // V_s
         // V_s = (vA - vB) . contactNormal
+    }
+
+    public static float separatingVelocity(PhysicsObject objA, PhysicsObject objB){
+        return - objA.getClosingVelocity(objB.x(),objB.y(),objB.z(),objB.vx(),objB.vy(),objB.vz());
     }
 
     /**
@@ -40,18 +57,23 @@ public class CollisionMath {
         VectorTranslator.normalize(result);
     }
 
-    /**
-     * Solves a collision assuming both objects are particles
-     * */
-    public static void solveCollision(PhysicsObject a, PhysicsObject b, float restitution){
-        float[] posA = buffers[0], posB = buffers[1], velA = buffers[2], velB = buffers[3];
-        float[] contact = buffers[4]; // from A's perspective
-        a.getCoords(posA); b.getCoords(posB); a.getVelocity(velA); b.getVelocity(velB);
+    private static final float[][] solveCollisionBuffers = new float[5][4];
+    // para evitar colisões com a função separatingVelocity
 
-        float sep = separatingVelocity(posA,velA,posB,velB);
+    /**
+     * Solves a collision assuming both objects are particles,
+     * does not correct the position, only the velocity
+     * */
+    public static void solveCollision(Collideable a, Collideable b, float restitution){
+        float[] posA = solveCollisionBuffers[0], posB = solveCollisionBuffers[1],
+                velA = solveCollisionBuffers[2], velB = solveCollisionBuffers[3];
+        float[] contact = solveCollisionBuffers[4]; // from A's perspective
+        a.getCoords(posA); b.getCoords(posB); a.getVelocity(velA); b.getVelocity(velB);
+//        float sep = separatingVelocity(posA,velA,posB,velB);
+        float sep = separatingVelocity(a,b);
         if(sep > 0){return;}
 
-        getContactNormal(posA,posB,contact);
+        a.getContactNormal(posB,contact);
 
         final float inverseSum = a.getInverseMass() + b.getInverseMass();
         if(inverseSum <= 0) {return;}
@@ -66,5 +88,26 @@ public class CollisionMath {
         a.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
         VectorTranslator.flipVector(impulsePerIMass);
         b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
+    }
+
+    /**
+     * Distances two objects that are colliding with one another
+     * @param contactNormal contact normal from A's perspective
+     * */
+    public static void solveContact(PhysicsObject a, PhysicsObject b, float[] contactNormal, float contactDepth){
+        if(contactDepth <= 0){return;}
+
+        final float invMassSum = a.getInverseMass() + b.getInverseMass();
+        //invMassSum *= contactDepth;
+
+        VectorTranslator.getNormalized(contactNormal,buffers[0]);
+        contactNormal = buffers[0];
+        VectorTranslator.scaleVector(contactNormal,- contactDepth / invMassSum, buffers[1]);
+
+        VectorTranslator.scaleVector(buffers[1], -a.getInverseMass(), buffers[2]);
+        a.applyTranslation(buffers[2]);
+
+        VectorTranslator.scaleVector(buffers[1],  b.getInverseMass(), buffers[2]);
+        b.applyTranslation(buffers[2]);
     }
 }

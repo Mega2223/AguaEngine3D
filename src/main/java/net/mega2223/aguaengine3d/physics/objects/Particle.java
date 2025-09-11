@@ -9,6 +9,7 @@ import java.util.Arrays;
 public class Particle implements PhysicsObject {
 
     protected final float[] pos = new float[4];
+
     protected final float[] velocity =  new float[4];
 
     private final float[] accelerationAccumulator = new float[4];
@@ -72,11 +73,31 @@ public class Particle implements PhysicsObject {
         System.arraycopy(velocity,0,dest,0,3);
     }
 
+    public void toLocalCoordinateSystem(@Modified float[] vec3) {
+        VectorTranslator.subtractFromVector(vec3,pos);
+    }
+
+    public void toGlobalCoordinateSystem(@Modified float[] vec3) {
+        VectorTranslator.addToVector(vec3,pos);
+    }
+
     public float getMass() {
         return mass;
     }
 
     public float getInverseMass() {
         return invMass;
+    }
+
+    public void toLocalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest) {
+        dest[0] = pointVelocity[0] - velocity[0];
+        dest[1] = pointVelocity[1] - velocity[1];
+        dest[2] = pointVelocity[2] - velocity[2];
+    }
+
+    public void toGlobalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest){
+        dest[0] = - pointVelocity[0] + velocity[0];
+        dest[1] = - pointVelocity[1] + velocity[1];
+        dest[2] = - pointVelocity[2] + velocity[2];
     }
 }

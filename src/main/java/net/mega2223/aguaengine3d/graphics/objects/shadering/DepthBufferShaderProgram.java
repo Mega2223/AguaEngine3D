@@ -69,10 +69,17 @@ public class DepthBufferShaderProgram implements ShaderProgram{
         GL30.glUniformMatrix4fv(translationMatrixLoc,false,translationMatrix);
     }
 
+    protected float[] rotationMatrix = new float[16];
     @Override
     public void setRotationMatrix(float[] m4) {
-        GL30.glUseProgram(id);
+        GL30.glUseProgram(getID());
+        MatrixTranslator.copy(m4,rotationMatrix);
         GL30.glUniformMatrix4fv(rotationMatrixLoc,false,m4);
+    }
+
+    @Override
+    public void getRotationMatrix(float[] destM4) {
+        MatrixTranslator.copy(rotationMatrix,destM4);
     }
 
     @Override

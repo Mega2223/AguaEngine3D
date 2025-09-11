@@ -22,18 +22,18 @@ public class PhysicsContext {
     }
 
     public void update(float deltaT){
-        collisionManager.manageCollisions(deltaT);
         for(PhysicsActor actor : actors){
             actor.act(deltaT,this);
         }
         for(Force f : forces){
             for(PhysicsObject o : objects){
-                f.apply(o);
+                f.apply(o.getActor(), deltaT);
             }
         }
         for(PhysicsObject o : objects){
             o.update(deltaT);
         }
+        collisionManager.manageCollisions(deltaT);
     }
 
     public void addObject(PhysicsObject object){

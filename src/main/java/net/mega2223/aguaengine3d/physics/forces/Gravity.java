@@ -21,10 +21,10 @@ public class Gravity implements Force {
     }
 
     @Override
-    public void apply(PhysicsObject object) {
+    public void apply(PhysicsObject object, float deltaT) {
         // since gravity is proportional to mass it cancels out
         // the inverse mass multiplication,
         // so it's easier to just apply the total acceleration
-        object.applyAcceleration(force[0],force[1],force[2]);
+        object.applyAcceleration(force[0]*deltaT,force[1]*deltaT,force[2]*deltaT);
     }
 }

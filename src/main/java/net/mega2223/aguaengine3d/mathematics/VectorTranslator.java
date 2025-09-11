@@ -28,9 +28,9 @@ public class VectorTranslator {
         dest[2] = factor * vec3[2];
     }
 
-    public static void divideVector(@Modified float[] vector, float factor){
+    public static void divideVector(@Modified float[] vec3, float factor){
         for (int i = 0; i < 3; i++) {
-            vector[i]/=factor;
+            vec3[i]/=factor;
         }
     }
 
@@ -54,11 +54,11 @@ public class VectorTranslator {
         }
     }
 
-    public static void addToVector(float x, float y, float z, @Modified float[] vector){
-        vector[0]+=x;
-        vector[1]+=y;
-        vector[2]+=z;
+    public static void addToVector(float x, float y, float z, @Modified float[] vec3){
+        vec3[0]+=x; vec3[1]+=y; vec3[2]+=z;
     }
+
+
 
     public static void subtractFromVector(@Modified float[] v1, float[] v2){
         subtractFromVector(v1,v2,v1);
@@ -90,6 +90,12 @@ public class VectorTranslator {
         dest[0] = vec3[0];
         dest[1] = vec3[1];
         dest[2] = vec3[2];
+    }
+
+    public static void copy(float x, float y, float z, @Modified float[] dest){
+        dest[0] = x;
+        dest[1] = y;
+        dest[2] = z;
     }
 
     public static void crossProduct(@Modified float[] vector, float[] vector2){
@@ -127,22 +133,37 @@ public class VectorTranslator {
         return x1*x2+y1*y2+z1*z2;
     }
 
-    public static void normalize(@Modified float[] vector){
-        float magnitude = magnitude(vector);
+    public static double dotProduct(double x1, double y1, double z1, double x2, double y2, double z2){
+        return x1*x2+y1*y2+z1*z2;
+    }
+
+    public static void normalize(@Modified float[] vec3){
+        float magnitude = magnitude(vec3);
         if(magnitude == 0){
-            vector[0] = 1F;
+            vec3[0] = 1F;
             return;
         }
-        divideVector(vector,magnitude);
+        divideVector(vec3,magnitude);
+    }
+
+    public static void getNormalized(float[] vec3, @Modified float[] dest){
+        VectorTranslator.copy(vec3, dest);
+        VectorTranslator.normalize(dest);
     }
 
     public static float getAngleBetweenVectors(float[] vecA, float[] vecB){
-        float m1 = magnitude(vecA), m2 = magnitude(vecB);
-        float x1 = vecA[0], y1 = vecA[1], z1 = vecA[2];
-        float x2 = vecB[0], y2 = vecB[1], z2 = vecB[2];
-        float dot = dotProduct(x1,y1,z1,x2,y2,z2);
+        if( Float.isNaN(vecA[0]) || Float.isNaN(vecA[1]) || Float.isNaN(vecA[2]) || Float.isNaN(vecB[0]) || Float.isNaN(vecB[1]) || Float.isNaN(vecB[2])){
+            return Float.NaN;
+        }
+        double m1 = magnitude(vecA), m2 = magnitude(vecB);
+        double x1 = vecA[0], y1 = vecA[1], z1 = vecA[2];
+        double x2 = vecB[0], y2 = vecB[1], z2 = vecB[2];
+        double dot = dotProduct(x1,y1,z1,x2,y2,z2);
 
-        double angle = Math.acos(dot / (m1 * m2));
+        double a = dot / (m1 * m2); //dá overflow para valores muito pequenos
+        a = Math.min(a,1);
+        double angle = Math.acos(a);
+
 //        System.out.printf(Locale.US,
 //                "ANGLE BETWEEN (%.2f,%.2f,%.2f) AND (%.2f,%.2f,%.2f): %.2f\n",
 //                vecA[0],vecA[1],vecA[2],vecB[0],vecB[1],vecB[2],Math.toDegrees(angle));
@@ -166,7 +187,7 @@ public class VectorTranslator {
     //**Rotates a vector given an axis-angle*/
     public static void rotateAlongAxis(float[] vec3, float[] axis, @Modified float[] dest){
         Arrays.fill(dest,0);
-        float ang = magnitude(axis) % PI2;
+        float ang = magnitude(axis);
         if(ang == 0){ System.arraycopy(vec3,0,dest,0,3); return;}
         float s = (float) Math.sin(ang), C = 1F - (float) Math.cos(ang);
 
@@ -281,7 +302,7 @@ public class VectorTranslator {
         //TODO coloca tudo isso num StringBuilder
         System.out.print("v: [");
         for (int i = 0; i < vec.length; i++) {
-            System.out.printf(Locale.US,"%2.2f ",vec[i]);
+            System.out.printf(Locale.US,"%2.3f ",vec[i]);
 //            if(i + 1 >= vec.length){System.out.println(",");}
         }
         System.out.print("]\n");

@@ -3,76 +3,46 @@ package net.mega2223.aguaengine3d.mathematics;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 @SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
 
 //FIXME tem equações matriciais que mudam vetores os quais iterações seguintes ainda dependem
+//isso provavelmente será concertado com o buffer manager
 //ex translateAllVertices, dá uma olhada depois e verifica a translação de cada matriz
+
+/**
+ * Class that stores handmade math calculations for matrix translation and stuff
+ * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
+ * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
+ * */
 
 public class MatrixTranslator {
 
-    /**
-     * Class that stores handmade math calculations for matrix translation and stuff
-     * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
-     * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
-     * */
+    public enum M4 {
+         M_11(0), M_12(1), M_13(2), M_14(3),
+        M_21(4), M_22(5), M_23(6), M_24(7),
+        M_31(8), M_32(9), M_33(10), M_34(11),
+        M_41(12), M_42(13), M_43(14), M_44(15);
+        public final int i;
+        M4(int i) {this.i = i;}
+    }
 
-    public static final int ISOMETRIC_PROJECTION = 0;
-    public static final int WEAK_PERSPECTIVE_PROJECTION = 1;
-    public static final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
-    protected static final int TRUE_PERSPECTIVE_PROJECTION = 3;
-    protected static final int WEAKER_PERSPECTIVE_PROJECTION = 4;
+    public enum M3 {
+        M_11(0), M_12(1), M_13(2),
+        M_21(3), M_22(4), M_23(5),
+        M_31(6), M_32(7), M_33(8);
+        public final int i;
+        M3(int i) {this.i = i;}
+    }
 
     private static final float[] bufferMatrix4 = new float[16];
-
-    @Deprecated
-    public static void projectVec3(float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg) {
-        float fieldOfView = 90;
-
-        switch (projectionAlg) {
-
-            case ISOMETRIC_PROJECTION:
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                return;
-            case WEAK_PERSPECTIVE_PROJECTION:
-
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                System.out.println();
-                System.out.println(vec3[startingPoint + 2]);
-
-                float mult = fieldOfView / (fieldOfView + vec3[startingPoint + 2]);
-                System.out.println(fieldOfView + "/(" + fieldOfView + "+" + vec3[startingPoint + 2] + ") =" + mult);
-
-                vec3[startingPoint] *= mult;
-                vec3[startingPoint + 1] *= mult;
-                return;
-            case WEAKER_PERSPECTIVE_PROJECTION:
-                vec3[startingPoint] += projectionPoint[0];
-                vec3[startingPoint + 1] += projectionPoint[1];
-                vec3[startingPoint + 2] += projectionPoint[2];
-
-                vec3[startingPoint] /= -vec3[startingPoint + 2];
-                vec3[startingPoint + 1] /= -vec3[startingPoint + 2];
-                return;
-            case TRUE_PERSPECTIVE_PROJECTION:
-                float near = .01f;
-                float far = 1000f;
-
-        }
-    }
 
     public static void multiplyVectorMatrix(@Modified float[] vector, float[][] mat4) {
         if (mat4.length != 4 || vector.length != 4) {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
+        //FIXME not it isnt lmao
         for (int i = 0; i < 4; i++) {
             vector[i] = (mat4[i][0] * vector[0]) + (mat4[i][1] * vector[1]) + (mat4[i][2] * vector[2]) + (mat4[i][3] * vector[3]);
         }
@@ -83,6 +53,7 @@ public class MatrixTranslator {
             throw new UnsupportedOperationException();
         }
         //this is optimal I guess
+        //FIXME no it isnt lmao
         for (int i = 0; i < 4; i++) {
             int i1 = i * 4;
             vector[i] = (mat4[i1] * vector[0]) + (mat4[i1 + 1] * vector[1]) + (mat4[i1 + 2] * vector[2]) + (mat4[i1 + 3] * vector[3]);
@@ -102,8 +73,8 @@ public class MatrixTranslator {
         }
     }
 
-    public void rotateAllVectors(@Modified float[][] vectors, float[] rotationRadians) {
-        for (float[] polygon : vectors) {
+    public void rotateAllVectors(@Modified float[][] polygons, float[] rotationRadians) {
+        for (float[] polygon : polygons) {
             rotateAllVectors(polygon, rotationRadians);
         }
     }
@@ -111,34 +82,35 @@ public class MatrixTranslator {
     public void rotateAllVectors(@Modified float[] vectors, float[] rotationRadians) {
         for (int j = 0; j < vectors.length; j += 4) {
             float[] rot = vectors.clone();
-            MatrixTranslator.rotateVector(rotationRadians[0], rotationRadians[1], rotationRadians[2], j, vectors);
+            MatrixTranslator.rotateEulerAngles(rotationRadians[0], rotationRadians[1], rotationRadians[2], j, vectors);
         }
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, 0, 0, 0, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, 0, 0, 0, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, int startIndex, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, 0, 0, 0, startIndex, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, int startIndex, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, 0, 0, 0, startIndex, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, @Modified float[] result) {
-        rotateVector(rX, rY, rZ, aX, aY, aZ, 0, result);
+    public static void rotateEulerAngles(double rX, double rY, double rZ, float aX, float aY, float aZ, @Modified float[] result) {
+        rotateEulerAngles(rX, rY, rZ, aX, aY, aZ, 0, result);
     }
 
-    public static void rotateVector(double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
+    public static void rotateEulerAngles(double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
         float x = result[startIndex];
         float y = result[startIndex + 1];
         float z = result[startIndex + 2];
-        rotateVector(x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex, result);
+        rotateEulerAngles(x, y, z, rX, rY, rZ, aX, aY, aZ, startIndex, result);
     }
 
-    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, @Modified float[] result) {
-        rotateVector(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
+    public static void rotateEulerAngles(float x, float y, float z, double rX, double rY, double rZ, @Modified float[] result) {
+        rotateEulerAngles(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
     }
 
-    public static void rotateVector(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
+    // TODO i have no idea if this is 1,2,3 or 3,2,1
+    public static void rotateEulerAngles(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
 
         if (!Double.isFinite(rX)) {rX = 0;}
         if (!Double.isFinite(rY)) {rY = 0;}
@@ -276,36 +248,35 @@ public class MatrixTranslator {
         return ret;
     }
 
-    public static void multiply4x4Matrices(@Modified float[] m1, float[] m2){
-        multiply4x4Matrices(m1,m2,bufferMatrix4);
-        System.arraycopy(bufferMatrix4,0,m1,0,16);
+    public static void multiply4x4Matrices(@Modified float[] m4A, float[] m4B){
+        multiply4x4Matrices(m4A,m4B,bufferMatrix4);
+        System.arraycopy(bufferMatrix4,0,m4A,0,16);
     }
 
     //very proud of that one
-    public static void multiply4x4Matrices(float[] m1, float[] m2, @Modified float[] result){
+    public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
         Arrays.fill(bufferMatrix4,0);
         for (int c = 0; c < 4; c++) {
             for (int r = 0; r <4; r++) {
                 for (int i = 0; i < 4; i++) {
-                    int m1Loc = r*4+i;
-                    int m2Loc = c+i*4;//(c)*4+(3-r);
-                    bufferMatrix4[c + r*4] += m1[m1Loc]*m2[m2Loc];
+                    int m1Loc = r*4+i; int m2Loc = c+i*4;
+                    bufferMatrix4[c + r*4] += m4A[m1Loc]*m4B[m2Loc];
                 }
             }
         }
         System.arraycopy(bufferMatrix4, 0, result, 0, 16);
     }
 
-    public static void multiply3x3Matrices(float[] m1, float[] m2, @Modified float[] result){
+    public static void multiply3x3Matrices(float[] m3A, float[] m3B, @Modified float[] result){
         Arrays.fill(result,0);
         for (int c = 0; c < 3; c++) {
             for (int r = 0; r < 3; r++) {
                 for (int i = 0; i < 3; i++) {
-                    result[c + r*3] += m1[r*3+i]*m2[c+i*3];
+                    result[c + r*3] += m3A[r*3+i]*m3B[c+i*3];
                 }
             }
         }
-        System.arraycopy(result, 0, m1, 0, result.length);
+        System.arraycopy(result, 0, m3A, 0, result.length);
     }
 
     public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){
@@ -334,7 +305,9 @@ public class MatrixTranslator {
         }
     }
 
-    /**Generates a rotation angle given an axis angle, pretty inaccurate*/
+    /**
+     * Generates a rotation matrix given an axis angle, somewhat inaccurate
+     * */
     public static void rotationMatrixFromAxisAngle(float[] axisAngle, @Modified float[] dest){
         Arrays.fill(dest,0);
         float ang = VectorTranslator.magnitude(axisAngle[0],axisAngle[1],axisAngle[2]);
@@ -346,16 +319,27 @@ public class MatrixTranslator {
         dest[15] = 1;
     }
 
+    public static void axisAngleFromRotationMatrix(float[] rotMat4, @Modified float[] dest){
+        dest[0] = rotMat4[9] - rotMat4[6];
+        dest[1] = rotMat4[2] - rotMat4[8];
+        dest[2] = rotMat4[4] - rotMat4[1];
+        dest[3] = 0;
+    }
+
     /**
      * resets the current matrix and sets it to a translation
+     * @deprecated use flat matrices
      */
+    @Deprecated
     public static void generateTranslationMatrix(float[] vec, @Modified float[][] resultMat4) {
         generateTranslationMatrix(vec[0], vec[1], vec[2], resultMat4);
     }
 
     /**
      * resets the current matrix and sets it to a translation
+     * @deprecated use flat matrices
      */
+    @Deprecated()
     public static void generateTranslationMatrix(float x, float y, float z, @Modified float[][] resultMat4) {
         if (resultMat4.length != 4) {
             return;
@@ -371,7 +355,6 @@ public class MatrixTranslator {
         resultMat4[0][3] = x;
         resultMat4[1][3] = y;
         resultMat4[2][3] = z;
-
     }
     
     public static void generateTranslationMatrix(float[] vec, @Modified float[] resultMat4) {
@@ -484,15 +467,11 @@ public class MatrixTranslator {
 
     public static void applyLookTransformation(float cX, float cY, float cZ, float x, float y, float z, float upX, float upY, float upZ, @Modified float[] resultMat4){
         float dX, dY, dZ;
-        dX = cX - x;
-        dY = cY - y;
-        dZ = cZ - z;
+        dX = cX - x; dY = cY - y; dZ = cZ - z;
         float i = 1F/(float)(Math.sqrt(dX*dX + dY*dY + dZ*dZ));
         dX*=i; dY*=i; dZ*=i;
         float lX,lY,lZ;
-        lX = upY*dZ-upZ*dY;
-        lY = upZ*dX-upX*dZ;
-        lZ = upX*dY-upY*dX;
+        lX = upY*dZ-upZ*dY; lY = upZ*dX-upX*dZ; lZ = upX*dY-upY*dX;
         float iL = 1F/((float)Math.sqrt(lX*lX+lY*lY+lZ*lZ));
         lX*=iL; lY*=iL; lZ*=iL;
         float uX, uY, uZ;
@@ -533,12 +512,12 @@ public class MatrixTranslator {
         System.arraycopy(bufferMatrix4, 0, resultMat4, 0, bufferMatrix4.length);
     }
 
-    public static void getTransposeMatrix4(@Modified float[] resultMat4){
-        getTransposeMatrix4(resultMat4,bufferMatrix4);
+    public static void transposeMat4(@Modified float[] resultMat4){
+        transposeMat4(resultMat4,bufferMatrix4);
         System.arraycopy(bufferMatrix4,0,resultMat4,0,16);
     }
 
-    public static void getTransposeMatrix4(float[] m4,@Modified float[] resultMat4){
+    public static void transposeMat4(float[] m4, @Modified float[] resultMat4){
         for (int i = 0; i < 16; i++) {
             int r = i/4;
             int c = i%4;
@@ -546,7 +525,28 @@ public class MatrixTranslator {
         }
     }
 
-    public static void getInverseMatrix3(float[] m3,@Modified float[] resultMat3){
+    public static void getInverseMatrix4(float[] m4, @Modified float[] dest){
+        float inv = 1F/getDeterminantMatrix4(m4);
+
+        // Heavily based on cyclone's inverse mat4 algorithm
+        dest[0] = (-m4[9]*m4[6]+m4[5]*m4[10])*inv;
+        dest[4] = (m4[8]*m4[6]-m4[4]*m4[10])*inv;
+        dest[8] = (-m4[8]*m4[5]+m4[4]*m4[9])*inv;
+
+        dest[1] = (m4[9]*m4[2]-m4[1]*m4[10])*inv;
+        dest[5] = (-m4[8]*m4[2]+m4[0]*m4[10])*inv;
+        dest[9] = (m4[8]*m4[1]-m4[0]*m4[9])*inv;
+
+        dest[2] = (-m4[5]*m4[2]+m4[1]*m4[6])*inv;
+        dest[6] = (+m4[4]*m4[2]-m4[0]*m4[6])*inv;
+        dest[10] = (-m4[4]*m4[1]+m4[0]*m4[5])*inv;
+
+        dest[3] = (m4[9]*m4[6]*m4[3] -m4[5]*m4[10]*m4[3] -m4[9]*m4[2]*m4[7] +m4[1]*m4[10]*m4[7] +m4[5]*m4[2]*m4[11] -m4[1]*m4[6]*m4[11])*inv;
+        dest[7] = (-m4[8]*m4[6]*m4[3] +m4[4]*m4[10]*m4[3] +m4[8]*m4[2]*m4[7] -m4[0]*m4[10]*m4[7] -m4[4]*m4[2]*m4[11] +m4[0]*m4[6]*m4[11])*inv;
+        dest[11] =(m4[8]*m4[5]*m4[3] -m4[4]*m4[9]*m4[3] -m4[8]*m4[1]*m4[7] +m4[0]*m4[9]*m4[7] +m4[4]*m4[1]*m4[11] -m4[0]*m4[5]*m4[11])*inv;
+    }
+
+    public static void getInverseMatrix3(float[] m3,@Modified float[] dest){
         float determinantMatrix3 = getDeterminantMatrix3(m3);
         if(determinantMatrix3 == 0){throw new UnsupportedOperationException("Matrix does not have a determinant.");}
         float v1 = m3[0]*m3[4];
@@ -556,15 +556,15 @@ public class MatrixTranslator {
         float v5 = m3[1]*m3[6];
         float v6 = m3[2]*m3[6];
         float inv = 1/determinantMatrix3;
-        resultMat3[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
-        resultMat3[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
-        resultMat3[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
-        resultMat3[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
-        resultMat3[4] = (m3[0]*m3[8]-v6)*inv;
-        resultMat3[5] = -(v2-v4)*inv;
-        resultMat3[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
-        resultMat3[7] = -(m3[0]*m3[7]-v5)*inv;
-        resultMat3[8] = (v1-v3)*inv;
+        dest[0] = (m3[4]*m3[8]-m3[5]*m3[7])*inv;
+        dest[1] = -(m3[1]*m3[8]-m3[2]*m3[7])*inv;
+        dest[2] = (m3[1]*m3[5]-m3[2]*m3[4])*inv;
+        dest[3] = -(m3[3]*m3[8]-m3[5]*m3[6])*inv;
+        dest[4] = (m3[0]*m3[8]-v6)*inv;
+        dest[5] = -(v2-v4)*inv;
+        dest[6] = (m3[3]*m3[7]-m3[4]*m3[6])*inv;
+        dest[7] = -(m3[0]*m3[7]-v5)*inv;
+        dest[8] = (v1-v3)*inv;
     }
 
     public static void getTransposeMatrix3(float[] m3, @Modified float[] resultMat3){
@@ -575,41 +575,41 @@ public class MatrixTranslator {
         }
     }
 
+    // It works :p
+    public static float getDeterminantMatrix4(float[] M){
+        return +M[0]*(+M[5]*(+M[10]*(M[15])-M[11]*(M[14]))-M[6]*(+M[9]*(M[15])-M[11]*(M[13]))+M[7]*(+M[9]*(M[14])-M[10]*(M[13])))-M[1]*(+M[4]*(+M[10]*(M[15])-M[11]*(M[14]))-M[6]*(+M[8]*(M[15])-M[11]*(M[12]))+M[7]*(+M[8]*(M[14])-M[10]*(M[12])))+M[2]*(+M[4]*(+M[9]*(M[15])-M[11]*(M[13]))-M[5]*(+M[8]*(M[15])-M[11]*(M[12]))+M[7]*(+M[8]*(M[13])-M[9]*(M[12])))-M[3]*(+M[4]*(+M[9]*(M[14])-M[10]*(M[13]))-M[5]*(+M[8]*(M[14])-M[10]*(M[12]))+M[6]*(+M[8]*(M[13])-M[9]*(M[12])));
+    }
+
+    public static float getFromMat4(float[] mat4,int row, int column){
+        return mat4[(column%4) + (row*4)];
+    }
+
+    public static int getIndexMat4(int row, int column){
+        return (column%4) + (row*4);
+    }
+
+    public static float getFromNSizedMatrix(float[] mat4, int row, int column, int nRows, int nColumns){
+        return mat4[(column%nColumns) + (row*nRows)];
+    }
+
+    public static int getIndexNSizedMatrix(int row, int column, int nRows, int nColumns){
+        return (column%nColumns) + (row*nRows);
+    }
+
     public static float getDeterminantMatrix3(float[] mat3){
         return (mat3[0]*mat3[4]*mat3[8] + mat3[1]*mat3[5]*mat3[6] + mat3[2]*mat3[3]*mat3[7])-
                 (mat3[6]*mat3[4]*mat3[2] + mat3[7]*mat3[5]*mat3[0] + mat3[8]*mat3[3]*mat3[1]);
     }
 
-    public static void getRotationMat4FromQuaternion(float w, float x, float y, float z, float[] resultMat4){
-        Arrays.fill(resultMat4,0);
-        float[] stolenVector = VectorTranslator.buffer1;
-        VectorTranslator.getRotationRadians(w,x,y,z, stolenVector);
-        MatrixTranslator.generateRotationMatrix(stolenVector[0], stolenVector[1], stolenVector[2], resultMat4);
-        /*This doesn't work lol
-        resultMat4[0] = 1-(2*y*y+2*z*z);
-        resultMat4[1] = 2*x*y + 2*z*w;
-        resultMat4[2] = 2*x*z - 2*y*w;
-        resultMat4[4] = 2*x*y - 2*z*w;
-        resultMat4[5] = 1-(2*x*x+2*z*z);
-        resultMat4[6] = 2*y*z + 2*x*w;
-        resultMat4[8] = 2*x*z + 2*y*w;
-        resultMat4[9] = 2*y*z - 2*x*w;
-        resultMat4[10] = 1-(2*x*x+2*y*y);
-        resultMat4[15] = 1;*/
+    public static void copy(float[] m4,@Modified float[] dest){
+        System.arraycopy(m4, 0, dest, 0, 16);
     }
 
-
     public static void debugMatrix4x4(float[] matrix4) {
-        StringBuilder debug = new StringBuilder("[ ");
-        for (int i = 0; i < matrix4.length; i += 4) {
-            for (int j = 0; j < 4; j++) {
-                debug.append(String.format(Locale.US,"%.2f",matrix4[i + j])).append(" ");
-            }
-            debug.append("]\n");
-            if (i + 4 < matrix4.length) {
-                debug.append("[ ");
-            }
-        }
+        String debug = String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[0], matrix4[1], matrix4[2], matrix4[3]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[4], matrix4[5], matrix4[6], matrix4[7]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[8], matrix4[9], matrix4[10], matrix4[11]) +
+                String.format("[ %.2f %.2f %.2f %.2f ]\n", matrix4[12], matrix4[13], matrix4[14], matrix4[15]);
         System.out.println(debug);
     }
 
@@ -631,7 +631,7 @@ public class MatrixTranslator {
         System.out.println("Comparing " + m1N + " with " + m2N + ": ");
         for (int i = 0; i < m1.length; i++) {
             String m = "m" + i/4 + "" + i%4;
-            if(m1[i]!=m2[i]){System.out.println("Descrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
+            if(m1[i]!=m2[i]){System.out.println("Discrepancy at " + i + " (" + m + "): " + m1[i] + " != " + m2[i]);}
         }
         System.out.println("Comparison complete!");
     }
@@ -669,7 +669,7 @@ public class MatrixTranslator {
     public static void debugPolygon(float[] poly, int debugN){
         if(debugN >= 0){System.out.println("Debugging polygon " + debugN + ": ");}
         for (int i = 0; i < poly.length; i+=4) {
-            System.out.println("| Vertice " + i/4 + ": [" + poly[i] + "," + poly[i+1] + "," + poly[i+2] + "]");
+            System.out.println("| Vertex " + i/4 + ": [" + poly[i] + "," + poly[i+1] + "," + poly[i+2] + "]");
         }
     }
 
@@ -679,8 +679,54 @@ public class MatrixTranslator {
             float[] poly = model[i];
             System.out.println("| Debugging polygon " + i + ": ");
             for (int j = 0; j < poly.length; j+=4) {
-                System.out.println("|| Vertice " + j/4 + ": [" + poly[j] + "," + poly[j+1] + "," + poly[j+2] + "]");
+                System.out.println("|| Vertex " + j/4 + ": [" + poly[j] + "," + poly[j+1] + "," + poly[j+2] + "]");
             }
+        }
+    }
+
+    @Deprecated
+    public static void projectVec3(float[] vec3, int startingPoint, float[] projectionPoint, final int projectionAlg) {
+        float fieldOfView = 90;
+        final int ISOMETRIC_PROJECTION = 0;
+        final int WEAK_PERSPECTIVE_PROJECTION = 1;
+        final int PSEUDO_PERSPERCTIVE_PROJECTION = 2;
+        final int TRUE_PERSPECTIVE_PROJECTION = 3;
+        final int WEAKER_PERSPECTIVE_PROJECTION = 4;
+        switch (projectionAlg) {
+
+            case ISOMETRIC_PROJECTION:
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                return;
+            case WEAK_PERSPECTIVE_PROJECTION:
+
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                System.out.println();
+                System.out.println(vec3[startingPoint + 2]);
+
+                float mult = fieldOfView / (fieldOfView + vec3[startingPoint + 2]);
+                System.out.println(fieldOfView + "/(" + fieldOfView + "+" + vec3[startingPoint + 2] + ") =" + mult);
+
+                vec3[startingPoint] *= mult;
+                vec3[startingPoint + 1] *= mult;
+                return;
+            case WEAKER_PERSPECTIVE_PROJECTION:
+                vec3[startingPoint] += projectionPoint[0];
+                vec3[startingPoint + 1] += projectionPoint[1];
+                vec3[startingPoint + 2] += projectionPoint[2];
+
+                vec3[startingPoint] /= -vec3[startingPoint + 2];
+                vec3[startingPoint + 1] /= -vec3[startingPoint + 2];
+                return;
+            case TRUE_PERSPECTIVE_PROJECTION:
+                float near = .01f;
+                float far = 1000f;
+
         }
     }
 }
