@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics.advanced;
 
+import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
@@ -25,7 +26,7 @@ public class RigidBody implements Rotatable {
     private final float[] posDerivative = new float[4];
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
-    protected final float[] inverseInertialTensorWorldCoords = new float[16];
+    protected final float[] inverseRotatedInertialTensor = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -43,7 +44,7 @@ public class RigidBody implements Rotatable {
     public void update(float deltaT){
         // Calculations
         QuaternionTranslator.normalize(rotationQ4);
-        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix,inverseInertialTensorWorldCoords);
+        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix, inverseRotatedInertialTensor);
         // TODO essa é a ordem certa?
         // TODO precisa fazer isso?
 
@@ -129,7 +130,7 @@ public class RigidBody implements Rotatable {
         applyForce(fBuffer);
     }
 
-    public void applyRotationalCorrection(float dx, float dy, float dz, float px, float py, float pz){
+    public void applyRotationalTranslation(float dx, float dy, float dz, float px, float py, float pz){
         //FIXME TA TUDO ERRADO
         VectorTranslator.copy(px,py,pz,pBuffer);
         VectorTranslator.copy(dx,dy,dz,fBuffer);
@@ -139,7 +140,7 @@ public class RigidBody implements Rotatable {
         VectorTranslator.crossProduct(pBuffer,fBuffer);
 
         // BEGIN
-        VectorTranslator.normalize(pBuffer);
+//        VectorTranslator.normalize(pBuffer);
         VectorTranslator.scaleVector(pBuffer,.01F);
         // END
 
@@ -175,6 +176,27 @@ public class RigidBody implements Rotatable {
         dest[0] = pointVelocity[0] - velocity[0];
         dest[1] = pointVelocity[1] - velocity[1];
         dest[2] = pointVelocity[2] - velocity[2];
+    }
+
+    @Override
+    public void applyImpulse(float fx, float fy, float fz, float px, float py, float pz) {
+        float[] angularImpulse = BufferManager.allocateVec4();
+        float[] linearImpulse = BufferManager.allocateVec4();
+
+        VectorTranslator.copy(px,py,pz,angularImpulse);
+        VectorTranslator.copy(fx,fy,fz,linearImpulse);
+        toLocalCoordinateSystem(angularImpulse); // presumindo que este seja nosso centro de massa (p.197)
+
+        MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local
+        VectorTranslator.crossProduct(angularImpulse,linearImpulse);
+
+        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseRotatedInertialTensor); // todo isso tá certo?
+
+        applyAngularVelocity(angularImpulse);
+        applyImpulse(linearImpulse);
+
+        BufferManager.freeVec4(angularImpulse);
+        BufferManager.freeVec4(linearImpulse);
     }
 
     public float getMass() {

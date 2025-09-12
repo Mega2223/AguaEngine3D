@@ -218,32 +218,63 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
+        /* Sphere hell
+
         PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
                 new Sphere(1, 1),
                 Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
         );
-
-        sphere.setCoordinates(0,20,10);
-
+        sphere.setCoordinates(0,3,3);
         physicsContext.addObject(sphere);
         context.addObject(sphere);
 
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{5,0,0},
-//                new float[]{-5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{-5,0,0},
-//                new float[]{5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,5},
-//                new float[]{0,0,-5}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,-5},
-//                new float[]{0,0,5}
-//        ));
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);*/
+
+        physicsContext.addObject(new FixedPlane(
+                new float[]{5,0,0},
+                new float[]{-5,0,0}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{-5,0,0},
+                new float[]{5,0,0}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{0,0,5},
+                new float[]{0,0,-5}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{0,0,-5},
+                new float[]{0,0,5}
+        ));
+        physicsContext.addObject(new FixedPlane(
+                new float[]{0,-5,0},
+                new float[]{0,5,-0}
+        ));
 
         physicsContext.addForce(new Gravity(9.8F));
 //        physicsContext.addForce(new Drag(.001F,.01F));
@@ -290,7 +321,11 @@ public class Gaem3D {
 
     protected static void doLogic() {
 
-        int n = 1;
+        if(p != null){
+            VectorTranslator.debugVector(p.vx(),p.vy(),p.vz());
+        }
+
+        int n = 32;
         float rate = 1F;
         for (int i = 0; i < n; i++) {
             physicsContext.update(rate / (60F*n));
@@ -319,9 +354,7 @@ public class Gaem3D {
                 AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
                 context.addObject(l);
             }
-            VectorTranslator.debugVector(p.x(),p.y(),p.z());
         }
-
     }
 
     protected static void doRenderLogic() {

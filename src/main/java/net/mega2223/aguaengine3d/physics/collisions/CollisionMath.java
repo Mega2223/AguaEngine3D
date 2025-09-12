@@ -1,11 +1,11 @@
 package net.mega2223.aguaengine3d.physics.collisions;
 
+import com.sun.istack.internal.Nullable;
 import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
-import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
 
 public class CollisionMath {
     private CollisionMath(){}
@@ -75,7 +75,7 @@ public class CollisionMath {
      * assuming A and B are points, the contact normal
      * as any other normal *always* has a magnitude of 1.
      * */
-    public static void getContactNormal(float[] posA, float[] posB, @Modified float[] result) {
+    public static void getContactNormalPoints(float[] posA, float[] posB, @Modified float[] result) {
         VectorTranslator.subtractFromVector(posA,posB,result);
         VectorTranslator.normalize(result);
     }
@@ -87,7 +87,7 @@ public class CollisionMath {
      * Solves a collision assuming both objects are particles,
      * does not correct the position, only the velocity
      * */
-    public static void solveCollision(Collideable a, Collideable b, float restitution){
+    public static void solveCollisionSpheres(Collideable a, Collideable b, float restitution){
         float[] posA = solveCollisionBuffers[0], posB = solveCollisionBuffers[1],
                 velA = solveCollisionBuffers[2], velB = solveCollisionBuffers[3];
         float[] contact = solveCollisionBuffers[4]; // from A's perspective
@@ -147,11 +147,38 @@ public class CollisionMath {
         b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
     }
 
+    //TODO so ve se isso é coerente
+    public static void solveCollision(float[] posA, float[] velA, float invMassA,
+                                      float[] posB, float[] velB, float invMassB,
+                                      float separatingVelocity, float[] contactNormalA, float restitution,
+                                      @Modified float[] impulseA, @Nullable @Modified float[] impulseB){
+
+        final float inverseSum = invMassA + invMassB;
+        if(inverseSum <= 0 || separatingVelocity >= 0) {return;}
+
+        final float nSep = - restitution * separatingVelocity;
+        final float deltaVelocity = nSep - separatingVelocity;
+        final float impulse = deltaVelocity / inverseSum;
+
+        float[] impulsePerIMass = BufferManager.allocateVec4();
+
+        VectorTranslator.scaleVector(contactNormalA,impulse,impulsePerIMass);
+
+        VectorTranslator.copy(impulseA,impulsePerIMass);
+
+        if(impulseB != null){
+            VectorTranslator.flipVector(impulsePerIMass);
+            VectorTranslator.copy(impulseB,impulsePerIMass);
+        }
+
+        BufferManager.freeVec4(impulsePerIMass);
+    }
+
     /**
      * Distances two objects that are colliding with one another
      * @param contactNormal contact normal from A's perspective
      * */
-    public static void solveContact(PhysicsObject a, PhysicsObject b, float[] contactNormal, float contactDepth){
+    public static void solveContactSpheres(PhysicsObject a, PhysicsObject b, float[] contactNormal, float contactDepth){
         if(contactDepth <= 0){return;}
 
         final float invMassSum = a.getInverseMass() + b.getInverseMass();
@@ -189,6 +216,22 @@ public class CollisionMath {
         a.applyTranslation(buffers[2]);
     }
 
+    public static void solveContact(float[] posA, float invMassA, float[] posB, float invMassB,
+                                    float[] contactNormalA, float contactDepth,
+                                    @Modified float[] translationA, @Nullable @Modified float[] translationB){
+        if(contactDepth <= 0){return;}
+
+        float[] totalAmount = BufferManager.allocateVec4();
+        final float invMassSum = invMassA + invMassB;
+        VectorTranslator.scaleVector(contactNormalA,- contactDepth / invMassSum, totalAmount);
+
+        VectorTranslator.scaleVector(totalAmount, -invMassA, translationA);
+        if(translationB != null){
+            VectorTranslator.scaleVector(totalAmount,  invMassB, translationB);
+        }
+        BufferManager.freeVec4(totalAmount);
+    }
+
     /**
      * Distances two objects that are colliding with one another
      * @param contactNormal contact normal from A's perspective (in world coords)
@@ -202,15 +245,9 @@ public class CollisionMath {
         VectorTranslator.scaleVector(contactNormal,- contactDepth / invMassSum, buffers[1]);
 
         VectorTranslator.scaleVector(buffers[1], -a.getInverseMass(), buffers[2]);
-        a.applyRotationalCorrection(buffers[2],contactPoint);
+        a.applyRotationalTranslation(buffers[2],contactPoint);
 
         VectorTranslator.scaleVector(buffers[1], b.getInverseMass(), buffers[2]);
         b.applyTranslation(buffers[2]);
-    }
-
-    public static void resolveContact(float[] pointA, float[] velA, float invMassA,
-                                      float[] pointB, float[] velB, float invMassB,
-                                      float[] contactNormal, float contactDepth){
-        //TODO :3
     }
 }

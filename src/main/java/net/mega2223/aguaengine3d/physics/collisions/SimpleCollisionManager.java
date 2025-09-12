@@ -13,7 +13,7 @@ public class SimpleCollisionManager extends CollisionManager{
     }
 
     @Override
-    public void manageCollisions(float deltaT) {
+    public void doSinglePass(float deltaT) {
         List<PhysicsObject> objects = physContext.getObjects(); // fixme maybe too resource intensive
         for(PhysicsObject o1 : objects){
             o1 = o1.getActor();
@@ -24,8 +24,6 @@ public class SimpleCollisionManager extends CollisionManager{
                 float depth = ((Collideable) o1).solveCollision((Collideable) o2,buffer);
                 if (depth <= 0){
                     depth = ((Collideable) o2).solveCollision((Collideable) o1,buffer);
-//                  CollisionMath.solveContact(o1, o2, buffer, depth);
-//			        CollisionMath.solveCollision((Collideable) o1, (Collideable) o2, 1.0F);
                 }
             }
         }

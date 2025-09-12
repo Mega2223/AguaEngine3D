@@ -16,6 +16,24 @@ public interface PhysicsObject {
 
     void update(float deltaT);
 
+    float x(); float y(); float z();
+    float vx(); float vy(); float vz();
+
+    /** Converts a global coordinate to a coordinate from the object's internal coordinate system*/
+    void toLocalCoordinateSystem(@Modified float[] vec3);
+
+    /** Converts a coordinate from the object's internal coordinate system to a global coordinate*/
+    void toGlobalCoordinateSystem(@Modified float[] vec3);
+
+    /** Gets the relative velocity of the point in relation to the object
+     * @param point point in world coordinates
+     * @param pointVelocity velocity in world coordinates
+     * @param dest returns the velocity of the point in relation to the object in world coordinates
+     * */
+    void toLocalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
+
+    void toGlobalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
+
     default void applyForce(float fx, float fy, float fz){
         float invMass = getInverseMass();
         applyVelocity(fx*invMass,fy*invMass,fz*invMass);
@@ -37,10 +55,6 @@ public interface PhysicsObject {
     default void applyTranslation(float[] translation){
         applyTranslation(translation[0], translation[1], translation[2]);
     }
-
-    float x(); float y(); float z();
-    float vx(); float vy(); float vz();
-
     default void getCoords(@Modified float[] dest){
         dest[0] = x(); dest[1] = y(); dest[2] = z();
     }
@@ -61,18 +75,7 @@ public interface PhysicsObject {
         return this;
     }
 
-    /** Converts a global coordinate to a coordinate from the object's internal coordinate system*/
-    void toLocalCoordinateSystem(@Modified float[] vec3);
-
-    /** Converts a coordinate from the object's internal coordinate system to a global coordinate*/
-    void toGlobalCoordinateSystem(@Modified float[] vec3);
-
-    /** Gets the relative velocity of the point in relation to the object
-     * @param point point in world coordinates
-     * @param pointVelocity velocity in world coordinates
-     * @param dest returns the velocity of the point in relation to the object in world coordinates
-     * */
-    void toLocalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
-
-    void toGlobalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
+    default void applyVelocity(float[] velocity){
+        applyVelocity(velocity[0],velocity[1],velocity[2]);
+    }
 }

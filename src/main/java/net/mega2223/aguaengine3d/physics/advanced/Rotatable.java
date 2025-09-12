@@ -4,6 +4,7 @@ import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
 public interface Rotatable extends PhysicsObject {
+
     void getRotationMatrix(@Modified float[] m4);
     void getRotationQuaternion(@Modified float[] q4);
 
@@ -22,9 +23,13 @@ public interface Rotatable extends PhysicsObject {
      * */
     void applyForce(float fx, float fy, float fz, float px, float py, float pz);
 
-    void applyRotationalCorrection(float rx, float ry, float rz, float px, float py, float pz);
+    void applyImpulse(float fx, float fy, float fz, float px, float py, float pz);
+
+    void applyRotationalTranslation(float rx, float ry, float rz, float px, float py, float pz);
 
     void applyTorque(float tx, float ty, float tz);
+
+    void applyAngularVelocity(float rvx, float rvy, float rvz);
 
     void applyRotation(float rx, float ry, float rz);
 
@@ -40,7 +45,15 @@ public interface Rotatable extends PhysicsObject {
         applyTorque(torque[0],torque[1],torque[2]);
     }
 
-    default void applyRotationalCorrection(float[] amount, float[] point){
-        applyRotationalCorrection(amount[0],amount[1],amount[2],point[0],point[1],point[2]);
+    default void applyRotationalTranslation(float[] amount, float[] point){
+        applyRotationalTranslation(amount[0],amount[1],amount[2],point[0],point[1],point[2]);
+    }
+
+    default void applyImpulse(float[] impulse, float[] point){
+        applyImpulse(impulse[0],impulse[1],impulse[2],point[0],point[1],point[2]);
+    }
+
+    default void applyAngularVelocity(float[] rotationalVelocity){
+        applyAngularVelocity(rotationalVelocity[0],rotationalVelocity[1],rotationalVelocity[2]);
     }
 }

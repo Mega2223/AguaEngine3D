@@ -43,7 +43,7 @@ public class FixedPlane extends Particle implements Collideable {
     }
 
     @Override
-    public void getContactNormal(float[] coord, float[] result) {
+    public void getContactNormal(float[] point, float[] result) {
         VectorTranslator.getFlipped(normal,result);
     }
 
@@ -59,23 +59,18 @@ public class FixedPlane extends Particle implements Collideable {
             if(depth > 0){
                 VectorTranslator.copy(normal,contactNormalDest);
                 VectorTranslator.flipVector(contactNormalDest);
-                CollisionMath.solveContact(this, s, contactNormalDest, depth);
+                CollisionMath.solveContactSpheres(this, s, contactNormalDest, depth);
 
+                // computes the closest point in the plane from the center of the sphere
                 VectorTranslator.subtractFromVector(point[0],point[1],point[2],c.x(),c.y(),c.z(),contactPointBuffer);
-                VectorTranslator.scaleVector(normal,
-                        VectorTranslator.dotProduct(contactPointBuffer,normal),
-                        contactPointBuffer
-                );
+                VectorTranslator.scaleVector(normal, VectorTranslator.dotProduct(contactPointBuffer,normal), contactPointBuffer);
                 VectorTranslator.addToVector(c.x(),c.y(),c.z(),contactPointBuffer);
-
-//                Thread.currentThread().getId();
 
                 float sep = CollisionMath.separatingVelocity(
                         contactPointBuffer[0],contactPointBuffer[1],contactPointBuffer[2],
-                        0,0,0,
-                        c.x(),c.y(),c.z(),
-                        c.vx(),c.vy(),c.vz()
+                        0,0,0, c.x(),c.y(),c.z(), c.vx(),c.vy(),c.vz()
                 );
+
                 CollisionMath.solveCollision(c,this,sep,normal,1);
             }
             return depth;
@@ -85,14 +80,14 @@ public class FixedPlane extends Particle implements Collideable {
 
     private final float[] contactPointBuffer = new float[4];
 
-    //TODO coloca na super
-    public float getCollision(float[] point, float[] contactNormalDest){
+    @Override
+    public float getCollision(float[] point, float[] result){
         VectorTranslator.copy(point,buffer);
         VectorTranslator.subtractFromVector(buffer,this.point);
         VectorTranslator.flipVector(buffer);
         float depth = Math.max(0, VectorTranslator.dotProduct(buffer,normal));
-        VectorTranslator.copy(normal,contactNormalDest);
-        VectorTranslator.flipVector(contactNormalDest);
+        VectorTranslator.copy(normal, result);
+        VectorTranslator.flipVector(result);
         return Math.max(0,depth);
     }
 
