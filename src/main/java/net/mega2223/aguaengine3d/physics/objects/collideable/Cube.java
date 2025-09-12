@@ -6,6 +6,8 @@ import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsMath;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
+import net.mega2223.aguaengine3d.physics.collisions.CollisionManager;
+import net.mega2223.aguaengine3d.physics.collisions.CollisionMath;
 
 public class Cube extends RigidBody implements Collideable {
 
@@ -62,33 +64,42 @@ public class Cube extends RigidBody implements Collideable {
         toGlobalCoordinateSystem(result);
     }
 
-    public float getCollision(Collideable c, float[] contactNormalDest) {
-        //TODO returns bool?
+    @Override
+    public void applyForce(float fx, float fy, float fz) {
+        super.applyForce(fx, fy, fz);
+    }
+
+    public float solveCollision(Collideable c, float[] contactNormalDest) {
         if(c instanceof Sphere){
 
         } else if (c instanceof Cube) {
 
         } else if (c instanceof FixedPlane) {
             FixedPlane f = ((FixedPlane) c);
+            float depth = 0;
             for (int v = 0; v < worldVertices.length; v+=4) {
                 vertexBuffer[0] = worldVertices[v];
                 vertexBuffer[1] = worldVertices[v+1];
                 vertexBuffer[2] = worldVertices[v+2];
                 vertexBuffer[3] = worldVertices[v+3];
                 float contactDepth = f.getCollision(vertexBuffer, buffer);
+                VectorTranslator.flipVector(buffer);
+                contactDepth = Math.max(contactDepth,0);
                 if(contactDepth > 0){
-                    //TODO Alkdsaçlkdslçkaçl
-                    //VectorTranslator.scaleVector(vertexBuffer,1,buffer);
-                    applyForce(0,.0001F,0,vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
-                    setVelocity(vx(),-vy()*.5F,vz());
-                    setCoordinates(x(),y()+contactDepth,z());
-                    //TODO ARRRHHHH
-                    // FIXME DASLKÇLSAK
-                    // THE WRETCHED FUNGUS HAS TAKEN OVER MY MIND AND WILL SOON TAKE OVER MANY OTHERS
-                    // FIXME // FIXME // FIXME FIXME IXIEMIXEXMEIMXIEMIEMIXMIEMIXMEIMXIMEIXMIEXMIEMIXMEIMXIEM
-                   // break;0
+                    CollisionMath.solveContact(this,c,vertexBuffer,buffer,contactDepth);
+                    // solve Collision
+//                    VectorTranslator.copy(f.normal,buffer);
+//                    VectorTranslator.scaleVector(buffer,contactDepth);
+//                    applyRotationalCorrection(buffer[0],buffer[1],buffer[2],vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
+//                    setVelocity();
+//                    applyForce(buffer[0],buffer[1],buffer[1],vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
+//                    setVelocity(vx(),-vy()*.5F,vz());
+//                    setCoordinates(x(),y()+contactDepth,z());
+                    return depth;
                 }
+                depth = Math.max(depth,contactDepth);
             }
+            return depth;
         }
         return 0F;
     }

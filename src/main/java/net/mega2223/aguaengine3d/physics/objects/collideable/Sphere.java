@@ -34,15 +34,23 @@ public class Sphere extends Particle implements Collideable {
         CollisionMath.getContactNormal(pos,coord,result);
     }
 
+    private final float[] buffer = new float[4];
+
     @Override
-    public float getCollision(Collideable c, @Modified float[] contactNormalBuffer) {
+    public float solveCollision(Collideable c, @Modified float[] contactNormalBuffer) {
         if(c instanceof Sphere){
             Sphere sphere = (Sphere) c;
             float depth = (sphere.radius + radius) - VectorTranslator.getDistance(pos,sphere.pos);
             CollisionMath.getContactNormal(pos,sphere.pos,contactNormalBuffer);
-            return Math.max(depth,0);
+            depth = Math.max(depth,0);
+            if(depth > 0){
+                CollisionMath.solveContact(this, sphere, contactNormalBuffer, depth);
+                CollisionMath.solveCollision(this, sphere, 1.0F); // TODO restitution
+                //also veja se isso funciona
+            }
+            return depth;
         } else if (c instanceof FixedPlane) {
-//            System.out.println("womp womp");
+            // a classe FixedPlane já lida com esse caso
         }
         return 0;
     }

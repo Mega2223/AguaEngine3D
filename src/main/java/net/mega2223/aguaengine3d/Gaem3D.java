@@ -4,6 +4,7 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -28,6 +29,7 @@ import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
+import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
@@ -170,6 +172,9 @@ public class Gaem3D {
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
                 ((RigidBody)p.getActor()).applyTorque(0,-.01F,0);
             }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_P) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).setAngularVelocity(0,0,0);
+            }
         });
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
@@ -213,6 +218,16 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
+        PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+
+        sphere.setCoordinates(0,20,10);
+
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+
 //        physicsContext.addObject(new FixedPlane(
 //                new float[]{5,0,0},
 //                new float[]{-5,0,0}
@@ -231,7 +246,7 @@ public class Gaem3D {
 //        ));
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.001F,.01F));
+//        physicsContext.addForce(new Drag(.001F,.01F));
         //physicsContext.addActor(new FloorActor(-.001F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {

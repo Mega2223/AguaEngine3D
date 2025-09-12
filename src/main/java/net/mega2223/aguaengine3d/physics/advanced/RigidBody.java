@@ -129,6 +129,39 @@ public class RigidBody implements Rotatable {
         applyForce(fBuffer);
     }
 
+    public void applyRotationalCorrection(float dx, float dy, float dz, float px, float py, float pz){
+        //FIXME TA TUDO ERRADO
+        VectorTranslator.copy(px,py,pz,pBuffer);
+        VectorTranslator.copy(dx,dy,dz,fBuffer);
+        toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
+
+        MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
+        VectorTranslator.crossProduct(pBuffer,fBuffer);
+
+        // BEGIN
+        VectorTranslator.normalize(pBuffer);
+        VectorTranslator.scaleVector(pBuffer,.01F);
+        // END
+
+        applyRotation(pBuffer);
+        applyTranslation(fBuffer);
+    }
+
+    public void applyAngularVelocity(float rvX, float rvY, float rvZ){
+        VectorTranslator.addToVector(rvX,rvY,rvZ,angularVelocity);
+    }
+
+    private final float[] rBuffer = new float[4];
+    public void applyRotation(float rx, float ry, float rz){
+        VectorTranslator.copy(rx,ry,rz,rBuffer);
+        QuaternionTranslator.addAngularVelocity(rotationQ4,rBuffer,1,buffers[1]);//fixme
+        QuaternionTranslator.copy(buffers[1],rotationQ4);
+    }
+
+    public void applyRotation(float[] rotation){
+        applyRotation(rotation[0],rotation[1],rotation[2]);
+    }
+
     @Override
     public void applyTorque(float tx, float ty, float tz) {
         VectorTranslator.copy(tx,ty,tz,torqueBuffer);
@@ -172,7 +205,7 @@ public class RigidBody implements Rotatable {
         // point e dest estão em world coordinates
         VectorTranslator.subtractFromVector(point,pos, pointVelBuffer);
         VectorTranslator.crossProduct(angularVelocity, pointVelBuffer,dest);
-        VectorTranslator.addToVector(dest,velocity); // TODO isso funciona?
+        VectorTranslator.addToVector(dest,velocity);
     }
 
     public void setInertialTensor(float[] inertialTensor){
@@ -185,5 +218,19 @@ public class RigidBody implements Rotatable {
         MatrixTranslator.getInverseMatrix4(inverseInertialTensor,this.inertialTensor);
     }
 
+    @Override
+    public void getInertialTensor(@Modified float[] dest) {
+        MatrixTranslator.copy(inertialTensor,dest);
+    }
+
+    @Override
+    public void getInverseInertialTensor(@Modified float[] dest) {
+        MatrixTranslator.copy(inverseInertialTensor,dest);
+    }
+
     private final float[] pointVelBuffer = new float[4];
+
+    public void setAngularVelocity(float x, float y, float z) {
+        VectorTranslator.copy(x,y,z,angularVelocity);
+    }
 }

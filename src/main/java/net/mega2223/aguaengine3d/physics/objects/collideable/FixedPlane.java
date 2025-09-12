@@ -25,6 +25,13 @@ public class FixedPlane extends Particle implements Collideable {
     }
 
     @Override
+    public void update(float deltaT) {
+        Arrays.fill(velocity,0);
+        super.update(deltaT);
+        Arrays.fill(velocity,0);
+    }
+
+    @Override
     public boolean collides(float x, float y, float z) {
         buffer[0] = x; buffer[1] = y; buffer[2] = z;
         return VectorTranslator.dotProduct(buffer,normal) == 0;
@@ -41,19 +48,42 @@ public class FixedPlane extends Particle implements Collideable {
     }
 
     @Override
-    public float getCollision(Collideable c, float[] contactNormalDest) {
+    public float solveCollision(Collideable c, float[] contactNormalDest) {
         if(c instanceof Sphere){
             Sphere s = (Sphere) c;
             s.getPos(buffer);
             VectorTranslator.subtractFromVector(buffer,point);
             VectorTranslator.flipVector(buffer);
             float depth = Math.max(0, VectorTranslator.dotProduct(buffer,normal) + s.radius);
-            VectorTranslator.copy(normal,contactNormalDest);
-            VectorTranslator.flipVector(contactNormalDest);
-            return Math.max(0,depth);
+
+            if(depth > 0){
+                VectorTranslator.copy(normal,contactNormalDest);
+                VectorTranslator.flipVector(contactNormalDest);
+                CollisionMath.solveContact(this, s, contactNormalDest, depth);
+
+                VectorTranslator.subtractFromVector(point[0],point[1],point[2],c.x(),c.y(),c.z(),contactPointBuffer);
+                VectorTranslator.scaleVector(normal,
+                        VectorTranslator.dotProduct(contactPointBuffer,normal),
+                        contactPointBuffer
+                );
+                VectorTranslator.addToVector(c.x(),c.y(),c.z(),contactPointBuffer);
+
+//                Thread.currentThread().getId();
+
+                float sep = CollisionMath.separatingVelocity(
+                        contactPointBuffer[0],contactPointBuffer[1],contactPointBuffer[2],
+                        0,0,0,
+                        c.x(),c.y(),c.z(),
+                        c.vx(),c.vy(),c.vz()
+                );
+                System.out.println(sep);
+            }
+            return depth;
         }
         return 0;
     }
+
+    private final float[] contactPointBuffer = new float[4];
 
     //TODO coloca na super
     public float getCollision(float[] point, float[] contactNormalDest){
@@ -101,5 +131,15 @@ public class FixedPlane extends Particle implements Collideable {
         VectorTranslator.copy(x,y,z,vBuffer[2]);
         VectorTranslator.copy(vx,vy,vz,vBuffer[3]);
         return CollisionMath.closingVelocity(vBuffer[0],vBuffer[1],vBuffer[2], vBuffer[3]);
+    }
+
+    @Override
+    public void getVelocity(float[] dest) {
+        super.getVelocity(dest);
+    }
+
+    @Override
+    public void setVelocity(float vx, float vy, float vz) {
+        System.out.println("whar");
     }
 }

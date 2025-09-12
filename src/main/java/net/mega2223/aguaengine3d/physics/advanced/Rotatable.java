@@ -22,9 +22,25 @@ public interface Rotatable extends PhysicsObject {
      * */
     void applyForce(float fx, float fy, float fz, float px, float py, float pz);
 
+    void applyRotationalCorrection(float rx, float ry, float rz, float px, float py, float pz);
+
     void applyTorque(float tx, float ty, float tz);
+
+    void applyRotation(float rx, float ry, float rz);
+
+//    void setRotation(float rx, float ry, float rz); TODO
+
+    void setAngularVelocity(float vx, float vy, float vz);
+
+    void getInertialTensor(@Modified float[] dest);
+
+    void getInverseInertialTensor(@Modified float[] dest);
 
     default void applyTorque(float[] torque){
         applyTorque(torque[0],torque[1],torque[2]);
+    }
+
+    default void applyRotationalCorrection(float[] amount, float[] point){
+        applyRotationalCorrection(amount[0],amount[1],amount[2],point[0],point[1],point[2]);
     }
 }
