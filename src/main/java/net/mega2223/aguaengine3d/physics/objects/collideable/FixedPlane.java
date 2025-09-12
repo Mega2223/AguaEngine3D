@@ -76,7 +76,7 @@ public class FixedPlane extends Particle implements Collideable {
                         c.x(),c.y(),c.z(),
                         c.vx(),c.vy(),c.vz()
                 );
-                System.out.println(sep);
+                CollisionMath.solveCollision(c,this,sep,normal,1);
             }
             return depth;
         }

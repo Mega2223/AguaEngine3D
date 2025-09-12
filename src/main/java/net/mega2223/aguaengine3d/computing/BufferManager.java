@@ -7,11 +7,9 @@ public class BufferManager {
     //reintroducing the concept of memory leaks for Java :)
     private BufferManager(){}
 
-    public static final BufferManager manager = new BufferManager();
+    private static final List<ThreadBufferManager> threadManagers = new ArrayList<>(20);
 
-    private final List<ThreadBufferManager> threadManagers = new ArrayList<>(20);
-
-    private ThreadBufferManager getManagerForThread(long threadID){
+    private static ThreadBufferManager getManagerForThread(long threadID){
         synchronized (threadManagers){
             for (ThreadBufferManager act : threadManagers){
                 if(act.threadID == threadID){
@@ -24,25 +22,25 @@ public class BufferManager {
         }
     }
 
-    public float[] allocateVec4(){
+    public static float[] allocateVec4(){
         long threadID = Thread.currentThread().getId();
         ThreadBufferManager manager = getManagerForThread(threadID);
         return manager.allocateBuffer4();
     }
 
-    public float[] allocateMatrix4(){
+    public static float[] allocateMatrix4(){
         long threadID = Thread.currentThread().getId();
         ThreadBufferManager manager = getManagerForThread(threadID);
         return manager.allocateBuffer16();
     }
 
-    public void freeVec4(float[] buffer){
+    public static void freeVec4(float[] buffer){
         long threadID = Thread.currentThread().getId();
         ThreadBufferManager manager = getManagerForThread(threadID);
         manager.deallocateBuffer4(buffer);
     }
 
-    public void freeMat4(float[] buffer){
+    public static void freeMat4(float[] buffer){
         long threadID = Thread.currentThread().getId();
         ThreadBufferManager manager = getManagerForThread(threadID);
         manager.deallocateBuffer16(buffer);
@@ -68,6 +66,7 @@ public class BufferManager {
             }
             ObjBuffer<float[]> ret = new ObjBuffer<>(new float[4]);
             ret.allocated = true;
+            float4Buffers.add(ret);
             return ret.buffer;
         }
 
@@ -76,6 +75,7 @@ public class BufferManager {
                 ObjBuffer<float[]> act = float4Buffers.get(i);
                 if(act.allocated && act.buffer == buffer){
                     act.allocated = false;
+                    return;
                 }
             }
             throw new UnsupportedOperationException("Buffer is not currently allocated");
@@ -91,6 +91,7 @@ public class BufferManager {
             }
             ObjBuffer<float[]> ret = new ObjBuffer<>(new float[16]);
             ret.allocated = true;
+            float16Buffers.add(ret);
             return ret.buffer;
         }
 
@@ -99,6 +100,7 @@ public class BufferManager {
                 ObjBuffer<float[]> act = float16Buffers.get(i);
                 if(act.allocated && act.buffer == buffer){
                     act.allocated = false;
+                    return;
                 }
             }
             throw new UnsupportedOperationException("Buffer is not currently allocated");
@@ -113,4 +115,6 @@ public class BufferManager {
             this.buffer = buffer;
         }
     }
+
+    //TODO allocatePermanent?
 }

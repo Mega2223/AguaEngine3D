@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics.collisions;
 
+import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
@@ -16,20 +17,33 @@ public class CollisionMath {
      * less than zero if they are moving apart
      * */
     public static float closingVelocity(float[] posA, float[] velA, float[] posB, float[] velB){
-        VectorTranslator.subtractFromVector(posA,posB,buffers[0]); //b[0] = pa - pb
-        VectorTranslator.getFlipped(buffers[0], buffers[1]); // b[1] = pb - pa
-        VectorTranslator.normalize(buffers[0]);
-        VectorTranslator.normalize(buffers[1]);
-        return VectorTranslator.dotProduct(velA, buffers[1]) +
-               VectorTranslator.dotProduct(velB, buffers[0]);
+        float[] bufferA = BufferManager.allocateVec4(), bufferB = BufferManager.allocateVec4();
+
+        VectorTranslator.subtractFromVector(posA,posB, bufferA); //b[0] = pa - pb
+        VectorTranslator.getFlipped(bufferA, bufferB); // b[1] = pb - pa
+        VectorTranslator.normalize(bufferA);
+        VectorTranslator.normalize(bufferB);
+        float ret = VectorTranslator.dotProduct(velA, bufferB) + VectorTranslator.dotProduct(velB, bufferA);
+
+        BufferManager.freeVec4(bufferA); BufferManager.freeVec4(bufferB);
+        return ret;
     }
 
     public static float closingVelocity(float aX, float aY, float aZ, float avX, float avY, float avZ, float bX, float bY, float bZ, float bvX, float bvY, float bvZ){
-        VectorTranslator.copy(aX, aY, aZ, buffers[0]); // fixme COLISÃO DE BUFFER SEU IDIOTA !!!!
-        VectorTranslator.copy(avX, avY, avZ, buffers[1]);
-        VectorTranslator.copy(bX, bY, bZ, buffers[2]);
-        VectorTranslator.copy(bvX, bvY, bvZ, buffers[3]);
-        return closingVelocity(buffers[0], buffers[1], buffers[2], buffers[3]); // Most thread-safe AguaEngine3D method
+        float[] posA = BufferManager.allocateVec4(); float[] velA = BufferManager.allocateVec4();
+        float[] posB = BufferManager.allocateVec4(); float[] velB = BufferManager.allocateVec4();
+
+        VectorTranslator.copy(aX, aY, aZ, posA);
+        VectorTranslator.copy(avX, avY, avZ, velA);
+        VectorTranslator.copy(bX, bY, bZ, posB);
+        VectorTranslator.copy(bvX, bvY, bvZ, velB);
+
+        float ret = closingVelocity(posA, velA, posB, velB);
+
+        BufferManager.freeVec4(posA); BufferManager.freeVec4(velA);
+        BufferManager.freeVec4(posB); BufferManager.freeVec4(velB);
+
+        return ret;
     }
 
     public static float closingVelocity(PhysicsObject objA, PhysicsObject objB){
