@@ -64,14 +64,15 @@ public class Cube extends RigidBody implements Collideable {
 
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
-            float maxDepth = 0;
 
             for (int v = 0; v < worldVertices.length; v+=4) {
                 float[] currentVertex = BufferManager.allocateVec4();
                 float[] contactNormal = BufferManager.allocateVec4();
 
-                currentVertex[0] = worldVertices[v]; currentVertex[1] = worldVertices[v+1];
-                currentVertex[2] = worldVertices[v+2]; currentVertex[3] = worldVertices[v+3];
+//                currentVertex[0] = worldVertices[v]; currentVertex[1] = worldVertices[v+1];
+//                currentVertex[2] = worldVertices[v+2]; currentVertex[3] = worldVertices[v+3];
+
+                VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
 
                 float contactDepth = plane.getCollision(currentVertex, contactNormal);
 
@@ -87,32 +88,46 @@ public class Cube extends RigidBody implements Collideable {
 
                     plane.getVelocity(planeVel);
                     plane.getClosestPoint(currentVertex,planePoint);
-                    System.out.println("solving contact");
-//                    CollisionMath.solveContact(this,c, currentVertex,contactNormal,contactDepth);
                     CollisionMath.solveContact(pos,invMass,planePoint,plane.getInverseMass(),
                             contactNormal,contactDepth,translation,null);
+                    applyRotationalTranslation(translation,planePoint);
+//                    updateWorldVertices();
+//                    VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
 
-                    float closingV = CollisionMath.closingVelocity(
-                            pos,velocity,planePoint,planeVel
+                    float[] vertexVel = BufferManager.allocateVec4();
+                    getLocalPointVelocity(currentVertex,vertexVel);
+                    float[] pNormal = plane.normal;
+
+                    float separatingVelocity = CollisionMath.separatingVelocity(
+                            0,0,0,
+                            vertexVel[0],vertexVel[1],vertexVel[2],
+                            -pNormal[0],-pNormal[1],-pNormal[2],
+                            0,0,0
                     );
 
+                    BufferManager.freeVec4(vertexVel);
+
                     CollisionMath.solveCollision(
-                            pos, invMass,
-                            planePoint, plane.getInverseMass(),
-                            closingV, contactNormal, 1,
+                            invMass,
+                            plane.getInverseMass(),
+                            separatingVelocity, contactNormal, .5F,
                             impulseA, impulseB
                     );
 
+                    //FIXME ele só tá considerando o primeiro ponto de colisão :p
+
+                    VectorTranslator.debugVector("center",pos);
+                    VectorTranslator.debugVector("velocity",velocity);
+                    VectorTranslator.debugVector("angularVelocity",angularVelocity);
                     VectorTranslator.debugVector("point",currentVertex);
-                    VectorTranslator.debugVector("vel",velocity);
-                    VectorTranslator.debugVector("impulse",impulseA);
-                    VectorTranslator.debugVector("translation",translation);
+                    VectorTranslator.debugVector("pointVelocity",vertexVel);
+                    VectorTranslator.debugVector("planePoint",planePoint);
+                    VectorTranslator.debugVector("separatingVelocity",separatingVelocity);
+                    VectorTranslator.debugVector("resultingImpulse",impulseA);
+                    VectorTranslator.debugVector("resultingTranslation",translation);
+//                    System.exit(2223);
 
-
-//                    applyImpulse(impulseA,planePoint);
-                    applyRotationalTranslation(translation,planePoint);
-
-                    setVelocity(0,0,0);
+                    applyImpulse(impulseA,planePoint);
 
                     BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);
                     BufferManager.freeVec4(translation);

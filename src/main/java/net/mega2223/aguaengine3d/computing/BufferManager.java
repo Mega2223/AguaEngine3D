@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.computing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BufferManager {
@@ -93,6 +94,7 @@ public class BufferManager {
                 buffer.owner = b.toString();
             }
 
+            Arrays.fill(buffer.buffer,0);
             buffer.allocated = true;
             buffer.lastAllocation = System.currentTimeMillis();
             return buffer.buffer;

@@ -17,6 +17,8 @@ public class PhysicsContext {
     protected List<Force> forces = new ArrayList<>(16);
     protected CollisionManager collisionManager = new SimpleCollisionManager(this);
 
+    public long iteration = 0;
+
     public PhysicsContext(){
 
     }
@@ -38,6 +40,7 @@ public class PhysicsContext {
             o.update(deltaT);
         }
         collisionManager.manageCollisions(deltaT,collisionPasses);
+        iteration++;
     }
 
     public void addObject(PhysicsObject object){

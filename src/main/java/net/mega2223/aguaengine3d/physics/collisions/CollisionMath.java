@@ -148,8 +148,8 @@ public class CollisionMath {
     }
 
     //TODO so ve se isso é coerente
-    public static void solveCollision(float[] posA, float invMassA, float[] posB, float invMassB,
-                                      float separatingVelocity, float[] contactNormalA, float restitution,
+    public static void solveCollision(float invMassA, float invMassB, float separatingVelocity,
+                                      float[] contactNormalA, float restitution,
                                       @Modified float[] impulseA, @Nullable @Modified float[] impulseB){
 
         final float inverseSum = invMassA + invMassB;

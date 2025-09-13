@@ -91,10 +91,14 @@ public class FixedPlane extends Particle implements Collideable {
         return Math.max(0,depth);
     }
 
-    /**Returns distance from the closest point iin the plane*/
-    public float getDistance(float[] coord){
-        VectorTranslator.subtractFromVector(point,coord,buffer);
-        return VectorTranslator.dotProduct(buffer,normal) + VectorTranslator.magnitude(coord);
+    /**Returns distance from the closest point in the plane*/
+    public float getDistance(float[] point){
+        // |N dot (p - p_0)|
+        float v = VectorTranslator.dotProduct(
+                normal[0], normal[1], normal[2],
+                point[0] - this.point[0], point[1] - this.point[1], point[2] - this.point[2]
+        );
+        return Math.abs(v);
     }
 
     public void getClosestPoint(float[] coord, @Modified float[] dest){

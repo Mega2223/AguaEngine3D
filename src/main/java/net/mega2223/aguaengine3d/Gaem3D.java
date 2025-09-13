@@ -35,7 +35,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-@SuppressWarnings({"unused"})
+//@SuppressWarnings({"unused"})
 
 /*
  * The official AguaEngine3D TODO list:
@@ -218,7 +218,7 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
-        /* Sphere hell
+        // Sphere hell
 
         PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
                 new Sphere(1, 1),
@@ -227,7 +227,7 @@ public class Gaem3D {
         sphere.setCoordinates(0,3,3);
         physicsContext.addObject(sphere);
         context.addObject(sphere);
-
+        /*
         sphere = new PhysicsObjectDecorator<>(
                 new Sphere(1, 1),
                 Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
@@ -277,7 +277,7 @@ public class Gaem3D {
 //        ));
 
         physicsContext.addForce(new Gravity(9.8F));
-//        physicsContext.addForce(new Drag(.001F,.01F));
+        physicsContext.addForce(new Drag(.01F,.1F));
         //physicsContext.addActor(new FloorActor(-.001F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
@@ -320,18 +320,13 @@ public class Gaem3D {
     Renderable line = null;
 
     protected static void doLogic() {
-
-        if(p != null){
-            VectorTranslator.debugVector(p.vx(),p.vy(),p.vz());
-        }
-
-        int simSteps = 1, collisionSteps = 3;
-        float rate = 1F;
+        int simSteps = 64, collisionSteps = 12;
+        float rate = 1;
         for (int i = 0; i < simSteps; i++) {
             physicsContext.update(rate / (60F*simSteps),collisionSteps);
         }
 
-        if (framesElapsed % (60 * 39284) == 0) {
+        if (framesElapsed % (60 * 2223) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
@@ -344,8 +339,13 @@ public class Gaem3D {
             context.addObject(p);
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
-            //p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
-            p.setCoordinates(0,2,0);
+//            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 8, Gaem3D.r.nextFloat() - .5F);
+            p.setCoordinates(0,7,0);
+//            r.setAngularVelocity(
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F
+//            );
 
             final float[] rVertices = m.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {

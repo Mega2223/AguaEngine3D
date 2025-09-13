@@ -131,7 +131,6 @@ public class RigidBody implements Rotatable {
     }
 
     public void applyRotationalTranslation(float dx, float dy, float dz, float px, float py, float pz){
-        //FIXME TA TUDO ERRADO
         VectorTranslator.copy(px,py,pz,pBuffer);
         VectorTranslator.copy(dx,dy,dz,fBuffer);
         toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
@@ -144,7 +143,7 @@ public class RigidBody implements Rotatable {
 //        VectorTranslator.scaleVector(pBuffer,.1F);
         // END
 
-//        applyRotation(pBuffer); fixme todo ixme todo fixme todo
+        applyRotation(pBuffer); //fixme todo ixme todo fixme todo
         applyTranslation(fBuffer);
     }
 
@@ -190,9 +189,10 @@ public class RigidBody implements Rotatable {
         MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local
         VectorTranslator.crossProduct(angularImpulse,linearImpulse);
 
-//        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseRotatedInertialTensor); // todo isso tá certo?
+//        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseInertialTensor); // todo isso tá certo?
 
-        applyAngularVelocity(angularImpulse);
+        VectorTranslator.scaleVector(angularImpulse,.1F); // todo remove
+        applyAngularVelocity(angularImpulse); //fixme
         applyImpulse(linearImpulse);
 
         BufferManager.freeVec4(angularImpulse);
@@ -209,7 +209,7 @@ public class RigidBody implements Rotatable {
 
     @Override
     public void toGlobalVelocity(float[] point, float[] pointVelocity, float[] dest) {
-
+        //todo
     }
 
     @Override
