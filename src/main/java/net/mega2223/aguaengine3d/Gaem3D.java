@@ -255,26 +255,26 @@ public class Gaem3D {
         physicsContext.addObject(sphere);
         context.addObject(sphere);*/
 
-        physicsContext.addObject(new FixedPlane(
-                new float[]{5,0,0},
-                new float[]{-5,0,0}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{-5,0,0},
-                new float[]{5,0,0}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,0,5},
-                new float[]{0,0,-5}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,0,-5},
-                new float[]{0,0,5}
-        ));
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,-5,0},
-                new float[]{0,5,-0}
-        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{5,0,0},
+//                new float[]{-5,0,0}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{-5,0,0},
+//                new float[]{5,0,0}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,0,5},
+//                new float[]{0,0,-5}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,0,-5},
+//                new float[]{0,0,5}
+//        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,-5,0},
+//                new float[]{0,5,-0}
+//        ));
 
         physicsContext.addForce(new Gravity(9.8F));
 //        physicsContext.addForce(new Drag(.001F,.01F));
@@ -325,22 +325,20 @@ public class Gaem3D {
             VectorTranslator.debugVector(p.vx(),p.vy(),p.vz());
         }
 
-        int n = 32;
+        int simSteps = 1, collisionSteps = 3;
         float rate = 1F;
-        for (int i = 0; i < n; i++) {
-            physicsContext.update(rate / (60F*n));
+        for (int i = 0; i < simSteps; i++) {
+            physicsContext.update(rate / (60F*simSteps),collisionSteps);
         }
 
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
-            //r.angularAccelAccumulator[1] = .25F;
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
 //                    new Sphere(1, 1.0F),
-                    r,
-                    m
+                    r, m
             );
 
             context.addObject(p);

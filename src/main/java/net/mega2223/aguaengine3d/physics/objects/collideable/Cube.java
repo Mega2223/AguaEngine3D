@@ -24,12 +24,15 @@ public class Cube extends RigidBody implements Collideable {
     @Override
     public void update(float deltaT) {
         super.update(deltaT);
+        updateWorldVertices();
+    }
+
+    public void updateWorldVertices(){
         for (int i = 0; i < vertices.length; i+=4) {
             buffer[0] = vertices[i]; buffer[1] = vertices[i+1]; buffer[2] = vertices[i+2];
             toGlobalCoordinateSystem(buffer);
             worldVertices[i] = buffer[0]; worldVertices[i+1] = buffer[1]; worldVertices[i+2] = buffer[2];
         }
-
     }
 
     public boolean collides(float x, float y, float z) {
@@ -54,18 +57,14 @@ public class Cube extends RigidBody implements Collideable {
     }
 
     public float solveCollision(Collideable c, float[] contactNormalDest) {
+        updateWorldVertices();
         if(c instanceof Sphere){
 
         } else if (c instanceof Cube) {
 
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
-            float depth = 0;
-            int numberOfContacts = 0;
-
-            float[] translationAccumulator = BufferManager.allocateVec4();
-            float[] impulseAccumulator = BufferManager.allocateVec4();
-            float[] pointAccumulator = BufferManager.allocateVec4();
+            float maxDepth = 0;
 
             for (int v = 0; v < worldVertices.length; v+=4) {
                 float[] currentVertex = BufferManager.allocateVec4();
@@ -80,8 +79,6 @@ public class Cube extends RigidBody implements Collideable {
                 contactDepth = Math.max(contactDepth,0);
 
                 if(contactDepth > 0){
-                    numberOfContacts++;
-
                     float[] planePoint = BufferManager.allocateVec4(),
                             planeVel = BufferManager.allocateVec4(),
                             impulseA = BufferManager.allocateVec4(),
@@ -90,51 +87,46 @@ public class Cube extends RigidBody implements Collideable {
 
                     plane.getVelocity(planeVel);
                     plane.getClosestPoint(currentVertex,planePoint);
-
+                    System.out.println("solving contact");
 //                    CollisionMath.solveContact(this,c, currentVertex,contactNormal,contactDepth);
                     CollisionMath.solveContact(pos,invMass,planePoint,plane.getInverseMass(),
-                            contactNormal,depth,translation,null);
+                            contactNormal,contactDepth,translation,null);
 
                     float closingV = CollisionMath.closingVelocity(
                             pos,velocity,planePoint,planeVel
                     );
 
                     CollisionMath.solveCollision(
-                            pos,velocity,invMass,
-                            planePoint, planeVel, plane.getInverseMass(),
+                            pos, invMass,
+                            planePoint, plane.getInverseMass(),
                             closingV, contactNormal, 1,
                             impulseA, impulseB
                     );
 
-//                    applyImpulse(impulseA,pointA);
-                    VectorTranslator.addToVector(impulseAccumulator,impulseA);
-                    VectorTranslator.addToVector(pointAccumulator,currentVertex);
-                    VectorTranslator.addToVector(translationAccumulator,translation);
+                    VectorTranslator.debugVector("point",currentVertex);
+                    VectorTranslator.debugVector("vel",velocity);
+                    VectorTranslator.debugVector("impulse",impulseA);
+                    VectorTranslator.debugVector("translation",translation);
+
+
+//                    applyImpulse(impulseA,planePoint);
+                    applyRotationalTranslation(translation,planePoint);
+
+                    setVelocity(0,0,0);
 
                     BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);
                     BufferManager.freeVec4(translation);
                     BufferManager.freeVec4(impulseA); BufferManager.freeVec4(impulseB);
-                }
-                depth = Math.max(depth,contactDepth);
 
+                    BufferManager.freeVec4(currentVertex);
+                    BufferManager.freeVec4(contactNormal);
+                    return contactDepth;
+                }
                 BufferManager.freeVec4(currentVertex);
                 BufferManager.freeVec4(contactNormal);
             }
 
-            if(numberOfContacts > 0){
-                VectorTranslator.scaleVector(impulseAccumulator,1F/numberOfContacts);
-                VectorTranslator.scaleVector(pointAccumulator,1F/numberOfContacts);
-                VectorTranslator.scaleVector(translationAccumulator,1F/numberOfContacts);
-
-                applyImpulse(impulseAccumulator,pointAccumulator);
-                applyRotationalTranslation(translationAccumulator,pointAccumulator);
-            }
-
-            BufferManager.freeVec4(impulseAccumulator);
-            BufferManager.freeVec4(pointAccumulator);
-            BufferManager.freeVec4(translationAccumulator);
-
-            return depth;
+            return 0;
         }
         return 0F;
     }

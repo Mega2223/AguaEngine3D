@@ -148,8 +148,7 @@ public class CollisionMath {
     }
 
     //TODO so ve se isso é coerente
-    public static void solveCollision(float[] posA, float[] velA, float invMassA,
-                                      float[] posB, float[] velB, float invMassB,
+    public static void solveCollision(float[] posA, float invMassA, float[] posB, float invMassB,
                                       float separatingVelocity, float[] contactNormalA, float restitution,
                                       @Modified float[] impulseA, @Nullable @Modified float[] impulseB){
 
@@ -164,11 +163,11 @@ public class CollisionMath {
 
         VectorTranslator.scaleVector(contactNormalA,impulse,impulsePerIMass);
 
-        VectorTranslator.copy(impulseA,impulsePerIMass);
+        VectorTranslator.copy(impulsePerIMass,impulseA);
 
         if(impulseB != null){
             VectorTranslator.flipVector(impulsePerIMass);
-            VectorTranslator.copy(impulseB,impulsePerIMass);
+            VectorTranslator.copy(impulsePerIMass,impulseB);
         }
 
         BufferManager.freeVec4(impulsePerIMass);
@@ -182,7 +181,6 @@ public class CollisionMath {
         if(contactDepth <= 0){return;}
 
         final float invMassSum = a.getInverseMass() + b.getInverseMass();
-        //invMassSum *= contactDepth;
 
         VectorTranslator.getNormalized(contactNormal,buffers[0]);
         contactNormal = buffers[0];

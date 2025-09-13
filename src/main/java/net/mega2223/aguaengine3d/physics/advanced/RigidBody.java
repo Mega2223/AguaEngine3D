@@ -141,10 +141,10 @@ public class RigidBody implements Rotatable {
 
         // BEGIN
 //        VectorTranslator.normalize(pBuffer);
-        VectorTranslator.scaleVector(pBuffer,.01F);
+//        VectorTranslator.scaleVector(pBuffer,.1F);
         // END
 
-        applyRotation(pBuffer);
+//        applyRotation(pBuffer); fixme todo ixme todo fixme todo
         applyTranslation(fBuffer);
     }
 
@@ -190,7 +190,7 @@ public class RigidBody implements Rotatable {
         MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local
         VectorTranslator.crossProduct(angularImpulse,linearImpulse);
 
-        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseRotatedInertialTensor); // todo isso tá certo?
+//        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseRotatedInertialTensor); // todo isso tá certo?
 
         applyAngularVelocity(angularImpulse);
         applyImpulse(linearImpulse);
