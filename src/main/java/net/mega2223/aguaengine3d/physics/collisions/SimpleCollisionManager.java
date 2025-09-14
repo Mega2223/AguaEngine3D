@@ -17,7 +17,7 @@ public class SimpleCollisionManager extends CollisionManager{
 
     @Override
     public void doSinglePass(float deltaT) {
-        System.out.println("Starting collision iteration " + iteration);
+//        System.out.println("Starting collision iteration " + iteration);
         List<PhysicsObject> objects = physContext.getObjects(); // fixme maybe too resource intensive
         for(PhysicsObject o1 : objects){
             o1 = o1.getActor();

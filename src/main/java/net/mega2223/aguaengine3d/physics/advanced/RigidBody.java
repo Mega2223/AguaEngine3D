@@ -26,7 +26,7 @@ public class RigidBody implements Rotatable {
     private final float[] posDerivative = new float[4];
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
-    protected final float[] inverseRotatedInertialTensor = new float[16];
+    protected final float[] rotatedInverseInertialTensor = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -44,7 +44,7 @@ public class RigidBody implements Rotatable {
     public void update(float deltaT){
         // Calculations
         QuaternionTranslator.normalize(rotationQ4);
-        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix, inverseRotatedInertialTensor);
+        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix, rotatedInverseInertialTensor);
         // TODO essa é a ordem certa?
         // TODO precisa fazer isso?
 
@@ -189,7 +189,7 @@ public class RigidBody implements Rotatable {
         MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local
         VectorTranslator.crossProduct(angularImpulse,linearImpulse);
 
-//        MatrixTranslator.multiplyVec4Mat4(linearImpulse, inverseInertialTensor); // todo isso tá certo?
+//        MatrixTranslator.multiplyVec4Mat4(angularImpulse, rotatedInverseInertialTensor);
 
         VectorTranslator.scaleVector(angularImpulse,.1F); // todo remove
         applyAngularVelocity(angularImpulse); //fixme

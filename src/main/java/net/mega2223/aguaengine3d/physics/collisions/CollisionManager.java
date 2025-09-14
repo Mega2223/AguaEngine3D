@@ -14,11 +14,11 @@ public abstract class CollisionManager {
     }
 
     public void manageCollisions(float deltaT, int passes){
-        System.out.println("starting passes");
+//        System.out.println("starting passes");
         for (int i = 0; i < passes; i++) {
             doSinglePass(deltaT);
         }
-        System.out.println("ending passes");
+//        System.out.println("ending passes");
     }
 
     abstract void doSinglePass(float deltaT);

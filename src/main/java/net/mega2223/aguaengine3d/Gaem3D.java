@@ -218,7 +218,7 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
-        // Sphere hell
+        /* Sphere hell
 
         PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
                 new Sphere(1, 1),
@@ -276,9 +276,30 @@ public class Gaem3D {
 //                new float[]{0,5,-0}
 //        ));
 
+        RigidBody r = new Cube(1);
+        Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        p = new PhysicsObjectDecorator<>(r, m);
+        context.addObject(p);
+        context.addObject(new VertexTracker((Model) p.getRenderable()));
+        physicsContext.addObject(p);
+        p.setCoordinates(0,1,0);
+
+        r = new Cube(1);
+        m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        p = new PhysicsObjectDecorator<>(r, m);
+        context.addObject(p);
+        context.addObject(new VertexTracker((Model) p.getRenderable()));
+        physicsContext.addObject(p);
+        p.setCoordinates(0,1,4);
+
+        final float[] rVertices = m.getRelativeVertices();
+        for (int i = 0; i < rVertices.length; i+= 4) {
+            AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
+            context.addObject(l);
+        }
+
         physicsContext.addForce(new Gravity(9.8F));
         physicsContext.addForce(new Drag(.01F,.1F));
-        //physicsContext.addActor(new FloorActor(-.001F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
 //            @Override
@@ -320,13 +341,13 @@ public class Gaem3D {
     Renderable line = null;
 
     protected static void doLogic() {
-        int simSteps = 64, collisionSteps = 12;
-        float rate = 1;
+        int simSteps = 8, collisionSteps = 4;
+        float rate = .2f;
         for (int i = 0; i < simSteps; i++) {
             physicsContext.update(rate / (60F*simSteps),collisionSteps);
         }
 
-        if (framesElapsed % (60 * 2223) == 0) {
+        if (1+framesElapsed % (2223 * 5) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
@@ -340,7 +361,7 @@ public class Gaem3D {
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
 //            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 8, Gaem3D.r.nextFloat() - .5F);
-            p.setCoordinates(0,7,0);
+            p.setCoordinates(0,0,4);
 //            r.setAngularVelocity(
 //                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
 //                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
