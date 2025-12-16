@@ -86,6 +86,7 @@ import java.util.Random;
  *      maybe bind it to the RenderingContext object (for global qualities like fog rendering)
  * Classe que representa uma série de transformações? <- Transform?
  * Multi threadening <- lmao good luck with all these static buffers
+ * Material Interface (for friction, restitution etc.)
  * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow

@@ -63,40 +63,7 @@ public class Cube extends RigidBody implements Collideable {
 
         } else if (c instanceof Cube) {
             Cube cube2 = (Cube) c;
-            for (int v = 0; v < worldVertices.length; v+=4) {
-                float[] currentVertex = BufferManager.allocateVec4();
-                float[] contactNormal = BufferManager.allocateVec4();
-                VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
 
-                float contactDepth = cube2.getCollision(currentVertex,contactNormal);
-
-                if(contactDepth > 0){
-                    float[] cube2ContactPoint = BufferManager.allocateVec4();
-                    float[] translationA = BufferManager.allocateVec4();
-                    float[] translationB = BufferManager.allocateVec4();
-
-                    VectorTranslator.flipVector(contactNormal);
-                    VectorTranslator.scaleVector(contactNormal,contactDepth,cube2ContactPoint);
-                    VectorTranslator.addToVector(cube2ContactPoint,currentVertex);
-
-                    CollisionMath.solveContact(pos,invMass,cube2ContactPoint,cube2.getInverseMass(),
-                            contactNormal,contactDepth,translationA,translationB);
-
-//                    applyRotationalTranslation(translationA,currentVertex);
-                    applyTranslation(translationA);
-                    cube2.applyTranslation(translationB);
-//                    cube2.applyRotationalTranslation(translationB,cube2ContactPoint);
-
-                    VectorTranslator.debugVector("tA",translationA);
-
-                    BufferManager.freeVec4(cube2ContactPoint);
-                    BufferManager.freeVec4(translationA);
-                    BufferManager.freeVec4(translationB);
-                }
-                BufferManager.freeVec4(currentVertex);
-                BufferManager.freeVec4(contactNormal);
-                return contactDepth;
-            }
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
             return resolveCollisionWithPlane(plane);

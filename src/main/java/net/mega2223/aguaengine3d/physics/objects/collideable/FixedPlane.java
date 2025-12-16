@@ -14,7 +14,7 @@ public class FixedPlane extends Particle implements Collideable {
     private static final float[] buffer = new float[4];
 
     float[] normal = new float[4], point = new float[4];
-    float friction = .025F; // TODO ve se a fricção também funciona para planos não alinhados ao sistema de coordenadas
+    float friction = .25F; // TODO ve se a fricção também funciona para planos não alinhados ao sistema de coordenadas
 
     /** Creates a FixedPlane object
      * @param normal Plane normal, that is, a vector which is orthogonal with all possible vectors inside the plane
@@ -77,7 +77,6 @@ public class FixedPlane extends Particle implements Collideable {
 
                 getFriction(c.vx(),c.vy(),c.vz(),buffer);
                 c.applyForce(buffer);
-                VectorTranslator.debugVector(buffer);
             }
             return depth;
         }
