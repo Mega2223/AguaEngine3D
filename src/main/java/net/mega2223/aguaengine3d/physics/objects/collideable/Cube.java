@@ -31,7 +31,7 @@ public class Cube extends RigidBody implements Collideable {
         updateWorldVertices();
     }
 
-    public void updateWorldVertices(){
+    protected void updateWorldVertices(){
         for (int i = 0; i < vertices.length; i+=4) {
             buffer[0] = vertices[i]; buffer[1] = vertices[i+1]; buffer[2] = vertices[i+2];
             toGlobalCoordinateSystem(buffer);
@@ -50,10 +50,6 @@ public class Cube extends RigidBody implements Collideable {
     public float maxRadius() {
         return 2; //sqrt 2 mas fds
     }
-
-//    public void getContactNormal(float[] coord, @Modified float[] result) {
-//
-//    }
 
     @Override
     public void applyForce(float fx, float fy, float fz) {
@@ -202,8 +198,6 @@ public class Cube extends RigidBody implements Collideable {
                         separatingVelocity, contactNormal, .5F,
                         impulseA, impulseB
                 );
-
-                //FIXME ele só tá considerando o primeiro ponto de colisão :p
 
 //                    VectorTranslator.debugVector("center",pos);
 //                    VectorTranslator.debugVector("velocity",velocity);

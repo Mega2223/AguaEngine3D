@@ -1,6 +1,5 @@
 package net.mega2223.aguaengine3d.physics.collisions;
 
-import com.sun.istack.internal.Nullable;
 import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
@@ -148,20 +147,20 @@ public class CollisionMath {
      * Solves a collision,
      * does not correct the position, only the velocity
      * */
-    public static void solveCollision(Collideable a, Collideable b, float[] contactNormal, float restitution){
+    public static void solveCollision(Collideable a, Collideable b, float[] contactNormalA, float restitution){
         float sep = separatingVelocity(a,b);
         if(sep > 0){return;}
-        solveCollision(a,b,sep,contactNormal,restitution);
+        solveCollision(a,b,sep,contactNormalA,restitution);
     }
 
-    public static void solveCollision(Collideable a, Collideable b, float separatingVelocity, float[] contactNormal, float restitution){
+    public static void solveCollision(Collideable a, Collideable b, float separatingVelocity, float[] contactNormalA, float restitution){
         float[] posA = solveCollisionBuffers[0], posB = solveCollisionBuffers[1],
                 velA = solveCollisionBuffers[2], velB = solveCollisionBuffers[3];
         float[] contact = solveCollisionBuffers[4]; // from A's perspective
         a.getCoords(posA); b.getCoords(posB); a.getVelocity(velA); b.getVelocity(velB);
 //        float sep = separatingVelocity(posA,velA,posB,velB);
 
-        VectorTranslator.copy(contactNormal,contact);
+        VectorTranslator.copy(contactNormalA,contact);
 
         final float inverseSum = a.getInverseMass() + b.getInverseMass();
         if(inverseSum <= 0) {return;}
@@ -178,10 +177,9 @@ public class CollisionMath {
         b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
     }
 
-    //TODO so ve se isso é coerente
     public static void solveCollision(float invMassA, float invMassB, float separatingVelocity,
                                       float[] contactNormalA, float restitution,
-                                      @Modified float[] impulseA, @Nullable @Modified float[] impulseB){
+                                      @Modified float[] impulseA, @Modified float[] impulseB){
 
         final float inverseSum = invMassA + invMassB;
         if(inverseSum <= 0 || separatingVelocity >= 0) {return;}
@@ -247,7 +245,7 @@ public class CollisionMath {
 
     public static void solveContact(float[] posA, float invMassA, float[] posB, float invMassB,
                                     float[] contactNormalA, float contactDepth,
-                                    @Modified float[] translationA, @Nullable @Modified float[] translationB){
+                                    @Modified float[] translationA, @Modified float[] translationB){
         if(contactDepth <= 0){return;}
 
         float[] totalAmount = BufferManager.allocateVec4();

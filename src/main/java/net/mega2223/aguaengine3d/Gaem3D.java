@@ -4,7 +4,6 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -16,26 +15,20 @@ import net.mega2223.aguaengine3d.graphics.utils.ShaderDictionary;
 import net.mega2223.aguaengine3d.graphics.utils.ShaderManager;
 import net.mega2223.aguaengine3d.graphics.utils.TextureManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
-import net.mega2223.aguaengine3d.physics.actors.FloorActor;
 import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
-import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
-import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
-import org.lwjgl.glfw.GLFW;
 
+import org.lwjgl.glfw.GLFW;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-
-//@SuppressWarnings({"unused"})
 
 /*
  * The official AguaEngine3D TODO list:
@@ -90,31 +83,29 @@ import java.util.Random;
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
 
 public class Gaem3D {
-
-    public static final int TARGET_FPS = 120;
+    public static final int TARGET_FPS = 60;
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     public static final float SPEED = .1F;
     public static final float[] camera = {0, 4, 0, 0};
     protected static final String TITLE = "3 DIMENSÇÕES";
-    protected static final int D = 512;
     public static int framesElapsed = 0;
     static WindowManager manager;
     static RenderingContext context;
     static PhysicsContext physicsContext = new PhysicsContext();
 
     static float[] trans = new float[16];
-    static float[] proj = new float[16];
+    static float[] projectionMatrix = new float[16];
 
     static PhysicsObjectDecorator<PhysicsObject, Positionable> p = null;
     static Random r = new Random(2223);
 
     // Pelo amor de deus eu não vou fazer isso para todas as teclas
-    // me dá um tempo
+    // me dá um tempo IntelliJ
     @SuppressWarnings("lossy-conversions")
     public static void main(String[] args) {
 
         //GLFW
-        manager = new WindowManager(300, 300, TITLE);
+        manager = new WindowManager(600, 400, TITLE);
         manager.init();
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
@@ -195,15 +186,9 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png") // não funciona em distribuições unix???
         );
-//        Model nonChessFloor = new Model(
-//                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
-//                new int[]{0, 1, 2, 2, 1, 3},
-//                new SolidColorShaderProgram(.6F, .8F, .6F)
-//        );
-        context.addObject(chessFloor);
-//	    context.addObject(nonChessFloor);
 
-        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        context.addObject(chessFloor);
+
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat, cat, cat, cat, cat, cat}
@@ -218,64 +203,6 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
-        /* Sphere hell
-
-        PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
-                new Sphere(1, 1),
-                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
-        );
-        sphere.setCoordinates(0,3,3);
-        physicsContext.addObject(sphere);
-        context.addObject(sphere);
-        /*
-        sphere = new PhysicsObjectDecorator<>(
-                new Sphere(1, 1),
-                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
-        );
-        sphere.setCoordinates(0.1F,3,3);
-        sphere.setVelocity(6,7.6F,4.2F);
-        physicsContext.addObject(sphere);
-        context.addObject(sphere);
-
-        sphere = new PhysicsObjectDecorator<>(
-                new Sphere(1, 1),
-                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
-        );
-        sphere.setCoordinates(0.1F,3,3);
-        sphere.setVelocity(6,7.6F,4.2F);
-        physicsContext.addObject(sphere);
-        context.addObject(sphere);
-
-        sphere = new PhysicsObjectDecorator<>(
-                new Sphere(1, 1),
-                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
-        );
-        sphere.setCoordinates(0.1F,3,3);
-        sphere.setVelocity(6,7.6F,4.2F);
-        physicsContext.addObject(sphere);
-        context.addObject(sphere);*/
-
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{5,0,0},
-//                new float[]{-5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{-5,0,0},
-//                new float[]{5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,5},
-//                new float[]{0,0,-5}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,-5},
-//                new float[]{0,0,5}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,-5,0},
-//                new float[]{0,5,-0}
-//        ));
-
         RigidBody r = new Cube(1);
         Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
         p = new PhysicsObjectDecorator<>(r, m);
@@ -284,13 +211,14 @@ public class Gaem3D {
         physicsContext.addObject(p);
         p.setCoordinates(0,1,0);
 
-        r = new Cube(1);
-        m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
-        p = new PhysicsObjectDecorator<>(r, m);
-        context.addObject(p);
-        context.addObject(new VertexTracker((Model) p.getRenderable()));
-        physicsContext.addObject(p);
-        p.setCoordinates(0,1,4);
+        // segundo cubo para propositos de testar colisão entre cubos
+//        r = new Cube(1);
+//        m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+//        p = new PhysicsObjectDecorator<>(r, m);
+//        context.addObject(p);
+//        context.addObject(new VertexTracker((Model) p.getRenderable()));
+//        physicsContext.addObject(p);
+//        p.setCoordinates(0,1,4);
 
         final float[] rVertices = m.getRelativeVertices();
         for (int i = 0; i < rVertices.length; i+= 4) {
@@ -299,7 +227,7 @@ public class Gaem3D {
         }
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.01F,.1F));
+//        physicsContext.addForce(new Drag(.01F,.1F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
 //            @Override
@@ -342,11 +270,10 @@ public class Gaem3D {
 
     protected static void doLogic() {
         int simSteps = 8, collisionSteps = 4;
-        float rate = .2f;
+        float rate = 1F;
         for (int i = 0; i < simSteps; i++) {
             physicsContext.update(rate / (60F*simSteps),collisionSteps);
         }
-
         if (1+framesElapsed % (2223 * 5) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
@@ -377,11 +304,11 @@ public class Gaem3D {
     }
 
     protected static void doRenderLogic() {
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, proj);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(projectionMatrix, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, projectionMatrix);
         context.doLogic();
         manager.fitViewport();
-        context.doRender(proj);
+        context.doRender(projectionMatrix);
         RenderingManager.printErrorQueue();
         manager.update();
     }
