@@ -20,5 +20,9 @@ public interface Collideable extends PhysicsObject {
 
     float getCollision(Collideable c, @Modified float[] contactNormalDest);
 
+    default float getRestitution(){
+        return 0;
+    }
+
     float x(); float y(); float z();
 }

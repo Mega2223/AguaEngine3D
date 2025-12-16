@@ -1,11 +1,15 @@
 package net.mega2223.aguaengine3d.physics.objects.collideable;
 
+import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsMath;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
+import net.mega2223.aguaengine3d.physics.collisions.CollisionMath;
+
+import java.util.Arrays;
 
 public class Cube extends RigidBody implements Collideable {
 
@@ -71,17 +75,29 @@ public class Cube extends RigidBody implements Collideable {
         } else if (c instanceof FixedPlane) {
             FixedPlane f = ((FixedPlane) c);
             for (int v = 0; v < worldVertices.length; v+=4) {
+//                float[] planeContactPoint = BufferManager
                 vertexBuffer[0] = worldVertices[v];
                 vertexBuffer[1] = worldVertices[v+1];
                 vertexBuffer[2] = worldVertices[v+2];
                 vertexBuffer[3] = worldVertices[v+3];
                 float contactDepth = f.getCollision(vertexBuffer, buffer);
                 if(contactDepth > 0){
+                    VectorTranslator.flipVector(buffer);
+                    VectorTranslator.scaleVector(buffer,contactDepth);
+                    applyTranslation(buffer);
+                    // o plano tem massa infinita então não precisa fazer
+                    // uma resolução de contato muito avançada
+
+                    float restitutionAverage = (getRestitution() + f.getRestitution()) / 2F;
+                    CollisionMath.solveCollision(this,f,);
+
+                    //VectorTranslator.debugVector(buffer);
+
                     //TODO Alkdsaçlkdslçkaçl
                     //VectorTranslator.scaleVector(vertexBuffer,1,buffer);
-                    applyForce(0,.0001F,0,vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
-                    setVelocity(vx(),-vy()*.5F,vz());
-                    setCoordinates(x(),y()+contactDepth,z());
+//                    applyForce(0,.0001F,0,vertexBuffer[0],vertexBuffer[1],vertexBuffer[2]);
+//                    setVelocity(vx(),-vy()*.5F,vz());
+//                    setCoordinates(x(),y()+contactDepth,z());
                     //TODO ARRRHHHH
                     // FIXME DASLKÇLSAK
                     // THE WRETCHED FUNGUS HAS TAKEN OVER MY MIND AND WILL SOON TAKE OVER MANY OTHERS
