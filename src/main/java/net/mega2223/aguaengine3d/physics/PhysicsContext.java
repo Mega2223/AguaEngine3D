@@ -17,11 +17,17 @@ public class PhysicsContext {
     protected List<Force> forces = new ArrayList<>(16);
     protected CollisionManager collisionManager = new SimpleCollisionManager(this);
 
+    public long iteration = 0;
+
     public PhysicsContext(){
 
     }
 
     public void update(float deltaT){
+        update(deltaT,1);
+    }
+
+    public void update(float deltaT, int collisionPasses){
         for(PhysicsActor actor : actors){
             actor.act(deltaT,this);
         }
@@ -33,7 +39,8 @@ public class PhysicsContext {
         for(PhysicsObject o : objects){
             o.update(deltaT);
         }
-        collisionManager.manageCollisions(deltaT);
+        collisionManager.manageCollisions(deltaT,collisionPasses);
+        iteration++;
     }
 
     public void addObject(PhysicsObject object){

@@ -183,7 +183,6 @@ public class QuaternionTranslator {
         vecToImaginary(angVelVec3, angularVelocityQ4Buffer);
         quaternionProduct(angularVelocityQ4Buffer,rotationQ4,qRotationBuffer);
         scalarProduct(qRotationBuffer,deltaT/2);
-        //addRotations(rotationQ4,qRotationBuffer,dest); // TODO veja
         simpleAddition(rotationQ4,qRotationBuffer,dest);
     }
 }

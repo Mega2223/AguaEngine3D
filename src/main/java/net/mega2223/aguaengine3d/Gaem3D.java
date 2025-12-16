@@ -4,6 +4,7 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -28,12 +29,13 @@ import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
+import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-@SuppressWarnings({"unused"})
+//@SuppressWarnings({"unused"})
 
 /*
  * The official AguaEngine3D TODO list:
@@ -170,6 +172,9 @@ public class Gaem3D {
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
                 ((RigidBody)p.getActor()).applyTorque(0,-.01F,0);
             }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_P) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).setAngularVelocity(0,0,0);
+            }
         });
 
         ShaderManager.setIsGlobalShaderDictEnabled(true);
@@ -213,6 +218,43 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
+        /* Sphere hell
+
+        PhysicsObjectDecorator<Sphere, Model> sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0,3,3);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+        /*
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);
+
+        sphere = new PhysicsObjectDecorator<>(
+                new Sphere(1, 1),
+                Mesh.CUBE.toModel(new SolidColorShaderProgram(.7F, .4F, 1))
+        );
+        sphere.setCoordinates(0.1F,3,3);
+        sphere.setVelocity(6,7.6F,4.2F);
+        physicsContext.addObject(sphere);
+        context.addObject(sphere);*/
+
 //        physicsContext.addObject(new FixedPlane(
 //                new float[]{5,0,0},
 //                new float[]{-5,0,0}
@@ -229,10 +271,35 @@ public class Gaem3D {
 //                new float[]{0,0,-5},
 //                new float[]{0,0,5}
 //        ));
+//        physicsContext.addObject(new FixedPlane(
+//                new float[]{0,-5,0},
+//                new float[]{0,5,-0}
+//        ));
+
+        RigidBody r = new Cube(1);
+        Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        p = new PhysicsObjectDecorator<>(r, m);
+        context.addObject(p);
+        context.addObject(new VertexTracker((Model) p.getRenderable()));
+        physicsContext.addObject(p);
+        p.setCoordinates(0,1,0);
+
+        r = new Cube(1);
+        m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        p = new PhysicsObjectDecorator<>(r, m);
+        context.addObject(p);
+        context.addObject(new VertexTracker((Model) p.getRenderable()));
+        physicsContext.addObject(p);
+        p.setCoordinates(0,1,4);
+
+        final float[] rVertices = m.getRelativeVertices();
+        for (int i = 0; i < rVertices.length; i+= 4) {
+            AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
+            context.addObject(l);
+        }
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.001F,.01F));
-        //physicsContext.addActor(new FloorActor(-.001F));
+        physicsContext.addForce(new Drag(.01F,.1F));
 
 //        context.addScript(new ScriptedSequence("PhysFollower") {
 //            @Override
@@ -274,39 +341,39 @@ public class Gaem3D {
     Renderable line = null;
 
     protected static void doLogic() {
-
-        int n = 1;
-        float rate = 1F;
-        for (int i = 0; i < n; i++) {
-            physicsContext.update(rate / (60F*n));
+        int simSteps = 8, collisionSteps = 4;
+        float rate = .2f;
+        for (int i = 0; i < simSteps; i++) {
+            physicsContext.update(rate / (60F*simSteps),collisionSteps);
         }
 
-        if (framesElapsed % (60 * 39284) == 0) {
+        if (1+framesElapsed % (2223 * 5) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
-            //r.angularAccelAccumulator[1] = .25F;
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
 //                    new Sphere(1, 1.0F),
-                    r,
-                    m
+                    r, m
             );
 
             context.addObject(p);
             context.addObject(new VertexTracker((Model) p.getRenderable()));
             physicsContext.addObject(p);
-            //p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
-            p.setCoordinates(0,2,0);
+//            p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 8, Gaem3D.r.nextFloat() - .5F);
+            p.setCoordinates(0,0,4);
+//            r.setAngularVelocity(
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F,
+//                    (Gaem3D.r.nextFloat()-.5f)*3.14F
+//            );
 
             final float[] rVertices = m.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
                 AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
                 context.addObject(l);
             }
-            VectorTranslator.debugVector(p.x(),p.y(),p.z());
         }
-
     }
 
     protected static void doRenderLogic() {

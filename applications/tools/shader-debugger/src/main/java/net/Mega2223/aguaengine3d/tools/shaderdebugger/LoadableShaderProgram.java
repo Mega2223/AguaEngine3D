@@ -8,7 +8,7 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
 public class LoadableShaderProgram implements ShaderProgram {
-    int id = -1;
+    int id;
     protected int projectionMatrixLocation = -1;
     protected int translationMatrixLocation = -1;
     protected int rotationMatrixLocation = -1;

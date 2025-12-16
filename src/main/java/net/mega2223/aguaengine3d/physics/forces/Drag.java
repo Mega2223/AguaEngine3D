@@ -29,8 +29,8 @@ public class Drag implements Force{
         object.applyForce(buffer[0]*deltaT,buffer[1]*deltaT,buffer[2]*deltaT);
         if(object instanceof RigidBody){
             RigidBody r = (RigidBody) object;
-            float[] angularAccelAccumulator = r.angularVelocity.clone();
-            VectorTranslator.scaleVector(angularAccelAccumulator,-kLinear);
+            float[] angularAccelAccumulator = r.angularVelocity.clone();//fixme
+            VectorTranslator.scaleVector(angularAccelAccumulator,-kLinear*deltaT);
             r.applyTorque(angularAccelAccumulator);
         }
     }
