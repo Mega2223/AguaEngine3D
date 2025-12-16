@@ -7,7 +7,7 @@ import java.util.Arrays;
 import static net.mega2223.aguaengine3d.mathematics.MatrixTranslator.M4.*;
 
 public class PhysicsMath {
-    private PhysicsMath(){};
+    private PhysicsMath(){}
 
     private static final float _1D12 = 1F / 12F;
     private static final float _1D6 = 1F / 6F;

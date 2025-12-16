@@ -32,5 +32,9 @@ public interface Collideable extends PhysicsObject {
      * */
     float getCollision(float[] point, float[] result);
 
+    default float getRestitution(){
+        return 0;
+    }
+
     float x(); float y(); float z();
 }

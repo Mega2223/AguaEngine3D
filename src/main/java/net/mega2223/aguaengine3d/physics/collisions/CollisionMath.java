@@ -51,7 +51,7 @@ public class CollisionMath {
     }
 
     /**
-     * Inverse of the closing velocity
+     * Negative of the closing velocity
      * */
     public static float separatingVelocity(float[] posA, float[] velA, float[] posB, float[] velB){
         return - closingVelocity(posA, velA, posB, velB); // V_s
@@ -82,6 +82,7 @@ public class CollisionMath {
 
     private static final float[][] solveCollisionBuffers = new float[5][4];
     // para evitar colisões com a função separatingVelocity
+    // TODO esse modelo de bufferização é horrível cara
 
     /**
      * Solves a collision assuming both objects are particles,
@@ -92,8 +93,38 @@ public class CollisionMath {
                 velA = solveCollisionBuffers[2], velB = solveCollisionBuffers[3];
         float[] contact = solveCollisionBuffers[4]; // from A's perspective
         a.getCoords(posA); b.getCoords(posB); a.getVelocity(velA); b.getVelocity(velB);
-//        float sep = separatingVelocity(posA,velA,posB,velB);
+        //float sep = separatingVelocity(posA,velA,posB,velB);
         float sep = separatingVelocity(a,b);
+        if(sep > 0){return;}
+
+        a.getContactNormal(posB,contact);
+
+        final float inverseSum = a.getInverseMass() + b.getInverseMass();
+        if(inverseSum <= 0) {return;}
+
+        final float nSep = - restitution * sep;
+        final float deltaVelocity = nSep - sep;
+        final float impulse = deltaVelocity / inverseSum;
+
+        float[] impulsePerIMass = buffers[0];
+        VectorTranslator.scaleVector(contact,impulse,impulsePerIMass);
+
+        a.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
+        VectorTranslator.flipVector(impulsePerIMass);
+        b.applyImpulse(impulsePerIMass[0],impulsePerIMass[1],impulsePerIMass[2]);
+    }
+
+    public static void solveCollision(Collideable a, Collideable b, float[] collisionPointA, float[] collisionPointB, float restitution){
+        float[] posA = solveCollisionBuffers[0], posB = solveCollisionBuffers[1],
+                velA = solveCollisionBuffers[2], velB = solveCollisionBuffers[3];
+        float[] contact = solveCollisionBuffers[4]; // from A's perspective
+        //a.getCoords(posA); b.getCoords(posB);
+        a.getVelocity(velA); b.getVelocity(velB);
+        VectorTranslator.copy(collisionPointA,posA);
+        VectorTranslator.copy(collisionPointB,posB);
+
+        float sep = separatingVelocity(posA,velA,posB,velB);
+//        float sep = separatingVelocity(a,b);
         if(sep > 0){return;}
 
         a.getContactNormal(posB,contact);
