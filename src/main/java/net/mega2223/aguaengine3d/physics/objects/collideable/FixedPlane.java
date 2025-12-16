@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics.objects.collideable;
 
+import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
@@ -13,6 +14,7 @@ public class FixedPlane extends Particle implements Collideable {
     private static final float[] buffer = new float[4];
 
     float[] normal = new float[4], point = new float[4];
+    float friction = .025F; // TODO ve se a fricção também funciona para planos não alinhados ao sistema de coordenadas
 
     /** Creates a FixedPlane object
      * @param normal Plane normal, that is, a vector which is orthogonal with all possible vectors inside the plane
@@ -70,8 +72,12 @@ public class FixedPlane extends Particle implements Collideable {
                         contactPointBuffer[0],contactPointBuffer[1],contactPointBuffer[2],
                         0,0,0, c.x(),c.y(),c.z(), c.vx(),c.vy(),c.vz()
                 );
+                float averageRestitution = (this.getRestitution() + s.getRestitution())/2F;
+                CollisionMath.solveCollision(c,this,sep,normal,averageRestitution);
 
-                CollisionMath.solveCollision(c,this,sep,normal,1);
+                getFriction(c.vx(),c.vy(),c.vz(),buffer);
+                c.applyForce(buffer);
+                VectorTranslator.debugVector(buffer);
             }
             return depth;
         }
@@ -91,7 +97,7 @@ public class FixedPlane extends Particle implements Collideable {
         return Math.max(0,depth);
     }
 
-    /**Returns distance from the closest point in the plane*/
+    /**Returns absolute distance from the closest point in the plane*/
     public float getDistance(float[] point){
         // |N dot (p - p_0)|
         float v = VectorTranslator.dotProduct(
@@ -101,6 +107,7 @@ public class FixedPlane extends Particle implements Collideable {
         return Math.abs(v);
     }
 
+    /** Gives the point inside the plane that is closest to coord*/
     public void getClosestPoint(float[] coord, @Modified float[] dest){
         VectorTranslator.scaleVector(normal,getDistance(coord),dest);
         VectorTranslator.addToVector(dest,coord);
@@ -140,5 +147,17 @@ public class FixedPlane extends Particle implements Collideable {
     @Override
     public void setVelocity(float vx, float vy, float vz) {
         System.out.println("whar");
+    }
+
+    public void getFriction(float vX, float vY, float vZ, @Modified float[] dest){
+        float[] normalBuffer = BufferManager.allocateVec4();
+        VectorTranslator.copy(normal,normalBuffer);
+        VectorTranslator.copy(vX,vY,vZ,dest);
+        float dp = vX * normal[0] + vY * normal[1] + vZ * normal[2];
+        VectorTranslator.normalize(normalBuffer);
+        VectorTranslator.scaleVector(normalBuffer,-dp);
+        VectorTranslator.addToVector(dest,normalBuffer);
+        VectorTranslator.scaleVector(dest,-friction);
+        BufferManager.freeVec4(normalBuffer);
     }
 }

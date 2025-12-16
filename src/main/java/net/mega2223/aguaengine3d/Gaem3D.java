@@ -4,6 +4,7 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -26,8 +27,10 @@ import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
+import net.mega2223.aguaengine3d.physics.objects.Particle;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
+import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
@@ -107,12 +110,12 @@ public class Gaem3D {
     static Random r = new Random(2223);
 
     // Pelo amor de deus eu não vou fazer isso para todas as teclas
-    // me dá um tempo
+    // me dá um tempo IntelliJ
     @SuppressWarnings("lossy-conversions")
     public static void main(String[] args) {
 
         //GLFW
-        manager = new WindowManager(300, 300, TITLE);
+        manager = new WindowManager(600, 400, TITLE);
         manager.init();
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
@@ -159,16 +162,19 @@ public class Gaem3D {
                 p.applyAcceleration(-.1F, 0, 0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(.01F,0,0);
+                ((RigidBody)p.getActor()).applyTorque(.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_T) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(-.01F,0,0);
+                ((RigidBody)p.getActor()).applyTorque(-.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Y) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,.01F,0);
+                ((RigidBody)p.getActor()).applyTorque(0,.04F,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,-.01F,0);
+                ((RigidBody)p.getActor()).applyTorque(0,-.04F,0);
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_P) == GLFW.GLFW_PRESS) {
+                ((RigidBody)p.getActor()).setAngularVelocity(0,0,0);
             }
         });
 
@@ -190,13 +196,8 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png") // não funciona em distribuições unix???
         );
-//        Model nonChessFloor = new Model(
-//                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
-//                new int[]{0, 1, 2, 2, 1, 3},
-//                new SolidColorShaderProgram(.6F, .8F, .6F)
-//        );
+
         context.addObject(chessFloor);
-//	    context.addObject(nonChessFloor);
 
         Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
@@ -213,33 +214,19 @@ public class Gaem3D {
                 new float[]{0,0,0}
         ));
 
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{5,0,0},
-//                new float[]{-5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{-5,0,0},
-//                new float[]{5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,5},
-//                new float[]{0,0,-5}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,-5},
-//                new float[]{0,0,5}
-//        ));
+        PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
+                new Sphere(1,1),
+                Mesh.CUBE.toModel(
+                        new SolidColorShaderProgram(1, 0, 0)
+                )
+        );
+        physicsContext.addObject(
+                ball
+        );
+        context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.001F,.01F));
-        //physicsContext.addActor(new FloorActor(-.001F));
-
-//        context.addScript(new ScriptedSequence("PhysFollower") {
-//            @Override
-//            protected void preLogic(int iteration, RenderingContext context) {
-//                camera[0] = p.x(); camera[1] = p.y()+.6F; camera[2] = p.z()-5;
-//            }
-//        });
+//        physicsContext.addForce(new Drag(.0001F,.001F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -274,7 +261,6 @@ public class Gaem3D {
     Renderable line = null;
 
     protected static void doLogic() {
-
         int n = 1;
         float rate = 1F;
         for (int i = 0; i < n; i++) {
@@ -284,12 +270,11 @@ public class Gaem3D {
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
-            //r.angularAccelAccumulator[1] = .25F;
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
-//                    new Sphere(1, 1.0F),
-                    r,
+                    new Sphere(1, 1.0F),
+//                    r,
                     m
             );
 

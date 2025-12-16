@@ -4,6 +4,7 @@ import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
+import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsMath;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
@@ -113,6 +114,7 @@ public class Cube extends RigidBody implements Collideable {
         // f(p) = min(f_mx(p),f_my(p),f_mz(p))
         Arrays.fill(rotationQ4,0);
         rotationQ4[0] = 1; updateWorldVertices();//fixme ja sabe ne
+        // mano isso aqui sequer funciona???? TODO
 
         float xPlus = -buffer[0] + 1, xLess = buffer[0] + 1; // Profundidades já positivadas
         float yPlus = -buffer[1] + 1, yLess = buffer[1] + 1;
@@ -154,9 +156,6 @@ public class Cube extends RigidBody implements Collideable {
             float[] currentVertex = BufferManager.allocateVec4();
             float[] contactNormal = BufferManager.allocateVec4();
 
-//                currentVertex[0] = worldVertices[v]; currentVertex[1] = worldVertices[v+1];
-//                currentVertex[2] = worldVertices[v+2]; currentVertex[3] = worldVertices[v+3];
-
             VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
 
             float contactDepth = plane.getCollision(currentVertex, contactNormal);
@@ -176,21 +175,17 @@ public class Cube extends RigidBody implements Collideable {
                 CollisionMath.solveContact(pos,invMass,planePoint,plane.getInverseMass(),
                         contactNormal,contactDepth,translation,null);
                 applyRotationalTranslation(translation,planePoint);
-//                    updateWorldVertices();
-//                    VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
 
                 float[] vertexVel = BufferManager.allocateVec4();
                 getLocalPointVelocity(currentVertex,vertexVel);
                 float[] pNormal = plane.normal;
 
                 float separatingVelocity = CollisionMath.separatingVelocity(
-                        0,0,0,
+                        0,0,0, // o plano é constante ent isso é um atalho
                         vertexVel[0],vertexVel[1],vertexVel[2],
                         -pNormal[0],-pNormal[1],-pNormal[2],
-                        0,0,0
+                        0,0,0 // plano não se move :p
                 );
-
-                BufferManager.freeVec4(vertexVel);
 
                 CollisionMath.solveCollision(
                         invMass,
@@ -199,23 +194,16 @@ public class Cube extends RigidBody implements Collideable {
                         impulseA, impulseB
                 );
 
-//                    VectorTranslator.debugVector("center",pos);
-//                    VectorTranslator.debugVector("velocity",velocity);
-//                    VectorTranslator.debugVector("angularVelocity",angularVelocity);
-//                    VectorTranslator.debugVector("point",currentVertex);
-//                    VectorTranslator.debugVector("pointVelocity",vertexVel);
-//                    VectorTranslator.debugVector("planePoint",planePoint);
-//                    VectorTranslator.debugVector("separatingVelocity",separatingVelocity);
-//                    VectorTranslator.debugVector("resultingImpulse",impulseA);
-//                    VectorTranslator.debugVector("resultingTranslation",translation);
-//                    System.exit(2223);
-
                 applyImpulse(impulseA,planePoint);
 
+                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],impulseA);
+//                VectorTranslator.debugVector(impulseA);
+//                applyImpulse(impulseA,planePoint);
+
+                BufferManager.freeVec4(vertexVel);
                 BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);
                 BufferManager.freeVec4(translation);
                 BufferManager.freeVec4(impulseA); BufferManager.freeVec4(impulseB);
-
                 BufferManager.freeVec4(currentVertex);
                 BufferManager.freeVec4(contactNormal);
                 return contactDepth;
@@ -225,4 +213,5 @@ public class Cube extends RigidBody implements Collideable {
         }
         return 0;
     }
+
 }
