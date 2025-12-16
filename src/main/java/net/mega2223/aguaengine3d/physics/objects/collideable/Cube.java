@@ -196,9 +196,12 @@ public class Cube extends RigidBody implements Collideable {
 
                 applyImpulse(impulseA,planePoint);
 
-                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],impulseA);
-//                VectorTranslator.debugVector(impulseA);
-//                applyImpulse(impulseA,planePoint);
+                float[] frictionForce = impulseA; // redundante mas enfim
+                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],frictionForce);
+                applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
+                        planePoint[0],planePoint[1],planePoint[2]);
+                // TODO isso tá estranho, o ponto tá certo?
+                // Talvez seja a física to Torque q esteja meio ruim msm
 
                 BufferManager.freeVec4(vertexVel);
                 BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);

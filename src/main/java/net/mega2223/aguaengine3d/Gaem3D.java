@@ -273,8 +273,8 @@ public class Gaem3D {
             Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
-                    new Sphere(1, 1.0F),
-//                    r,
+//                    new Sphere(1, 1.0F),
+                    r,
                     m
             );
 
