@@ -255,7 +255,7 @@ public class MatrixTranslator {
 
     //very proud of that one
     /**
-     * Returns the 4x4 matrix product
+     * Returns the 4x4 matrix product:
      * ret = A (*) B
      * */
     public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
