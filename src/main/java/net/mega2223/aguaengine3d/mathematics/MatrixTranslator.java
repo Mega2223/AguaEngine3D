@@ -254,10 +254,14 @@ public class MatrixTranslator {
     }
 
     //very proud of that one
+    /**
+     * Returns the 4x4 matrix product
+     * ret = A (*) B
+     * */
     public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
         Arrays.fill(bufferMatrix4,0);
         for (int c = 0; c < 4; c++) {
-            for (int r = 0; r <4; r++) {
+            for (int r = 0; r < 4; r++) {
                 for (int i = 0; i < 4; i++) {
                     int m1Loc = r*4+i; int m2Loc = c+i*4;
                     bufferMatrix4[c + r*4] += m4A[m1Loc]*m4B[m2Loc];

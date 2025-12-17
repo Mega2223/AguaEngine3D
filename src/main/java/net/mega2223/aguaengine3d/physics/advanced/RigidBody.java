@@ -44,9 +44,10 @@ public class RigidBody implements Rotatable {
     public void update(float deltaT){
         // Calculations
         QuaternionTranslator.normalize(rotationQ4);
-        MatrixTranslator.multiply4x4Matrices(inverseInertialTensor,rotationMatrix, rotatedInverseInertialTensor);
+        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor, rotatedInverseInertialTensor);
         // TODO essa é a ordem certa?
         // TODO precisa fazer isso?
+        // TODO dia isso
 
         // Linear Velocity
         VectorTranslator.addToVector(velocity,accelerationAccumulator);
@@ -125,26 +126,24 @@ public class RigidBody implements Rotatable {
         toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
 
         MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
+        // (sim eu removo a rotação pra rodar o ponto de novo :p)
         VectorTranslator.crossProduct(pBuffer,fBuffer);
         applyTorque(pBuffer);
         applyForce(fBuffer);
     }
 
+    private final float[] rotBuffer = new float[4];
+    private final float[] tBuffer = new float[4];
     public void applyRotationalTranslation(float dx, float dy, float dz, float px, float py, float pz){
-        VectorTranslator.copy(px,py,pz,pBuffer);
-        VectorTranslator.copy(dx,dy,dz,fBuffer);
-        toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
+        VectorTranslator.copy(px,py,pz,rotBuffer);
+        VectorTranslator.copy(dx,dy,dz,tBuffer);
+        toLocalCoordinateSystem(rotBuffer); // presumindo que este seja nosso centro de massa (p.197)
 
-        MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
-        VectorTranslator.crossProduct(pBuffer,fBuffer);
+        MatrixTranslator.multiplyVec4Mat4(rotBuffer,rotationMatrix); // rotação global, translação local
+        VectorTranslator.crossProduct(rotBuffer,tBuffer);
 
-        // BEGIN
-//        VectorTranslator.normalize(pBuffer);
-//        VectorTranslator.scaleVector(pBuffer,.1F);
-        // END
-
-        applyRotation(pBuffer); //fixme todo ixme todo fixme todo
-        applyTranslation(fBuffer);
+        applyRotation(rotBuffer); //fixme a quantidade de rotação?
+        applyTranslation(tBuffer);
     }
 
     public void applyAngularVelocity(float rvX, float rvY, float rvZ){
@@ -166,6 +165,13 @@ public class RigidBody implements Rotatable {
     public void applyTorque(float tx, float ty, float tz) {
         VectorTranslator.copy(tx,ty,tz,torqueBuffer);
         MatrixTranslator.multiplyVectorMatrix(torqueBuffer,inverseInertialTensor);
+        // Eu acredito que seja o tensor rotatedInverseInertialTensor
+        // mas ele tem um comportamento super bugado quando eu uso ele
+        // talvez seja um problema na própria rotação do tensor,
+        // pelo menos a direção to torque tá certa tanto no eixo
+        // de posição quanto no eixo de rotação kkkkkk
+        // TODO: ver esse problema de distribuição de do tensor inercial
+        // Até o momento eu só testei isso com um tensor identidade também
         VectorTranslator.addToVector(angularAccelAccumulator,torqueBuffer);
     }
     float[] torqueBuffer = new float[4];
@@ -178,12 +184,12 @@ public class RigidBody implements Rotatable {
     }
 
     @Override
-    public void applyImpulse(float fx, float fy, float fz, float px, float py, float pz) {
+    public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         float[] angularImpulse = BufferManager.allocateVec4();
         float[] linearImpulse = BufferManager.allocateVec4();
 
         VectorTranslator.copy(px,py,pz,angularImpulse);
-        VectorTranslator.copy(fx,fy,fz,linearImpulse);
+        VectorTranslator.copy(ix, iy, iz,linearImpulse);
         toLocalCoordinateSystem(angularImpulse); // presumindo que este seja nosso centro de massa (p.197)
 
         MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local

@@ -19,14 +19,24 @@ public interface Rotatable extends PhysicsObject {
 
     /**
      * Applies a force at the specified point,
-     * where both f and p are world-oriented coordinates
+     * where f is a world oriented force and
+     * p is a point in world coordinates
      * */
     void applyForce(float fx, float fy, float fz, float px, float py, float pz);
 
-    void applyImpulse(float fx, float fy, float fz, float px, float py, float pz);
+    /**
+     * Applies an impulse at the specified point,
+     * where i is a world oriented force and
+     * p is a point in world coordinates
+     * */
+    void applyImpulse(float ix, float iy, float iz, float px, float py, float pz);
 
     void applyRotationalTranslation(float rx, float ry, float rz, float px, float py, float pz);
 
+    /**
+     * Applies an angular torque to the object
+     * (a change of rotation with respect to the object's inertia)
+     * */
     void applyTorque(float tx, float ty, float tz);
 
     void applyAngularVelocity(float rvx, float rvy, float rvz);
