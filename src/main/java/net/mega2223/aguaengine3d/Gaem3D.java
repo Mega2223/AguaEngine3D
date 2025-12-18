@@ -30,9 +30,11 @@ import net.mega2223.aguaengine3d.physics.objects.Particle;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
+import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings({"unused"})
@@ -94,6 +96,10 @@ import java.util.Random;
 // talvez só substituir o corpo da função para evitar problemas de compatibilidade?
 // buffer de texto: faz +- igual o... scons?? esqueci o nome
 // buffer livre com função de flip
+
+// Manter a rotação do tensor inercial e o atrito do plano ao mesmo tempo tem efeitos ruins
+// eu não tenho a mínima ideia de se o problema é o tensor inercial invertido rotacionado ou
+// a projeção feita pra calcular o atrito no plano
 
 public class Gaem3D {
 
@@ -214,10 +220,12 @@ public class Gaem3D {
 
         // Phys Obj
 
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,1,0},
-                new float[]{0,0,0}
-        ));
+        FixedPlane fixedPlane = new FixedPlane(
+                new float[]{0, 1, 0},
+                new float[]{0, 0, 0}
+        );
+        fixedPlane.setFriction(0.0F);
+        physicsContext.addObject(fixedPlane);
 
         PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
                 new Sphere(1,1),
@@ -270,10 +278,16 @@ public class Gaem3D {
             physicsContext.update(rate / (60F*n));
         }
 
+        List<CollisionVisualization> collisionOutputStream = CollisionVisualization.COLLISION_OUTPUT_STREAM;
+        if(collisionOutputStream != null && !collisionOutputStream.isEmpty()){
+            context.addObject(collisionOutputStream.get(0));
+            collisionOutputStream.remove(0);
+        }
+
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
             RigidBody r = new Cube(1);
-            Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+            Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
             p = new PhysicsObjectDecorator<>(
 //                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
 //                    new Sphere(1, 1.0F),

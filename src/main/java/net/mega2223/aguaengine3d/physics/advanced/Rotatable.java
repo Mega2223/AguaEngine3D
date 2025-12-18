@@ -34,8 +34,8 @@ public interface Rotatable extends PhysicsObject {
     void applyRotationalTranslation(float rx, float ry, float rz, float px, float py, float pz);
 
     /**
-     * Applies an angular torque to the object
-     * (a change of rotation with respect to the object's inertia)
+     * Applies an angular torque to the object (a change of rotation with respect to the object's inertia)
+     * The torque applied is in world coordinates
      * */
     void applyTorque(float tx, float ty, float tz);
 
@@ -51,6 +51,10 @@ public interface Rotatable extends PhysicsObject {
 
     void getInverseInertialTensor(@Modified float[] dest);
 
+    /**
+     * Applies an angular torque to the object (a change of rotation with respect to the object's inertia)
+     * The torque applied is in world coordinates
+     * */
     default void applyTorque(float[] torque){
         applyTorque(torque[0],torque[1],torque[2]);
     }

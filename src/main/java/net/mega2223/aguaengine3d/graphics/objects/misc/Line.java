@@ -7,6 +7,8 @@ import net.mega2223.aguaengine3d.graphics.utils.RenderingManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
+import java.util.Arrays;
+
 public class Line implements Renderable {
 
     final SolidColorShaderProgram shaderProgram;
@@ -81,5 +83,13 @@ public class Line implements Renderable {
     @Override
     public ShaderProgram getShader() {
         return shaderProgram;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("LINE:\nBEGIN: %.4f %.4f %.4f\nEND: %.4f %.4f %.4f\nDIFF: %.4f %.4f %.4f\n%s",
+                vertices[0],vertices[1],vertices[2],vertices[4],vertices[5],vertices[6],
+                vertices[4]-vertices[0],vertices[5]-vertices[1],vertices[6]-vertices[2],
+                Arrays.toString(Thread.currentThread().getStackTrace()));
     }
 }

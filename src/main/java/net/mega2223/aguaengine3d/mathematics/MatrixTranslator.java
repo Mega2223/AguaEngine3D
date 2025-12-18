@@ -273,11 +273,11 @@ public class MatrixTranslator {
         System.arraycopy(bufferMatrix4,0,m4A,0,16);
     }
 
+    private static final float[] matrixProductBuffer = new float[16];
     /**
      * Returns the 4x4 matrix product: <p>
      * result = A (*) B
      * */
-    private static final float[] matrixProductBuffer = new float[16];
     public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
         Arrays.fill(matrixProductBuffer,0);
         for (int c = 0; c < 4; c++) {

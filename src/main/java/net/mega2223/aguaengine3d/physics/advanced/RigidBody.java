@@ -5,8 +5,10 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
+import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class RigidBody implements Rotatable {
 
@@ -42,9 +44,8 @@ public class RigidBody implements Rotatable {
     }
 
     public void update(float deltaT){
-        // Calculations
+        // Rotation Normalization
         QuaternionTranslator.normalize(rotationQ4);
-        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor, rotatedInverseInertialTensor);
         // TODO essa é a ordem certa?
         // TODO precisa fazer isso?
         // TODO dia isso
@@ -63,6 +64,7 @@ public class RigidBody implements Rotatable {
 
         QuaternionTranslator.rotationMatrixFromQuaternion(rotationQ4,rotationMatrix);
         MatrixTranslator.transposeMat4(rotationMatrix,inverseRotationMatrix);
+        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor,rotatedInverseInertialTensor);
         // The inverse of a rotation matrix is it's transpose, much quicker to calculate :)
     }
 
@@ -135,6 +137,18 @@ public class RigidBody implements Rotatable {
         // É o que eles fazem na Cyclone, mas eu acho estranho,
         // dependendo do ponto, o torque pode ser mais ou menos forte, mas
         // a força é constante?? Isso que eu ganho por não estudar física :p
+        List<CollisionVisualization> collisionOutputStream = CollisionVisualization.COLLISION_OUTPUT_STREAM;
+        if(collisionOutputStream != null){
+//                    VectorTranslator.debugVector("IM",impulseA);
+//                    VectorTranslator.debugVector("TR",translation);
+            CollisionVisualization vis = new CollisionVisualization(
+                    new float[]{px, py, pz, 0},
+                    new float[]{fx * 1000, fy * 1000, fz * 1000, 0},
+                    new float[4]
+            );
+            collisionOutputStream.add(vis);
+            System.out.println(Arrays.toString(new float[]{fx * 1000, fy * 1000, fz * 1000, 0}));
+        }
     }
 
     private final float[] rotBuffer = new float[4];
@@ -171,15 +185,26 @@ public class RigidBody implements Rotatable {
     @Override
     public void applyTorque(float tx, float ty, float tz) {
         VectorTranslator.copy(tx,ty,tz,torqueBuffer);
-//        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,inverseInertialTensor);
+        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,rotatedInverseInertialTensor);
         // a função de aplicar torque precisa fazer isso? não cabe somente
         // a integração? (função update)
         // é, me parece que a função torque x tensor inverso só acontece na integração :p
 
-        System.out.println("TENSOR :");
-        MatrixTranslator.debugMatrix4x4(inertialTensor);
-        MatrixTranslator.debugMatrix4x4(inverseInertialTensor);
-        MatrixTranslator.debugMatrix4x4(rotatedInverseInertialTensor);
+//        System.out.println("TORQUE: ");
+//        VectorTranslator.debugVector(tx,ty,tz,0);
+
+//        System.out.println("RMATRIX :");
+//        MatrixTranslator.debugMatrix4x4(rotationMatrix);
+//        MatrixTranslator.debugMatrix4x4(inverseRotationMatrix);
+
+//        System.out.println("TENSOR :");
+//        MatrixTranslator.debugMatrix4x4(inertialTensor);
+//        MatrixTranslator.debugMatrix4x4(inverseInertialTensor);
+//        MatrixTranslator.debugMatrix4x4(rotatedInverseInertialTensor);
+
+//        System.out.println("RESULTING TORQUE :");
+//        VectorTranslator.debugVector(torqueBuffer);
+//        System.out.println();
 
         // Eu acredito que seja o tensor rotatedInverseInertialTensor
         // mas ele tem um comportamento super bugado quando eu uso ele
@@ -217,6 +242,18 @@ public class RigidBody implements Rotatable {
         VectorTranslator.scaleVector(angularImpulse,.1F); // todo remove
         applyAngularVelocity(angularImpulse); //fixme
         applyImpulse(linearImpulse);
+
+        List<CollisionVisualization> collisionOutputStream = CollisionVisualization.COLLISION_OUTPUT_STREAM;
+        if(collisionOutputStream != null){
+//                    VectorTranslator.debugVector("IM",impulseA);
+//                    VectorTranslator.debugVector("TR",translation);
+            CollisionVisualization vis = new CollisionVisualization(
+                    new float[]{px, py, pz, 0},
+                    new float[4],
+                    new float[]{ix * 100, iy * 100, iz * 100, 0}
+            );
+            collisionOutputStream.add(vis);
+        }
 
         BufferManager.freeVec4(angularImpulse);
         BufferManager.freeVec4(linearImpulse);

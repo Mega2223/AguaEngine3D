@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics.collisions;
 
+import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 

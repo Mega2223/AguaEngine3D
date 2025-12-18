@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.physics.objects.collideable;
 
 import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
+import net.mega2223.aguaengine3d.graphics.objects.modeling.utils.VertexTracker;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
@@ -9,8 +10,10 @@ import net.mega2223.aguaengine3d.physics.PhysicsMath;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
 import net.mega2223.aguaengine3d.physics.collisions.CollisionMath;
+import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Cube extends RigidBody implements Collideable {
 
@@ -120,7 +123,7 @@ public class Cube extends RigidBody implements Collideable {
 
     float resolveCollisionWithPlane(FixedPlane plane){
         for (int v = 0; v < worldVertices.length; v+=4) {
-            float[] currentVertex = BufferManager.allocateVec4();
+            float[] currentVertex = BufferManager.allocateVec4(); // TODO método que aloca e já coloca os dados
             float[] contactNormal = BufferManager.allocateVec4();
 
             VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
@@ -163,10 +166,10 @@ public class Cube extends RigidBody implements Collideable {
 
                 applyImpulse(impulseA,planePoint);
 
-                float[] frictionForce = impulseA; // redundante mas enfim
-                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],frictionForce);
-                applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
-                        planePoint[0],planePoint[1],planePoint[2]);
+//                float[] frictionForce = impulseA; // redundante mas enfim FIXME?
+//                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],frictionForce);
+//                applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
+//                        planePoint[0],planePoint[1],planePoint[2]);
                 // TODO isso tá estranho, o ponto tá certo?
                 // Talvez seja a física to Torque q esteja meio ruim msm
 
