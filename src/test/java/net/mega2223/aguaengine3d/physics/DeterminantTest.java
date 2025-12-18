@@ -1,11 +1,10 @@
 package net.mega2223.aguaengine3d.physics;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
-import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 
 import java.util.Random;
 
-public class DeleteThis {
+public class DeterminantTest {
     static Random r = new Random("among us".hashCode() + System.currentTimeMillis());
     public static void main(String[] args) {
         float[] axis = new float[4];
@@ -21,7 +20,7 @@ public class DeleteThis {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                float r = DeleteThis.r.nextFloat() * 2 - 1;
+                float r = DeterminantTest.r.nextFloat() * 2 - 1;
                 mat4[i*4+j%4]= r*10;
             }
         }

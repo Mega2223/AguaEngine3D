@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.generictests;
 
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class IsMatrixMatrixMultiplicationAssociative {
@@ -38,7 +39,7 @@ public class IsMatrixMatrixMultiplicationAssociative {
         boolean throwErr = false;
         for (int i = 0; i < 16; i++) {
             boolean acceptable = Math.abs(r1[i]-r2[i]) < ERROR_MARGIN;
-            System.out.printf("%d [ %.4f ] [ %.4f ] %s\n",i,r1[i],r2[i], acceptable ? "OK" : "FAIL");
+            System.out.printf(Locale.US,"%2d [ %.5f ] [ %.5f ] %s\n",i,r1[i],r2[i], acceptable ? "OK" : "FAIL");
             if(!acceptable){
                 throwErr = true;
             }

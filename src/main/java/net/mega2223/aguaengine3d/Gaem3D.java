@@ -22,7 +22,6 @@ import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
-import net.mega2223.aguaengine3d.physics.actors.FloorActor;
 import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
@@ -90,6 +89,11 @@ import java.util.Random;
  * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
+// TODO o cálculo do inverso matricial é válido? seria legal ter um teste p/ isso
+// Shader dict: Refaz tudo, uma função deve ser $(nomeDaFuncao), usa um REGEX pelamor
+// talvez só substituir o corpo da função para evitar problemas de compatibilidade?
+// buffer de texto: faz +- igual o... scons?? esqueci o nome
+// buffer livre com função de flip
 
 public class Gaem3D {
 
@@ -104,13 +108,13 @@ public class Gaem3D {
     static RenderingContext context;
     static PhysicsContext physicsContext = new PhysicsContext();
 
-    static float[] trans = new float[16];
-    static float[] proj = new float[16];
+    static float[] projectionMatrix = new float[16];
 
     static PhysicsObjectDecorator<PhysicsObject, Positionable> p = null;
-    static Random r = new Random(2223);
+    static final Random r = new Random(2223);
 
-    // Pelo amor de deus eu não vou fazer isso para todas as teclas
+    // Pelo amor de deus eu não vou fazer um cast para todas as teclas
+    // "ah erro de precisão mimimimimimi"
     // me dá um tempo IntelliJ
     @SuppressWarnings("lossy-conversions")
     public static void main(String[] args) {
@@ -200,7 +204,7 @@ public class Gaem3D {
 
         context.addObject(chessFloor);
 
-        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+//        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat, cat, cat, cat, cat, cat}
@@ -221,13 +225,11 @@ public class Gaem3D {
                         new SolidColorShaderProgram(1, 0, 0)
                 )
         );
-        physicsContext.addObject(
-                ball
-        );
+        physicsContext.addObject(ball);
         context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-//        physicsContext.addForce(new Drag(.0001F,.001F));
+        physicsContext.addForce(new Drag(.01F,.01F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -296,11 +298,11 @@ public class Gaem3D {
     }
 
     protected static void doRenderLogic() {
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, proj);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(projectionMatrix, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, projectionMatrix);
         context.doLogic();
         manager.fitViewport();
-        context.doRender(proj);
+        context.doRender(projectionMatrix);
         RenderingManager.printErrorQueue();
         manager.update();
     }

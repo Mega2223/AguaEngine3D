@@ -4,22 +4,32 @@ import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.util.Arrays;
 
-@SuppressWarnings("unused") //"Aqui seu programador IDIOTA o método está INUTILIZADO, apague IMEDIATAMENTE"
+
+/** Class that stores handmade math calculations for matrix translation and stuff
+ * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
+ * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
+ * */
+
+@SuppressWarnings("unused") // sim, isso é uma ENGINE, nem tudo precisa ser usado na fonte
 
 //FIXME tem equações matriciais que mudam vetores os quais iterações seguintes ainda dependem
 //isso provavelmente será concertado com o buffer manager
 //ex translateAllVertices, dá uma olhada depois e verifica a translação de cada matriz
 
-/**
- * Class that stores handmade math calculations for matrix translation and stuff
- * Seems like LWJGL has libraries that do exactly what I'm trying to do, but I'm just too deep to care now
- * Plus it's pretty cool doing your own stuff and seeing how it does not work the way you intended
- * */
+// em geral, os métodos dessa classe estão muito inconsistentes, principalmente os de matemática 3x3
+// preciso dar uma geralzona aqui, mas eu estou tod o atarefado em relação a engine então pode ser
+// que isso demore
 
 public class MatrixTranslator {
 
     public enum M4 {
-         M_11(0), M_12(1), M_13(2), M_14(3),
+        // O formato de matriz é alinhado de tal forma que o transpose está nos indices 3,7 e 11
+        // isso vai em contraste com o modelo do OpenGL que coloca o transpose em 12, 13 ,14
+        // é preciso fazer uma transposição pra mandar para o OGL
+        // a matriz de tradução eu não faço o transpose, isso em tese deveria dar ruim, possivelmente
+        // meu código de shader está mal-feito, TODO: verificar shaders e transposes
+        // Talvez caiba só deixar _11, _12 etc. para evitar repetições
+        M_11(0), M_12(1), M_13(2), M_14(3),
         M_21(4), M_22(5), M_23(6), M_24(7),
         M_31(8), M_32(9), M_33(10), M_34(11),
         M_41(12), M_42(13), M_43(14), M_44(15);
@@ -28,6 +38,8 @@ public class MatrixTranslator {
     }
 
     public enum M3 {
+        // Eu sou relativamente favorável a remover o modelo M3 completamente.
+        // acredito que toda a matemática relevante dá pra fazer no R^(4x4)
         M_11(0), M_12(1), M_13(2),
         M_21(3), M_22(4), M_23(5),
         M_31(6), M_32(7), M_33(8);
@@ -38,11 +50,8 @@ public class MatrixTranslator {
     private static final float[] bufferMatrix4 = new float[16];
 
     public static void multiplyVectorMatrix(@Modified float[] vector, float[][] mat4) {
-        if (mat4.length != 4 || vector.length != 4) {
-            throw new UnsupportedOperationException();
-        }
         //this is optimal I guess
-        //FIXME not it isnt lmao
+        //FIXME no it isn't lmao
         for (int i = 0; i < 4; i++) {
             vector[i] = (mat4[i][0] * vector[0]) + (mat4[i][1] * vector[1]) + (mat4[i][2] * vector[2]) + (mat4[i][3] * vector[3]);
         }
@@ -73,6 +82,8 @@ public class MatrixTranslator {
         }
     }
 
+    //TODO faz sentido ter isso aqui?
+    // (olha todos esses métodos de rotação)
     public void rotateAllVectors(@Modified float[][] polygons, float[] rotationRadians) {
         for (float[] polygon : polygons) {
             rotateAllVectors(polygon, rotationRadians);
@@ -109,9 +120,11 @@ public class MatrixTranslator {
         rotateEulerAngles(x, y, z, rX, rY, rZ, 0, 0, 0, 0, result);
     }
 
-    // TODO i have no idea if this is 1,2,3 or 3,2,1
+    // TODO i have no idea of the rotation order
+    //  possivelmente cabe até remover completamente a rotação por angulos eulerianos
+    //  uma vez que agora a engine tem suporte a angulos de rotação, que em geral
+    //  são muito mais seguros.
     public static void rotateEulerAngles(float x, float y, float z, double rX, double rY, double rZ, float aX, float aY, float aZ, int startIndex, @Modified float[] result) {
-
         if (!Double.isFinite(rX)) {rX = 0;}
         if (!Double.isFinite(rY)) {rY = 0;}
         if (!Double.isFinite(rZ)) {rZ = 0;}
@@ -221,6 +234,7 @@ public class MatrixTranslator {
         }
     }
 
+    // TODO huh?? tira isso daqui
     public static void addArrays(@Modified float[] arr, float[] arr2) {
         for (int i = 0; i < arr.length; i++) {
             arr[i] += arr2[i];
@@ -248,31 +262,41 @@ public class MatrixTranslator {
         return ret;
     }
 
+    /**
+     * Sets the A matrix to be the matrix product: <p>
+     * A' = A (*) B
+     * */
     public static void multiply4x4Matrices(@Modified float[] m4A, float[] m4B){
         multiply4x4Matrices(m4A,m4B,bufferMatrix4);
+        // TODO isso é extremamente suscetível a colisões de buffer com outros métodos
+        // a MatrixTranslator precisa mudar o sistema de buffers interno dela
         System.arraycopy(bufferMatrix4,0,m4A,0,16);
     }
 
-    //very proud of that one
     /**
-     * Returns the 4x4 matrix product:
-     * ret = A (*) B
+     * Returns the 4x4 matrix product: <p>
+     * result = A (*) B
      * */
+    private static final float[] matrixProductBuffer = new float[16];
     public static void multiply4x4Matrices(float[] m4A, float[] m4B, @Modified float[] result){
-        Arrays.fill(bufferMatrix4,0);
+        Arrays.fill(matrixProductBuffer,0);
         for (int c = 0; c < 4; c++) {
             for (int r = 0; r < 4; r++) {
                 for (int i = 0; i < 4; i++) {
                     int m1Loc = r*4+i; int m2Loc = c+i*4;
-                    bufferMatrix4[c + r*4] += m4A[m1Loc]*m4B[m2Loc];
+                    matrixProductBuffer[c + r*4] += m4A[m1Loc]*m4B[m2Loc];
                 }
             }
         }
-        System.arraycopy(bufferMatrix4, 0, result, 0, 16);
+        System.arraycopy(matrixProductBuffer, 0, result, 0, 16);
     }
 
+    /**
+     * Returns the 3x3 matrix product: <p>
+     * result = A (*) B
+     * */
     public static void multiply3x3Matrices(float[] m3A, float[] m3B, @Modified float[] result){
-        Arrays.fill(result,0);
+        Arrays.fill(result,0); // TODO deixa igual ta no metodo 4x4
         for (int c = 0; c < 3; c++) {
             for (int r = 0; r < 3; r++) {
                 for (int i = 0; i < 3; i++) {
@@ -283,11 +307,19 @@ public class MatrixTranslator {
         System.arraycopy(result, 0, m3A, 0, result.length);
     }
 
+    /**
+     * Sets vec4 to be the matrix product from the column vector and the 4x4 matrix <p>
+     * vec4' = mat4 (*) vec4
+     * */
     public static void multiplyVec4Mat4(@Modified float[] vec4, float[] mat4){
-        multiplyVec4Mat4(vec4,mat4,VectorTranslator.buffer1);
+        multiplyVec4Mat4(vec4,mat4,VectorTranslator.buffer1); //TODO KKKKKKKKKKKK aiai
         System.arraycopy(VectorTranslator.buffer1,0,vec4,0,4);
     }
 
+    /**
+     * Gives the matrix product from the column vector and the 4x4 matrix <p>
+     * result = mat4 (*) vec4
+     * */
     public static void multiplyVec4Mat4(float[] vec4, float[] mat4,@Modified float[] result){
         Arrays.fill(result,0);
         for (int i = 0; i < 16; i++) {

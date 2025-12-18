@@ -123,27 +123,34 @@ public class RigidBody implements Rotatable {
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
         VectorTranslator.copy(px,py,pz,pBuffer);
         VectorTranslator.copy(fx,fy,fz,fBuffer);
-        toLocalCoordinateSystem(pBuffer); // presumindo que este seja nosso centro de massa (p.197)
 
-        MatrixTranslator.multiplyVec4Mat4(pBuffer,rotationMatrix); // rotação global, translação local
-        // (sim eu removo a rotação pra rodar o ponto de novo :p)
+        VectorTranslator.subtractFromVector(pBuffer,pos);
+        // presumindo que este seja nosso centro de massa (p.197)
+        // a posição do ponto é relativa ao centro de massa,
+        // a rotação é no sistema de coordenadas global
+
         VectorTranslator.crossProduct(pBuffer,fBuffer);
         applyTorque(pBuffer);
         applyForce(fBuffer);
+        // É o que eles fazem na Cyclone, mas eu acho estranho,
+        // dependendo do ponto, o torque pode ser mais ou menos forte, mas
+        // a força é constante?? Isso que eu ganho por não estudar física :p
     }
 
     private final float[] rotBuffer = new float[4];
     private final float[] tBuffer = new float[4];
     public void applyRotationalTranslation(float dx, float dy, float dz, float px, float py, float pz){
-        VectorTranslator.copy(px,py,pz,rotBuffer);
-        VectorTranslator.copy(dx,dy,dz,tBuffer);
-        toLocalCoordinateSystem(rotBuffer); // presumindo que este seja nosso centro de massa (p.197)
-
-        MatrixTranslator.multiplyVec4Mat4(rotBuffer,rotationMatrix); // rotação global, translação local
-        VectorTranslator.crossProduct(rotBuffer,tBuffer);
-
-        applyRotation(rotBuffer); //fixme a quantidade de rotação?
-        applyTranslation(tBuffer);
+        applyTranslation(dx,dy,dz);
+        // TODO isso só funciona se A MATEMÁTICA INERCIAL ESTIVER FUNCIONANDO >:(
+//        VectorTranslator.copy(px,py,pz,rotBuffer);
+//        VectorTranslator.copy(dx,dy,dz,tBuffer);
+//        toLocalCoordinateSystem(rotBuffer); // presumindo que este seja nosso centro de massa (p.197)
+//
+//        MatrixTranslator.multiplyVec4Mat4(rotBuffer,rotationMatrix); // rotação global, translação local
+//        VectorTranslator.crossProduct(rotBuffer,tBuffer);
+//
+//        applyRotation(rotBuffer); //fixme a quantidade de rotação?
+//        applyTranslation(tBuffer);
     }
 
     public void applyAngularVelocity(float rvX, float rvY, float rvZ){
@@ -164,7 +171,16 @@ public class RigidBody implements Rotatable {
     @Override
     public void applyTorque(float tx, float ty, float tz) {
         VectorTranslator.copy(tx,ty,tz,torqueBuffer);
-        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,inverseInertialTensor);
+//        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,inverseInertialTensor);
+        // a função de aplicar torque precisa fazer isso? não cabe somente
+        // a integração? (função update)
+        // é, me parece que a função torque x tensor inverso só acontece na integração :p
+
+        System.out.println("TENSOR :");
+        MatrixTranslator.debugMatrix4x4(inertialTensor);
+        MatrixTranslator.debugMatrix4x4(inverseInertialTensor);
+        MatrixTranslator.debugMatrix4x4(rotatedInverseInertialTensor);
+
         // Eu acredito que seja o tensor rotatedInverseInertialTensor
         // mas ele tem um comportamento super bugado quando eu uso ele
         // talvez seja um problema na própria rotação do tensor,
@@ -172,6 +188,7 @@ public class RigidBody implements Rotatable {
         // de posição quanto no eixo de rotação kkkkkk
         // TODO: ver esse problema de distribuição de do tensor inercial
         // Até o momento eu só testei isso com um tensor identidade também
+        // pelo q me parece, ele acumula o torque e multiplica na integração?
         VectorTranslator.addToVector(angularAccelAccumulator,torqueBuffer);
     }
     float[] torqueBuffer = new float[4];
