@@ -123,7 +123,7 @@ public class Cube extends RigidBody implements Collideable {
 
     float resolveCollisionWithPlane(FixedPlane plane){
         for (int v = 0; v < worldVertices.length; v+=4) {
-            float[] currentVertex = BufferManager.allocateVec4(); // TODO método que aloca e já coloca os dados
+            float[] currentVertex = BufferManager.allocateVec4(); // TODO método que aloca e já coloca os dados?
             float[] contactNormal = BufferManager.allocateVec4();
 
             VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2],currentVertex);
@@ -173,6 +173,14 @@ public class Cube extends RigidBody implements Collideable {
                 // TODO isso tá estranho, o ponto tá certo?
                 // Talvez seja a física to Torque q esteja meio ruim msm
 
+                // TODO HONESTAMENTE, EM VEZ DE FICAR ALOCANDO EM CADA FRAME
+                //  SERIA MAIS FÁCIL MANTER O ESCOPO DE BUFFERS PERMANENTES GLOBAL
+                //  e sim, eu sei que o BufferManager foi feito justamente pra não
+                //  ter que fazer isso, mas fazer o que :p
+                //  esse código é terrível de ler, prefiro ter um escopo enorme
+                //  also uma alocação de buffer permanente seria legal para
+                //  evitar alguns checks, depois eu vejo um jeito de
+                //  conter o escopo somente a essa função e manter um acesso rápido
                 BufferManager.freeVec4(vertexVel);
                 BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);
                 BufferManager.freeVec4(translation);

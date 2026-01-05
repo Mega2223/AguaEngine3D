@@ -2,8 +2,12 @@ package net.mega2223.aguaengine3d.physics.actors;
 
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.objects.Particle;
 
+/**
+ Simulates a floor
+ @deprecated use a Plane hitbox instead
+  * */
+@Deprecated
 public class FloorActor implements PhysicsActor{
     float y;
     public FloorActor(float y){

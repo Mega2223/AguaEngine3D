@@ -63,6 +63,9 @@ public interface Rotatable extends PhysicsObject {
         applyRotationalTranslation(amount[0],amount[1],amount[2],point[0],point[1],point[2]);
     }
 
+    /**
+     * Applies an impulse at the specified point (in world coordinates)
+     * */
     default void applyImpulse(float[] impulse, float[] point){
         applyImpulse(impulse[0],impulse[1],impulse[2],point[0],point[1],point[2]);
     }

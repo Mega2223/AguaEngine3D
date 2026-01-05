@@ -4,7 +4,6 @@ package net.mega2223.aguaengine3d;
 import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
-import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Skybox;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.TexturedModel;
@@ -26,10 +25,8 @@ import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
 import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
-import net.mega2223.aguaengine3d.physics.objects.Particle;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
-import net.mega2223.aguaengine3d.physics.objects.collideable.Sphere;
 import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,7 +34,10 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings({"unused"})
+/**
+ * The engine's enter-point, mostly used for testing.
+ * Yes, the spelling is intentional.
+ * */
 
 /*
  * The official AguaEngine3D TODO list:
@@ -100,9 +100,13 @@ import java.util.Random;
 // Manter a rotação do tensor inercial e o atrito do plano ao mesmo tempo tem efeitos ruins
 // eu não tenho a mínima ideia de se o problema é o tensor inercial invertido rotacionado ou
 // a projeção feita pra calcular o atrito no plano
+// talvez um contexto de física possa ter um grupo de streams de saída as quais o Gaem3D pode puxar direto
+
+// talvez tirar o 'dest'? é uma convenção meio ruim, com a anotação @Modified
+// não é necessário, ao meu ver, falar que a variável é o destino
+
 
 public class Gaem3D {
-
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     public static final float SPEED = .1F;
@@ -227,17 +231,17 @@ public class Gaem3D {
         fixedPlane.setFriction(0.0F);
         physicsContext.addObject(fixedPlane);
 
-        PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
-                new Sphere(1,1),
-                Mesh.CUBE.toModel(
-                        new SolidColorShaderProgram(1, 0, 0)
-                )
-        );
-        physicsContext.addObject(ball);
-        context.addObject(ball);
+//        PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
+//                new Sphere(1,1),
+//                Mesh.CUBE.toModel(
+//                        new SolidColorShaderProgram(1, 0, 0)
+//                )
+//        );
+//        physicsContext.addObject(ball);
+//        context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.01F,.01F));
+        physicsContext.addForce(new Drag(.25F,.01F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -263,13 +267,11 @@ public class Gaem3D {
                 doRenderLogic();
                 notRendered = 0;
                 framesElapsed++;
-                //lastCycleDuration = System.currentTimeMillis() - cycleStart;
+//                lastCycleDuration = System.currentTimeMillis() - cycleStart;
                 framesLastSecond++;
             }
         }
     }
-
-    Renderable line = null;
 
     protected static void doLogic() {
         int n = 1;

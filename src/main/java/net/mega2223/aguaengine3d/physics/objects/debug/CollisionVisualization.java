@@ -9,9 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollisionVisualization implements Renderable {
-    float[] position = new float[4];
-    float[] translation = new float[4];
-    float[] force = new float[4];
+    // TODO idealmente isso seria feito a partir de uma stream de dados dentro da aplicação
+    //  de forma análoga a um stdin por exemplo, onde algum lugar manda colisões e outro lugar
+    //  consome essas colisões para fazer a visualização, acho que seria a melhor forma de
+    //  manter o módulo gráfico e o módulo físico ainda segregados
+    float[] position;
+    float[] translation;
+    float[] force;
     float timeToRemove = 5F;
 
     public static List<CollisionVisualization> COLLISION_OUTPUT_STREAM = new ArrayList<>();
