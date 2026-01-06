@@ -33,15 +33,24 @@ public class RenderingContext implements Comparator<Renderable> {
         return this;
     }
 
+    List<Renderable> toRemove = new ArrayList<>();
+
     public void doLogic(){
         if(!active){return;}
         for(ScriptedSequence s : scripts){
             s.preLogic(iteration,this);
         }
-        for(Renderable o : objects){o.doLogic(iteration);}
+        for(Renderable o : objects){
+            o.doLogic(iteration);
+            if(!o.isValid()){
+                toRemove.add(o);
+            }
+        }
         for(ScriptedSequence s : scripts){
             s.postLogic(iteration,this);
         }
+        objects.removeAll(toRemove);
+        toRemove.clear();
         iteration++;
     }
 

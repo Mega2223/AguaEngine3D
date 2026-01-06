@@ -1,6 +1,7 @@
 package net.mega2223.aguaengine3d.graphics.objects.shadering;
 
 import net.mega2223.aguaengine3d.graphics.objects.LightspaceRenderingManager;
+import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import org.lwjgl.opengl.GL30;
 
 public abstract class ShaderProgramTemplate implements ShaderProgram{
@@ -14,7 +15,7 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     protected int projectionMatrixLocation = -1;
     protected int translationMatrixLocation = -1;
     protected int rotationMatrixLocation = -1;
-    protected int itnerationLocation = -1;
+    protected int iterationLocation = -1;
 
     protected int[] shadowEnableBoolLoc = new int[MAX_LIGHTS];
     protected int[] lightSpacePositions = new int[MAX_LIGHTS];
@@ -26,7 +27,7 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
         projectionMatrixLocation = GL30.glGetUniformLocation(getID(),"projection");
         translationMatrixLocation = GL30.glGetUniformLocation(getID(),"translation");
         rotationMatrixLocation = GL30.glGetUniformLocation(getID(),"rotation");
-        itnerationLocation = GL30.glGetUniformLocation(getID(),"iteration");
+        iterationLocation = GL30.glGetUniformLocation(getID(),"iteration");
         GL30.glUseProgram(getID());
         //fixme this may be messing up the depth display shader somehow
         for (int i = 0; i < MAX_LIGHTS; i++) {
@@ -40,16 +41,29 @@ public abstract class ShaderProgramTemplate implements ShaderProgram{
     }
 
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
         GL30.glUniformMatrix4fv(translationMatrixLocation,false,translationMatrix);
         GL30.glUniformMatrix4fv(projectionMatrixLocation,false,projectionMatrix);
-        GL30.glUniform1i(itnerationLocation,interation);
+        GL30.glUniform1i(iterationLocation,iteration);
     }
 
-    public void setRotationMatrix(float[] m4){
+
+    protected float[] rotationMatrix = new float[16];
+    @Override
+    public void setRotationMatrix(float[] m4) {
         GL30.glUseProgram(getID());
-        GL30.glUniformMatrix4fv(rotationMatrixLocation,false,m4);
+        MatrixTranslator.copy(m4,rotationMatrix);
+        GL30.glUniformMatrix4fv(rotationMatrixLocation,true,m4);
+        // TODO pq só matrizes de rotação dão ruim? INVESTIGUE !!!
+        // em tese todas as matrizes deveriam ser transpostas, mas a matriz de tradução
+        // funciona ok
+        // cpa talvez seja a ordem de multiplicação no código dos shaders
+    }
+
+    @Override
+    public void getRotationMatrix(float[] destM4) {
+        MatrixTranslator.copy(rotationMatrix,destM4);
     }
 
     @Override

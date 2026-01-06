@@ -20,11 +20,13 @@ uniform vec4[MAX_LIGHTS] lights; //4th location is brightness
 uniform vec4[MAX_LIGHTS] lightColors; //4th location is color influence
 
 //lightspace calculations for shadow rendering, off by default
+/*
 uniform sampler2D[MAX_LIGHTS] shadowmaps;//fixme OpenGL does not like sampler arrays JUST IN SOME MACHINES FOR SOME REASON >:(
 uniform int[MAX_LIGHTS] doShadowMapping;
-
+*/
 out vec4 color;
 
+/*
 float calculateShadowAt(int index){
     vec4 pos = lightSpacePos[index];
     vec3 tr = lightSpacePos[index].xyz/lightSpacePos[index].w;
@@ -33,8 +35,9 @@ float calculateShadowAt(int index){
     br = cos(clamp(br*3.14,-3.14,3.14))+1;
     tr/=2;tr+=.5;
     float depth = texture(shadowmaps[index],tr.xy)[0];
-    return tr.z-.00005 > depth ? 1:0;
+    return tr.z-.00005 > depth ? 1.0:0.0;
 }
+*/
 
 float calculateLightInfluence(vec4 light,vec4 coord){
     float influence = distance(light.xyz,coord.xyz);
@@ -52,7 +55,7 @@ void main(){
     for(int i = 0; i < MAX_LIGHTS; i++){
         float lightInfluence = calculateLightInfluence(lights[i],objectiveCoord);
         vec4 mixedColor = mix(textureColor, lightColors[i], lightColors[i].a);
-        lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
+        //lightInfluence = doShadowMapping[i]==0?(lightInfluence):(lightInfluence-calculateShadowAt(i));
         lightInfluence = clamp(lightInfluence,0,1);
         color = mix(color,mixedColor,lightInfluence);
     }

@@ -4,15 +4,16 @@ import java.util.List;
 import java.util.Random;
 
 public class MathUtils {
-    public static Object doWeightedSelection(@SuppressWarnings("rawtypes") List objectList, float[] weights){
-        return doWeightedSelection(objectList.toArray(),weights);
+    public static <T> T doWeightedSelection(List<T> objectList, float[] weights){
+        T[] array = (T[]) objectList.toArray(); // Como assim esse cast não é seguro????
+        return doWeightedSelection(array,weights);
     }
-    public static Object doWeightedSelection(Object[] objects, float[] weights){
+    public static <T> T doWeightedSelection(T[] objects, float[] weights){
         if(objects.length!= weights.length){throw new UnsupportedOperationException("Objects or weights not set up correctly");}
         if(objects.length == 1){return objects[0];}
-        float totalWeightLenght = 0;
-        for(float act : weights){totalWeightLenght+=act;}
-        float randomValue = new Random().nextFloat() * totalWeightLenght;
+        float weightSum = 0;
+        for(float act : weights){weightSum+=act;}
+        float randomValue = new Random().nextFloat() * weightSum;
         float currentPos = 0;
         for(int i = 0; i < objects.length; i++){
             if(randomValue >= currentPos && randomValue < currentPos+weights[i]){return objects[i];}
@@ -36,11 +37,11 @@ public class MathUtils {
         return ret;
     }
 
-    public static void predictNextPos(float[] initialVector, float vectorSpeed, float directionRadians){
-        predictNextPos(initialVector,0,1,vectorSpeed,directionRadians);
+    public static void predict2D(float[] initialVector, float vectorSpeed, float directionRadians){
+        predict2D(initialVector,0,1,vectorSpeed,directionRadians);
     }
 
-    public static void predictNextPos(float[] initialVector, int xLocationInArray, int zLocationInArray, float vectorSpeed, float directionRadians){
+    public static void predict2D(float[] initialVector, int xLocationInArray, int zLocationInArray, float vectorSpeed, float directionRadians){
         float x = initialVector[xLocationInArray] , z = initialVector[zLocationInArray];
         float s = (float) Math.sin(directionRadians);
         float c = (float) Math.cos(directionRadians);
@@ -68,7 +69,6 @@ public class MathUtils {
         }
 
         return smallestDis;
-
     }
 
     public static void scaleAllElements(float[] array, float factor){
@@ -77,7 +77,7 @@ public class MathUtils {
         }
     }
 
-    public static float getHighestNInDataset(float[] data){
+    public static float highestValueInArray(float[] data){
         float f = data[0];
         for (int i = 1; i < data.length; i++) {
             f = Math.max(f,data[i]);

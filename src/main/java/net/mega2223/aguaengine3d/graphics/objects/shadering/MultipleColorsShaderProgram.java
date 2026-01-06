@@ -40,8 +40,8 @@ public class MultipleColorsShaderProgram extends ShaderProgramTemplate implement
     }
 
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
-        super.setUniforms(interation, translationMatrix, projectionMatrix);
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
+        super.setUniforms(iteration, translationMatrix, projectionMatrix);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class AxisAngleTest {
 
 //            VectorTranslator.normalize(a); VectorTranslator.normalize(b);
 
-            VectorTranslator.getAxisAngle(a,b,axis);
+            VectorTranslator.getRotationAxis(a,b,axis);
 //
 //        VectorTranslator.getCrossProduct(a,b,axis);
 //        VectorTranslator.normalize(axis);
@@ -52,7 +52,7 @@ public class AxisAngleTest {
             );
             float[] t = new float[4];
             for (int i = 0; i < 4; i++) {t[i] = res[i] - b[i];}
-            if(VectorTranslator.getMagnitude(t) > .001F){
+            if(VectorTranslator.magnitude(t) > .001F){
                 throw new RuntimeException("Invalid vector transformation");
             }
             System.out.println("\nTESTING REVERSE");

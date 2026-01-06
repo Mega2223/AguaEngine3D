@@ -7,6 +7,8 @@ import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
 import org.lwjgl.opengl.GL30;
 
+import java.util.Arrays;
+
 public class CubemapInterpreterShaderProgram implements ShaderProgram{
 
     final int id;
@@ -89,6 +91,11 @@ public class CubemapInterpreterShaderProgram implements ShaderProgram{
     @Override
     public void setRotationMatrix(float[] m4) {
 
+    }
+
+    @Override
+    public void getRotationMatrix(float[] destM4) {
+        Arrays.fill(destM4,0);
     }
 
     @Override

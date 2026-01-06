@@ -11,4 +11,6 @@ public interface Renderable {
     ShaderProgram getShader(); //ideally this would not be here but RenderingManager needs it
 
     default int getRenderOrderPosition(){return 0;}
+    default boolean isValid(){return true;}
+    default void unallocate(){}; //TODO isso não deve ser default
 }

@@ -29,9 +29,9 @@ public class SolidColorShaderProgram extends ShaderProgramTemplate implements Sh
     private int uniformColorLocation = -1;
 
     @Override
-    public void setUniforms(int interation, float[] translationMatrix, float[] projectionMatrix) {
+    public void setUniforms(int iteration, float[] translationMatrix, float[] projectionMatrix) {
         GL30.glUseProgram(getID());
-        super.setUniforms(interation, translationMatrix, projectionMatrix);
+        super.setUniforms(iteration, translationMatrix, projectionMatrix);
         GL30.glUniform4f(uniformColorLocation,color[0],color[1],color[2],color[3]);
     }
 

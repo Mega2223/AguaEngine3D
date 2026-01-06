@@ -198,7 +198,7 @@ public class ModelUtils {
             float vAx = v1x - v0x; float vAy = v1y - v0y; float vAz = v1z - v0z;
             float vBx = v2x - v0x; float vBy = v2y - v0y; float vBz = v2z - v0z;
 
-            VectorTranslator.getCrossProduct(vAx, vAy, vAz, vBx, vBy, vBz, bufferVec);
+            VectorTranslator.crossProduct(vAx, vAy, vAz, vBx, vBy, vBz, bufferVec);
             VectorTranslator.normalize(bufferVec);
 
             primitiveNormals[i/3][0] = bufferVec[0];
@@ -289,7 +289,7 @@ public class ModelUtils {
                 //" + vertices[ind] + " y: " + vertices[ind+1] + " z: " + vertices[ind + 2]
                 System.out.printf(Locale.US,"x: %.3f y:%.3f z:%.3f\n",vertices[ind],vertices[ind+1],vertices[ind+2]);
             }
-            VectorTranslator.getCrossProduct(
+            VectorTranslator.crossProduct(
                     vertices[indices[i]*4]-vertices[indices[i+2]*4],
                     vertices[indices[i]*4+1]-vertices[indices[i+2]*4+1],
                     vertices[indices[i]*4+2]-vertices[indices[i+2]*4+2],
