@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d;
 
 
-import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
@@ -120,7 +119,7 @@ public class Gaem3D {
 
     static float[] projectionMatrix = new float[16];
 
-    static PhysicsObjectDecorator<PhysicsObject, Positionable> p = null;
+    static PhysicsObjectDecorator<PhysicsObject, Positionable> lastObject = null;
     static final Random r = new Random(2223);
 
     // Pelo amor de deus eu não vou fazer um cast para todas as teclas
@@ -165,31 +164,31 @@ public class Gaem3D {
             }
 
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(.1F, 0, 0);
+                lastObject.applyAcceleration(.1F, 0, 0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(0, 0, -.1F);
+                lastObject.applyAcceleration(0, 0, -.1F);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(0, 0, .1F);
+                lastObject.applyAcceleration(0, 0, .1F);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(-.1F, 0, 0);
+                lastObject.applyAcceleration(-.1F, 0, 0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(.04F,0,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_T) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(-.04F,0,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(-.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Y) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,.04F,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(0,.04F,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,-.04F,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(0,-.04F,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_P) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).setAngularVelocity(0,0,0);
+                ((RigidBody) lastObject.getActor()).setAngularVelocity(0,0,0);
             }
         });
 
@@ -288,27 +287,29 @@ public class Gaem3D {
 
         if (framesElapsed % (60 * 39284) == 0) {
             System.out.println("SHAW");
-            RigidBody r = new Cube(1);
-            Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
-            p = new PhysicsObjectDecorator<>(
-//                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
-//                    new Sphere(1, 1.0F),
-                    r,
-                    m
+            RigidBody rb = new Cube(1);
+            rb.setInverseInertialTensor(
+                    new float[] {
+                            .1F,0,0,0,
+                            0,.1F,0,0,
+                            0,0,.1F,0,
+                            0,0,0,1
+                    }
             );
+            rb.setRotationAxis(0,0, (float) Math.PI / 2);
+            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
+            lastObject = new PhysicsObjectDecorator<>(rb, mod);
+            context.addObject(lastObject);
+            context.addObject(new VertexTracker((Model) lastObject.getRenderable()));
+            physicsContext.addObject(lastObject);
+            lastObject.setCoordinates(0,2,0);
 
-            context.addObject(p);
-            context.addObject(new VertexTracker((Model) p.getRenderable()));
-            physicsContext.addObject(p);
-            //p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
-            p.setCoordinates(0,2,0);
-
-            final float[] rVertices = m.getRelativeVertices();
+            final float[] rVertices = mod.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
-                AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
+                AngularVelocityVisualizer l = new AngularVelocityVisualizer(mod,rb,i);
                 context.addObject(l);
             }
-            VectorTranslator.debugVector(p.x(),p.y(),p.z());
+            VectorTranslator.debugVector(lastObject.x(), lastObject.y(), lastObject.z());
         }
 
     }

@@ -136,15 +136,14 @@ public class Cube extends RigidBody implements Collideable {
             if(contactDepth > 0){
                 float[] planePoint = BufferManager.allocateVec4(),
                         planeVel = BufferManager.allocateVec4(),
-                        impulseA = BufferManager.allocateVec4(),
-                        impulseB = BufferManager.allocateVec4(),
-                        translation = BufferManager.allocateVec4();
+                        impulseCube = BufferManager.allocateVec4(),
+                        translationCube = BufferManager.allocateVec4();
 
                 plane.getVelocity(planeVel);
                 plane.getClosestPoint(currentVertex,planePoint);
                 CollisionMath.solveContact(pos,invMass,planePoint,plane.getInverseMass(),
-                        contactNormal,contactDepth,translation,null);
-                applyRotationalTranslation(translation,planePoint);
+                        contactNormal,contactDepth,translationCube,null);
+                applyRotationalTranslation(translationCube,planePoint);
 
                 float[] vertexVel = BufferManager.allocateVec4();
                 getLocalPointVelocity(currentVertex,vertexVel);
@@ -161,12 +160,12 @@ public class Cube extends RigidBody implements Collideable {
                         invMass,
                         plane.getInverseMass(),
                         separatingVelocity, contactNormal, .5F,
-                        impulseA, impulseB
+                        impulseCube, null
                 );
 
-                applyImpulse(impulseA,planePoint);
+                applyImpulse(impulseCube,planePoint);
 
-//                float[] frictionForce = impulseA; // redundante mas enfim FIXME?
+//                float[] frictionForce = impulseCube; // redundante mas enfim FIXME?
 //                plane.getFriction(vertexVel[0],vertexVel[1],vertexVel[2],frictionForce);
 //                applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
 //                        planePoint[0],planePoint[1],planePoint[2]);
@@ -183,8 +182,8 @@ public class Cube extends RigidBody implements Collideable {
                 //  conter o escopo somente a essa função e manter um acesso rápido
                 BufferManager.freeVec4(vertexVel);
                 BufferManager.freeVec4(planeVel); BufferManager.freeVec4(planePoint);
-                BufferManager.freeVec4(translation);
-                BufferManager.freeVec4(impulseA); BufferManager.freeVec4(impulseB);
+                BufferManager.freeVec4(translationCube);
+                BufferManager.freeVec4(impulseCube);
                 BufferManager.freeVec4(currentVertex);
                 BufferManager.freeVec4(contactNormal);
                 return contactDepth;

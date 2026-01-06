@@ -39,7 +39,7 @@ public interface Rotatable extends PhysicsObject {
      * */
     void applyTorque(float tx, float ty, float tz);
 
-    void applyAngularVelocity(float rvx, float rvy, float rvz);
+    void applyAngularImpulse(float rvx, float rvy, float rvz);
 
     void applyRotation(float rx, float ry, float rz);
 
@@ -70,7 +70,7 @@ public interface Rotatable extends PhysicsObject {
         applyImpulse(impulse[0],impulse[1],impulse[2],point[0],point[1],point[2]);
     }
 
-    default void applyAngularVelocity(float[] rotationalVelocity){
-        applyAngularVelocity(rotationalVelocity[0],rotationalVelocity[1],rotationalVelocity[2]);
+    default void applyAngularImpulse(float[] angularImpulse){
+        applyAngularImpulse(angularImpulse[0],angularImpulse[1],angularImpulse[2]);
     }
 }

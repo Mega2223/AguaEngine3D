@@ -27,7 +27,7 @@ public class RigidBody implements Rotatable {
     private final float[] deltaPos = new float[4];
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
-    protected final float[] rotatedInverseInertialTensor = new float[16];
+    protected final float[] rotatedInverseInertiaTensor = new float[16];
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -64,9 +64,28 @@ public class RigidBody implements Rotatable {
         QuaternionTranslator.copy(buffers[0],rotationQ4);
 
         QuaternionTranslator.rotationMatrixFromQuaternion(rotationQ4,rotationMatrix);
-        MatrixTranslator.transposeMat4(rotationMatrix,inverseRotationMatrix);
-        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor,rotatedInverseInertialTensor);
-        // The inverse of a rotation matrix is it's transpose, much quicker to calculate :)
+        MatrixTranslator.transposeMat4(rotationMatrix,inverseRotationMatrix); // The inverse of a rotation matrix is it's transpose, much quicker to calculate :)
+
+        // Inverse Inertial Tensor in world rotation
+        // I[w] = R x I x R^(-1)
+        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor,rotatedInverseInertiaTensor);
+        MatrixTranslator.multiply4x4Matrices(rotatedInverseInertiaTensor,inverseRotationMatrix);
+        // TODO se isso não funcionar, calcula o inverso depois de rotar o tensor
+        //  talvez manter ambos os tensores não seja uma má ideia
+
+//        System.out.println("rotationQ4");
+//        VectorTranslator.debugVector(rotationQ4);
+//        float[] axis = new float[4];
+//        System.out.println("rotationAxis");
+//        VectorTranslator.debugVector(axis);
+//        System.out.println("rotationMatrix");
+//        MatrixTranslator.debugMatrix4x4(rotationMatrix);
+//        System.out.println("inverseInertialTensor");
+//        MatrixTranslator.debugMatrix4x4(inverseInertialTensor);
+//        System.out.println("rotatedInverseInertiaTensor");
+//        MatrixTranslator.debugMatrix4x4(rotatedInverseInertiaTensor);
+//        System.exit(0);
+
     }
 
     @Override
@@ -159,19 +178,19 @@ public class RigidBody implements Rotatable {
     public void applyRotationalTranslation(float dx, float dy, float dz, float px, float py, float pz){
         applyTranslation(dx,dy,dz);
         // TODO isso só funciona se A MATEMÁTICA INERCIAL ESTIVER FUNCIONANDO >:(
-//        VectorTranslator.copy(px,py,pz,rotBuffer);
-//        VectorTranslator.copy(dx,dy,dz,tBuffer);
-//        toLocalCoordinateSystem(rotBuffer); // presumindo que este seja nosso centro de massa (p.197)
-//
-//        MatrixTranslator.multiplyVec4Mat4(rotBuffer,rotationMatrix); // rotação global, translação local
-//        VectorTranslator.crossProduct(rotBuffer,tBuffer);
-//
-//        applyRotation(rotBuffer); //fixme a quantidade de rotação?
-//        applyTranslation(tBuffer);
+        // FIXME Deus está morto
     }
 
-    public void applyAngularVelocity(float rvX, float rvY, float rvZ){
-        VectorTranslator.addToVector(rvX,rvY,rvZ,angularVelocity);
+    float[] angularImpulseBuffer = new float[4];
+    public void applyAngularImpulse(float iX, float iY, float iZ){
+        // TODO talvez a tradução de tensor inercial por rotação esteja errada
+        //  recomendo comparar com o met[h]od(o) da cyclone e ver se bate por meio
+        //  de algum teste
+        VectorTranslator.copy(iX,iY,iZ, angularImpulseBuffer);
+        MatrixTranslator.multiplyVec4Mat4(angularImpulseBuffer, rotatedInverseInertiaTensor);
+        // não daria pra verificar se o tensor inercial reverso faz o trabalho dele direito
+        //  tentando rotar o vetor em vez do tensor e comparando os resultados?
+        VectorTranslator.addToVector(angularVelocity,angularImpulseBuffer);
     }
 
     private final float[] rBuffer = new float[4];
@@ -191,7 +210,7 @@ public class RigidBody implements Rotatable {
         // TODO isso tem comportamento irregular, o tensor inercial talvez esteja sendo
         //  traduzido de forma errada
         VectorTranslator.copy(tx,ty,tz,torqueBuffer);
-        MatrixTranslator.multiplyVectorMatrix(torqueBuffer,rotatedInverseInertialTensor);
+        MatrixTranslator.multiplyVectorMatrix(torqueBuffer, rotatedInverseInertiaTensor);
         VectorTranslator.addToVector(angularAccelAccumulator,torqueBuffer);
     }
 
@@ -202,25 +221,25 @@ public class RigidBody implements Rotatable {
         dest[2] = pointVelocity[2] - velocity[2];
     }
 
+    float[] angularImpulse = BufferManager.allocatePermanentVec4(0,0,0,0);
+    float[] linearImpulse = BufferManager.allocatePermanentVec4(0,0,0,0);
+    float[] impulsePoint = BufferManager.allocatePermanentVec4(0,0,0,0);
     @Override
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
-        float[] angularImpulse = BufferManager.allocateVec4();
-        float[] linearImpulse = BufferManager.allocateVec4();
+        VectorTranslator.copy(px,py,pz,impulsePoint);
+        VectorTranslator.copy(ix,iy,iz,linearImpulse);
 
-        VectorTranslator.copy(px,py,pz,angularImpulse);
-        VectorTranslator.copy(ix, iy, iz,linearImpulse);
-        toLocalCoordinateSystem(angularImpulse); // presumindo que este seja nosso centro de massa (p.197)
+        VectorTranslator.subtractFromVector(impulsePoint,pos);
+        // Presumindo que este seja nosso centro de massa (p.197)
+        // a posição do ponto é relativa ao centro de massa,
+        // a rotação é no sistema de coordenadas global
 
-        MatrixTranslator.multiplyVec4Mat4(angularImpulse,rotationMatrix); // rotação global, translação local
-        VectorTranslator.crossProduct(angularImpulse,linearImpulse);
-
-        VectorTranslator.scaleVector(angularImpulse,.1F); // todo remove
-        applyAngularVelocity(angularImpulse); //fixme
+        VectorTranslator.crossProduct(impulsePoint,linearImpulse,angularImpulse);
         applyImpulse(linearImpulse);
-
-        BufferManager.freeVec4(angularImpulse);
-        BufferManager.freeVec4(linearImpulse);
+        applyAngularImpulse(angularImpulse);
     }
+
+
 
     public float getMass() {
         return mass;
@@ -277,5 +296,15 @@ public class RigidBody implements Rotatable {
 
     public void setAngularVelocity(float x, float y, float z) {
         VectorTranslator.copy(x,y,z,angularVelocity);
+    }
+
+    float[] axisBuffer = new float[4];
+    public void setRotationAxis(float x, float y, float z){
+        VectorTranslator.copy(x,y,z,axisBuffer);
+        QuaternionTranslator.axisAngleToQuaternion(axisBuffer,rotationQ4);
+    }
+
+    public void debugProperties(){
+        //TODO
     }
 }

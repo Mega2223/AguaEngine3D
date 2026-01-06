@@ -192,7 +192,9 @@ public class CollisionMath {
 
         VectorTranslator.scaleVector(contactNormalA,impulse,impulsePerIMass);
 
-        VectorTranslator.copy(impulsePerIMass,impulseA);
+        if(impulseA != null){
+            VectorTranslator.copy(impulsePerIMass,impulseA);
+        }
 
         if(impulseB != null){
             VectorTranslator.flipVector(impulsePerIMass);
