@@ -9,5 +9,15 @@ public abstract class CollisionManager {
         physContext = context;
     }
 
-    public abstract void manageCollisions(float deltaT);
+    public void managerCollisions(float deltaT){
+        manageCollisions(deltaT,1);
+    }
+
+    public void manageCollisions(float deltaT, int passes){
+        for (int i = 0; i < passes; i++) {
+            doSinglePass(deltaT);
+        }
+    }
+
+    abstract void doSinglePass(float deltaT);
 }

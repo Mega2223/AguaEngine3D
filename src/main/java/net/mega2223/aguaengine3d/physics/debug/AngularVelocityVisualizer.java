@@ -4,7 +4,7 @@ import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
-import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
+import net.mega2223.aguaengine3d.physics.objects.advanced.RigidBody;
 
 public class AngularVelocityVisualizer extends Line {
     final int xi, yi, zi;

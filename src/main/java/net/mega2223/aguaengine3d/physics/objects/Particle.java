@@ -2,6 +2,7 @@ package net.mega2223.aguaengine3d.physics.objects;
 
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.Material;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
 import java.util.Arrays;
@@ -9,23 +10,23 @@ import java.util.Arrays;
 public class Particle implements PhysicsObject {
 
     protected final float[] pos = new float[4];
-
     protected final float[] velocity =  new float[4];
-
     private final float[] accelerationAccumulator = new float[4];
-    private final float[] posDerivative = new float[4];
 
     protected float mass, invMass;
+
+    protected Material material = Material.DEFAULT;
 
     public Particle(float mass){
         this.mass = mass; this.invMass = 1F/mass;
     }
 
+    private final float[] deltaPos = new float[4];
     public void update(float deltaT){
         VectorTranslator.addToVector(velocity,accelerationAccumulator);
         Arrays.fill(accelerationAccumulator,0);
-        VectorTranslator.scaleVector(velocity,deltaT,posDerivative);
-        VectorTranslator.addToVector(pos, posDerivative);
+        VectorTranslator.scaleVector(velocity,deltaT, deltaPos);
+        VectorTranslator.addToVector(pos, deltaPos);
     }
 
     @Override
@@ -99,5 +100,14 @@ public class Particle implements PhysicsObject {
         dest[0] = - pointVelocity[0] + velocity[0];
         dest[1] = - pointVelocity[1] + velocity[1];
         dest[2] = - pointVelocity[2] + velocity[2];
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 }

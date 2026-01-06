@@ -1,7 +1,6 @@
 package net.mega2223.aguaengine3d;
 
 
-import net.mega2223.aguaengine3d.graphics.objects.Renderable;
 import net.mega2223.aguaengine3d.graphics.objects.RenderingContext;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Model;
@@ -20,20 +19,23 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
-import net.mega2223.aguaengine3d.physics.actors.FloorActor;
+import net.mega2223.aguaengine3d.physics.objects.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
-import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
+import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings({"unused"})
+/**
+ * The engine's enter-point, mostly used for testing.
+ * Yes, the spelling is intentional.
+ * */
 
 /*
  * The official AguaEngine3D TODO list:
@@ -83,12 +85,26 @@ import java.util.Random;
  *      maybe bind it to the RenderingContext object (for global qualities like fog rendering)
  * Classe que representa uma série de transformações? <- Transform?
  * Multi threadening <- lmao good luck with all these static buffers
+ * Material Interface (for friction, restitution etc.)
  * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
+// TODO o cálculo do inverso matricial é válido? seria legal ter um teste p/ isso
+// Shader dict: Refaz tudo, uma função deve ser $(nomeDaFuncao), usa um REGEX pelamor
+// talvez só substituir o corpo da função para evitar problemas de compatibilidade?
+// buffer de texto: faz +- igual o... scons?? esqueci o nome
+// buffer livre com função de flip
+
+// Manter a rotação do tensor inercial e o atrito do plano ao mesmo tempo tem efeitos ruins
+// eu não tenho a mínima ideia de se o problema é o tensor inercial invertido rotacionado ou
+// a projeção feita pra calcular o atrito no plano
+// talvez um contexto de física possa ter um grupo de streams de saída as quais o Gaem3D pode puxar direto
+
+// talvez tirar o 'dest'? é uma convenção meio ruim, com a anotação @Modified
+// não é necessário, ao meu ver, falar que a variável é o destino
+
 
 public class Gaem3D {
-
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
     public static final float SPEED = .1F;
@@ -100,19 +116,19 @@ public class Gaem3D {
     static RenderingContext context;
     static PhysicsContext physicsContext = new PhysicsContext();
 
-    static float[] trans = new float[16];
-    static float[] proj = new float[16];
+    static float[] projectionMatrix = new float[16];
 
-    static PhysicsObjectDecorator<PhysicsObject, Positionable> p = null;
-    static Random r = new Random(2223);
+    static PhysicsObjectDecorator<PhysicsObject, Positionable> lastObject = null;
+    static final Random r = new Random(2223);
 
-    // Pelo amor de deus eu não vou fazer isso para todas as teclas
-    // me dá um tempo
+    // Pelo amor de deus eu não vou fazer um cast para todas as teclas
+    // "ah erro de precisão mimimimimimi"
+    // me dá um tempo IntelliJ
     @SuppressWarnings("lossy-conversions")
     public static void main(String[] args) {
 
         //GLFW
-        manager = new WindowManager(300, 300, TITLE);
+        manager = new WindowManager(600, 400, TITLE);
         manager.init();
         manager.addUpdateEvent(() -> { //walk events
             double s = Math.sin(camera[3]);
@@ -147,28 +163,31 @@ public class Gaem3D {
             }
 
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_LEFT) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(.1F, 0, 0);
+                lastObject.applyAcceleration(.1F, 0, 0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_DOWN) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(0, 0, -.1F);
+                lastObject.applyAcceleration(0, 0, -.1F);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(0, 0, .1F);
+                lastObject.applyAcceleration(0, 0, .1F);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_RIGHT) == GLFW.GLFW_PRESS) {
-                p.applyAcceleration(-.1F, 0, 0);
+                lastObject.applyAcceleration(-.1F, 0, 0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_R) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(.01F,0,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_T) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(-.01F,0,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(-.04F,0,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_Y) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,.01F,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(0,.04F,0);
             }
             if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_U) == GLFW.GLFW_PRESS) {
-                ((RigidBody)p.getActor()).applyTorque(0,-.01F,0);
+                ((RigidBody) lastObject.getActor()).applyTorque(0,-.04F,0);
+            }
+            if (GLFW.glfwGetKey(manager.getWindow(), GLFW.GLFW_KEY_P) == GLFW.GLFW_PRESS) {
+                ((RigidBody) lastObject.getActor()).setAngularVelocity(0,0,0);
             }
         });
 
@@ -190,15 +209,10 @@ public class Gaem3D {
                 new float[]{0, 0, 100, 0, 0, 100, 100, 100},
                 TextureManager.loadTexture(Utils.TEXTURES_DIR + "/xadrez.png") // não funciona em distribuições unix???
         );
-//        Model nonChessFloor = new Model(
-//                new float[]{-50, 0, -50, 0, 50, 0, -50, 0, -50, 0, 50, 0, 50, 0, 50, 0},
-//                new int[]{0, 1, 2, 2, 1, 3},
-//                new SolidColorShaderProgram(.6F, .8F, .6F)
-//        );
-        context.addObject(chessFloor);
-//	    context.addObject(nonChessFloor);
 
-        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
+        context.addObject(chessFloor);
+
+//        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat, cat, cat, cat, cat, cat}
@@ -208,38 +222,23 @@ public class Gaem3D {
 
         // Phys Obj
 
-        physicsContext.addObject(new FixedPlane(
-                new float[]{0,1,0},
-                new float[]{0,0,0}
-        ));
+        FixedPlane fixedPlane = new FixedPlane(
+                new float[]{0, 1, 0},
+                new float[]{0, 0, 0}
+        );
+        physicsContext.addObject(fixedPlane);
 
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{5,0,0},
-//                new float[]{-5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{-5,0,0},
-//                new float[]{5,0,0}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,5},
-//                new float[]{0,0,-5}
-//        ));
-//        physicsContext.addObject(new FixedPlane(
-//                new float[]{0,0,-5},
-//                new float[]{0,0,5}
-//        ));
+//        PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
+//                new Sphere(1,1),
+//                Mesh.CUBE.toModel(
+//                        new SolidColorShaderProgram(1, 0, 0)
+//                )
+//        );
+//        physicsContext.addObject(ball);
+//        context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.001F,.01F));
-        //physicsContext.addActor(new FloorActor(-.001F));
-
-//        context.addScript(new ScriptedSequence("PhysFollower") {
-//            @Override
-//            protected void preLogic(int iteration, RenderingContext context) {
-//                camera[0] = p.x(); camera[1] = p.y()+.6F; camera[2] = p.z()-5;
-//            }
-//        });
+//        physicsContext.addForce(new Drag(.25F,.01F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -265,56 +264,66 @@ public class Gaem3D {
                 doRenderLogic();
                 notRendered = 0;
                 framesElapsed++;
-                //lastCycleDuration = System.currentTimeMillis() - cycleStart;
+//                lastCycleDuration = System.currentTimeMillis() - cycleStart;
                 framesLastSecond++;
             }
         }
     }
 
-    Renderable line = null;
-
     protected static void doLogic() {
-
         int n = 1;
         float rate = 1F;
         for (int i = 0; i < n; i++) {
             physicsContext.update(rate / (60F*n));
         }
 
-        if (framesElapsed % (60 * 39284) == 0) {
+        List<CollisionVisualization> collisionOutputStream = CollisionVisualization.COLLISION_OUTPUT_STREAM;
+        if(collisionOutputStream != null && !collisionOutputStream.isEmpty()){
+            context.addObject(collisionOutputStream.get(0));
+            collisionOutputStream.remove(0);
+        }
+
+        if (framesElapsed % (60 * 5) == 0) {
             System.out.println("SHAW");
-            RigidBody r = new Cube(1);
-            //r.angularAccelAccumulator[1] = .25F;
-            Model m = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
-            p = new PhysicsObjectDecorator<>(
-//                    new Sphere(60*r.nextFloat()+.01F, 1.0F),
-//                    new Sphere(1, 1.0F),
-                    r,
-                    m
-            );
+            RigidBody rb = new Cube(1);
+//            rb.setInverseInertialTensor(
+//                    new float[] {
+//                            .1F,0,0,0,
+//                            0,.1F,0,0,
+//                            0,0,.1F,0,
+//                            0,0,0,1
+//                    }
+//            );
+            rb.setAngularVelocity(0,0,5);
 
-            context.addObject(p);
-            context.addObject(new VertexTracker((Model) p.getRenderable()));
-            physicsContext.addObject(p);
-            //p.setCoordinates(Gaem3D.r.nextFloat() - .5F, 2f, Gaem3D.r.nextFloat() - .5F);
-            p.setCoordinates(0,2,0);
+            rb.setOrientationAxis(
+                    (float) (Math.PI * Math.random())/10F,
+                    (float) (Math.PI * Math.random())/10F,
+                    (float) (Math.PI * Math.random())/10F );
 
-            final float[] rVertices = m.getRelativeVertices();
+            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
+            lastObject = new PhysicsObjectDecorator<>(rb, mod);
+            context.addObject(lastObject);
+            context.addObject(new VertexTracker((Model) lastObject.getRenderable()));
+            physicsContext.addObject(lastObject);
+            lastObject.setCoordinates(0,6,0);
+
+            final float[] rVertices = mod.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {
-                AngularVelocityVisualizer l = new AngularVelocityVisualizer(m,r,i);
+                AngularVelocityVisualizer l = new AngularVelocityVisualizer(mod,rb,i);
                 context.addObject(l);
             }
-            VectorTranslator.debugVector(p.x(),p.y(),p.z());
+            VectorTranslator.debugVector(lastObject.x(), lastObject.y(), lastObject.z());
         }
 
     }
 
     protected static void doRenderLogic() {
-        MatrixTranslator.generatePerspectiveProjectionMatrix(proj, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
-        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, proj);
+        MatrixTranslator.generatePerspectiveProjectionMatrix(projectionMatrix, 0.01f, 1000f, (float) Math.toRadians(45), manager.viewportSize[0], manager.viewportSize[1]);
+        MatrixTranslator.applyLookTransformation(camera, (float) (camera[0] + Math.sin(camera[3])), camera[1], (float) (camera[2] + Math.cos(camera[3])), 0, 1, 0, projectionMatrix);
         context.doLogic();
         manager.fitViewport();
-        context.doRender(proj);
+        context.doRender(projectionMatrix);
         RenderingManager.printErrorQueue();
         manager.update();
     }

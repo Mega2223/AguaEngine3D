@@ -19,15 +19,14 @@ public class WindowManager {
         viewportSize = new int[]{w,h};
     }
 
-    @SuppressWarnings("CommentedOutCode")
     public void init(){
         GLFWErrorCallback.createPrint(System.err).set();
         GLFW.glfwMakeContextCurrent(windowName);
         GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE,GLFW.GLFW_TRUE);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE,GLFW.GLFW_OPENGL_CORE_PROFILE);
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GL30.GL_TRUE);
-        //GLFW.glfwWindowHint(GLFW.GLFW_VERSION_MINOR,2);
-        //GLFW.glfwWindowHint(GLFW.GLFW_VERSION_MAJOR,3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR,3);
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR,2);
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
         GLFW.glfwDefaultWindowHints();
 

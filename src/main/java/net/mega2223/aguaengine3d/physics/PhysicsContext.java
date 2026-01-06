@@ -1,10 +1,9 @@
 package net.mega2223.aguaengine3d.physics;
 
-import net.mega2223.aguaengine3d.physics.actors.PhysicsActor;
+import net.mega2223.aguaengine3d.physics.objects.actors.PhysicsActor;
 import net.mega2223.aguaengine3d.physics.collisions.CollisionManager;
 import net.mega2223.aguaengine3d.physics.collisions.SimpleCollisionManager;
 import net.mega2223.aguaengine3d.physics.forces.Force;
-import net.mega2223.aguaengine3d.physics.objects.Particle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,11 +16,17 @@ public class PhysicsContext {
     protected List<Force> forces = new ArrayList<>(16);
     protected CollisionManager collisionManager = new SimpleCollisionManager(this);
 
+    public long iteration = 0;
+
     public PhysicsContext(){
 
     }
 
     public void update(float deltaT){
+        update(deltaT,1);
+    }
+
+    public void update(float deltaT, int collisionPasses){
         for(PhysicsActor actor : actors){
             actor.act(deltaT,this);
         }
@@ -33,7 +38,8 @@ public class PhysicsContext {
         for(PhysicsObject o : objects){
             o.update(deltaT);
         }
-        collisionManager.manageCollisions(deltaT);
+        collisionManager.manageCollisions(deltaT,collisionPasses);
+        iteration++;
     }
 
     public void addObject(PhysicsObject object){

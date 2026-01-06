@@ -81,32 +81,38 @@ public class VectorTranslator {
     }
 
     public static void getFlipped(float[] vec3,@Modified float[] result){
-        result[0]=-vec3[0];
-        result[1]=-vec3[1];
-        result[2]=-vec3[2];
+        result[0]=-vec3[0]; result[1]=-vec3[1]; result[2]=-vec3[2];
     }
 
     public static void copy(float[] vec3,@Modified float[] dest){
-        dest[0] = vec3[0];
-        dest[1] = vec3[1];
-        dest[2] = vec3[2];
+        dest[0] = vec3[0]; dest[1] = vec3[1]; dest[2] = vec3[2];
     }
 
     public static void copy(float x, float y, float z, @Modified float[] dest){
-        dest[0] = x;
-        dest[1] = y;
-        dest[2] = z;
+        dest[0] = x; dest[1] = y; dest[2] = z;
     }
 
-    public static void crossProduct(@Modified float[] vector, float[] vector2){
-        crossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], buffer1);
-        System.arraycopy(buffer1,0,vector,0,3);
+    /**
+     * Sets vA to be the 3-dimensional cross product between vA and vB
+     * vA' = vA (x) vB
+     * */
+    public static void crossProduct(@Modified float[] vecA, float[] vecB){
+        crossProduct(vecA[0], vecA[1], vecA[2], vecB[0], vecB[1], vecB[2], buffer1);
+        System.arraycopy(buffer1,0,vecA,0,3);
     }
 
-    public static void crossProduct(float[] vector, float[] vector2, @Modified float[] result){
-        crossProduct(vector[0], vector[1], vector[2], vector2[0], vector2[1], vector2[2], result);
+    /**
+     * Calculates the 3-dimensional cross product between v1 and v2
+     * result = vA (x) vB
+     * */
+    public static void crossProduct(float[] vecA, float[] vecB, @Modified float[] result){
+        crossProduct(vecA[0], vecA[1], vecA[2], vecB[0], vecB[1], vecB[2], result);
     }
 
+    /**
+     * Calculates the 3-dimensional cross product between v1 and v2
+     * result = v1 (x) v2
+     * */
     public static void crossProduct(float x1, float y1, float z1, float x2, float y2, float z2, @Modified float[] result){
         result[0] = y1*z2-z1*y2;
         result[1] = z1*x2-x1*z2;

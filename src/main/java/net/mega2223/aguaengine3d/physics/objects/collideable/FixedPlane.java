@@ -1,5 +1,6 @@
 package net.mega2223.aguaengine3d.physics.objects.collideable;
 
+import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.collisions.Collideable;
@@ -25,6 +26,13 @@ public class FixedPlane extends Particle implements Collideable {
     }
 
     @Override
+    public void update(float deltaT) {
+        Arrays.fill(velocity,0);
+        super.update(deltaT);
+        Arrays.fill(velocity,0);
+    }
+
+    @Override
     public boolean collides(float x, float y, float z) {
         buffer[0] = x; buffer[1] = y; buffer[2] = z;
         return VectorTranslator.dotProduct(buffer,normal) == 0;
@@ -36,42 +44,68 @@ public class FixedPlane extends Particle implements Collideable {
     }
 
     @Override
-    public void getContactNormal(float[] coord, float[] result) {
+    public void getContactNormal(float[] point, float[] result) {
         VectorTranslator.getFlipped(normal,result);
     }
 
     @Override
-    public float getCollision(Collideable c, float[] contactNormalDest) {
+    public float solveCollision(Collideable c, float[] contactNormalDest) {
         if(c instanceof Sphere){
             Sphere s = (Sphere) c;
             s.getPos(buffer);
             VectorTranslator.subtractFromVector(buffer,point);
             VectorTranslator.flipVector(buffer);
             float depth = Math.max(0, VectorTranslator.dotProduct(buffer,normal) + s.radius);
-            VectorTranslator.copy(normal,contactNormalDest);
-            VectorTranslator.flipVector(contactNormalDest);
-            return Math.max(0,depth);
+
+            if(depth > 0){
+                VectorTranslator.copy(normal,contactNormalDest);
+                VectorTranslator.flipVector(contactNormalDest);
+                CollisionMath.solveContactSpheres(this, s, contactNormalDest, depth);
+
+                // computes the closest point in the plane from the center of the sphere
+                VectorTranslator.subtractFromVector(point[0],point[1],point[2],c.x(),c.y(),c.z(),contactPointBuffer);
+                VectorTranslator.scaleVector(normal, VectorTranslator.dotProduct(contactPointBuffer,normal), contactPointBuffer);
+                VectorTranslator.addToVector(c.x(),c.y(),c.z(),contactPointBuffer);
+
+                float sep = CollisionMath.separatingVelocity(
+                        contactPointBuffer[0],contactPointBuffer[1],contactPointBuffer[2],
+                        0,0,0, c.x(),c.y(),c.z(), c.vx(),c.vy(),c.vz()
+                );
+                float averageRestitution = (this.getRestitution() + s.getRestitution())/2F;
+                CollisionMath.solveCollision(c,this,sep,normal,averageRestitution);
+
+                getFriction(c.vx(),c.vy(),c.vz(),c.getMaterial().getFriction(),buffer);
+                c.applyForce(buffer);
+            }
+            return depth;
         }
         return 0;
     }
 
-    //TODO coloca na super
-    public float getCollision(float[] point, float[] contactNormalDest){
+    private final float[] contactPointBuffer = new float[4];
+
+    @Override
+    public float getCollision(float[] point, float[] result){
         VectorTranslator.copy(point,buffer);
         VectorTranslator.subtractFromVector(buffer,this.point);
         VectorTranslator.flipVector(buffer);
         float depth = Math.max(0, VectorTranslator.dotProduct(buffer,normal));
-        VectorTranslator.copy(normal,contactNormalDest);
-        VectorTranslator.flipVector(contactNormalDest);
+        VectorTranslator.copy(normal, result);
+        VectorTranslator.flipVector(result);
         return Math.max(0,depth);
     }
 
-    /**Returns distance from the closest point iin the plane*/
-    public float getDistance(float[] coord){
-        VectorTranslator.subtractFromVector(point,coord,buffer);
-        return VectorTranslator.dotProduct(buffer,normal) + VectorTranslator.magnitude(coord);
+    /**Returns absolute distance from the closest point in the plane*/
+    public float getDistance(float[] point){
+        // |N dot (p - p_0)|
+        float v = VectorTranslator.dotProduct(
+                normal[0], normal[1], normal[2],
+                point[0] - this.point[0], point[1] - this.point[1], point[2] - this.point[2]
+        );
+        return Math.abs(v);
     }
 
+    /** Gives the point inside the plane that is closest to coord*/
     public void getClosestPoint(float[] coord, @Modified float[] dest){
         VectorTranslator.scaleVector(normal,getDistance(coord),dest);
         VectorTranslator.addToVector(dest,coord);
@@ -102,4 +136,26 @@ public class FixedPlane extends Particle implements Collideable {
         VectorTranslator.copy(vx,vy,vz,vBuffer[3]);
         return CollisionMath.closingVelocity(vBuffer[0],vBuffer[1],vBuffer[2], vBuffer[3]);
     }
+
+    @Override
+    public void getVelocity(float[] dest) {
+        super.getVelocity(dest);
+    }
+
+    @Override
+    public void setVelocity(float vx, float vy, float vz) {
+        System.out.println("whar");
+    }
+
+    float[] normalBuffer = BufferManager.allocateVec4StaticContext();
+    public void getFriction(float vX, float vY, float vZ, float objectFriction, @Modified float[] frictionForce){
+        VectorTranslator.copy(normal,normalBuffer);
+        VectorTranslator.copy(vX,vY,vZ,frictionForce);
+        float dp = vX * normal[0] + vY * normal[1] + vZ * normal[2];
+        VectorTranslator.normalize(normalBuffer);
+        VectorTranslator.scaleVector(normalBuffer,-dp);
+        VectorTranslator.addToVector(frictionForce,normalBuffer);
+        VectorTranslator.scaleVector(frictionForce,-(objectFriction + material.getFriction())*0.5F);
+    }
+
 }
