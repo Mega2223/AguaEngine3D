@@ -34,6 +34,8 @@ public interface PhysicsObject {
 
     void toGlobalVelocity(float[] point, float[] pointVelocity, @Modified float[] dest);
 
+    Material getMaterial(); // para aggregates vamos ter que mudar algumas coisas
+
     default void applyForce(float fx, float fy, float fz){
         float invMass = getInverseMass();
         applyVelocity(fx*invMass,fy*invMass,fz*invMass);
@@ -73,6 +75,9 @@ public interface PhysicsObject {
 
     default PhysicsObject getActor(){
         return this;
+        // TODO o getMaterial pode ter uma lógica semelhante?
+        //  O foda é ter os agregados, mas acho que dá pra
+        //  resolver todas as colisões em formas de primitivas
     }
 
     default void applyVelocity(float[] velocity){

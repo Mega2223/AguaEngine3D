@@ -4,7 +4,7 @@ import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
+import net.mega2223.aguaengine3d.physics.objects.advanced.RigidBody;
 
 public class CollisionMath {
     private CollisionMath(){}

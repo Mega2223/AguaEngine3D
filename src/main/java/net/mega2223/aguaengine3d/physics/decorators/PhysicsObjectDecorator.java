@@ -2,8 +2,9 @@ package net.mega2223.aguaengine3d.physics.decorators;
 
 import net.mega2223.aguaengine3d.graphics.objects.misc.Positionable;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
+import net.mega2223.aguaengine3d.physics.Material;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.advanced.Rotatable;
+import net.mega2223.aguaengine3d.physics.objects.advanced.Rotatable;
 
 public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positionable> implements Positionable, PhysicsObject {
 
@@ -158,6 +159,11 @@ public class PhysicsObjectDecorator<P extends PhysicsObject, R extends Positiona
     @Override
     public void toGlobalVelocity(float[] point, float[] pointVelocity, float[] dest) {
         physicsObject.toGlobalVelocity(point, pointVelocity, dest);
+    }
+
+    @Override
+    public Material getMaterial() {
+        return physicsObject.getMaterial();
     }
 
     public R getRenderable() {

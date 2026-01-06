@@ -1,6 +1,6 @@
 package net.mega2223.aguaengine3d.physics;
 
-import net.mega2223.aguaengine3d.physics.actors.PhysicsActor;
+import net.mega2223.aguaengine3d.physics.objects.actors.PhysicsActor;
 import net.mega2223.aguaengine3d.physics.collisions.CollisionManager;
 import net.mega2223.aguaengine3d.physics.collisions.SimpleCollisionManager;
 import net.mega2223.aguaengine3d.physics.forces.Force;

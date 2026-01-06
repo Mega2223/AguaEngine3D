@@ -4,15 +4,15 @@ public interface Material {
     float getFriction();
     float getRestitution();
 
-    Material STANDARD = new Material() {
+    Material DEFAULT = new Material() {
         @Override
         public float getFriction() {
-            return .5F;
+            return .25F;
         }
 
         @Override
         public float getRestitution() {
-            return .5F;
+            return .25F;
         }
     };
 }

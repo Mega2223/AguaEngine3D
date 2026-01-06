@@ -19,10 +19,9 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
-import net.mega2223.aguaengine3d.physics.advanced.RigidBody;
+import net.mega2223.aguaengine3d.physics.objects.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
-import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.forces.Gravity;
 import net.mega2223.aguaengine3d.physics.objects.collideable.Cube;
 import net.mega2223.aguaengine3d.physics.objects.collideable.FixedPlane;
@@ -227,7 +226,6 @@ public class Gaem3D {
                 new float[]{0, 1, 0},
                 new float[]{0, 0, 0}
         );
-        fixedPlane.setFriction(0.0F);
         physicsContext.addObject(fixedPlane);
 
 //        PhysicsObjectDecorator<Particle, Model> ball = new PhysicsObjectDecorator<>(
@@ -240,7 +238,7 @@ public class Gaem3D {
 //        context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.25F,.01F));
+//        physicsContext.addForce(new Drag(.25F,.01F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -285,24 +283,33 @@ public class Gaem3D {
             collisionOutputStream.remove(0);
         }
 
-        if (framesElapsed % (60 * 39284) == 0) {
+        if (framesElapsed % (60 * 5) == 0) {
             System.out.println("SHAW");
             RigidBody rb = new Cube(1);
-            rb.setInverseInertialTensor(
-                    new float[] {
-                            .1F,0,0,0,
-                            0,.1F,0,0,
-                            0,0,.1F,0,
-                            0,0,0,1
-                    }
-            );
-            rb.setRotationAxis(0,0, (float) Math.PI / 2);
+//            rb.setInverseInertialTensor(
+//                    new float[] {
+//                            .1F,0,0,0,
+//                            0,.1F,0,0,
+//                            0,0,.1F,0,
+//                            0,0,0,1
+//                    }
+//            );
+            rb.setOrientationAxis(
+                    (float) (Math.PI * Math.random()),
+                    (float) (Math.PI * Math.random()),
+                    (float) (Math.PI * Math.random()) );
+
+            rb.setOrientationAxis(
+                    (float) (Math.PI * Math.random())/10F,
+                    (float) (Math.PI * Math.random())/10F,
+                    (float) (Math.PI * Math.random())/10F );
+
             Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
             lastObject = new PhysicsObjectDecorator<>(rb, mod);
             context.addObject(lastObject);
             context.addObject(new VertexTracker((Model) lastObject.getRenderable()));
             physicsContext.addObject(lastObject);
-            lastObject.setCoordinates(0,2,0);
+            lastObject.setCoordinates(0,6,0);
 
             final float[] rVertices = mod.getRelativeVertices();
             for (int i = 0; i < rVertices.length; i+= 4) {

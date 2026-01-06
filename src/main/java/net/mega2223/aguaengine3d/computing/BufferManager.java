@@ -31,8 +31,12 @@ public class BufferManager {
         return manager.allocateBuffer4();
     }
 
-    public static float[] allocatePermanentVec4(float v0, float v1, float v2, float v3){
+    public static float[] allocateVec4StaticContext(float v0, float v1, float v2, float v3){
         return new float[]{v0,v1,v2,v3}; // TODO KKKKKKKKKKKKKK
+    }
+
+    public static float[] allocateVec4StaticContext(){
+        return allocateVec4StaticContext(0,0,0,0);
     }
 
 //    public static float[] allocateMatrix4(){

@@ -14,9 +14,6 @@ public class FixedPlane extends Particle implements Collideable {
     private static final float[] buffer = new float[4];
 
     float[] normal = new float[4], point = new float[4];
-    float friction = .25F;
-    // TODO ve se a fricção também funciona para planos não alinhados ao sistema de coordenadas
-    // TODO troca a fricção por um Material
 
     /** Creates a FixedPlane object
      * @param normal Plane normal, that is, a vector which is orthogonal with all possible vectors inside the plane
@@ -77,7 +74,7 @@ public class FixedPlane extends Particle implements Collideable {
                 float averageRestitution = (this.getRestitution() + s.getRestitution())/2F;
                 CollisionMath.solveCollision(c,this,sep,normal,averageRestitution);
 
-                getFriction(c.vx(),c.vy(),c.vz(),buffer);
+                getFriction(c.vx(),c.vy(),c.vz(),c.getMaterial().getFriction(),buffer);
                 c.applyForce(buffer);
             }
             return depth;
@@ -150,23 +147,15 @@ public class FixedPlane extends Particle implements Collideable {
         System.out.println("whar");
     }
 
-    public void getFriction(float vX, float vY, float vZ, @Modified float[] dest){
-        float[] normalBuffer = BufferManager.allocateVec4();
+    float[] normalBuffer = BufferManager.allocateVec4StaticContext();
+    public void getFriction(float vX, float vY, float vZ, float objectFriction, @Modified float[] frictionForce){
         VectorTranslator.copy(normal,normalBuffer);
-        VectorTranslator.copy(vX,vY,vZ,dest);
+        VectorTranslator.copy(vX,vY,vZ,frictionForce);
         float dp = vX * normal[0] + vY * normal[1] + vZ * normal[2];
         VectorTranslator.normalize(normalBuffer);
         VectorTranslator.scaleVector(normalBuffer,-dp);
-        VectorTranslator.addToVector(dest,normalBuffer);
-        VectorTranslator.scaleVector(dest,-friction);
-        BufferManager.freeVec4(normalBuffer);
+        VectorTranslator.addToVector(frictionForce,normalBuffer);
+        VectorTranslator.scaleVector(frictionForce,-(objectFriction + material.getFriction())*0.5F);
     }
 
-    public float getFriction() {
-        return friction;
-    }
-
-    public void setFriction(float friction) {
-        this.friction = friction;
-    }
 }

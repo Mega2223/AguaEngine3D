@@ -1,4 +1,4 @@
-package net.mega2223.aguaengine3d.physics.advanced;
+package net.mega2223.aguaengine3d.physics.objects.advanced;
 
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;

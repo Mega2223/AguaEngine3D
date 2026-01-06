@@ -1,9 +1,10 @@
-package net.mega2223.aguaengine3d.physics.advanced;
+package net.mega2223.aguaengine3d.physics.objects.advanced;
 
 import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.annotations.Modified;
+import net.mega2223.aguaengine3d.physics.Material;
 import net.mega2223.aguaengine3d.physics.QuaternionTranslator;
 
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class RigidBody implements Rotatable {
     protected final float[] rotationMatrix = new float[16];
     protected final float[] inverseRotationMatrix = new float[16];
     protected final float[] rotatedInverseInertiaTensor = new float[16];
+
+    Material material = Material.DEFAULT;
 
     public RigidBody(float mass) {
         this.mass = mass;
@@ -149,9 +152,6 @@ public class RigidBody implements Rotatable {
     private final float[] fBuffer = new float[4];
     @Override
     public void applyForce(float fx, float fy, float fz, float px, float py, float pz) {
-        if(true){
-            return;
-        }
         VectorTranslator.copy(px,py,pz,pBuffer);
         VectorTranslator.copy(fx,fy,fz,fBuffer);
 
@@ -221,9 +221,9 @@ public class RigidBody implements Rotatable {
         dest[2] = pointVelocity[2] - velocity[2];
     }
 
-    float[] angularImpulse = BufferManager.allocatePermanentVec4(0,0,0,0);
-    float[] linearImpulse = BufferManager.allocatePermanentVec4(0,0,0,0);
-    float[] impulsePoint = BufferManager.allocatePermanentVec4(0,0,0,0);
+    float[] angularImpulse = BufferManager.allocateVec4StaticContext(0,0,0,0);
+    float[] linearImpulse = BufferManager.allocateVec4StaticContext(0,0,0,0);
+    float[] impulsePoint = BufferManager.allocateVec4StaticContext(0,0,0,0);
     @Override
     public void applyImpulse(float ix, float iy, float iz, float px, float py, float pz) {
         VectorTranslator.copy(px,py,pz,impulsePoint);
@@ -299,9 +299,18 @@ public class RigidBody implements Rotatable {
     }
 
     float[] axisBuffer = new float[4];
-    public void setRotationAxis(float x, float y, float z){
+    public void setOrientationAxis(float x, float y, float z){
         VectorTranslator.copy(x,y,z,axisBuffer);
         QuaternionTranslator.axisAngleToQuaternion(axisBuffer,rotationQ4);
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     public void debugProperties(){
