@@ -6,7 +6,7 @@ import net.mega2223.aguaengine3d.physics.PhysicsObject;
 
 import java.util.List;
 
-public class SimpleCollisionManager extends CollisionManager{
+public class SimpleCollisionManager extends CollisionManager {
 
     public long iteration = 0;
 
@@ -19,22 +19,23 @@ public class SimpleCollisionManager extends CollisionManager{
     @Override
     public void doSinglePass(float deltaT) {
         List<PhysicsObject> objects = physContext.getObjects(); // fixme maybe too resource intensive
-        for(PhysicsObject o1 : objects){
+        for (PhysicsObject o1 : objects) {
             o1 = o1.getActor();
-            if(!(o1 instanceof Collideable)){continue;}
+            if (!(o1 instanceof Collideable)) {
+                continue;
+            }
             //System.out.println("h");
-            for(PhysicsObject o2 : objects){
+            for (PhysicsObject o2 : objects) {
                 o2 = o2.getActor();
-                if(o1 == o2 || !(o2 instanceof Collideable)){continue;}
-                if (((Collideable) o1).collidesWith((Collideable) o2)){
-			//System.out.println("COLLISION RAAARRRHHHH");
-			CollisionMath.solveCollision(o1, o2, 1.0F);
-                float depth = ((Collideable) o1).solveCollision((Collideable) o2,buffer);
-                if (depth <= 0){
-                     ((Collideable) o2).solveCollision((Collideable) o1,buffer);
+                if (o1 == o2 || !(o2 instanceof Collideable)) {
+                    continue;
+                }
+                float depth = ((Collideable) o1).solveCollision((Collideable) o2, buffer);
+                if (depth <= 0) {
+                    ((Collideable) o2).solveCollision((Collideable) o1, buffer);
                 }
             }
+            iteration++;
         }
-        iteration++;
     }
 }
