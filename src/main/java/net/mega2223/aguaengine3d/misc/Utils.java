@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.Collection;
 import java.util.List;
 
 public class Utils {

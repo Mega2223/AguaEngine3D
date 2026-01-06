@@ -20,7 +20,7 @@ public class Geometry {
 
     private Geometry(){}
     private static final float[][] bufferMat = new float[4][16];
-
+    private static final float[] buffer = new float[4];
     public static Mesh genPolygon(int edges, float radius){
         float[] vertices = new float[4 + edges * 4];
         for (int i = 0; i < edges * 4; i+=4) {
@@ -45,6 +45,10 @@ public class Geometry {
     private static final float SIN_60 = (float) Math.sin(Math.toRadians(60));
 
     static boolean temp = false;
+
+    //fixme um dos motivos dessa solução ser tão elaborada é que vc tá usando a borda do triângulo
+    // pra fazer aa segunda rotação em vez de usar o vetor cima e o vetor direção como referência, isso
+    // poderia ser mais simples eu acho, mas uma solução é uma solução :P:P::P:P
     public static Model genPolyhedron(int m, int n){
         ShaderProgram shader = new NormalDebugShaderProgram();
 
@@ -92,14 +96,12 @@ public class Geometry {
                 buffer[0] = x; buffer[1] = y; buffer[2] = z;
                 VectorTranslator.subtractFromVector(buffer,triangleCenter);
                 VectorTranslator.rotateAlongAxis(buffer,axis,dest);
-                VectorTranslator.scaleVector(dest,1F/sideLen);
+                VectorTranslator.scaleVector(dest,1.5F/sideLen);
             }
 
             @Override
             public void reverse(float x, float y, float z, float[] dest) {}
         };
-
-        float[] buffer = new float[4];
 
         for (int i = 0; i < planeSample.size(); i+=4) {
             float x = planeSample.get(i), y = planeSample.get(i + 1), z = planeSample.get(i + 2);
@@ -151,16 +153,9 @@ public class Geometry {
                 dir.setDirection(directions[j]);
                 Civ.context.addObject(dir);
             }
-
-//            VectorTranslator.getCrossProduct(v1x, v1y, v1z, v2x, v2y, v2z, faceNormal);
-//            VectorTranslator.normalize(faceNormal);
-//
-//                if(VectorTranslator.getAngleBetweenVectors(faceNormal,center) > .001F){
-//                    System.out.println("DESTROY!");
-//                    VectorTranslator.flipVector(faceNormal);
-//                }
             //fixme isso não funciona com o produto vetorial
             // MESMO QUANDO eu verifico o ângulo entre o normal e o centro do triângulo
+            // talvez seja um problema na função de colinearidade ela tá meio paia
             System.arraycopy(trCenter,0,trNormal,0,3);
             VectorTranslator.normalize(trNormal);
 
@@ -193,10 +188,13 @@ public class Geometry {
                 normalAlign.transform(planeVertex,current);
                 VectorTranslator.subtractFromVector(planeBoundB,planeBoundF,planeBoundV);
 
+                float[] nYpositive = new float[4];
+                normalAlign.transform(yPositive,nYpositive);
+                VectorTranslator.subtractFromVector(nYpositive,trCenter);
+
                 float[] triangleAlignAxis = new float[4];
-                VectorTranslator.getAxisAngle(
-                        planeBoundV[0],planeBoundV[1],planeBoundV[2],v1x,v1y,v1z,
-                        triangleAlignAxis);
+                VectorTranslator.getAxisAngle(nYpositive, directions[0], triangleAlignAxis);
+                VectorTranslator.flipVector(triangleAlignAxis);
 
                 Transform triangleCorrection = new Transform() {
                     @Override
@@ -214,28 +212,25 @@ public class Geometry {
                 triangleCorrection.transform(planeBoundF,nPlaneBoundF2);
                 triangleCorrection.transform(planeBoundB,nPlaneBoundB2);
                 VectorTranslator.flipVector(triangleAlignAxis);
+                // eu não AGUENTO MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIS
 
-                float[] nYpositive = new float[4];
-                normalAlign.transform(yPositive,nYpositive);
-                triangleCorrection.transform(nYpositive);
-                VectorTranslator.subtractFromVector(nYpositive,trCenter);
+//                boolean isRightAngle = false;
+//                for (int k = 0; k < 3; k++) {
+//                    isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
+//                }
+//                if(!isRightAngle){
+//                    Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
+//                    ModelUtils.scaleModel(WRONG,.1F);
+//                    WRONG.setCoords(2.5F*trNormal[0],2.5F*trNormal[1],2.5F*trNormal[2]);
+//                    Civ.context.addObject(WRONG);
+//                    System.out.println("AAAAAAAAAAGSDG"); // ÇSAJDKAJKDLSJALKSDJ :'(
+//                    float[] normal2 = trNormal.clone();
+//                    VectorTranslator.normalize(normal2);
+//                    VectorTranslator.scaleVector(normal2, (float) Math.PI);
+//                    VectorTranslator.rotateAlongAxis(current.clone(),normal2,current);
+//                }
 
-                boolean isRightAngle = false;
-                for (int k = 0; k < 3; k++) {
-                    isRightAngle |= VectorTranslator.getAngleBetweenVectors(directions[k], nYpositive) <= Math.toRadians(2);
-                }
                 triangleCorrection.transform(current);
-                if(!isRightAngle){
-                    Model WRONG = Mesh.CUBE.toModel(new SolidColorShaderProgram(1,.1F,.1F));
-                    ModelUtils.scaleModel(WRONG,.1F);
-                    WRONG.setCoords(2.5F*trNormal[0],2.5F*trNormal[1],2.5F*trNormal[2]);
-                    Civ.context.addObject(WRONG);
-//                    System.out.println("AAAAAAAAAAGSDG");
-                    float[] normal2 = trNormal.clone();
-                    VectorTranslator.normalize(normal2);
-                    VectorTranslator.scaleVector(normal2, (float) Math.PI);
-                    VectorTranslator.rotateAlongAxis(current.clone(),normal2,current);
-                }
 
                 for (int k = 0; k < 4; k++) { finalSample.add(current[k]); }
 
