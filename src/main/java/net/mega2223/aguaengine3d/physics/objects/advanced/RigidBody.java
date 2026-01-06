@@ -17,10 +17,10 @@ public class RigidBody implements Rotatable {
     protected final float[] velocity = new float[3];
 
     protected final float[] rotationQ4 = {1F,0F,0F,0F};
-    public final float[] angularVelocity = new float[4]; //FIXME
+    public final float[] angularVelocity = new float[4];
 
     protected float mass, invMass;
-    protected float[] inertialTensor = new float[16], inverseInertialTensor =  new float[16];
+    protected float[] inertiaTensor = new float[16], inverseInertiaTensor =  new float[16];
 
     private final float[] accelerationAccumulator = new float[4];
     private final float[] angularAccelAccumulator = new float[4];
@@ -35,14 +35,14 @@ public class RigidBody implements Rotatable {
     public RigidBody(float mass) {
         this.mass = mass;
         this.invMass = 1F/mass;
-        MatrixTranslator.generateIdentity(inertialTensor);
-        MatrixTranslator.generateIdentity(inverseInertialTensor);
+        MatrixTranslator.generateIdentity(inertiaTensor);
+        MatrixTranslator.generateIdentity(inverseInertiaTensor);
     }
 
-    public RigidBody(float mass, float[] inertialTensor){
+    public RigidBody(float mass, float[] inertiaTensor){
         this.mass = mass;
         this.invMass = 1F/mass;
-        this.setInertialTensor(inertialTensor);
+        this.setInertiaTensor(inertiaTensor);
     }
 
     public void update(float deltaT){
@@ -71,24 +71,9 @@ public class RigidBody implements Rotatable {
 
         // Inverse Inertial Tensor in world rotation
         // I[w] = R x I x R^(-1)
-        MatrixTranslator.multiply4x4Matrices(rotationMatrix,inverseInertialTensor,rotatedInverseInertiaTensor);
+        // Eu estou presumindo que o mesmo vale pra I^(-1), talvez eu não devesse kkkkkkkk
+        MatrixTranslator.multiply4x4Matrices(rotationMatrix, inverseInertiaTensor,rotatedInverseInertiaTensor);
         MatrixTranslator.multiply4x4Matrices(rotatedInverseInertiaTensor,inverseRotationMatrix);
-        // TODO se isso não funcionar, calcula o inverso depois de rotar o tensor
-        //  talvez manter ambos os tensores não seja uma má ideia
-
-//        System.out.println("rotationQ4");
-//        VectorTranslator.debugVector(rotationQ4);
-//        float[] axis = new float[4];
-//        System.out.println("rotationAxis");
-//        VectorTranslator.debugVector(axis);
-//        System.out.println("rotationMatrix");
-//        MatrixTranslator.debugMatrix4x4(rotationMatrix);
-//        System.out.println("inverseInertialTensor");
-//        MatrixTranslator.debugMatrix4x4(inverseInertialTensor);
-//        System.out.println("rotatedInverseInertiaTensor");
-//        MatrixTranslator.debugMatrix4x4(rotatedInverseInertiaTensor);
-//        System.exit(0);
-
     }
 
     @Override
@@ -272,24 +257,24 @@ public class RigidBody implements Rotatable {
         VectorTranslator.addToVector(dest,velocity);
     }
 
-    public void setInertialTensor(float[] inertialTensor){
-        MatrixTranslator.copy(inertialTensor,this.inertialTensor);
-        MatrixTranslator.getInverseMatrix4(inertialTensor,this.inverseInertialTensor);
+    public void setInertiaTensor(float[] inertiaTensor){
+        MatrixTranslator.copy(inertiaTensor,this.inertiaTensor);
+        MatrixTranslator.getInverseMatrix4(inertiaTensor,this.inverseInertiaTensor);
     }
 
-    public void setInverseInertialTensor(float[] inverseInertialTensor){
-        MatrixTranslator.copy(inverseInertialTensor,this.inverseInertialTensor);
-        MatrixTranslator.getInverseMatrix4(inverseInertialTensor,this.inertialTensor);
+    public void setInverseInertiaTensor(float[] inverseInertiaTensor){
+        MatrixTranslator.copy(inverseInertiaTensor,this.inverseInertiaTensor);
+        MatrixTranslator.getInverseMatrix4(inverseInertiaTensor,this.inertiaTensor);
     }
 
     @Override
     public void getInertialTensor(@Modified float[] dest) {
-        MatrixTranslator.copy(inertialTensor,dest);
+        MatrixTranslator.copy(inertiaTensor,dest);
     }
 
     @Override
     public void getInverseInertialTensor(@Modified float[] dest) {
-        MatrixTranslator.copy(inverseInertialTensor,dest);
+        MatrixTranslator.copy(inverseInertiaTensor,dest);
     }
 
     private final float[] pointVelBuffer = new float[4];
@@ -303,7 +288,6 @@ public class RigidBody implements Rotatable {
         VectorTranslator.copy(x,y,z,axisBuffer);
         QuaternionTranslator.axisAngleToQuaternion(axisBuffer,rotationQ4);
     }
-
     @Override
     public Material getMaterial() {
         return material;

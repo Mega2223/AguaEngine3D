@@ -20,9 +20,11 @@ public interface Collideable extends PhysicsObject {
         getCollision(point,result);
     }
 
-    /**Solves the collision  between objects
+    /**Solves the collision between both objects, tries to resolve interpenetration and
+     * applies impulses and forces accordingly
      * @param contactNormalDest contact normal from this collideable's perspective
-     * @return the contact depth in case the collision was resolved
+     * @return the contact depth in case the collision was resolved, if no
+     * collision was identified, returns 0.
      * */
     float solveCollision(Collideable c, @Modified float[] contactNormalDest);
 

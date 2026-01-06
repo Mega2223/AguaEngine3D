@@ -294,10 +294,7 @@ public class Gaem3D {
 //                            0,0,0,1
 //                    }
 //            );
-            rb.setOrientationAxis(
-                    (float) (Math.PI * Math.random()),
-                    (float) (Math.PI * Math.random()),
-                    (float) (Math.PI * Math.random()) );
+            rb.setAngularVelocity(0,0,5);
 
             rb.setOrientationAxis(
                     (float) (Math.PI * Math.random())/10F,

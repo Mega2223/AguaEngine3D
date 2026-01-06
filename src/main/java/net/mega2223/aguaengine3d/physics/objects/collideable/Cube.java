@@ -22,7 +22,7 @@ public class Cube extends RigidBody implements Collideable {
         super(mass);
         float[] tensor = new float[16];
         PhysicsMath.getInertialTensorForRect(2,2,2,mass,2f,tensor);
-        setInertialTensor(tensor);
+        setInertiaTensor(tensor);
     }
 
     @Override
@@ -59,10 +59,10 @@ public class Cube extends RigidBody implements Collideable {
     public float solveCollision(Collideable c, float[] contactNormalDest) {
         updateWorldVertices();
         if(c instanceof Sphere){
-
+            // TODO
         } else if (c instanceof Cube) {
             Cube cube2 = (Cube) c;
-
+            // TODO
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
             return resolveCollisionWithPlane(plane);
@@ -125,14 +125,14 @@ public class Cube extends RigidBody implements Collideable {
     //  also uma alocação de buffer permanente seria legal para
     //  evitar alguns checks, depois eu vejo um jeito de
     //  conter o escopo somente a essa função e manter um acesso rápido
-    float[] nearestPlanePoint = BufferManager.allocateVec4(),
-            planeVelocity = BufferManager.allocateVec4(),
-            impulseSelf = BufferManager.allocateVec4(),
-            translationSelf = BufferManager.allocateVec4(),
-            currentMeshVertex = BufferManager.allocateVec4(),
-            contactNormal = BufferManager.allocateVec4(),
-            vertexVelocity = BufferManager.allocateVec4(),
-            frictionForce = BufferManager.allocateVec4();
+    float[] nearestPlanePoint = BufferManager.allocateVec4StaticContext(),
+            planeVelocity = BufferManager.allocateVec4StaticContext(),
+            impulseSelf = BufferManager.allocateVec4StaticContext(),
+            translationSelf = BufferManager.allocateVec4StaticContext(),
+            currentMeshVertex = BufferManager.allocateVec4StaticContext(),
+            contactNormal = BufferManager.allocateVec4StaticContext(),
+            vertexVelocity = BufferManager.allocateVec4StaticContext(),
+            frictionForce = BufferManager.allocateVec4StaticContext();
 
     float resolveCollisionWithPlane(FixedPlane plane){
         for (int v = 0; v < worldVertices.length; v+=4) {
