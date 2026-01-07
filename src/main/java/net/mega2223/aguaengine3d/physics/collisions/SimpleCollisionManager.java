@@ -24,7 +24,6 @@ public class SimpleCollisionManager extends CollisionManager {
             if (!(o1 instanceof Collideable)) {
                 continue;
             }
-            //System.out.println("h");
             for (PhysicsObject o2 : objects) {
                 o2 = o2.getActor();
                 if (o1 == o2 || !(o2 instanceof Collideable)) {

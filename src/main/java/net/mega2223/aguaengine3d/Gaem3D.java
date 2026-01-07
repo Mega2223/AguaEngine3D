@@ -19,6 +19,7 @@ import net.mega2223.aguaengine3d.misc.Utils;
 import net.mega2223.aguaengine3d.objects.WindowManager;
 import net.mega2223.aguaengine3d.physics.PhysicsContext;
 import net.mega2223.aguaengine3d.physics.PhysicsObject;
+import net.mega2223.aguaengine3d.physics.forces.Drag;
 import net.mega2223.aguaengine3d.physics.objects.advanced.RigidBody;
 import net.mega2223.aguaengine3d.physics.debug.AngularVelocityVisualizer;
 import net.mega2223.aguaengine3d.physics.decorators.PhysicsObjectDecorator;
@@ -29,6 +30,9 @@ import net.mega2223.aguaengine3d.physics.objects.debug.CollisionVisualization;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Random;
 
@@ -43,6 +47,7 @@ import java.util.Random;
  * Font rendering <- unfinished <- almost finished
  * Rewrite texture loading function <- maybe not???
  * Convert light objects to structs in shaders
+ * Also make said structs more dynamic
  * The floor is slightly transparent somehow <- FIXED
  * Geometry Shader support (Possibly compute shaders aswell, may require an OpenGL upgrade) <- Done
  * Move aero to another module? (also finish it lol) <- DONE
@@ -53,7 +58,7 @@ import java.util.Random;
  * Figure out why the FPS loop is weird
  * Improvements on procedural building generation (aka multi building and scaling support) (Done, kinda)
  * Optimize OpenGL calls, ESPECIALLY the VBOs that store the model data
- * We NEED VAOs
+ * We NEED VAOs the whole engine runs on a single VAO lol
  * Model blueprint class <- Done
  * Coverage testing <- what
  * Sound stuff
@@ -61,23 +66,23 @@ import java.util.Random;
  * Trigger stuff
  * Collision stuff <- WIP
  * Animation stuff
- * Perhaps a static OpenGL manager class?
+ * Perhaps a static OpenGL manager class? <- Isn't this just RenderingManager?6
  * Denote static buffers explicitly as static? <- DONE afaik
  * Interaction radius detection interface <- Done
- * Object declaration instantiation generation annotation?
- * Calculate the restitution variable lol <- Womp womp
- * Also the physics module needs the friction force <- Womp womp
+ * Object declaration instantiation generation annotation? Done
+ * Calculate the restitution variable lol <- Womp womp (Done with material)
+ * Also the physics module needs the friction force <- Womp womp (DONE !!!!)
  * Parallel contact is weird currently <- Womp womp
- * Static functions that creates objects with bound buffers
+ * Static functions that creates objects with bound buffers (kinda done)
  * Shader recompile function
  * Render order priority variable/method? (Done)
  * Rewrite the normal handling code (Done)
  * Model editor (maybe a inbuilt tools tools package)
  * Interpolation interface and objects (Done)
- * FPS manager for windowmanagers
+ * FPS manager for windowmanagers?
  * TAG para operações que criam objetos <- +- feito
  * Filter functions? (functions that filter :p) <- what was bro yapping about
- * Dinamically alocated text object
+ * Dynamically allocated text object (also should be a output stream with ability to swap)
  * Texturable interface?
  * Modular uniform sync
  * Subdividing triangles of a model for debugging purposes
@@ -89,20 +94,20 @@ import java.util.Random;
  * */
 
 //FIXME: seems like SolidColorShaderProgram throws an OpenGL error somehow
-// TODO o cálculo do inverso matricial é válido? seria legal ter um teste p/ isso
+
 // Shader dict: Refaz tudo, uma função deve ser $(nomeDaFuncao), usa um REGEX pelamor
 // talvez só substituir o corpo da função para evitar problemas de compatibilidade?
 // buffer de texto: faz +- igual o... scons?? esqueci o nome
 // buffer livre com função de flip
 
-// Manter a rotação do tensor inercial e o atrito do plano ao mesmo tempo tem efeitos ruins
-// eu não tenho a mínima ideia de se o problema é o tensor inercial invertido rotacionado ou
-// a projeção feita pra calcular o atrito no plano
+// para a questão do sombreamento, devido a natureza dinâmica dos objetos, talvez seja melhor
+// simplesmente recompilar os shaders e trocar o número de objetos, se eu quiser ter sla 10 luzes
+// acho um bom compromisso, até pq tem luzes direcionadas e luzes não direcionadas
+
 // talvez um contexto de física possa ter um grupo de streams de saída as quais o Gaem3D pode puxar direto
 
 // talvez tirar o 'dest'? é uma convenção meio ruim, com a anotação @Modified
 // não é necessário, ao meu ver, falar que a variável é o destino
-
 
 public class Gaem3D {
     public static final int TARGET_FPS = 120;
@@ -112,9 +117,9 @@ public class Gaem3D {
     protected static final String TITLE = "3 DIMENSÇÕES";
     protected static final int D = 512;
     public static int framesElapsed = 0;
-    static WindowManager manager;
-    static RenderingContext context;
-    static PhysicsContext physicsContext = new PhysicsContext();
+    public static WindowManager manager;
+    public static RenderingContext context;
+    public static PhysicsContext physicsContext = new PhysicsContext();
 
     static float[] projectionMatrix = new float[16];
 
@@ -126,7 +131,6 @@ public class Gaem3D {
     // me dá um tempo IntelliJ
     @SuppressWarnings("lossy-conversions")
     public static void main(String[] args) {
-
         //GLFW
         manager = new WindowManager(600, 400, TITLE);
         manager.init();
@@ -197,7 +201,6 @@ public class Gaem3D {
         context = new RenderingContext();
 
         //scenery setup
-
         context.setLight(0, 0, 10, 0, 1000)
                 .setBackGroundColor(.5f, .5f, .6f)
                 .setActive(true)
@@ -212,7 +215,6 @@ public class Gaem3D {
 
         context.addObject(chessFloor);
 
-//        Model cube = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0));
         BufferedImage cat = Utils.readImage(Utils.TEXTURES_DIR + "/img.png");
         Skybox sk = new Skybox(TextureManager.generateCubemapTexture(
                 new BufferedImage[]{cat, cat, cat, cat, cat, cat}
@@ -221,7 +223,6 @@ public class Gaem3D {
         context.addScript(((CubemapInterpreterShaderProgram) sk.getShader()).genRotationUpdateRunnable(camera));
 
         // Phys Obj
-
         FixedPlane fixedPlane = new FixedPlane(
                 new float[]{0, 1, 0},
                 new float[]{0, 0, 0}
@@ -238,7 +239,7 @@ public class Gaem3D {
 //        context.addObject(ball);
 
         physicsContext.addForce(new Gravity(9.8F));
-//        physicsContext.addForce(new Drag(.25F,.01F));
+        physicsContext.addForce(new Drag(.25F,.01F));
 
         //Render Logic be like:
         long notRendered = 0;
@@ -271,10 +272,10 @@ public class Gaem3D {
     }
 
     protected static void doLogic() {
-        int n = 1;
+        int simSteps = 4;
         float rate = 1F;
-        for (int i = 0; i < n; i++) {
-            physicsContext.update(rate / (60F*n));
+        for (int i = 0; i < simSteps; i++) {
+            physicsContext.update(rate / (60F*simSteps));
         }
 
         List<CollisionVisualization> collisionOutputStream = CollisionVisualization.COLLISION_OUTPUT_STREAM;
@@ -283,7 +284,7 @@ public class Gaem3D {
             collisionOutputStream.remove(0);
         }
 
-        if (framesElapsed % (60 * 5) == 0) {
+        if (framesElapsed % (60 * 15) == 0) {
             System.out.println("SHAW");
             RigidBody rb = new Cube(1);
 //            rb.setInverseInertialTensor(
@@ -301,7 +302,7 @@ public class Gaem3D {
                     (float) (Math.PI * Math.random())/10F,
                     (float) (Math.PI * Math.random())/10F );
 
-            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.5F));
+            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.1F));
             lastObject = new PhysicsObjectDecorator<>(rb, mod);
             context.addObject(lastObject);
             context.addObject(new VertexTracker((Model) lastObject.getRenderable()));

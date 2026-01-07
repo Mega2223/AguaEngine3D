@@ -31,7 +31,7 @@ void main(){
         vec4 mixedColor = mix(color2, lightColors[i], lightColors[i].a);
         color = mix(color,mixedColor,lightInfluence);
     }
-    float v = dot(fragmentNormal.xyz,normalize(vec3(2,1,0)));
+    float v = dot(fragmentNormal.xyz,normalize(vec3(0,-1,0))); // TODO hardcoded lol
     color = mix(color,vec4(0.1,0.1,0.1,1),clamp(v,0,1));
     mixFog();
 }

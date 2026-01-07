@@ -1,6 +1,8 @@
 package net.mega2223.aguaengine3d.physics.objects.collideable;
 
+import net.mega2223.aguaengine3d.Gaem3D;
 import net.mega2223.aguaengine3d.computing.BufferManager;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
@@ -16,6 +18,7 @@ public class Cube extends RigidBody implements Collideable {
     private static final float[] buffer = new float[4];
     public static final float TOLERANCE = 0.1F;
     float[] vertices = Mesh.CUBE.getVertices();
+    int[] edges = Mesh.CUBE.getIndices();
     float[] worldVertices = vertices.clone();
 
     public Cube(float mass) {
@@ -62,7 +65,7 @@ public class Cube extends RigidBody implements Collideable {
             // TODO
         } else if (c instanceof Cube) {
             Cube cube2 = (Cube) c;
-            // TODO
+            resolveCollisionWithCube(cube2);
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
             return resolveCollisionWithPlane(plane);
@@ -134,7 +137,8 @@ public class Cube extends RigidBody implements Collideable {
             vertexVelocity = BufferManager.allocateVec4StaticContext(),
             frictionForce = BufferManager.allocateVec4StaticContext();
 
-    float resolveCollisionWithPlane(FixedPlane plane){
+    // Iterates for every vertex, if one is inside the plane, resolves accordingly
+    protected float resolveCollisionWithPlane(FixedPlane plane){
         for (int v = 0; v < worldVertices.length; v+=4) {
 
             VectorTranslator.copy(worldVertices[v],worldVertices[v+1],worldVertices[v+2], currentMeshVertex);
@@ -148,6 +152,7 @@ public class Cube extends RigidBody implements Collideable {
                 plane.getClosestPoint(currentMeshVertex, nearestPlanePoint);
                 CollisionMath.solveContact(pos,invMass, nearestPlanePoint,plane.getInverseMass(),
                         contactNormal,contactDepth, translationSelf,null);
+
                 applyRotationalTranslation(translationSelf, nearestPlanePoint);
 
                 getLocalPointVelocity(currentMeshVertex, vertexVelocity);
@@ -167,22 +172,108 @@ public class Cube extends RigidBody implements Collideable {
                         .5F*( getRestitution() + plane.getRestitution()),
                         impulseSelf, null
                 );
-
                 applyImpulse(impulseSelf, nearestPlanePoint);
-
                 // Applies a friction against the object's speed component which is perpendicular
-                //  to the plane
+                // to the plane
                 plane.getFriction(
                         vertexVelocity[0],vertexVelocity[1],vertexVelocity[2],
                         getMaterial().getFriction(), frictionForce);
                 applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
                         nearestPlanePoint[0], nearestPlanePoint[1], nearestPlanePoint[2]);
-                // TODO isso tá estranho, o ponto tá certo?
-                // Talvez seja a física to Torque q esteja meio ruim msm
                 return contactDepth;
             }
         }
         return 0;
     }
 
+    protected float resolveCollisionWithCube(Cube cube){
+        return resolveCollisionWithCube(cube,true);
+    }
+
+    float[] contactAccum = BufferManager.allocateVec4StaticContext(),
+            collisionPointWorld = BufferManager.allocateVec4StaticContext();
+
+    protected float resolveCollisionWithCube(Cube cube, boolean iterateBoth){
+        Arrays.fill(contactNormal,0);
+        float contactDepth = 0F;
+        // Resolves point-face collisions
+        for (int v = 0; v < worldVertices.length; v+=4) {
+            VectorTranslator.copy(worldVertices[v], worldVertices[v + 1], worldVertices[v + 2], currentMeshVertex);
+            cube.toLocalCoordinateSystem(currentMeshVertex);
+            // O acumulador de contato é um pedido de correção no sistema de coordenadas do mesh
+            // para algum determinado eixo, ele pode ser maior ou menor que zero, só há um contato
+            // se os 6 planos forem penetrados
+            for (int axis = 0; axis < 3; axis++) {
+                float xPosCorrection = Math.max(0,1 - currentMeshVertex[axis]); //sugere correção para o positivo
+                float xNegCorrection = Math.min(0,- currentMeshVertex[axis] - 1); // sugere correção para o negativo
+                // não há caso onde ambos são nulos, peguemos o de menor valor absoluto
+                if(xPosCorrection < -xNegCorrection){
+                    contactAccum[axis] = xPosCorrection;
+                } else {
+                    contactAccum[axis] = xNegCorrection;
+                }
+            }
+            if(contactAccum[0] != 0 && contactAccum[1] != 0 && contactAccum[2] != 0){
+                isolateAxisWithLowestAbs(contactAccum);
+//                VectorTranslator.debugVector(contactAccum);
+                contactDepth = VectorTranslator.magnitude(contactAccum);
+                // é melhor pegar o eixo mínimo eu acho
+                VectorTranslator.copy(contactAccum,contactNormal);
+                VectorTranslator.normalize(contactNormal);
+                MatrixTranslator.multiplyVec4Mat4(contactNormal,cube.rotationMatrix);
+                VectorTranslator.copy(worldVertices[v], worldVertices[v + 1], worldVertices[v + 2], collisionPointWorld);
+            }
+        }
+        if(iterateBoth && contactDepth == 0){
+            cube.resolveCollisionWithCube(this,false);
+        }
+        if(contactDepth > 0){
+            float invMassSum = invMass + cube.invMass;
+            VectorTranslator.scaleVector(contactNormal,contactDepth * invMass / invMassSum);
+            applyRotationalTranslation(contactNormal,collisionPointWorld);
+            VectorTranslator.normalize(contactNormal);
+            VectorTranslator.flipVector(contactNormal);
+            VectorTranslator.scaleVector(contactNormal,contactDepth * cube.invMass / invMassSum);
+            cube.applyRotationalTranslation(contactNormal,collisionPointWorld);
+//            Line toAdd = new Line(1, 0, 0){
+//                int val = 10;
+//                @Override
+//                public void doLogic(int iteration) {
+//                    super.doLogic(iteration);
+//                    val--;
+//                }
+//                @Override
+//                public boolean isValid() {
+//                    return val > 0;
+//                }
+//            };
+//            toAdd.setStart(collisionPointWorld);
+//            toAdd.setDirection(contactNormal);
+//            Gaem3D.context.addObject(toAdd);
+
+        }
+        return contactDepth;
+    }
+
+    private static void isolateAxisWithLargestAbs(float[] vec3){
+        float absX = Math.abs(vec3[0]), absY = Math.abs(vec3[1]), absZ = Math.abs(vec3[2]);
+        if(absX > absY && absX > absZ){
+            vec3[1] = 0; vec3[2] = 0;
+        } else if (absY > absZ){
+            vec3[0] = 0; vec3[2] = 0;
+        } else {
+            vec3[0] = 0; vec3[1] = 0;
+        }
+    }
+
+    private static void isolateAxisWithLowestAbs(float[] vec3){
+        float absX = Math.abs(vec3[0]), absY = Math.abs(vec3[1]), absZ = Math.abs(vec3[2]);
+        if(absX < absY && absX < absZ){
+            vec3[1] = 0; vec3[2] = 0;
+        } else if (absY < absZ){
+            vec3[0] = 0; vec3[2] = 0;
+        } else {
+            vec3[0] = 0; vec3[1] = 0;
+        }
+    }
 }

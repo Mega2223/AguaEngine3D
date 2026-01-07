@@ -19,5 +19,5 @@ void main(){
     gl_Position = projection * (rotation*toTrans*translation);
     worldCoord = gl_Position;
     objectiveCoord = toTrans * translation;
-    fragmentNormal = vertexNormal;
+    fragmentNormal = rotation * vertexNormal;
 }

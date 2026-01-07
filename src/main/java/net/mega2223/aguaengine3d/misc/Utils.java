@@ -40,7 +40,7 @@ public class Utils {
                     new BufferedReader(new InputStreamReader(stream));
             return readStreamReader(reader);
         } catch (IOException | NullPointerException e) {
-            RuntimeException runtimeException = new RuntimeException("There is no directory such as " + path);
+            RuntimeException runtimeException = new RuntimeException("Could not find any directory such as " + path);
             e.printStackTrace();
             throw runtimeException;
         }

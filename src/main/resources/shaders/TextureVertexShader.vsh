@@ -26,11 +26,11 @@ void main(){
     gl_Position.w = 1;
     vec4 toTrans = vec4(gl_Position.xyzw);
 
-    gl_Position = projection * (rotation*toTrans*translation);
+    gl_Position = projection * (rotation*toTrans*translation); // isso tá errado, por isso q nao precisa do transpose
     objectiveCoord = toTrans * translation;
     worldCoord = gl_Position;
     texturePosition = textureCoords;
-    fragmentNormal = vertexNormal;
+    fragmentNormal = rotation * vertexNormal;
 
     for(int i = 0; i < MAX_LIGHTS; i++){
         lightSpacePos[i] = lightspace_projections[i] * (toTrans);

@@ -92,4 +92,9 @@ public class Line implements Renderable {
                 vertices[4]-vertices[0],vertices[5]-vertices[1],vertices[6]-vertices[2],
                 Arrays.toString(Thread.currentThread().getStackTrace()));
     }
+
+    @Override
+    public int getRenderOrderPosition() {
+        return -1;
+    }
 }
