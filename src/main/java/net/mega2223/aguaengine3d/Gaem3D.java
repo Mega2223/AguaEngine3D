@@ -109,6 +109,8 @@ import java.util.Random;
 // talvez tirar o 'dest'? é uma convenção meio ruim, com a anotação @Modified
 // não é necessário, ao meu ver, falar que a variável é o destino
 
+// nao tem como escapar vamos precisar de uma classe vetor
+
 public class Gaem3D {
     public static final int TARGET_FPS = 120;
     public static final float[] DEFAULT_SKY_COLOR = {.5f, .5f, .5f, 1};
@@ -238,8 +240,11 @@ public class Gaem3D {
 //        physicsContext.addObject(ball);
 //        context.addObject(ball);
 
-        physicsContext.addForce(new Gravity(9.8F));
-        physicsContext.addForce(new Drag(.25F,.01F));
+//        physicsContext.addForce(new Gravity(9.8F));
+//        physicsContext.addForce(new Drag(.25F,.01F));
+
+        addCube(0,1,0,0,0,0);
+        addCube((float) 0,5,0,(float) Math.PI, (float) Math.PI,0).setVelocity(0,-1,0);
 
         //Render Logic be like:
         long notRendered = 0;
@@ -271,9 +276,11 @@ public class Gaem3D {
         }
     }
 
+    static int cubes = 0;
+
     protected static void doLogic() {
-        int simSteps = 4;
-        float rate = 1F;
+        int simSteps = 1;
+        float rate = 1f;
         for (int i = 0; i < simSteps; i++) {
             physicsContext.update(rate / (60F*simSteps));
         }
@@ -284,7 +291,7 @@ public class Gaem3D {
             collisionOutputStream.remove(0);
         }
 
-        if (framesElapsed % (60 * 15) == 0) {
+        if (framesElapsed % (60 * 15) == 0 && cubes < 2) {
             System.out.println("SHAW");
             RigidBody rb = new Cube(1);
 //            rb.setInverseInertialTensor(
@@ -295,14 +302,16 @@ public class Gaem3D {
 //                            0,0,0,1
 //                    }
 //            );
-            rb.setAngularVelocity(0,0,5);
+//            rb.setAngularVelocity(0,0,5);
 
             rb.setOrientationAxis(
                     (float) (Math.PI * Math.random())/10F,
                     (float) (Math.PI * Math.random())/10F,
                     (float) (Math.PI * Math.random())/10F );
 
-            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(0, 1, 0,.1F));
+            rb.setOrientationAxis((float) Math.PI, (float) Math.PI,0);
+
+            Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(r.nextFloat(),r.nextFloat(), r.nextFloat(),.33F));
             lastObject = new PhysicsObjectDecorator<>(rb, mod);
             context.addObject(lastObject);
             context.addObject(new VertexTracker((Model) lastObject.getRenderable()));
@@ -315,8 +324,32 @@ public class Gaem3D {
                 context.addObject(l);
             }
             VectorTranslator.debugVector(lastObject.x(), lastObject.y(), lastObject.z());
+            cubes++;
         }
 
+    }
+
+    static Cube addCube(float x, float y, float z, float aX, float aY, float aZ){
+        System.out.println("SHAW");
+        Cube rb = new Cube(1);
+
+        rb.setOrientationAxis(aX,aY,aZ);
+
+        Model mod = Model.loadModel(Utils.readFile(Utils.MODELS_DIR + "/cube.obj"), new SolidColorShaderProgram(r.nextFloat(),r.nextFloat(), r.nextFloat(),.33F));
+        lastObject = new PhysicsObjectDecorator<>(rb, mod);
+        context.addObject(lastObject);
+        context.addObject(new VertexTracker((Model) lastObject.getRenderable()));
+        physicsContext.addObject(lastObject);
+        lastObject.setCoordinates(x,y,z);
+
+        final float[] rVertices = mod.getRelativeVertices();
+        for (int i = 0; i < rVertices.length; i+= 4) {
+            AngularVelocityVisualizer l = new AngularVelocityVisualizer(mod,rb,i);
+            context.addObject(l);
+        }
+        VectorTranslator.debugVector(lastObject.x(), lastObject.y(), lastObject.z());
+        cubes++;
+        return rb;
     }
 
     protected static void doRenderLogic() {

@@ -19,7 +19,7 @@ public class Line implements Renderable {
 
     int verticesVBO = -1;
     public Line(float r, float g, float b){
-        shaderProgram = new SolidColorShaderProgram(r,g,b);
+        shaderProgram = new SolidColorShaderProgram(r,g,b,1);
         updateVerticesVBO();
     }
 
@@ -95,6 +95,6 @@ public class Line implements Renderable {
 
     @Override
     public int getRenderOrderPosition() {
-        return -1;
+        return -5;
     }
 }

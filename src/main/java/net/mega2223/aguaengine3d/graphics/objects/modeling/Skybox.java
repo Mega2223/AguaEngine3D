@@ -58,7 +58,7 @@ public class Skybox implements Renderable {
 
     @Override
     public int getRenderOrderPosition() {
-        return -2;
+        return -10;
     }
 
 

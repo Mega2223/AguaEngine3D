@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.physics.objects.collideable;
 import net.mega2223.aguaengine3d.Gaem3D;
 import net.mega2223.aguaengine3d.computing.BufferManager;
 import net.mega2223.aguaengine3d.graphics.objects.misc.Line;
+import net.mega2223.aguaengine3d.graphics.objects.misc.Point;
 import net.mega2223.aguaengine3d.graphics.objects.modeling.Mesh;
 import net.mega2223.aguaengine3d.mathematics.MatrixTranslator;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
@@ -18,7 +19,6 @@ public class Cube extends RigidBody implements Collideable {
     private static final float[] buffer = new float[4];
     public static final float TOLERANCE = 0.1F;
     float[] vertices = Mesh.CUBE.getVertices();
-    int[] edges = Mesh.CUBE.getIndices();
     float[] worldVertices = vertices.clone();
 
     public Cube(float mass) {
@@ -60,12 +60,12 @@ public class Cube extends RigidBody implements Collideable {
     }
 
     public float solveCollision(Collideable c, float[] contactNormalDest) {
-        updateWorldVertices();
+        updateWorldVertices(); // TODO ele tá reportando o normal de contato?
         if(c instanceof Sphere){
             // TODO
         } else if (c instanceof Cube) {
             Cube cube2 = (Cube) c;
-            resolveCollisionWithCube(cube2);
+            return resolveCollisionWithCube(cube2);
         } else if (c instanceof FixedPlane) {
             FixedPlane plane = ((FixedPlane) c);
             return resolveCollisionWithPlane(plane);
@@ -128,6 +128,10 @@ public class Cube extends RigidBody implements Collideable {
     //  also uma alocação de buffer permanente seria legal para
     //  evitar alguns checks, depois eu vejo um jeito de
     //  conter o escopo somente a essa função e manter um acesso rápido
+
+    // a convenção padrão deveria ser assim, cada função declara os seus buffers
+    // em cima de si mesma de forma estática, o maior problema com esse padrão
+    // é uma potencial colisão de nomes
     float[] nearestPlanePoint = BufferManager.allocateVec4StaticContext(),
             planeVelocity = BufferManager.allocateVec4StaticContext(),
             impulseSelf = BufferManager.allocateVec4StaticContext(),
@@ -156,12 +160,12 @@ public class Cube extends RigidBody implements Collideable {
                 applyRotationalTranslation(translationSelf, nearestPlanePoint);
 
                 getLocalPointVelocity(currentMeshVertex, vertexVelocity);
-                float[] pNormal = plane.normal;
+                float[] planeNormal = plane.normal;
 
                 float separatingVelocity = CollisionMath.separatingVelocity(
                         0,0,0, // o plano é constante ent isso é um atalho
                         vertexVelocity[0], vertexVelocity[1], vertexVelocity[2],
-                        -pNormal[0],-pNormal[1],-pNormal[2],
+                        -planeNormal[0],-planeNormal[1],-planeNormal[2],
                         0,0,0 // plano não se move :p
                 );
 
@@ -176,6 +180,9 @@ public class Cube extends RigidBody implements Collideable {
                 // Applies a friction against the object's speed component which is perpendicular
                 // to the plane
                 plane.getFriction(
+                        // TODO como isso é calcular uma projeção num plano e provavelmente
+                        //  funciona para poliedros regulares, seria legal ter um GeometryUtils
+                        //  com esse tipo de função
                         vertexVelocity[0],vertexVelocity[1],vertexVelocity[2],
                         getMaterial().getFriction(), frictionForce);
                 applyForce(frictionForce[0],frictionForce[1],frictionForce[2],
@@ -191,9 +198,14 @@ public class Cube extends RigidBody implements Collideable {
     }
 
     float[] contactAccum = BufferManager.allocateVec4StaticContext(),
-            collisionPointWorld = BufferManager.allocateVec4StaticContext();
+            collisionPointWorld = BufferManager.allocateVec4StaticContext(),
+            collisionPointWorldVelocity = BufferManager.allocateVec4StaticContext(),
+            cubeCollisionPointW = BufferManager.allocateVec4StaticContext(),
+            cubeCollisionPointVelW = BufferManager.allocateVec4StaticContext(),
+            impulseCube = BufferManager.allocateVec4StaticContext();
 
     protected float resolveCollisionWithCube(Cube cube, boolean iterateBoth){
+        // TODO falta resolver as acelerações (also contato edge/plano)
         Arrays.fill(contactNormal,0);
         float contactDepth = 0F;
         // Resolves point-face collisions
@@ -222,12 +234,91 @@ public class Cube extends RigidBody implements Collideable {
                 VectorTranslator.normalize(contactNormal);
                 MatrixTranslator.multiplyVec4Mat4(contactNormal,cube.rotationMatrix);
                 VectorTranslator.copy(worldVertices[v], worldVertices[v + 1], worldVertices[v + 2], collisionPointWorld);
+
+                // gets the collision point at the other cube
+                VectorTranslator.copy(worldVertices[v], worldVertices[v + 1], worldVertices[v + 2], cubeCollisionPointW);
+                VectorTranslator.scaleVector(contactNormal,contactDepth);
+                VectorTranslator.addToVector(cubeCollisionPointW,contactNormal);
+                VectorTranslator.normalize(contactNormal);
             }
         }
         if(iterateBoth && contactDepth == 0){
             cube.resolveCollisionWithCube(this,false);
         }
         if(contactDepth > 0){
+//            Arrays.fill(velocity,0); // FIXME REMOVE ISSO >:(
+//            Arrays.fill(cube.velocity,0);
+            //FIXME como eu nao to mexendo na aceleração ele vai acumulando até ela 'explodir'
+            // e os cubos entrarem um no outro
+
+            // impulso / resolução de colisão
+            getLocalPointVelocity(collisionPointWorld,collisionPointWorldVelocity);
+            cube.getLocalPointVelocity(cubeCollisionPointW,cubeCollisionPointVelW);
+//            float separatingVelocity = CollisionMath.separatingVelocity(
+//                    collisionPointWorld[0], collisionPointWorld[1], collisionPointWorld[2],
+//                    collisionPointWorldVelocity[0], collisionPointWorldVelocity[1], collisionPointWorldVelocity[2],
+//                    cubeCollisionPointW[0], cubeCollisionPointW[1], cubeCollisionPointW[2], // TODO
+//                    cubeCollisionPointVelW[0], cubeCollisionPointVelW[1], cubeCollisionPointVelW[2] // TODO
+//            );
+
+            float separatingVelocity = CollisionMath.separatingVelocity(
+                   cubeCollisionPointW, collisionPointWorldVelocity,
+                   collisionPointWorld, cubeCollisionPointVelW
+                    // Trocados deliberadamente, presumindo que o ponto do nosso cubo
+                    // estiver dentro do outro cubo, ele vai estar tecnicamente 'separando'
+                    // pois os pontos estarão se movendo para longe um do outro
+            );
+
+            CollisionMath.solveCollision(
+                    invMass,
+                    cube.invMass,
+                    separatingVelocity, contactNormal,
+                    .5F*( getRestitution() + cube.getRestitution()),
+                    impulseSelf, impulseCube
+            );
+
+            VectorTranslator.debugVector("VERTEX IMPULSE",impulseSelf);
+            VectorTranslator.debugVector("FACE IMPULSE",impulseCube);
+            System.out.printf("SEP: %f\n",separatingVelocity);
+            applyImpulse(impulseSelf, collisionPointWorld);
+            cube.applyImpulse(impulseCube, cubeCollisionPointW);
+
+            Gaem3D.context.addObject(new Point(
+                    .05F,cubeCollisionPointW[0],cubeCollisionPointW[1],cubeCollisionPointW[2],1,0,0){
+                int t = 500;
+                @Override public boolean isValid() {
+                    t--; return t > 0;
+                }
+            });
+
+            Line cubeImpulse = new Line(1, 0, 0){
+                int t = 500;
+                @Override public boolean isValid() {
+                    t--; return t > 0;
+                }};
+            cubeImpulse.setStart(cubeCollisionPointW);
+            cubeImpulse.setDirection(impulseCube);
+            Gaem3D.context.addObject(cubeImpulse);
+
+            Gaem3D.context.addObject(new Point(
+                    .05F,collisionPointWorld[0],collisionPointWorld[1],collisionPointWorld[2],0,1,0){
+                int t = 500;
+                @Override public boolean isValid() {
+                    t--; return t > 0;
+                }
+            });
+
+            Line selfImpulse = new Line(0, 1, 0){
+                int t = 500;
+                @Override public boolean isValid() {
+                    t--; return t > 0;
+                }
+            };
+            selfImpulse.setStart(collisionPointWorld);
+            selfImpulse.setDirection(impulseSelf);
+            Gaem3D.context.addObject(selfImpulse);
+
+            // tradução / resolução de contato
             float invMassSum = invMass + cube.invMass;
             VectorTranslator.scaleVector(contactNormal,contactDepth * invMass / invMassSum);
             applyRotationalTranslation(contactNormal,collisionPointWorld);
@@ -255,7 +346,7 @@ public class Cube extends RigidBody implements Collideable {
         return contactDepth;
     }
 
-    private static void isolateAxisWithLargestAbs(float[] vec3){
+    protected static void isolateAxisWithLargestAbs(float[] vec3){
         float absX = Math.abs(vec3[0]), absY = Math.abs(vec3[1]), absZ = Math.abs(vec3[2]);
         if(absX > absY && absX > absZ){
             vec3[1] = 0; vec3[2] = 0;

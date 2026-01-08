@@ -3,6 +3,7 @@ package net.mega2223.aguaengine3d.graphics.objects.modeling;
 import net.mega2223.aguaengine3d.graphics.objects.shadering.ShaderProgram;
 import net.mega2223.aguaengine3d.mathematics.VectorTranslator;
 import net.mega2223.aguaengine3d.misc.Utils;
+import net.mega2223.aguaengine3d.misc.annotations.Modified;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -167,7 +168,8 @@ public class ModelUtils {
         }
     }
 
-    public static void scaleAllVertices(float[] vertices, float factor){
+    //TODO Precisa anotar as coisas aqui
+    public static void scaleAllVertices(@Modified float[] vertices, float factor){
         for (int i = 0; i < vertices.length; i+=4) {
             vertices[i] *= factor; vertices[i+1] *= factor; vertices[i+2] *= factor;
         }
